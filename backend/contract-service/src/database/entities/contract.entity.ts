@@ -10,7 +10,7 @@ export class Contract {
   name_contract: string;
 
   @Column({ type: 'varchar', length: 50 })
-  customer: string;
+  project: string;
 
   @Column({ type: 'int' })
   price: number;

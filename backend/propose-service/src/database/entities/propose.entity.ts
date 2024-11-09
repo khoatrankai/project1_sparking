@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { ListProduct } from './list_product.entity';
 
 @Entity()
 export class Propose {
@@ -7,12 +8,6 @@ export class Propose {
 
   @Column({ type: 'varchar', length: 50 })
   name_propose: string;
-
-  @Column({ type: 'enum', enum: ['OP', 'CT'], default: 'CT' })
-  type_related: string;
-
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  related_id: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_start: Date;
@@ -25,6 +20,9 @@ export class Propose {
 
   @Column({type:'int'})
   price:number
+
+  @Column({ type: 'varchar', length: 50 })
+  contract:string
 
   @Column({ type: 'enum', enum: ['none', 'before', 'after'], default: 'none' })
   type_discount: string;
@@ -52,4 +50,7 @@ export class Propose {
 
   @UpdateDateColumn()
   updated_at:Date
+
+  @OneToMany(() => ListProduct, listProduct => listProduct.product)
+  products: ListProduct[];
 }

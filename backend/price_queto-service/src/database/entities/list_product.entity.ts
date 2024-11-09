@@ -1,0 +1,30 @@
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { PriceQuote } from './price_quote.entity';
+
+@Entity()
+export class ListProduct {
+  @PrimaryColumn({ type: 'varchar', length: 50 })
+  PQ_product_id: string;
+
+  @ManyToOne(() => PriceQuote, priceQuote => priceQuote.price_quote_id)
+  @JoinColumn({ name: 'price_quote_id' })
+  price_quote: PriceQuote;
+
+  @Column({ type: 'varchar', length: 50 })
+  product: string;
+
+  @Column({type:'int'})
+  price:number
+
+  @Column({type:'int'})
+  quantity:number
+
+  @Column({type:'int'})
+  vat:number
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
+}

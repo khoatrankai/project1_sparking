@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PriceQuoteController } from './price_quote.controller';
 import { PriceQuoteService } from './price_quote.service';
-import { PriceQuote } from 'src/database/entities/price_queto.entity';
+import { PriceQuote } from 'src/database/entities/price_quote.entity';
 
 
 @Module({

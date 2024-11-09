@@ -1,108 +1,79 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { CreatePriceQuoteDto } from 'src/dto/create_price_quote.dto';
+import {  Injectable, NotFoundException } from '@nestjs/common';
+import { CreatePriceQuoteDto } from 'src/dto/PriceQuoteDto/create_price_quote.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PriceQuote } from 'src/database/entities/price_queto.entity';
+import { PriceQuote } from 'src/database/entities/price_quote.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
-import { UpdatePriceQuoteDto } from 'src/dto/update_price_quote.dto';
-import { GetFilterPriceQuoteDto } from 'src/dto/get_filter_price_quote.dto';
+import {Repository } from 'typeorm';
+import { UpdatePriceQuoteDto } from 'src/dto/PriceQuoteDto/update_price_quote.dto';
+import { CreateListProductDto } from 'src/dto/ListProductDto/create_list_product.dto';
+import { ListProduct } from 'src/database/entities/list_product.entity';
+import { UpdateListProductDto } from 'src/dto/ListProductDto/update_list_product.dto';
 
 
 @Injectable()
 export class PriceQuoteService {
 
-  constructor(@InjectRepository(PriceQuote) private readonly priceQuoteRepository:Repository<PriceQuote>){}
+  constructor(@InjectRepository(PriceQuote) private readonly priceQuoteRepository:Repository<PriceQuote>, @InjectRepository(ListProduct)
+  private listProductRepository: Repository<ListProduct>){}
   getHello(): string {
     return 'Hello World!';
   }
-  async createPriceQuote(createPriceQuote: CreatePriceQuoteDto) {
-    try {
-      const id = uuidv4();
-      const newPriceQuote = this.priceQuoteRepository.create({
-        ...createPriceQuote,
-        price_quote_id: id,
-      });
-      await this.priceQuoteRepository.save(newPriceQuote);
-
-      return {
-        statusCode: HttpStatus.CREATED,
-      };
-    } catch {
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-      };
-    }
+  async createPriceQuote(createPriceQuoteDto: CreatePriceQuoteDto): Promise<PriceQuote> {
+    const priceQuote = this.priceQuoteRepository.create({...createPriceQuoteDto,price_quote_id:uuidv4()});
+    return await this.priceQuoteRepository.save(priceQuote);
   }
 
-  async updatePriceQuote(updatePriceQuote: UpdatePriceQuoteDto) {
-    try {
-      await this.priceQuoteRepository.update(
-        updatePriceQuote.price_quote_id,
-        updatePriceQuote,
-      );
-      return {
-        statusCode: HttpStatus.OK,
-      };
-    } catch {
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-      };
+  async findOnePriceQuote(id: string) {
+    const priceQuote = await this.priceQuoteRepository.findOne({ where: { price_quote_id: id },relations: ['products'] });
+    if (!priceQuote) {
+      throw new NotFoundException(`PriceQuote with ID ${id} not found`);
     }
+    return priceQuote;
   }
 
-  async getFilterPriceQuote(getFilterPriceQuote: GetFilterPriceQuoteDto) {
-    const type_date = Number(getFilterPriceQuote.type_date) ?? null;
-    const date_start = getFilterPriceQuote.date_start ? new Date(getFilterPriceQuote.date_start) : null;
-    const date_expired = getFilterPriceQuote.date_expired ? new Date(getFilterPriceQuote.date_expired) : null;
-    const status = getFilterPriceQuote.status ?? null;
-    const staff_support = getFilterPriceQuote.staff_support ?? null;
-  
-    const whereCondition: any = {};
-  
-    // Lọc theo staff_support
-    if (staff_support) {
-      whereCondition.staff_support = staff_support;
-    }
-  
-    // Lọc theo khoảng thời gian (date_start và date_expired)
-    if (date_start || date_expired) {
-      if (!type_date) {
-        if (date_start && date_expired) {
-          whereCondition.date_start = Between(date_start, date_expired);
-        } else {
-          if (date_start) {
-            whereCondition.date_start = MoreThanOrEqual(date_start);
-          }
-          if (date_expired) {
-            whereCondition.date_start = LessThanOrEqual(date_expired);
-          }
-        }
-      } else {
-        if (date_start && date_expired) {
-          whereCondition.date_expired = Between(date_start, date_expired);
-        } else {
-          if (date_start) {
-            whereCondition.date_expired = MoreThanOrEqual(date_start);
-          }
-          if (date_expired) {
-            whereCondition.date_expired = LessThanOrEqual(date_expired);
-          }
-        }
-      }
-    }
-  
-    // Lọc theo status
-    if (status) {
-      whereCondition.status = status;
-    }
-  
-    // Lấy dữ liệu từ repository dựa trên điều kiện whereCondition
-    const result = await this.priceQuoteRepository.find({
-      where: whereCondition,
-    });
-  
-    return result;
+  async findAllPriceQuote() {
+    return await this.priceQuoteRepository.find({ relations: ['products'] });
   }
+
+  async updatePriceQuote(id: string, updatePriceQuoteDto: UpdatePriceQuoteDto) {
+    await this.priceQuoteRepository.update(id, updatePriceQuoteDto);
+    const updatedPriceQuote = await this.priceQuoteRepository.findOne({ where: { price_quote_id: id } });
+    if (!updatedPriceQuote) {
+      throw new NotFoundException(`PriceQuote with ID ${id} not found`);
+    }
+    return updatedPriceQuote;
+  }
+
+
+  async createListProduct(createListProductDto: CreateListProductDto) {
+    const priceQuote = await this.priceQuoteRepository.findOne({where:{price_quote_id:createListProductDto.price_quote}})
+    const listProduct = this.listProductRepository.create({...createListProductDto,price_quote:priceQuote,PQ_product_id:uuidv4()});
+    return await this.listProductRepository.save(listProduct);
+  }
+
+  async findOneListProduct(id: string) {
+    const listProduct = await this.listProductRepository.findOne({ where: { PQ_product_id: id } });
+    if (!listProduct) {
+      throw new NotFoundException('ListProduct not found');
+    }
+    return listProduct;
+  }
+
+  async findAllListProduct() {
+    return await this.listProductRepository.find();
+  }
+
+  async updateListProduct(id: string, updateListProductDto: UpdateListProductDto) {
+    return await this.listProductRepository.update(id,updateListProductDto);
+  }
+
+  async removeListProduct(id: string) {
+    const result = await this.listProductRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('ListProduct not found');
+    }
+  }
+ 
  
 }

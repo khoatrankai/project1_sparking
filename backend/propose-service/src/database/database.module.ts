@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Propose } from './entities/propose.entity';
+import { ListProduct } from './entities/list_product.entity';
 
 
 @Module({
@@ -12,7 +13,7 @@ import { Propose } from './entities/propose.entity';
       username: 'root',
       password: '123456789',
       database: 'db_sparking_4',
-      entities: [Propose],
+      entities: [Propose,ListProduct],
       // synchronize: true,
       // dropSchema: true,
     }),
