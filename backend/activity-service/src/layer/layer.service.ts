@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import {  Repository } from 'typeorm';
@@ -30,6 +30,8 @@ import { UpdateStatusWorkDto } from 'src/dto/StatusWorkDto/update-status_activit
 import { CreatePictureWorkDto } from 'src/dto/PicturesWorkDto/get-picture_work.dto';
 import { CreateListUserDto } from 'src/dto/ListUserDto/create-list_user.dto';
 import { UpdateListUserDto } from 'src/dto/ListUserDto/update-list_user.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 
 
 
@@ -37,7 +39,7 @@ import { UpdateListUserDto } from 'src/dto/ListUserDto/update-list_user.dto';
 @Injectable()
 export class LayerService {
 
-  constructor(@InjectRepository(Activities)
+  constructor(@Inject('USER') private readonly usersClient:ClientProxy,@InjectRepository(Activities)
   private readonly activitiesRepository: Repository<Activities>,@InjectRepository(TypeActivities)
   private readonly typeActivitiesRepository: Repository<TypeActivities>, @InjectRepository(StatusActivities)
   private readonly statusActivitiesRepository: Repository<StatusActivities>, @InjectRepository(PictureActivity)
@@ -54,260 +56,279 @@ export class LayerService {
     return 'Hello World!';
   }
   async createActivity(createActivityDto: CreateActivityDto) {
-    const type = await this.typeActivitiesRepository.findOne({where:{type_activity_id:createActivityDto.type}})
-    const status = await this.statusActivitiesRepository.findOne({where:{status_activity_id:createActivityDto.status}})
-    const newActivity = this.activitiesRepository.create({...createActivityDto,activity_id:uuidv4(),type,status});
-    return await this.activitiesRepository.save(newActivity);
+    const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: createActivityDto.type } });
+    const status = await this.statusActivitiesRepository.findOne({ where: { status_activity_id: createActivityDto.status } });
+    const newActivity = this.activitiesRepository.create({ ...createActivityDto, activity_id: uuidv4(), type, status });
+    const result = await this.activitiesRepository.save(newActivity);
+    return { statusCode: HttpStatus.CREATED, message: 'Activity created successfully', data: result };
   }
-
-  // Update an existing activity by ID
+  
   async updateActivity(activity_id: string, updateActivityDto: UpdateActivityDto) {
-    const type = await this.typeActivitiesRepository.findOne({where:{type_activity_id:updateActivityDto.type}})
-    const status = await this.statusActivitiesRepository.findOne({where:{status_activity_id:updateActivityDto.status}})
-    return await this.activitiesRepository.update(activity_id,{...updateActivityDto,type,status});
+    const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: updateActivityDto.type } });
+    const status = await this.statusActivitiesRepository.findOne({ where: { status_activity_id: updateActivityDto.status } });
+    const result = await this.activitiesRepository.update(activity_id, { ...updateActivityDto, type, status });
+    return { statusCode: HttpStatus.OK, message: 'Activity updated successfully', data: result };
   }
-
-  // Get a single activity by ID
+  
   async getActivity(activity_id: string) {
     const activity = await this.activitiesRepository.findOne({
       where: { activity_id },
       relations: ['type', 'status', 'picture_urls', 'list_code_product'],
     });
-    if (!activity) {
-      throw new NotFoundException(`Activity with ID ${activity_id} not found`);
-    }
-    return activity;
+    if (!activity) throw new NotFoundException(`Activity with ID ${activity_id} not found`);
+    return { statusCode: HttpStatus.OK, data: activity };
   }
-
-  // Get all activities (optional)
+  
   async getAllActivities() {
-    return await this.activitiesRepository.find({
-      relations: ['type', 'status', 'picture_urls', 'list_code_product'],
-    });
+    const activities = await this.activitiesRepository.find({ relations: ['type', 'status', 'picture_urls', 'list_code_product'] });
+    return { statusCode: HttpStatus.OK, data: activities };
   }
-
+  
   async createTypeActivities(createTypeActivitiesDto: CreateTypeActivitiesDto) {
-    const newTypeActivity = this.typeActivitiesRepository.create(createTypeActivitiesDto);
-    return await this.typeActivitiesRepository.save(newTypeActivity);
+    const newTypeActivity = this.typeActivitiesRepository.create({ ...createTypeActivitiesDto, type_activity_id: uuidv4() });
+    const result = await this.typeActivitiesRepository.save(newTypeActivity);
+    return { statusCode: HttpStatus.CREATED, message: 'Type Activity created successfully', data: result };
   }
-
+  
   async updateTypeActivities(type_activity_id: string, updateTypeActivitiesDto: UpdateTypeActivitiesDto) {
-    return await this.typeActivitiesRepository.update(type_activity_id,updateTypeActivitiesDto);
+    const result = await this.typeActivitiesRepository.update(type_activity_id, updateTypeActivitiesDto);
+    return { statusCode: HttpStatus.OK, message: 'Type Activity updated successfully', data: result };
   }
-
+  
   async getTypeActivities(type_activity_id: string) {
     const typeActivity = await this.typeActivitiesRepository.findOne({
       where: { type_activity_id },
       relations: ['activity', 'status'],
     });
     if (!typeActivity) throw new NotFoundException(`TypeActivity with ID ${type_activity_id} not found`);
-    return typeActivity;
+    return { statusCode: HttpStatus.OK, data: typeActivity };
   }
-
+  
   async getAllTypeActivities() {
-    const typeActivity = await this.typeActivitiesRepository.find({
-      relations: ['activity', 'status'],
-    });
-    if (!typeActivity) throw new NotFoundException(`TypeActivity not found`);
-    return typeActivity;
+    const typeActivities = await this.typeActivitiesRepository.find({ relations: ['activity', 'status'] });
+    return { statusCode: HttpStatus.OK, data: typeActivities };
   }
-
-
+  
   async createStatusActivities(createStatusActivitiesDto: CreateStatusActivitiesDto) {
-    const type = await this.typeActivitiesRepository.findOne({where:{type_activity_id:createStatusActivitiesDto.type_activity}})
-    const newStatusActivity = this.statusActivitiesRepository.create({...createStatusActivitiesDto,type_activity:type});
-    return await this.statusActivitiesRepository.save(newStatusActivity);
+    const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: createStatusActivitiesDto.type_activity } });
+    const newStatusActivity = this.statusActivitiesRepository.create({ ...createStatusActivitiesDto, type_activity: type, status_activity_id: uuidv4() });
+    const result = await this.statusActivitiesRepository.save(newStatusActivity);
+    return { statusCode: HttpStatus.CREATED, message: 'Status Activity created successfully', data: result };
   }
-
-  async updateStatusActivities(status_activity_id: string, updateStatusActivitiesDto: UpdateStatusActivitiesDto){
-    const type = await this.typeActivitiesRepository.findOne({where:{type_activity_id:updateStatusActivitiesDto.type_activity}})
-    return await this.statusActivitiesRepository.update(status_activity_id,{...updateStatusActivitiesDto,type_activity:type});
+  
+  async updateStatusActivities(status_activity_id: string, updateStatusActivitiesDto: UpdateStatusActivitiesDto) {
+    const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: updateStatusActivitiesDto.type_activity } });
+    const result = await this.statusActivitiesRepository.update(status_activity_id, { ...updateStatusActivitiesDto, type_activity: type });
+    return { statusCode: HttpStatus.OK, message: 'Status Activity updated successfully', data: result };
   }
-
-  async getStatusActivities(status_activity_id: string){
+  
+  async getStatusActivities(status_activity_id: string) {
     const statusActivity = await this.statusActivitiesRepository.findOne({
       where: { status_activity_id },
       relations: ['activity', 'type_activity'],
     });
     if (!statusActivity) throw new NotFoundException(`StatusActivity with ID ${status_activity_id} not found`);
-    return statusActivity;
+    return { statusCode: HttpStatus.OK, data: statusActivity };
   }
-
-  async getAllStatusActivities(status_activity_id: string){
-    const statusActivity = await this.statusActivitiesRepository.find({
-      relations: ['activity', 'type_activity'],
-    });
-    if (!statusActivity) throw new NotFoundException(`StatusActivity with ID ${status_activity_id} not found`);
-    return statusActivity;
+  
+  async getAllStatusActivities() {
+    const statusActivities = await this.statusActivitiesRepository.find({ relations: ['activity', 'type_activity'] });
+    return { statusCode: HttpStatus.OK, data: statusActivities };
   }
-
-
+  
   async createPictureActivity(createPictureActivityDto: CreatePictureActivityDto[]) {
-    const activity = await this.activitiesRepository.findOne({where:{activity_id:createPictureActivityDto[0].activity}})
-    const newPictureActivity = this.pictureActivityRepository.create(createPictureActivityDto.map((dt)=>{return {...dt,activity}}));
-    return await this.pictureActivityRepository.save(newPictureActivity);
+    const activity = await this.activitiesRepository.findOne({ where: { activity_id: createPictureActivityDto[0].activity } });
+    const newPictureActivity = this.pictureActivityRepository.create(createPictureActivityDto.map((dt) => ({ ...dt, activity })));
+    const result = await this.pictureActivityRepository.save(newPictureActivity);
+    return { statusCode: HttpStatus.CREATED, message: 'Picture Activity created successfully', data: result };
   }
-
- 
+  
   async getAllPictureActivity(activity_id: string) {
-    const activity = await this.activitiesRepository.findOne({where:{activity_id}})
-    const pictureActivity = await this.pictureActivityRepository.find({ where: { activity:activity }, relations: ['activity'] });
+    const activity = await this.activitiesRepository.findOne({ where: { activity_id } });
+    const pictureActivity = await this.pictureActivityRepository.find({ where: { activity }, relations: ['activity'] });
     if (!pictureActivity) throw new NotFoundException(`PictureActivity not found`);
-    return pictureActivity;
+    return { statusCode: HttpStatus.OK, data: pictureActivity };
   }
- 
-
+  
   async createListCodeProduct(createListCodeProductDto: CreateListCodeProductDto[]) {
-    const activity = await this.activitiesRepository.findOne({where:{activity_id:createListCodeProductDto[0].activity}})
-    const newListCodeProduct = this.listCodeProductRepository.create(createListCodeProductDto.map((dt)=>{return {...dt,activity}}));
-    return await this.listCodeProductRepository.save(newListCodeProduct);
+    const activity = await this.activitiesRepository.findOne({ where: { activity_id: createListCodeProductDto[0].activity } });
+    const newListCodeProduct = this.listCodeProductRepository.create(createListCodeProductDto.map((dt) => ({ ...dt, activity })));
+    const result = await this.listCodeProductRepository.save(newListCodeProduct);
+    return { statusCode: HttpStatus.CREATED, message: 'List Code Product created successfully', data: result };
   }
-
+  
   async updateListCodeProduct(list_id: string, updateListCodeProductDto: UpdateListCodeProductDto) {
-    return await this.listCodeProductRepository.update(list_id,updateListCodeProductDto);
+    const result = await this.listCodeProductRepository.update(list_id, updateListCodeProductDto);
+    return { statusCode: HttpStatus.OK, message: 'List Code Product updated successfully', data: result };
   }
-
+  
   async getListCodeProduct(list_id: string) {
     const listCodeProduct = await this.listCodeProductRepository.findOne({ where: { list_id }, relations: ['activity'] });
     if (!listCodeProduct) throw new NotFoundException(`ListCodeProduct with ID ${list_id} not found`);
-    return listCodeProduct;
+    return { statusCode: HttpStatus.OK, data: listCodeProduct };
   }
-
+  
   async getAllListCodeProduct(activity_id: string) {
-    const activity = await this.activitiesRepository.findOne({where:{activity_id}})
+    const activity = await this.activitiesRepository.findOne({ where: { activity_id } });
     const listCodeProduct = await this.listCodeProductRepository.find({ where: { activity } });
-    if (!listCodeProduct) throw new NotFoundException(`ListCodeProduct not found`);
-    return listCodeProduct;
+    return { statusCode: HttpStatus.OK, data: listCodeProduct };
   }
 
 
 
   async createWork(createWorkDto: CreateWorkDto) {
-    const activity = await this.activitiesRepository.findOne({where:{activity_id:createWorkDto.activity}})
-    const type = await this.typeWorkRepository.findOne({where:{type_work_id:createWorkDto.type}})
-    const status = await this.statusWorkRepository.findOne({where:{status_work_id:createWorkDto.status}})
-    const newWork = this.worksRepository.create({...createWorkDto,work_id:uuidv4(),type,status,activity});
-    return await this.worksRepository.save(newWork);
+    const activity = await this.activitiesRepository.findOne({ where: { activity_id: createWorkDto.activity } });
+    const type = await this.typeWorkRepository.findOne({ where: { type_work_id: createWorkDto.type } });
+    const status = await this.statusWorkRepository.findOne({ where: { status_work_id: createWorkDto.status } });
+    const newWork = this.worksRepository.create({ ...createWorkDto, work_id: uuidv4(), type, status, activity });
+    const savedWork = await this.worksRepository.save(newWork);
+    return { statusCode: HttpStatus.CREATED, data: savedWork };
   }
-
-  // Update an existing activity by ID
+  
   async updateWork(work_id: string, updateWorkDto: UpdateWorkDto) {
-    const activity = await this.activitiesRepository.findOne({where:{activity_id:updateWorkDto.activity}})
-    const type = await this.typeWorkRepository.findOne({where:{type_work_id:updateWorkDto.type}})
-    const status = await this.statusWorkRepository.findOne({where:{status_work_id:updateWorkDto.status}})
-    return await this.worksRepository.update(work_id,{...updateWorkDto,type,status,activity});
+    const activity = await this.activitiesRepository.findOne({ where: { activity_id: updateWorkDto.activity } });
+    const type = await this.typeWorkRepository.findOne({ where: { type_work_id: updateWorkDto.type } });
+    const status = await this.statusWorkRepository.findOne({ where: { status_work_id: updateWorkDto.status } });
+    const updatedWork = await this.worksRepository.update(work_id, { ...updateWorkDto, type, status, activity });
+    return { statusCode: HttpStatus.OK, data: updatedWork };
   }
-
-  // Get a single activity by ID
+  
   async getWork(work_id: string) {
     const work = await this.worksRepository.findOne({
       where: { work_id },
       relations: ['type', 'status', 'picture_urls', 'list_user'],
     });
+    const userIds = work.list_user.map((dt)=>{
+      return dt.user
+    })
+    const dataUsers = await firstValueFrom(this.usersClient.send({cmd:'get-user_ids'},userIds))
+    // const dataListUser = await Promise.all(work.list_user.map(async dt=>{
+    //   const data = await firstValueFrom(this.usersClient.send({cmd:'get-user_id'},dt.user))
+    //   return data
+    // }))
+    
+    const dataRes = {...work,list_user:dataUsers}
     if (!work) {
       throw new NotFoundException(`Activity not found`);
     }
-    return work;
+    return { statusCode: HttpStatus.OK, data: dataRes };
   }
-
-  // Get all activities (optional)
+  
   async getAllWork() {
-    return await this.worksRepository.find({
+    const works = await this.worksRepository.find({
       relations: ['type', 'status', 'picture_urls', 'list_user'],
     });
+    return { statusCode: HttpStatus.OK, data: works };
   }
-
+  
   async createTypeWork(createTypeWorkDto: CreateTypeWorkDto) {
-    const newTypeWork = this.typeWorkRepository.create(createTypeWorkDto);
-    return await this.typeWorkRepository.save(newTypeWork);
+    const newTypeWork = this.typeWorkRepository.create({...createTypeWorkDto,type_work_id:uuidv4()});
+    const savedTypeWork = await this.typeWorkRepository.save(newTypeWork);
+    return { statusCode: HttpStatus.CREATED, data: savedTypeWork };
   }
-
+  
   async updateTypeWork(type_work_id: string, updateTypeWorkDto: UpdateTypeWorkDto) {
-    return await this.typeWorkRepository.update(type_work_id,updateTypeWorkDto);
+    const updatedTypeWork = await this.typeWorkRepository.update(type_work_id, updateTypeWorkDto);
+    return { statusCode: HttpStatus.OK, data: updatedTypeWork };
   }
-
+  
   async getTypeWork(type_work_id: string) {
     const typeWork = await this.typeWorkRepository.findOne({
       where: { type_work_id },
       relations: ['work', 'status'],
     });
-    if (!typeWork) throw new NotFoundException(`TypeActivity with ID ${typeWork} not found`);
-    return typeWork;
+    if (!typeWork) {
+      throw new NotFoundException(`TypeActivity with ID ${type_work_id} not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: typeWork };
   }
-
+  
   async getAllTypeWork() {
     const typeWork = await this.typeWorkRepository.find({
       relations: ['work', 'status'],
     });
-    if (!typeWork) throw new NotFoundException(`TypeActivity not found`);
-    return typeWork;
+    if (!typeWork) {
+      throw new NotFoundException(`TypeActivity not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: typeWork };
   }
-
-
+  
   async createStatusWork(createStatusWorkDto: CreateStatusWorkDto) {
-    const type = await this.typeWorkRepository.findOne({where:{type_work_id:createStatusWorkDto.type_work}})
-    const newStatusWork = this.statusWorkRepository.create({...createStatusWorkDto,type_work:type});
-    return await this.statusWorkRepository.save(newStatusWork);
+    const type = await this.typeWorkRepository.findOne({ where: { type_work_id: createStatusWorkDto.type_work } });
+    const newStatusWork = this.statusWorkRepository.create({ ...createStatusWorkDto, type_work: type,status_work_id:uuidv4() });
+    const savedStatusWork = await this.statusWorkRepository.save(newStatusWork);
+    return { statusCode: HttpStatus.CREATED, data: savedStatusWork };
   }
-
-  async updateStatusWork(status_work_id: string, updateStatusWorkDto: UpdateStatusWorkDto){
-    const type = await this.typeWorkRepository.findOne({where:{type_work_id:updateStatusWorkDto.type_work}})
-    return await this.statusWorkRepository.update(status_work_id,{...updateStatusWorkDto,type_work:type});
+  
+  async updateStatusWork(status_work_id: string, updateStatusWorkDto: UpdateStatusWorkDto) {
+    const type = await this.typeWorkRepository.findOne({ where: { type_work_id: updateStatusWorkDto.type_work } });
+    const updatedStatusWork = await this.statusWorkRepository.update(status_work_id, { ...updateStatusWorkDto, type_work: type });
+    return { statusCode: HttpStatus.OK, data: updatedStatusWork };
   }
-
-  async getStatusWork(status_work_id: string){
+  
+  async getStatusWork(status_work_id: string) {
     const statusWork = await this.statusWorkRepository.findOne({
       where: { status_work_id },
       relations: ['work', 'type_work'],
     });
-    if (!statusWork) throw new NotFoundException(`StatusActivity with ID ${status_work_id} not found`);
-    return statusWork;
+    if (!statusWork) {
+      throw new NotFoundException(`StatusActivity with ID ${status_work_id} not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: statusWork };
   }
-
-  async getAllStatusWork(){
+  
+  async getAllStatusWork() {
     const statusWork = await this.statusWorkRepository.find({
       relations: ['activity', 'type_activity'],
     });
-    if (!statusWork) throw new NotFoundException(`StatusActivity with } not found`);
-    return statusWork;
+    if (!statusWork) {
+      throw new NotFoundException(`StatusActivity not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: statusWork };
   }
-
-
+  
   async createPictureWork(createPictureWork: CreatePictureWorkDto[]) {
-    const work = await this.worksRepository.findOne({where:{work_id:createPictureWork[0].work}})
-    const newPictureWork = this.pictureWorkRepository.create(createPictureWork.map((dt)=>{return {...dt,work}}));
-    return await this.pictureActivityRepository.save(newPictureWork);
+    const work = await this.worksRepository.findOne({ where: { work_id: createPictureWork[0].work } });
+    const newPictureWork = this.pictureWorkRepository.create(createPictureWork.map((dt) => { return { ...dt, work }; }));
+    const savedPictureWork = await this.pictureActivityRepository.save(newPictureWork);
+    return { statusCode: HttpStatus.CREATED, data: savedPictureWork };
   }
-
- 
+  
   async getAllPictureWork(work_id: string) {
-    const work = await this.worksRepository.findOne({where:{work_id}})
+    const work = await this.worksRepository.findOne({ where: { work_id } });
     const pictureWork = await this.pictureWorkRepository.find({ where: { work }, relations: ['work'] });
-    if (!pictureWork) throw new NotFoundException(`PicturepictureWork not found`);
-    return pictureWork;
+    if (!pictureWork) {
+      throw new NotFoundException(`PictureWork not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: pictureWork };
   }
- 
-
+  
   async createListUser(createListUserDto: CreateListUserDto[]) {
-    const work = await this.worksRepository.findOne({where:{work_id:createListUserDto[0].work}})
-    const newListUser = this.listUserRepository.create(createListUserDto.map((dt)=>{return {...dt,work}}));
-    return await this.listUserRepository.save(newListUser);
+    const work = await this.worksRepository.findOne({ where: { work_id: createListUserDto[0].work } });
+    const newListUser = this.listUserRepository.create(createListUserDto.map((dt) => { return { ...dt, work,list_id:uuidv4() }; }));
+    const savedListUser = await this.listUserRepository.save(newListUser);
+    return { statusCode: HttpStatus.CREATED, data: savedListUser };
   }
-
+  
   async updateListUser(list_id: string, updateListUserDto: UpdateListUserDto) {
-    return await this.listUserRepository.update(list_id,updateListUserDto);
+    const updatedListUser = await this.listUserRepository.update(list_id, updateListUserDto);
+    return { statusCode: HttpStatus.OK, data: updatedListUser };
   }
-
+  
   async getListUser(list_id: string) {
     const listUser = await this.listUserRepository.findOne({ where: { list_id }, relations: ['work'] });
-    if (!listUser) throw new NotFoundException(`ListUser with ID ${list_id} not found`);
-    return listUser;
+    if (!listUser) {
+      throw new NotFoundException(`ListUser with ID ${list_id} not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: listUser };
   }
-
+  
   async getAllListUser(work_id: string) {
-    const work = await this.worksRepository.findOne({where:{work_id}})
+    const work = await this.worksRepository.findOne({ where: { work_id } });
     const listUser = await this.listUserRepository.find({ where: { work } });
-    if (!listUser) throw new NotFoundException(`ListUser not found`);
-    return listUser;
+    if (!listUser) {
+      throw new NotFoundException(`ListUser not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: listUser };
   }
 }

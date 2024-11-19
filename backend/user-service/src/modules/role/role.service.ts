@@ -75,6 +75,34 @@ export class RoleService {
  
   }
 
+  async checkRoleUser(user_id:string,name_tag:string){
+    try{
+     const user = await this.accountUserRepository.findOne({where:{user_id}})
+     const role = await this.roleTypeUserRepository.findOne({where:{name_tag:name_tag}})
+     if (!user || !role) {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+     const check = await this.roleUserRepository.findOne({where:{user_info:user,role_type:role,status:true}})
+     if(check){
+      return {
+        statusCode:HttpStatus.OK
+      }
+     }
+     return {
+      statusCode:HttpStatus.BAD_REQUEST
+    }
+     
+
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST
+      }
+    }
+ 
+  }
+
   async updateRoleUser(updateRoleUser:UpdateRoleUserDto){
     try{
       await this.roleUserRepository.update(updateRoleUser.role_id,updateRoleUser)

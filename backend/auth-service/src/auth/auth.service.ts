@@ -31,6 +31,13 @@ export class AuthService {
 
 
   async register(otpUserDto:CreateUserDto){
+    const checkUser =  await firstValueFrom(this.usersClient.send({cmd:'login-user'},otpUserDto.email))
+
+    if(checkUser){
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,message:'Tài khoản đã tồn tại'
+      }
+    }
     const secret = speakeasy.generateSecret({ length: 20 }).base32
     const otp = speakeasy.totp({
       secret: secret, 
@@ -70,7 +77,7 @@ export class AuthService {
   async login(userLoginDto:UserLoginDto){
     const user = await firstValueFrom(this.usersClient.send({cmd:'login-user'},userLoginDto.email))
     if(user){
-      const payload = {email : user.email,sub: user.user_id}
+      const payload = {email : user.email,sub: user.user_id,role:'admin'}
       const accessToken = this.jwtService.sign(payload, { expiresIn: process.env['JWT_ACCESS_TOKEN_EXPIRES_IN'] });
       const refreshToken = this.jwtService.sign(payload, { expiresIn: process.env['JWT_REFRESH_TOKEN_EXPIRES_IN'] });
       return {accessToken,refreshToken}
@@ -83,7 +90,7 @@ export class AuthService {
         secret: process.env['JWT_ACCESS_TOKEN_SECRET'],
       });
 
-      const newAccessToken = this.jwtService.sign({ sub: payload.sub }, { expiresIn: process.env['JWT_ACCESS_TOKEN_EXPIRES_IN'] });
+      const newAccessToken = this.jwtService.sign({ ...payload }, { expiresIn: process.env['JWT_ACCESS_TOKEN_EXPIRES_IN'] });
       return {newAccessToken}
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');

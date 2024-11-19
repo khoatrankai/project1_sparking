@@ -13,6 +13,11 @@ export class UpdateCustomerInfoDto {
 
   @IsString()
   @Length(1, 50)
+  @IsOptional()
+  opportunity?: string;
+
+  @IsString()
+  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   group_customer?: string; // ID của GroupCustomer
 

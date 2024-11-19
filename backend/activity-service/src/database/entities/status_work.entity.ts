@@ -13,7 +13,7 @@ export class StatusWork {
   name_tag: string;
 
   @ManyToOne(() => TypeWork,typework => typework.status)
-  @JoinColumn({ name: 'type' })
+  @JoinColumn({ name: 'type_work' })
   type_work: TypeWork;
 
   @OneToMany(() => Works, work => work.status)

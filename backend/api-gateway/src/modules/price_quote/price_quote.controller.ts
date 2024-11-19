@@ -1,9 +1,9 @@
-import {  Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
+import {  Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 // import { PriceQuetoService } from './price_queto.service';
-import { CreatePriceQuoteDto } from './dto/create_price_quote.dto';
-import { UpdatePriceQuoteDto } from './dto/update_price_quote.dto';
 import { PriceQuoteService } from './price_quote.service';
-import { GetFilterPriceQuoteDto } from './dto/get_filter_price_quote.dto';
+import { CreatePriceQuoteDto } from './dto/PriceQuoteDto/create_price_quote.dto';
+import { UpdatePriceQuoteDto } from './dto/PriceQuoteDto/update_price_quote.dto';
+import { PriceQuoteFilterDto } from './dto/PriceQuoteDto/get_filter_price_quote.dto';
 
 
 
@@ -17,6 +17,17 @@ export class PriceQuoteController {
     return this.priceQuetoService.getHello();
   }
 
+  @Get('all')
+  getAll(@Query() filter?:PriceQuoteFilterDto) {
+    return this.priceQuetoService.sendGetPriceQueto(filter);
+  }
+
+  @Get('id/:id')
+  getOne(@Param() data:{id:string}) {
+    console.log(data.id)
+    return this.priceQuetoService.sendGetPriceQuetoID(data.id);
+  }
+
   @Post()
   async createPriceQuote(@Body() createPriceQuoteDto: CreatePriceQuoteDto) {
     return this.priceQuetoService.sendCreatePriceQueto(createPriceQuoteDto);
@@ -27,9 +38,9 @@ export class PriceQuoteController {
     return this.priceQuetoService.sendUpdatePriceQueto(updatePriceQuoteDto);
   }
 
-  @Get('get-filter')
-  async getFilterPriceQuote(@Query() getFilterPriceQuoteDto: GetFilterPriceQuoteDto) {
-    return this.priceQuetoService.sendGetFilterPriceQuote(getFilterPriceQuoteDto);
-  }
+  // @Get('get-filter')
+  // async getFilterPriceQuote(@Query() getFilterPriceQuoteDto: GetFilterPriceQuoteDto) {
+  //   return this.priceQuetoService.sendGetFilterPriceQuote(getFilterPriceQuoteDto);
+  // }
   
 }

@@ -6,7 +6,7 @@ export class CreateListProductDto {
   PQ_product_id: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   price_quote: string;
 
   @IsString()
@@ -21,7 +21,6 @@ export class CreateListProductDto {
   @Min(1)
   quantity: number;
 
-  @IsInt()
-  @Min(0)
-  vat: number;
+  @IsString()
+  vat: string;
 }

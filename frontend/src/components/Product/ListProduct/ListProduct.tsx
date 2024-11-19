@@ -1,7 +1,4 @@
-import useFetchData from "@/hooks/useFetchData";
-import { ProductInfo } from "@/models/productInterface"; // Updated import
-import { Vat } from "@/models/systemInterface";
-import systemService from "@/services/systemService";
+import { IGetProductInfo } from "@/models/productInterface"; // Updated import
 import {
   Button,
   Dropdown,
@@ -17,26 +14,30 @@ import { FaArrowsRotate } from "react-icons/fa6";
 import ModalUpdateProduct from "../ToolProduct/ModalProduct/ModalUpdateProduct";
 import productService from "@/services/productService";
 import usePostData from "@/hooks/usePostData";
+import { AppDispatch, RootState } from "@/redux/store/store";
+import { useSelector } from "react-redux";
+import { fetchProductAbout } from "@/redux/store/slices/productSlices/get_about.slice";
+import { useDispatch } from "react-redux";
 // import ModalUpdateProduct from "../ToolProduct/ModalProduct/ModalUpdateProduct"
 
-type Props = {
-  dataSource?: ProductInfo[] | [];
-  handleRefreshData: () => void;
-};
-
-export default function ListProduct({ dataSource, handleRefreshData }: Props) {
+export default function ListProduct() {
   const { postdata } = usePostData();
-  const { data: dataVats } = useFetchData<Vat[]>(systemService.getVats);
-
-  const [pageLimit, setPageLimit] = useState<number>(25);
-  const [dataFilter, setDataFilter] = useState<ProductInfo[] | [] | undefined>(
-    dataSource
+  const dispatch = useDispatch<AppDispatch>();
+  const { datas: dataVats } = useSelector(
+    (state: RootState) => state.vat_system
   );
 
-  const columns: TableColumnsType<ProductInfo> = [
+  const [pageLimit, setPageLimit] = useState<number>(25);
+  const [dataFilter, setDataFilter] = useState<
+    IGetProductInfo[] | [] | undefined
+  >();
+  const { datas: dataSource } = useSelector(
+    (state: RootState) => state.info_products
+  );
+  const columns: TableColumnsType<IGetProductInfo> = [
     {
       title: "#",
-      className: "text-xs",
+      className: "text-xl",
       dataIndex: "product_id",
       render: (value: string, record, index) => (
         <div className="flex flex-col gap-1 ">
@@ -44,47 +45,47 @@ export default function ListProduct({ dataSource, handleRefreshData }: Props) {
             #{index + 1}.{`${value.slice(0, 10)}...`}
           </strong>
           <div className="flex gap-2">
-            <Button type="text" ghost className="text-xs text-blue-600">
+            <Button type="text" ghost className="text-xl text-blue-600">
               View
             </Button>
-            <ModalUpdateProduct
-              productID={value}
-              handleRefreshData={handleRefreshData}
-            />
+            <ModalUpdateProduct productID={value} />
           </div>
         </div>
       ),
-      sorter: (a: ProductInfo, b: ProductInfo) =>
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
         a.product_id.localeCompare(b.product_id),
     },
     {
       title: "Tên sản phẩm",
-      className: "text-xs",
+      className: "text-xl",
       dataIndex: "name",
       render: (value: string) => (
         <>{value.length > 15 ? `${value.slice(0, 15)}...` : value}</>
       ),
-      sorter: (a: ProductInfo, b: ProductInfo) => a.name.localeCompare(b.name),
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
+        a.name.localeCompare(b.name),
     },
     {
       title: "Loại sản phẩm",
-      className: "text-xs",
+      className: "text-xl",
       dataIndex: ["type", "name"],
-      sorter: (a: ProductInfo, b: ProductInfo) => a.type.localeCompare(b.type),
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
+        a.type.name.localeCompare(b.type.name),
       render: (value) => <>{value}</>,
     },
     {
       title: "Giá trị",
-      className: "text-xs",
+      className: "text-xl",
       dataIndex: "price",
       render: (value: number) => `${value.toLocaleString("vi-VN")}đ`,
-      sorter: (a: ProductInfo, b: ProductInfo) => a.price - b.price,
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) => a.price - b.price,
     },
     {
       title: "Thuế",
-      className: "text-xs",
+      className: "text-xl",
       dataIndex: "vat",
-      sorter: (a: ProductInfo, b: ProductInfo) => a.vat.localeCompare(b.vat),
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
+        a.vat.localeCompare(b.vat),
       render: (value) => (
         <>
           {
@@ -98,38 +99,42 @@ export default function ListProduct({ dataSource, handleRefreshData }: Props) {
     },
     {
       title: "Trạng thái",
-      className: "text-xs",
+      className: "text-xl",
       dataIndex: "status",
-      render: (value: string, record: ProductInfo) => (
+      render: (value: string, record: IGetProductInfo) => (
         <>
           <Switch
             defaultChecked={value === "active"}
-            onChange={(check) => {
-              postdata(() =>
+            onChange={async (check) => {
+              const statusCode = await postdata(() =>
                 productService.updateStatusProduct(
                   record.product_id,
                   check ? "active" : "hide"
                 )
               );
+              if (statusCode === 200) {
+                dispatch(fetchProductAbout());
+              }
             }}
           />
         </>
       ),
-      sorter: (a: ProductInfo, b: ProductInfo) =>
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
         a.status.localeCompare(b.status),
     },
     {
       title: "Số lượng",
-      className: "text-xs",
+      className: "text-xl",
       dataIndex: "quantity",
-      sorter: (a: ProductInfo, b: ProductInfo) => a.quantity - b.quantity,
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
+        a.quantity - b.quantity,
     },
     {
       title: "Đơn vị",
-      className: "text-xs",
+      className: "text-xl",
       dataIndex: ["unit_product", "name_unit"],
-      sorter: (a: ProductInfo, b: ProductInfo) =>
-        a.unit_product.localeCompare(b.unit_product),
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
+        a.unit_product.name_unit.localeCompare(b.unit_product.name_unit),
       render: (value) => <>{value}</>,
     },
   ];
@@ -158,7 +163,7 @@ export default function ListProduct({ dataSource, handleRefreshData }: Props) {
     );
   };
 
-  const rowSelection: TableRowSelection<ProductInfo> = {};
+  const rowSelection: TableRowSelection<IGetProductInfo> = {};
 
   return (
     <div className="">
@@ -203,7 +208,7 @@ export default function ListProduct({ dataSource, handleRefreshData }: Props) {
       </div>
       <div className="w-full overflow-auto">
         <div className="min-w-fit">
-          <Table<ProductInfo>
+          <Table<IGetProductInfo>
             columns={columns}
             rowSelection={rowSelection}
             dataSource={dataFilter}

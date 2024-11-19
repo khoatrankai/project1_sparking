@@ -1,15 +1,14 @@
 import { Tag } from "antd";
 import React from "react";
 import ModalAddCustomer from "./ModalCustomer/ModalAddCustomer";
-import useFetchData from "@/hooks/useFetchData";
-import customerService from "@/services/customerService";
-import { ICustomerStatistics } from "@/models/customerInterface";
+import { RootState } from "@/redux/store/store";
+import { useSelector } from "react-redux";
 
 // type Props = {};
 
 export default function ToolCustomer() {
-  const { data: dataAbout } = useFetchData<ICustomerStatistics>(
-    customerService.getAboutCustomer
+  const { datas: dataAbout } = useSelector(
+    (state: RootState) => state.about_customer
   );
   return (
     <div className="flex flex-col gap-2">
@@ -17,9 +16,9 @@ export default function ToolCustomer() {
         <ModalAddCustomer />
       </div>
       <div>
-        <h2 className="font-semibold">Tổng quan khách hàng</h2>
+        <h2 className="font-semibold text-white">Tổng quan khách hàng</h2>
         <div className="flex justify-around gap-2 flex-wrap">
-          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 border-0 shadow-lg shadow-black/20 bg-black/80">
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 border-0 shadow-lg shadow-black/20 bg-[#EB8823]">
             <p className="font-bold text-3xl text-white">
               {dataAbout?.totalCustomer.toLocaleString("vi-VN")}
             </p>
@@ -27,7 +26,7 @@ export default function ToolCustomer() {
               Tổng số khách hàng
             </p>
           </Tag>
-          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-green-500/80 border-0 shadow-lg  shadow-black/20">
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
             <p className="font-bold text-3xl text-white">
               {dataAbout?.totalActive.toLocaleString("vi-VN")}
             </p>
@@ -35,7 +34,7 @@ export default function ToolCustomer() {
               Khách hàng đang hoạt động
             </p>
           </Tag>
-          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-red-500/80 border-0 shadow-lg  shadow-black/20">
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
             <p className="font-bold text-3xl text-white">
               {dataAbout?.totalInActive.toLocaleString("vi-VN")}
             </p>
@@ -43,7 +42,7 @@ export default function ToolCustomer() {
               Khách hàng không hoạt động
             </p>
           </Tag>
-          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-blue-500/80 border-0 shadow-lg  shadow-black/20">
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
             <p className="font-bold text-3xl text-white">
               {dataAbout?.contactActive.toLocaleString("vi-VN")}
             </p>
@@ -51,7 +50,7 @@ export default function ToolCustomer() {
               Liên hệ đang hoạt động
             </p>
           </Tag>
-          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-yellow-500/80 border-0 shadow-lg  shadow-black/20">
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
             <p className="font-bold text-3xl text-white">
               {dataAbout?.contactInactive.toLocaleString("vi-VN")}
             </p>
@@ -59,7 +58,7 @@ export default function ToolCustomer() {
               Liên hệ ít hoạt động
             </p>
           </Tag>
-          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-green-600/80 border-0 shadow-lg  shadow-black/20">
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
             <p className="font-bold text-3xl text-white">
               {dataAbout?.contactActiveToday.toLocaleString("vi-VN")}
             </p>

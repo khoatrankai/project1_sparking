@@ -4,7 +4,7 @@ import { CreateGroupCustomerDto } from 'src/dto/create_group.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UpdateGroupCustomerDto } from 'src/dto/update_group.dto';
 import { CreateRoleTypeCustomerDto } from 'src/dto/create_role_type_customer.dto';
 import { RoleTypeCustomer } from 'src/database/entities/role_type_customer.entity';
@@ -46,6 +46,12 @@ export class CustomerService {
         statusCode: HttpStatus.BAD_REQUEST
       }
     }
+  }
+
+  async getCustomerIDs(customer_ids:string[]){
+    const data = await this.customerInfoRepository.find({where:{info_id:In(customer_ids)}});
+    const sortedData = customer_ids.map(id => data.find(user => user.info_id === id))
+    return sortedData
   }
 
   async createGroupCustomer(createGroupCustomer:CreateGroupCustomerDto){

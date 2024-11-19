@@ -28,6 +28,7 @@ export class CreateAccountCustomersDto {
   @IsString()
   @Length(1, 50)
   phone_number?: string;
+  
 
   @IsDateString()
   date_of_birth?: Date;

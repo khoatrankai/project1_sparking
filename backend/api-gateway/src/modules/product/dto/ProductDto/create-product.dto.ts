@@ -16,8 +16,8 @@ export class CreateProductDto {
 
   @Type(() => Number)
   @IsNumber()
-  @IsNotEmpty() // The price is required
-  price: number;
+  @IsOptional() // The price is required
+  price?: number = 0;
 
   @IsString()
   @IsNotEmpty() // The description is required

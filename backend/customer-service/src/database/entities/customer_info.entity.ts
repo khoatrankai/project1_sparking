@@ -20,6 +20,9 @@ export class CustomerInfo {
   @Column({ type: 'varchar', length: 50 })
   province: string;
 
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  opportunity: string;
+
   @Column({ type: 'varchar', length: 12 })
   phone_number: string;
 

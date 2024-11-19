@@ -13,7 +13,7 @@ export class StatusActivities {
   name_tag: string;
 
   @ManyToOne(() => TypeActivities,typeActivity => typeActivity.status)
-  @JoinColumn({ name: 'type' })
+  @JoinColumn({ name: 'type_activity' })
   type_activity: TypeActivities;
 
   @OneToMany(() => Activities, activity => activity.status)

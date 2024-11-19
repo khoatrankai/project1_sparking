@@ -3,14 +3,18 @@ import usePostData from "@/hooks/usePostData";
 import { GroupInfo, IUpdateCustomerInfo } from "@/models/customerInterface";
 import { Province } from "@/models/systemInterface";
 import { InfoUser } from "@/models/userInterface";
+import { fetchCustomerAbout } from "@/redux/store/slices/customerSlices/about_customer.slice";
+import { fetchCustomerInfos } from "@/redux/store/slices/customerSlices/get_all_customer.slice";
+import { AppDispatch, RootState } from "@/redux/store/store";
 import customerService from "@/services/customerService";
-import systemService from "@/services/systemService";
 import userService from "@/services/userService";
 import { Button, Form, Input, Menu, Modal, Select } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { Option } from "antd/es/mentions";
 import SubMenu from "antd/es/menu/SubMenu";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 type Props = {
   info_id: string;
@@ -18,8 +22,9 @@ type Props = {
 
 export default function ModalAddCustomer({ info_id }: Props) {
   const [form] = useForm();
-  const { data: dataProvinces } = useFetchData<Province[]>(
-    systemService.getProvinces
+  const dispatch = useDispatch<AppDispatch>();
+  const { datas: dataProvinces } = useSelector(
+    (state: RootState) => state.province_system
   );
 
   const { postdata } = usePostData();
@@ -38,6 +43,8 @@ export default function ModalAddCustomer({ info_id }: Props) {
         ...res.data,
         group_customer: res.data.group_customer.group_id,
       });
+      dispatch(fetchCustomerInfos());
+      dispatch(fetchCustomerAbout());
     }
   };
 

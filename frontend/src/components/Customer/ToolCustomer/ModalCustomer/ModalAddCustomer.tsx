@@ -3,24 +3,27 @@ import usePostData from "@/hooks/usePostData";
 import { CreateInfoCustomer, GroupInfo } from "@/models/customerInterface";
 import { Province } from "@/models/systemInterface";
 import { InfoUser } from "@/models/userInterface";
+import { fetchCustomerAbout } from "@/redux/store/slices/customerSlices/about_customer.slice";
+import { fetchCustomerInfos } from "@/redux/store/slices/customerSlices/get_all_customer.slice";
+import { AppDispatch, RootState } from "@/redux/store/store";
 import customerService from "@/services/customerService";
-import systemService from "@/services/systemService";
 import userService from "@/services/userService";
 import { Button, Form, Input, Menu, Modal, Select } from "antd";
 import { Option } from "antd/es/mentions";
 import SubMenu from "antd/es/menu/SubMenu";
 import React, { useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 // type Props = {}
 
 export default function ModalAddCustomer() {
-  const { data: dataProvinces } = useFetchData<Province[]>(
-    systemService.getProvinces
+  const { datas: dataProvinces } = useSelector(
+    (state: RootState) => state.province_system
   );
-
   const { postdata } = usePostData();
-
+  const dispatch = useDispatch<AppDispatch>();
   const { data: dataUsers } = useFetchData<InfoUser[]>(userService.getUsers);
   const { data: dataGroup } = useFetchData<GroupInfo[]>(
     customerService.getGroupCustomer
@@ -42,6 +45,8 @@ export default function ModalAddCustomer() {
     );
     if (res === 200 || res === 201) {
       setIsModalVisible(false);
+      dispatch(fetchCustomerInfos());
+      dispatch(fetchCustomerAbout());
     }
   };
 

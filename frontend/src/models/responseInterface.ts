@@ -2,6 +2,13 @@ interface SuccessResponse<T> {
     statusCode: number;
     data: T;
   }
+
+  interface DataStateRedux<T> {
+    datas: T;
+    loading: boolean;
+    error: string | null;
+  }
+  
   
   interface ErrorResponse {
     statusCode: number;
@@ -20,4 +27,4 @@ interface SuccessResponse<T> {
   type ApiResponse<T> = SuccessResponse<T> | ErrorResponse;
 
 
-  export type {ApiResponse,PostResponse,QRResponse}
+  export type {ApiResponse,PostResponse,QRResponse,DataStateRedux}

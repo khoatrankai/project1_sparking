@@ -13,23 +13,19 @@ import {
 } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import useFetchData from "@/hooks/useFetchData";
-import systemService from "@/services/systemService";
-import { Vat } from "@/models/systemInterface";
 import { Option } from "antd/es/mentions";
-import {
-  ITypeProduct,
-  IUnitProduct,
-  ProductInfo,
-} from "@/models/productInterface";
+import { ProductInfo } from "@/models/productInterface";
 import productService from "@/services/productService";
 import CustomFormData from "@/utils/CustomFormData";
 import usePostData from "@/hooks/usePostData";
 import { IoAddOutline } from "react-icons/io5";
+import { useForm } from "antd/es/form/Form";
+import { useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store/store";
+import { fetchProductInfos } from "@/redux/store/slices/productSlices/get_products";
+import { useDispatch } from "react-redux";
+import { fetchProductAbout } from "@/redux/store/slices/productSlices/get_about.slice";
 
-type Props = {
-  handleRefreshData: () => void;
-};
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 const getBase64 = (file: FileType): Promise<string> =>
@@ -40,16 +36,21 @@ const getBase64 = (file: FileType): Promise<string> =>
     reader.onerror = (error) => reject(error);
   });
 
-const ModalAddProduct = ({ handleRefreshData }: Props) => {
+const ModalAddProduct = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
   const { postdata } = usePostData();
-  const { data: dataTypes } = useFetchData<ITypeProduct[]>(
-    productService.getTypes
+  const { datas: dataTypes } = useSelector(
+    (state: RootState) => state.type_product
   );
-  const { data: dataVats } = useFetchData<Vat[]>(systemService.getVats);
-  const { data: dataUnits } = useFetchData<IUnitProduct[]>(
-    productService.getUnits
+  const { datas: dataUnits } = useSelector(
+    (state: RootState) => state.unit_product
   );
+  const { datas: dataVats } = useSelector(
+    (state: RootState) => state.vat_system
+  );
+  const [form] = useForm();
+
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -77,7 +78,9 @@ const ModalAddProduct = ({ handleRefreshData }: Props) => {
         productService.createProduct(formData)
       );
       if (statusCode === 201) {
-        handleRefreshData();
+        dispatch(fetchProductInfos());
+        dispatch(fetchProductAbout());
+        form.resetFields();
         setIsModalVisible(false);
       }
     } catch (error) {
@@ -114,7 +117,7 @@ const ModalAddProduct = ({ handleRefreshData }: Props) => {
       >
         <Form
           layout="vertical"
-          // form={form}
+          form={form}
           onFinish={handleSubmit}
           style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}
         >

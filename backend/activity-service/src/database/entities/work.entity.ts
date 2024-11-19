@@ -34,7 +34,7 @@ import { ListUser } from './list_user.entity';
     description: string;
 
     @ManyToOne(() => Activities, (activity) =>   activity.works)
-    @JoinColumn({ name: 'status' })
+    @JoinColumn({ name: 'activity' })
     activity: Activities;
 
     @Column({ type: 'timestamp' })

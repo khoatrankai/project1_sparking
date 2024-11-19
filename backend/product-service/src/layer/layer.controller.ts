@@ -35,7 +35,6 @@ export class LayerController {
 
   @MessagePattern({ cmd: 'create-product' })
   async createProduct(@Payload() createProductDto: CreateProductDto) {
-    console.log(createProductDto)
     return this.layerService.createProduct(createProductDto);
   }
 
@@ -91,6 +90,11 @@ export class LayerController {
   // async createPictureProduct(@Payload() createPictureProductDto: CreatePictureProductDto) {
   //   return this.layerService.createPictureProduct(createPictureProductDto);
   // }
+
+  @MessagePattern({cmd:'get-product_ids'})
+  getUserIDs(@Payload() product_ids:string[]){
+    return this.layerService.getProductIDs(product_ids)
+  }
 
   @MessagePattern({ cmd: 'create-pictures_product' })
   async createPicturesProduct(@Payload() createPictureProductDto: CreatePictureProductDto) {

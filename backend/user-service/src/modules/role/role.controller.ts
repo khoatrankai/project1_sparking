@@ -34,6 +34,11 @@ export class RoleController {
     return await this.roleService.addRoleUser(createRoleUserDto);
   }
 
+  @MessagePattern({cmd:'check-role_user'})
+  async checkRoleUser(data:{user_id:string,role_name_tag:string}) {
+    return await this.roleService.checkRoleUser(data.user_id,data.role_name_tag);
+  }
+
   @MessagePattern({cmd:'update-role_user'})
   async updateRoleStatus(updateRoleUserDto: UpdateRoleUserDto) {
     return await this.roleService.updateRoleUser(updateRoleUserDto);

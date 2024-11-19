@@ -34,10 +34,13 @@ import TabPane from "antd/es/tabs/TabPane";
 import { ColumnsType } from "antd/es/table";
 // import ModalQrScanner from "./ModalQrScanner";
 import ModalGenerateQr from "./ModalGenerateQr";
+import { AppDispatch } from "@/redux/store/store";
+import { useDispatch } from "react-redux";
+import { fetchProductInfos } from "@/redux/store/slices/productSlices/get_products";
+import { fetchProductAbout } from "@/redux/store/slices/productSlices/get_about.slice";
 
 type Props = {
   productID: string;
-  handleRefreshData: () => void;
 };
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
@@ -54,11 +57,12 @@ const ModalUpdateProduct = (props: Props) => {
   const [dataSource, setDataSource] = useState<ICodeProduct[] | []>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const { postdata } = usePostData();
-
+  const dispatch = useDispatch<AppDispatch>();
   const fetchListCode = async () => {
     const data = await productService.getProductsID(props.productID);
     if (data.statusCode === 200) {
-      props.handleRefreshData();
+      dispatch(fetchProductInfos());
+      dispatch(fetchProductAbout());
       setDataSource(data.data);
     }
   };
@@ -180,7 +184,8 @@ const ModalUpdateProduct = (props: Props) => {
         )
       );
       if (statusCode === 200) {
-        props.handleRefreshData();
+        dispatch(fetchProductInfos());
+        dispatch(fetchProductAbout());
         setIsModalVisible(false);
       }
     } catch (error) {

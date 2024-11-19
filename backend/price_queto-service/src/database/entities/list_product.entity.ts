@@ -6,8 +6,8 @@ export class ListProduct {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   PQ_product_id: string;
 
-  @ManyToOne(() => PriceQuote, priceQuote => priceQuote.price_quote_id)
-  @JoinColumn({ name: 'price_quote_id' })
+  @ManyToOne(() => PriceQuote, priceQuote => priceQuote.products)
+  @JoinColumn({ name: 'price_quote' })
   price_quote: PriceQuote;
 
   @Column({ type: 'varchar', length: 50 })
@@ -19,8 +19,8 @@ export class ListProduct {
   @Column({type:'int'})
   quantity:number
 
-  @Column({type:'int'})
-  vat:number
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  vat:string
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

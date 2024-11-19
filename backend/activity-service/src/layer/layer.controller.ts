@@ -38,6 +38,7 @@ export class LayerController {
 
   @MessagePattern('create-activity')
   async createActivity(@Payload() createActivityDto: CreateActivityDto) {
+    console.log("vip")
     return await this.layerService.createActivity(createActivityDto);
   }
 
@@ -92,8 +93,8 @@ export class LayerController {
   }
 
   @MessagePattern('get-all_status_activities')
-  async getAllStatusActivities(@Payload() status_activity_id: string) {
-    return await this.layerService.getAllStatusActivities(status_activity_id);
+  async getAllStatusActivities() {
+    return await this.layerService.getAllStatusActivities();
   }
 
   @MessagePattern('create-picture_activity')

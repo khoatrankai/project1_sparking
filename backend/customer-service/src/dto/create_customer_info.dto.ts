@@ -28,6 +28,11 @@ export class CreateCustomerInfoDto {
   @IsOptional()
   website?: string;
 
+  @IsString()
+  @Length(1, 50)
+  @IsOptional()
+  opportunity?: string;
+
   @IsEnum(['vnd', 'usd'])
   type_money: string;
   

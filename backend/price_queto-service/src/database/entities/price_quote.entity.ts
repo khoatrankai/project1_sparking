@@ -7,7 +7,7 @@ export class PriceQuote {
   price_quote_id: string;
 
   @Column({ type: 'varchar', length: 50 })
-  customer: string;
+  project: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_start: Date;
@@ -21,12 +21,6 @@ export class PriceQuote {
   @Column({ type: 'enum', enum: ['vnd', 'usd'], default: 'vnd' })
   type_money: string;
 
-  @Column({type:'int'})
-  price:number
-
-  @Column({type:'int'})
-  vat:number
-
   @Column({ type: 'varchar', length: 50 })
   reference_code: string;
 
@@ -34,7 +28,13 @@ export class PriceQuote {
   user_support: string;
 
   @Column({ type: 'enum', enum: ['none', 'before', 'after'], default: 'none' })
+  type_vat: string;
+
+  @Column({ type: 'enum', enum: ['percent', 'money'], default: 'percent' })
   type_discount: string;
+
+  @Column({ type: 'int',  default: 0 })
+  discount: number;
 
   @Column({ type: 'text', nullable: true })
   description: string;
@@ -46,6 +46,6 @@ export class PriceQuote {
   updated_at: Date;
 
 
-  @OneToMany(() => ListProduct, listProduct => listProduct.product)
+  @OneToMany(() => ListProduct, listProduct => listProduct.price_quote)
   products: ListProduct[];
 }

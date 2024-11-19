@@ -35,6 +35,12 @@ export class CreateCustomerInfoDto {
   @IsOptional()
   date_establish?: Date;
 
+
+  @IsString()
+  @Length(1, 50)
+  @IsOptional()
+  opportunity?: string;
+  
   @IsString()
   @Length(1, 50)
   address_payment: string;

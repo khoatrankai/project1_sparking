@@ -1,5 +1,6 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { TypeContract } from './type_contract.entity';
+import { Payment } from './payment.entity';
 
 @Entity()
 export class Contract {
@@ -12,8 +13,17 @@ export class Contract {
   @Column({ type: 'varchar', length: 50 })
   project: string;
 
+  @Column({ type: 'varchar', length: 50 })
+  customer: string;
+
   @Column({ type: 'int' })
   price: number;
+
+  @Column({ type: 'enum', enum: ['default', 'time'], default: 'default' })
+  type: string;
+
+  @Column({ type: 'int',nullable:true })
+  times: number;
 
   @ManyToOne(() => TypeContract)
   @JoinColumn({ name: 'type_contract' })
@@ -36,4 +46,7 @@ export class Contract {
 
   @UpdateDateColumn()
   updated_at:Date
+
+  @OneToMany(() => Payment,  payment => payment.contract)
+  payment: Payment[];
 }

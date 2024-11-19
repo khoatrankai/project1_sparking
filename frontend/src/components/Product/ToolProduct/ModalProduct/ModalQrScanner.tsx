@@ -130,7 +130,7 @@ const ModalQrScanner = () => {
       {startScan && (
         <>
           <Modal
-            title="Quét xuất kho"
+            title="Quét check sản phẩm"
             visible={startScan}
             onCancel={handleCancel}
             footer={null}

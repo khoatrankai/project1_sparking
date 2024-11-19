@@ -41,6 +41,11 @@ export class LayerController {
     const { id, updateProjectDto } = payload;
     return await this.layerService.updateProject(id, updateProjectDto);
   }
+
+  @MessagePattern({cmd:'get-project_ids'})
+  getUserIDs(@Payload() project_ids:string[]){
+    return this.layerService.getProjectIDs(project_ids)
+  }
  
 
  

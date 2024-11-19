@@ -28,10 +28,10 @@ export class Projects {
   @Column({ type: 'varchar', length: 50, nullable: true })
   customer: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   start_date: Date;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   end_date: Date;
 
   @Column({ type: 'text', nullable: true })

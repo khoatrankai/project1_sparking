@@ -78,7 +78,6 @@ export class CustomerController {
 
   @Post('create-customer-info')
   createCustomerInfo(@Body() createCustomerInfoDto: CreateCustomerInfoDto) {
-    console.log("goi vao day")
     return this.customerService.createCustomerInfo(createCustomerInfoDto);
   }
 

@@ -37,6 +37,8 @@ export class UserService {
     return this.usersClient.send({ cmd: 'add-role_user' }, createRoleUserDto);
   }
 
+
+
   async updateRoleUser(updateRoleUserDto: UpdateRoleUserDto) {
     return this.usersClient.send({ cmd: 'update-role_user' }, updateRoleUserDto);
   }

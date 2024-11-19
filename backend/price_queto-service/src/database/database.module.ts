@@ -14,8 +14,8 @@ import { ListProduct } from './entities/list_product.entity';
       password: '123456789',
       database: 'db_sparking_5',
       entities: [PriceQuote,ListProduct],
-      synchronize: true,
-      dropSchema: true,
+      // synchronize: true,
+      // dropSchema: true,
     }),
   ],
 })

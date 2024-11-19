@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AccountUsers } from 'src/database/entities/account_users.entity';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt'
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from 'src/dto/create_user.dto';
 import { ResultResponse } from 'src/common/interfaces/result.interface';
@@ -68,6 +68,17 @@ export class UserService {
   async getUsers(){
     const data = await this.accountUserRepository.find({select:['first_name','last_name','email','picture_url','user_id'],where:{status:'active'}});
     return data
+  }
+
+  async getUserID(user_id:string){
+    const data = await this.accountUserRepository.findOne({select:['first_name','last_name','email','picture_url','user_id'],where:{user_id}});
+    return data
+  }
+
+  async getUserIDs(user_ids:string[]){
+    const data = await this.accountUserRepository.find({select:['first_name','last_name','email','picture_url','user_id'],where:{user_id:In(user_ids)}});
+    const sortedData = user_ids.map(id => data.find(user => user.user_id === id))
+    return sortedData
   }
  
 }

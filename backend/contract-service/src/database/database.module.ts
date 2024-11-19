@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeContract } from './entities/type_contract.entity';
 import { Contract } from './entities/contract.entity';
+import { Payment } from './entities/payment.entity';
+import { TypeMethod } from './entities/type_method.entity';
 
 
 @Module({
@@ -13,9 +15,9 @@ import { Contract } from './entities/contract.entity';
       username: 'root',
       password: '123456789',
       database: 'db_sparking_7',
-      entities: [TypeContract,Contract],
-      synchronize: true,
-      dropSchema: true,
+      entities: [TypeContract,Contract,Payment,TypeMethod],
+      // synchronize: true,
+      // dropSchema: true,
     }),
   ],
 })

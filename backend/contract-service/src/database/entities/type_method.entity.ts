@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, CreateDateColumn, UpdateDateColumn, Column, OneToMany} from 'typeorm';
-import { MethodPayment } from './method_payment.entity';
+import { Payment } from './payment.entity';
 
 @Entity()
 export class TypeMethod {
@@ -18,6 +18,6 @@ export class TypeMethod {
   @UpdateDateColumn()
   updated_at:Date
 
-  @OneToMany(() => MethodPayment,  methodPayment => methodPayment.type_method)
-  method_payment: MethodPayment[];
+  @OneToMany(() => Payment,  payment => payment.type_method)
+  payment: Payment[];
 }

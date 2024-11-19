@@ -7,24 +7,14 @@ import { CustomerInfo } from "@/models/customerInterface";
 // type Props = {};
 
 export default function Customer() {
-  const [dataSource, setDataSource] = useState<CustomerInfo[] | []>([]);
-  const fetchData = async () => {
-    const data = await customerService.getAllCustomer();
-    if (data.statusCode === 200) {
-      setDataSource(data.data);
-    }
-  };
-  useEffect(() => {
-    fetchData();
-  }, []);
   return (
     <div>
       <div className="flex flex-col gap-2">
-        <div className="bg-[#1BA399] p-2 rounded-md">
+        <div className="bg-[#00A9AE] p-2 rounded-md">
           <ToolCustomer />
         </div>
-        <div className="bg-[#1BA399] p-2 rounded-md">
-          <ListCustomer dataSource={dataSource} />
+        <div className="bg-[#00A9AE] p-2 rounded-md">
+          <ListCustomer />
         </div>
       </div>
     </div>

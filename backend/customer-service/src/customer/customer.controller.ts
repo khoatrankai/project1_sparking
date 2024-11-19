@@ -39,6 +39,11 @@ export class CustomerController {
    
   }
 
+  @MessagePattern({cmd:'get-customer_ids'})
+  getCustomerIDs(@Payload() customer_ids:string[]){
+    return this.customerService.getCustomerIDs(customer_ids)
+  }
+
   @MessagePattern({cmd:'create-group_customer'})
   createGroupCustomer(createGroupCustomer:CreateGroupCustomerDto){
     return this.customerService.createGroupCustomer(createGroupCustomer)

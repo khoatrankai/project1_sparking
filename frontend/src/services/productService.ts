@@ -29,6 +29,35 @@ const productService = {
     const response = await api.get(`/product/type`);
     return response.data;
   },
+  createType: async(data:{name:string})=>{
+    const res = await api.post('/product/type', data);
+    if (!res) {
+        throw new Error("Failed to create type product: No response");
+    }
+    return res.data ;
+  },
+  createUnit: async(data:{name_unit:string})=>{
+    const res = await api.post('/product/unit', data);
+    if (!res) {
+        throw new Error("Failed to create unit product: No response");
+    }
+    return res.data ;
+  },
+
+  updateUnit: async(unit_id:string,data:string)=>{
+    const res = await api.put(`/product/unit/${unit_id}`, {name_unit:data});
+    if (!res) {
+        throw new Error("Failed to update unit product: No response");
+    }
+    return res.data ;
+  },
+  updateType: async(type_id:string,data:string)=>{
+    const res = await api.put(`/product/type/${type_id}`, {name:data});
+    if (!res) {
+        throw new Error("Failed to update unit product: No response");
+    }
+    return res.data ;
+  },
   createProduct: async (formdata:FormData):Promise<PostResponse | null> => {
     const res = await api_formdata.post('/product/new', formdata);
     if (!res) {

@@ -4,11 +4,13 @@ import { ContractController } from './contract.controller';
 import { ContractService } from './contract.service';
 import { Contract } from 'src/database/entities/contract.entity';
 import { TypeContract } from 'src/database/entities/type_contract.entity';
+import { Payment } from 'src/database/entities/payment.entity';
+import { TypeMethod } from 'src/database/entities/type_method.entity';
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Contract,TypeContract])
+    TypeOrmModule.forFeature([TypeContract,Contract,Payment,TypeMethod])
   ],
   controllers: [ContractController],
   providers: [ContractService],

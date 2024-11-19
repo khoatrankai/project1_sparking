@@ -2,7 +2,7 @@ import { Controller, Get, UseFilters } from '@nestjs/common';
 
 import { ConflictExceptionFilter } from 'src/common/filters/conflict-exception.filter';
 import { UserService } from './user.service';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateUserDto } from 'src/dto/create_user.dto';
 import { ResultResponse } from 'src/common/interfaces/result.interface';
 import { AccountUsers } from 'src/database/entities/account_users.entity';
@@ -16,6 +16,17 @@ export class UserController {
   getHello(): string {
     return this.userService.getHello();
   }
+
+  @MessagePattern({cmd:'get-user_id'})
+  getUserID(@Payload() user_id:string){
+    return this.userService.getUserID(user_id)
+  }
+
+  @MessagePattern({cmd:'get-user_ids'})
+  getUserIDs(@Payload() user_ids:string[]){
+    return this.userService.getUserIDs(user_ids)
+  }
+
   @MessagePattern({cmd:'register-user'})
   createUser(createUserDto:CreateUserDto): Promise<ResultResponse>{
     return this.userService.createUser(createUserDto)

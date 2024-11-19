@@ -3,7 +3,7 @@ import { IsString, IsEnum, IsInt, IsOptional, IsDateString } from 'class-validat
 export class UpdatePriceQuoteDto {
   @IsOptional()
   @IsString()
-  customer?: string;
+  project?: string;
 
   @IsOptional()
   @IsDateString()
@@ -22,14 +22,6 @@ export class UpdatePriceQuoteDto {
   type_money?: string;
 
   @IsOptional()
-  @IsInt()
-  price?: number;
-
-  @IsOptional()
-  @IsInt()
-  vat?: number;
-
-  @IsOptional()
   @IsString()
   reference_code?: string;
 
@@ -39,7 +31,15 @@ export class UpdatePriceQuoteDto {
 
   @IsOptional()
   @IsEnum(['none', 'before', 'after'])
-  type_discount?: string;
+  type_vat?: string;
+
+  @IsOptional()
+  @IsEnum(['percent', 'money'])
+  type_discount: string;
+
+  @IsInt()
+  @IsOptional()
+  discount: number;
 
   @IsOptional()
   @IsString()

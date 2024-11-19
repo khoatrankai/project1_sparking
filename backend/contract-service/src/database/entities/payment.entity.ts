@@ -1,26 +1,21 @@
-import { Entity, PrimaryColumn,JoinColumn, CreateDateColumn, UpdateDateColumn, OneToOne, Column } from 'typeorm';
+import { Entity, PrimaryColumn,JoinColumn, CreateDateColumn, UpdateDateColumn, Column, ManyToOne } from 'typeorm';
 import { Contract } from './contract.entity';
+import { TypeMethod } from './type_method.entity';
 
 @Entity()
 export class Payment {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   payment_id: string;
 
-  @OneToOne(() => Contract)
+  @ManyToOne(() => Contract)
   @JoinColumn({ name: 'contract' })
   contract: Contract;  
 
-  @Column({ type: 'enum', enum: ['pending', 'success'], default: 'pending' })
+  @Column({ type: 'enum', enum: ['pending','fail', 'success'], default: 'pending' })
   status: string;
-
-  @Column({ type: 'enum', enum: ['default', 'time'], default: 'default' })
-  type: string;
 
   @Column({ type: 'int' })
   price: number;
-
-  @Column({ type: 'int',nullable:true })
-  times: number;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_expired: Date;
@@ -30,4 +25,8 @@ export class Payment {
 
   @UpdateDateColumn()
   updated_at:Date
+
+  @ManyToOne(() => TypeMethod)
+  @JoinColumn({ name: 'type_method' })
+  type_method: TypeMethod;  
 }

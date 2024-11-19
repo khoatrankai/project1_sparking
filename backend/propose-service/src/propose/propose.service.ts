@@ -34,7 +34,7 @@ export class ProposeService {
   async findOnePropose(id: string) {
     const propose = await this.proposeRepository.findOne({ where: { propose_id: id } });
     if (!propose) throw new NotFoundException('Propose not found');
-    return propose;
+    return { statusCode: HttpStatus.OK, data: propose };
   }
 
   async updatePropose(id: string, updateProposeDto: UpdateProposeDto) {

@@ -37,13 +37,13 @@ export class ProductService {
       if(result){
       
         if(images.length > 0){
-          const datas = await this.cloudinaryService.uploadFiles(images)
+          const datas = await this.cloudinaryService.uploadFiles(images) 
           const resultImg = await firstValueFrom(this.productClient.send({ cmd: 'create-pictures_product' }, {url:datas,product:id } as CreatePictureProductDto));
           if(resultImg){
-            return { statusCode: HttpStatus.CREATED, message: 'Product created successfully' };
+            return { statusCode: HttpStatus.CREATED, message: 'Product and Picture created successfully' };
           }
         }
-        
+        return { statusCode: HttpStatus.CREATED, message: 'Product created successfully' };
 
        
       }

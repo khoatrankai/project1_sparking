@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import {  Not, Repository } from 'typeorm';
+import {  In, Not, Repository } from 'typeorm';
 import { Products } from 'src/database/entities/product.entity';
 import { CreateProductDto } from 'src/dto/ProductDto/create-product.dto';
 import { CodeProduct } from 'src/database/entities/code_product.entity';
@@ -60,10 +60,14 @@ export class LayerService {
     const type = await this.typeProductRepository.findOne({where:{type_product_id:createProductDto.type}})
     const unit_product = await this.unitProductRepository.findOne({where:{unit_id:createProductDto.unit_product}})
     const product = this.productRepository.create({...createProductDto,type,unit_product});
-    console.log("ok")
     return await this.productRepository.save(product);
   }
 
+  async getProductIDs(product_ids:string[]){
+    const data = await this.productRepository.find({where:{product_id:In(product_ids)},relations:['type']});
+    const sortedData = product_ids.map(id => data.find(item => item.product_id === id))
+    return sortedData
+  }
   async findAllProduct(): Promise<Products[]> {
     return await this.productRepository.find({where:{status:Not('delete')},relations:['type','unit_product']});
   }

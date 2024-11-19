@@ -1,4 +1,4 @@
-import { IsString, IsDate, IsEnum, IsOptional, IsInt, IsEmail, Length, IsPhoneNumber } from 'class-validator';
+import { IsString, IsDate, IsEnum, IsOptional, IsInt, IsEmail, Length } from 'class-validator';
 
 export class CreateProposeDto {
   @IsString()
@@ -10,6 +10,7 @@ export class CreateProposeDto {
   @Length(1, 50)
   name_propose: string;
 
+  
   @IsDate()
   date_start: Date;
 
@@ -42,7 +43,7 @@ export class CreateProposeDto {
   email?: string;
 
   @IsOptional()
-  @IsPhoneNumber()
+  @IsString()
   phone_number?: string;
 
   @IsOptional()

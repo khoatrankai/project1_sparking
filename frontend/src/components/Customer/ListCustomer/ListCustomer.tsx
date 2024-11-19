@@ -15,16 +15,21 @@ import { TableRowSelection } from "antd/es/table/interface";
 import React, { useEffect, useState } from "react";
 import { FaArrowsRotate } from "react-icons/fa6";
 import ModalUpdateCustomer from "../ToolCustomer/ModalCustomer/ModalUpdateCustomer";
+import { AppDispatch, RootState } from "@/redux/store/store";
+import { useSelector } from "react-redux";
+import { fetchCustomerInfos } from "@/redux/store/slices/customerSlices/get_all_customer.slice";
+import { useDispatch } from "react-redux";
+import { fetchCustomerAbout } from "@/redux/store/slices/customerSlices/about_customer.slice";
 
-type Props = {
-  dataSource?: CustomerInfo[] | [];
-};
-
-export default function ListCustomer({ dataSource }: Props) {
+export default function ListCustomer() {
   const [pageLimit, setPageLimit] = useState<number>(25);
-  const [dataFilter, setDataFilter] = useState<CustomerInfo[] | [] | undefined>(
-    dataSource
+  const dispatch = useDispatch<AppDispatch>();
+  const { datas: dataSource } = useSelector(
+    (state: RootState) => state.infos_customer
   );
+  const [dataFilter, setDataFilter] = useState<
+    CustomerInfo[] | [] | undefined
+  >();
   const { postdata } = usePostData();
   const columns: TableColumnsType<CustomerInfo> = [
     {
@@ -94,13 +99,17 @@ export default function ListCustomer({ dataSource }: Props) {
         <>
           <Switch
             defaultChecked={value === "active"}
-            onChange={(check) => {
-              postdata(() =>
+            onChange={async (check) => {
+              const statusCode = await postdata(() =>
                 customerService.updateStatusCustomer({
                   info_id: record.info_id,
                   status_active: check ? "active" : "inactive",
                 })
               );
+              if (statusCode === 200) {
+                dispatch(fetchCustomerInfos());
+                dispatch(fetchCustomerAbout());
+              }
             }}
           />
         </>

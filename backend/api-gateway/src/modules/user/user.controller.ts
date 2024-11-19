@@ -5,6 +5,7 @@ import { CreateRoleTypeUserDto } from './dto/create_role.dto';
 import { UpdateRoleTypeUserDto } from './dto/update_role.dto';
 import { CreateRoleUserDto } from './dto/create_role_user.dto';
 import { UpdateRoleUserDto } from './dto/update_role_user.dto';
+// import { RoleGuard } from 'src/guards/role.guard';
 
 @Controller('user')
 export class UserController {
@@ -15,6 +16,7 @@ export class UserController {
     return this.userService.getHello();
   }
 
+ 
   @Get('info')
   findOneInfo(@Query('user_id') user_id:string): Promise<InfoUserInterface>{
     return this.userService.findOneInfo(user_id)
@@ -37,12 +39,17 @@ export class UserController {
     return await this.userService.addRoleUser(createRoleUserDto);
   }
 
+
   
   @Put('update-role-user')
   async updateRoleUser (@Body() updateRoleUserDto: UpdateRoleUserDto) {
     return await this.userService.updateRoleUser(updateRoleUserDto);
   }
 
+
+  // @UseGuards(RoleGuard)
+  // @SetMetadata('checkfull',['all'])
+  // @SetMetadata('roles',['info-all_us','admin'])
   @Get('all')
   async getUsers () {
     return await this.userService.getUsers();

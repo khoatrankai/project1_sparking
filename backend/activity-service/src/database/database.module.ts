@@ -9,21 +9,37 @@ import { Works } from './entities/work.entity';
 import { TypeWork } from './entities/type_work.entity';
 import { StatusWork } from './entities/status_work.entity';
 import { PictureWork } from './entities/picture_work.entity';
+import { createConnection } from 'mysql2/promise';
+import { ListUser } from './entities/list_user.entity';
 
 
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '123456789',
-      database: 'db_sparking_activity',
-      entities: [Activities,TypeActivities,PictureActivity,StatusActivities,ListCodeProduct,Works,TypeWork,StatusWork,PictureWork],
-      synchronize: true,
-      dropSchema: true,
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => {
+        const connection = await createConnection({
+          host: 'localhost',
+          user: 'root',
+          password: '123456789',
+        });
+
+        // Tạo database nếu không tồn tại
+        await connection.query(`CREATE DATABASE IF NOT EXISTS db_sparking_activity`);
+        await connection.end();
+
+        return {
+          type: 'mysql',
+          host: 'localhost',
+          port: 3306,
+          username: 'root',
+          password: '123456789',
+          database: 'db_sparking_activity',
+          entities: [Activities,TypeActivities,PictureActivity,StatusActivities,ListCodeProduct,Works,TypeWork,StatusWork,PictureWork,ListUser],
+          // synchronize: true,
+          // dropSchema: true,
+        };
+      },
     }),
   ],
 })

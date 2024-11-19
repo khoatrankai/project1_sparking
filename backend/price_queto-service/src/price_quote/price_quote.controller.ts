@@ -5,8 +5,8 @@ import { PriceQuoteService } from './price_quote.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreatePriceQuoteDto } from 'src/dto/PriceQuoteDto/create_price_quote.dto';
 import { UpdatePriceQuoteDto } from 'src/dto/PriceQuoteDto/update_price_quote.dto';
-import { CreateListProductDto } from 'src/dto/ListProductDto/create_list_product.dto';
 import { UpdateListProductDto } from 'src/dto/ListProductDto/update_list_product.dto';
+import { PriceQuoteFilterDto } from 'src/dto/PriceQuoteDto/get_filter_price_quote.dto';
 
 @Controller()
 @UseFilters(ConflictExceptionFilter)
@@ -20,12 +20,7 @@ export class PriceQuoteController {
 
   @MessagePattern({ cmd: 'create-price_quote' })
   async createPriceQuote(@Payload() createPriceQuoteDto: CreatePriceQuoteDto) {
-    const priceQuote = await this.priceQuoteService.createPriceQuote(createPriceQuoteDto);
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'Price quote created successfully',
-      data: priceQuote,
-    };
+    return await this.priceQuoteService.createPriceQuote(createPriceQuoteDto);
   }
 
   @MessagePattern({ cmd: 'find-one_price_quote' })
@@ -39,8 +34,8 @@ export class PriceQuoteController {
   }
 
   @MessagePattern({ cmd: 'find-all_price_quotes' })
-  async findAllPriceQuote() {
-    const priceQuotes = await this.priceQuoteService.findAllPriceQuote();
+  async findAllPriceQuote(@Payload() filter?: PriceQuoteFilterDto) {
+    const priceQuotes = await this.priceQuoteService.findAllPriceQuote(filter);
     return {
       statusCode: HttpStatus.OK,
       message: 'All price quotes retrieved successfully',
@@ -59,15 +54,15 @@ export class PriceQuoteController {
     };
   }
 
-  @MessagePattern({ cmd: 'create-list_product' })
-  async createListProduct(@Payload() createListProductDto: CreateListProductDto) {
-    const listProduct = await this.priceQuoteService.createListProduct(createListProductDto);
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'List product created successfully',
-      data: listProduct,
-    };
-  }
+  // @MessagePattern({ cmd: 'create-list_product' })
+  // async createListProduct(@Payload() createListProductDto: CreateListProductDto) {
+  //   const listProduct = await this.priceQuoteService.createListProduct(createListProductDto);
+  //   return {
+  //     statusCode: HttpStatus.CREATED,
+  //     message: 'List product created successfully',
+  //     data: listProduct,
+  //   };
+  // }
 
   @MessagePattern({ cmd: 'find-one_list_product' })
   async findOneListProduct(@Payload() id: string) {

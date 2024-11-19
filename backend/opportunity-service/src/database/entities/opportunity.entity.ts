@@ -16,11 +16,11 @@ import { TypeOpportunities } from './type_opportunity.entity';
     opportunity_id: string;
   
     @ManyToOne(() => TypeOpportunities, (typeOpportunity) => typeOpportunity.opportunities)
-    @JoinColumn({ name: 'type_op_id' })
+    @JoinColumn({ name: 'type_opportunity' })
     type_opportunity: TypeOpportunities;
   
     @ManyToOne(() => TypeSources, (typeSource) => typeSource.opportunities)
-    @JoinColumn({ name: 'type_src_id' })
+    @JoinColumn({ name: 'type_source' })
     type_source: TypeSources;
   
     @Column({ type: 'varchar', length: 50, nullable: true })
@@ -62,7 +62,7 @@ import { TypeOpportunities } from './type_opportunity.entity';
     @Column({ type: 'text', nullable: true })
     description: string;
   
-    @Column({ type: 'date', nullable: true })
+    @Column({ type: 'datetime', nullable: true })
     latch_date: Date;
 
     @CreateDateColumn({ type: 'timestamp' })
