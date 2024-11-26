@@ -38,12 +38,12 @@ export class LayerController {
 
   @MessagePattern('create-activity')
   async createActivity(@Payload() createActivityDto: CreateActivityDto) {
-    console.log("vip")
     return await this.layerService.createActivity(createActivityDto);
   }
 
   @MessagePattern('update-activity')
   async updateActivity(@Payload() payload: { activity_id: string, updateActivityDto: UpdateActivityDto }) {
+    console.log(payload.updateActivityDto)
     return await this.layerService.updateActivity(payload.activity_id, payload.updateActivityDto);
   }
 

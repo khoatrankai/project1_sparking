@@ -26,6 +26,9 @@ export default function ListProduct() {
   const { datas: dataVats } = useSelector(
     (state: RootState) => state.vat_system
   );
+  const { datas: dataProfits } = useSelector(
+    (state: RootState) => state.get_profits
+  );
 
   const [pageLimit, setPageLimit] = useState<number>(25);
   const [dataFilter, setDataFilter] = useState<
@@ -85,13 +88,30 @@ export default function ListProduct() {
       className: "text-xl",
       dataIndex: "vat",
       sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
-        a.vat.localeCompare(b.vat),
+        (a.vat ?? "").localeCompare(b.vat ?? ""),
       render: (value) => (
         <>
           {
             dataVats?.find((dt) => {
               return dt.vat_id === value;
             })?.type_vat
+          }
+          %
+        </>
+      ),
+    },
+    {
+      title: "Lợi nhuận",
+      className: "text-xl",
+      dataIndex: "profit",
+      sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
+        (a.profit ?? "").localeCompare(b.profit ?? ""),
+      render: (value) => (
+        <>
+          {
+            dataProfits?.find((dt) => {
+              return dt.profit_id === value;
+            })?.type_profit
           }
           %
         </>

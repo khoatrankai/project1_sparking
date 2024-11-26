@@ -1,5 +1,6 @@
 // activities.dto.ts
-import { IsString, IsOptional,  IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional,  IsNotEmpty, IsArray } from 'class-validator';
+import { CreatePictureActivityDto } from '../PictureActivityDto/get-picture_activity.dto';
 
 export class CreateActivityDto {
   @IsString()
@@ -26,6 +27,9 @@ export class CreateActivityDto {
   @IsOptional()
   contract?: string;
 
+  @IsArray()
+  @IsOptional()
+  picture_urls?: CreatePictureActivityDto[];
 
 }
 

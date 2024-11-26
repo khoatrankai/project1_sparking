@@ -7,7 +7,7 @@ export class GetPictureActivityDto {
 
   @IsString()
   @IsNotEmpty()
-  url: string;
+  url: File;
 
   @IsString()
   @IsNotEmpty()

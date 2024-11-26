@@ -1,4 +1,4 @@
-import {  Body, Controller, Delete, Get,  Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {  Body, Controller, Delete, Get,  Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/ProductDto/create-product.dto';
 import { UpdateProductDto } from './dto/ProductDto/update-product.dto';
@@ -11,6 +11,10 @@ import { UpdateTypeProductDto } from './dto/TypeProductDto/update-type_product.d
 import { CreateUnitProductDto } from './dto/UnitProductDto/create-unit_product.dto';
 import { UpdateUnitProductDto } from './dto/UnitProductDto/update-unit_product.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { UpdateSupplierProductDto } from './dto/SupplierProductDto/update-supplier_product.dto';
+import { CreateSupplierProductDto } from './dto/SupplierProductDto/create-supplier_product.dto';
+import { CreateActivityContainerDto } from './dto/ActivityContainerDto/create-activity_container.dto';
+import { UpdateActivityContainerDto } from './dto/ActivityContainerDto/update-activity_container.dto';
 
 
 
@@ -157,6 +161,46 @@ export class ProductController {
     return this.productService.updateUnitProduct(id, updateUnitProductDto);
   }
  
+  @Post('supplier')
+async createSupplierProduct(@Body() createSupplierProductDto: CreateSupplierProductDto) {
+  return this.productService.createSupplierProduct(createSupplierProductDto);
+}
 
-  
+@Get('supplier')
+async findAllSupplierProduct() {
+  return this.productService.findAllSupplierProduct();
+}
+
+@Get('supplier/:id')
+async findOneSupplierProduct(@Param('id') id: string) {
+  return this.productService.findOneSupplierProduct(id);
+}
+
+@Put('supplier/:id')
+async updateSupplierProduct(@Param('id') id: string, @Body() updateSupplierProductDto: UpdateSupplierProductDto) {
+  return this.productService.updateSupplierProduct(id, updateSupplierProductDto);
+}
+
+@Post('activity_container')
+  async createActivityContainer(@Body() createActivityContainerDto: CreateActivityContainerDto) {
+    return this.productService.createActivityContainer(createActivityContainerDto);
+  }
+
+  @Get('activity_container')
+  async findAllActivityContainers(@Query('type') type:string) {
+    return this.productService.findAllActivityContainers(type);
+  }
+
+  @Get('activity_container/:id')
+  async findActivityContainerById(@Param('id') id: string) {
+    return this.productService.findActivityContainerById(id);
+  }
+
+  @Put('activity_container/:id')
+  async updateActivityContainer(
+    @Param('id') id: string,
+    @Body() updateActivityContainerDto: UpdateActivityContainerDto,
+  ) {
+    return this.productService.updateActivityContainer(id, updateActivityContainerDto);
+  }
 }

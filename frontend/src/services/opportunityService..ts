@@ -1,5 +1,5 @@
 
-import { ICreateOpportunitiesDto, ICreateOpportunitySourcesDto, ICreateTypeOpportunitiesDto, IUpdateOpportunitiesDto, IUpdateOpportunitySourcesDto, IUpdateTypeOpportunitiesDto } from '@/models/opportunityInterface';
+import { ICreateOpportunitiesDto, ICreateOpportunitySourcesDto, ICreateTypeOpportunitiesDto, IUpdateOpportunitiesDto, IUpdateTypeOpportunitiesDto } from '@/models/opportunityInterface';
 import api from './api';
 
 const opportunityService = {

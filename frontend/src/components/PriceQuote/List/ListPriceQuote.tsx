@@ -17,6 +17,9 @@ export default function ListPropose() {
   const { datas: dataSources } = useSelector(
     (state: RootState) => state.get_price_quotes
   );
+  const { datas: dataProfits } = useSelector(
+    (state: RootState) => state.get_profits
+  );
   const [dataFilter, setDataFilter] = useState<
     IGetPriceQuote[] | [] | undefined
   >([]);
@@ -49,7 +52,15 @@ export default function ListPropose() {
         <>
           {record.products
             .reduce((preValue, currValue) => {
-              return currValue.quantity * currValue.price + preValue;
+              const priceProfit =
+                currValue.price *
+                currValue.quantity *
+                ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                  ?.type_profit ?? 0) /
+                  100);
+              return (
+                currValue.quantity * currValue.price + priceProfit + preValue
+              );
             }, 0)
             .toLocaleString("vi-VN")}
           đ

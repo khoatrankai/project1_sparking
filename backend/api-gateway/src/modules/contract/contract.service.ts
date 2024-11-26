@@ -26,6 +26,12 @@ export class ContractService {
     );
   }
 
+  async getTypeContracts() {
+    return firstValueFrom(
+      this.contractClient.send({ cmd: 'get-type_contracts' }, {})
+    );
+  }
+
   async updateTypeContract(updateTypeContractDto: UpdateTypeContractDto) {
     return firstValueFrom(
       this.contractClient.send({ cmd: 'update-type_contract' }, updateTypeContractDto)
@@ -46,6 +52,10 @@ export class ContractService {
 
   async getContracts() {
     return firstValueFrom(this.contractClient.send({ cmd: 'get-contracts' }, {}));
+  }
+
+  async getContract(id:string) {
+    return firstValueFrom(this.contractClient.send({ cmd: 'get-contract' }, id));
   }
 
   async createPayment(createPaymentDto: CreatePaymentDto) {

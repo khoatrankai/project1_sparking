@@ -20,7 +20,7 @@ import systemService from "@/services/systemService";
 import { Vat } from "@/models/systemInterface";
 import { Option } from "antd/es/mentions";
 import {
-  ICodeProduct,
+  IGetCodeProduct,
   IPictureUrl,
   ITypeProduct,
   IUnitProduct,
@@ -34,10 +34,11 @@ import TabPane from "antd/es/tabs/TabPane";
 import { ColumnsType } from "antd/es/table";
 // import ModalQrScanner from "./ModalQrScanner";
 import ModalGenerateQr from "./ModalGenerateQr";
-import { AppDispatch } from "@/redux/store/store";
+import { AppDispatch, RootState } from "@/redux/store/store";
 import { useDispatch } from "react-redux";
 import { fetchProductInfos } from "@/redux/store/slices/productSlices/get_products";
 import { fetchProductAbout } from "@/redux/store/slices/productSlices/get_about.slice";
+import { useSelector } from "react-redux";
 
 type Props = {
   productID: string;
@@ -54,7 +55,10 @@ const getBase64 = (file: FileType): Promise<string> =>
   });
 
 const ModalUpdateProduct = (props: Props) => {
-  const [dataSource, setDataSource] = useState<ICodeProduct[] | []>([]);
+  const [dataSource, setDataSource] = useState<IGetCodeProduct[] | []>([]);
+  const { datas: dataProfits } = useSelector(
+    (state: RootState) => state.get_profits
+  );
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const { postdata } = usePostData();
   const dispatch = useDispatch<AppDispatch>();
@@ -66,7 +70,7 @@ const ModalUpdateProduct = (props: Props) => {
       setDataSource(data.data);
     }
   };
-  const columns: ColumnsType<ICodeProduct> = [
+  const columns: ColumnsType<IGetCodeProduct> = [
     {
       title: "ID sản phẩm",
       dataIndex: "code_product_id",
@@ -120,6 +124,9 @@ const ModalUpdateProduct = (props: Props) => {
   const { data: dataTypes } = useFetchData<ITypeProduct[]>(
     productService.getTypes
   );
+  const { datas: dataSupplier } = useSelector(
+    (state: RootState) => state.get_supplier
+  );
   const [form] = useForm();
   const { data: dataVats } = useFetchData<Vat[]>(systemService.getVats);
   const { data: dataUnits } = useFetchData<IUnitProduct[]>(
@@ -133,6 +140,7 @@ const ModalUpdateProduct = (props: Props) => {
         ...res.data,
         type: res.data?.type?.type_product_id,
         unit_product: res.data?.unit_product?.unit_id,
+        supplier_product: res.data.supplier_product?.supplier_id,
       });
       setFileList(
         res.data?.picture_urls?.map((dt: IPictureUrl) => {
@@ -248,6 +256,29 @@ const ModalUpdateProduct = (props: Props) => {
                 <Input placeholder="Tên sản phẩm" />
               </Form.Item>
               <Form.Item
+                name="supplier_product"
+                className="!m-0"
+                label="Nhà cung cấp"
+                // rules={[{ required: true, message: "Vui lòng chọn loại!" }]}
+                style={{ minWidth: "320px", flex: "1 1 0%" }}
+              >
+                <Select
+                  placeholder="Chọn nhà cung cấp"
+                  showSearch
+                  filterOption={(input, option) => {
+                    return (option?.children?.join("") ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase());
+                  }}
+                >
+                  {dataSupplier?.map((dt) => (
+                    <Option key={dt.supplier_id} value={dt.supplier_id}>
+                      {dt.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
                 name="type"
                 className="!m-0"
                 label="Loại sản phẩm"
@@ -298,7 +329,7 @@ const ModalUpdateProduct = (props: Props) => {
                 className="!m-0"
                 label="Thuế"
                 // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
-                style={{ minWidth: "320px", flex: "1 1 0%" }}
+                style={{ minWidth: "240px", flex: "1 1 0%" }}
               >
                 <Select
                   placeholder="Chọn loại thuế"
@@ -317,11 +348,34 @@ const ModalUpdateProduct = (props: Props) => {
                 </Select>
               </Form.Item>
               <Form.Item
+                name="profit"
+                className="!m-0"
+                label="Lợi nhuận"
+                // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
+                style={{ minWidth: "240px", flex: "1 1 0%" }}
+              >
+                <Select
+                  placeholder="Chọn loại lợi nhuận"
+                  showSearch
+                  filterOption={(input, option) => {
+                    return (option?.children?.join("") ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase());
+                  }}
+                >
+                  {dataProfits?.map((dt) => (
+                    <Option key={dt.profit_id} value={dt.profit_id}>
+                      {dt.type_profit}%
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
                 name="unit_product"
                 className="!m-0"
                 label="Đơn vị sản phẩm"
                 // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
-                style={{ minWidth: "320px", flex: "1 1 0%" }}
+                style={{ minWidth: "240px", flex: "1 1 0%" }}
               >
                 <Select
                   placeholder="Chọn loại đơn vị"
@@ -391,7 +445,7 @@ const ModalUpdateProduct = (props: Props) => {
               productID={props.productID}
               fetchListCode={fetchListCode}
             />
-            <Table<ICodeProduct>
+            <Table<IGetCodeProduct>
               columns={columns}
               // rowSelection={rowSelection}
               dataSource={dataSource}

@@ -1,11 +1,11 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Contract } from 'src/database/entities/contract.entity';
 import { CreateTypeContractDto } from 'src/dto/TypeContractDto/create_type_contract.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 
 
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { TypeContract } from 'src/database/entities/type_contract.entity';
 import { UpdateTypeContractDto } from 'src/dto/TypeContractDto/update_type_contract.dto';
 import { UpdateContractDto } from 'src/dto/ContractDto/update_contract.dto';
@@ -16,12 +16,14 @@ import { TypeMethod } from 'src/database/entities/type_method.entity';
 import { CreateTypeMethodDto } from 'src/dto/TypeMethodDto/create-type_method.dto';
 import { UpdateTypeMethodDto } from 'src/dto/TypeMethodDto/update-type_method.dto';
 import { CreateContractDto } from 'src/dto/ContractDto/create_contract.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 
 
 @Injectable()
 export class ContractService {
 
-  constructor(@InjectRepository(Contract) private readonly contractRepository:Repository<Contract>,@InjectRepository(TypeContract) private readonly typeContractRepository:Repository<TypeContract>,@InjectRepository(Payment)
+  constructor(@Inject('CUSTOMER') private readonly customersClient:ClientProxy,@InjectRepository(Contract) private readonly contractRepository:Repository<Contract>,@InjectRepository(TypeContract) private readonly typeContractRepository:Repository<TypeContract>,@InjectRepository(Payment)
   private paymentRepository: Repository<Payment>,
  @InjectRepository(TypeMethod)
   private typeMethodRepository: Repository<TypeMethod>){}
@@ -87,7 +89,8 @@ async createContract(createContract: CreateContractDto) {
       statusCode: HttpStatus.CREATED,
       message: 'Contract created successfully',
     };
-  } catch {
+  } catch(err) {
+    console.log(err)
     return {
       statusCode: HttpStatus.BAD_REQUEST,
       message: 'Failed to create Contract',
@@ -119,13 +122,47 @@ async updateContract(updateContract: UpdateContractDto) {
 
 // Get all Contracts
 async getContracts() {
-  const result = await this.contractRepository.find();
+  const result = await this.contractRepository.find({relations:['type_contract']});
+  console.log(result)
+  const customerIds = result.map((dt)=> dt.customer)
+  const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},customerIds))
   return {
     statusCode: HttpStatus.OK,
     message: 'Contracts retrieved successfully',
-    data: result,
+    data: result.map((dt,index)=>{
+      return {...dt,customer:customerInfos[index]}
+    }),
   };
 }
+
+async getContractID(id:string) {
+  const result = await this.contractRepository.findOne({where:{contract_id:id},relations:['type_contract']});
+  // const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_id'},result.customer))
+  return {
+    statusCode: HttpStatus.OK,
+    message: 'Contracts retrieved successfully',
+    data: {...result,type_contract:result.type_contract.type_id}
+    ,
+  };
+}
+async getContractIDs(contract_ids:string[]){
+  const data = await this.contractRepository.find({where:{contract_id:In(contract_ids)}});
+  const sortedData = contract_ids.map(id => data.find(contract => contract.contract_id === id))
+  return sortedData
+}
+
+// async getContracts() {
+//   const result = await this.contractRepository.find({relations:['type_contract']});
+//   const customerIds = result.map((dt)=> dt.customer)
+//   const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},customerIds))
+//   return {
+//     statusCode: HttpStatus.OK,
+//     message: 'Contracts retrieved successfully',
+//     data: result.map((dt,index)=>{
+//       return {...dt,customer:customerInfos[index]}
+//     }),
+//   };
+// }
 
 // Create a new Payment
 async createPayment(createPaymentDto: CreatePaymentDto) {
@@ -272,5 +309,59 @@ async getAllTypeMethods() {
     message: 'TypeMethods retrieved successfully',
     data: result,
   };
+}
+
+
+
+
+
+// Get a TypeContract by ID
+async getTypeContract(type_id: string) {
+  const typeContract = await this.typeContractRepository.findOne({
+    where: { type_id },
+  });
+  if (!typeContract) {
+    throw new NotFoundException({
+      statusCode: HttpStatus.NOT_FOUND,
+      message: `TypeContract with ID ${type_id} not found`,
+    });
+  }
+  return {
+    statusCode: HttpStatus.OK,
+    message: 'TypeContract retrieved successfully',
+    data: typeContract,
+  };
+}
+
+// Get all TypeContracts
+async getAllTypeContracts() {
+  const result = await this.typeContractRepository.find();
+  return {
+    statusCode: HttpStatus.OK,
+    message: 'TypeContracts retrieved successfully',
+    data: result,
+  };
+}
+
+// Delete a TypeContract by ID
+async deleteTypeContract(type_id: string) {
+  try {
+    const result = await this.typeContractRepository.delete(type_id);
+    if (result.affected === 0) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `TypeContract with ID ${type_id} not found`,
+      });
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'TypeContract deleted successfully',
+    };
+  } catch (error) {
+    return {
+      statusCode: HttpStatus.BAD_REQUEST,
+      message: 'Failed to delete TypeContract',
+    };
+  }
 }
 }

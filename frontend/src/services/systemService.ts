@@ -9,6 +9,10 @@ const systemService = {
     const response = await api.get(`/system/vats`);
     return response.data;
   },
+  getProfits: async () => {
+    const response = await api.get(`/system/profits`);
+    return response.data;
+  },
 
 
 };

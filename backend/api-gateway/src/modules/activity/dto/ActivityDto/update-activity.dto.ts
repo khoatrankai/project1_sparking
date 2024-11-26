@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsArray, IsOptional, IsString } from "class-validator";
+import { CreatePictureActivityDto } from "../PictureActivityDto/get-picture_activity.dto";
 
 export class UpdateActivityDto {
   @IsString()
@@ -20,4 +21,8 @@ export class UpdateActivityDto {
   @IsString()
   @IsOptional()
   contract?: string;
+
+  @IsArray()
+  @IsOptional()
+  picture_urls?: CreatePictureActivityDto[];
 }

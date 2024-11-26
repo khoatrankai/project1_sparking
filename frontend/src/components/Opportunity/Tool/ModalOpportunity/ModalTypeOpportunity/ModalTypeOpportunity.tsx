@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button, Form, Input, Modal, Table } from "antd";
-import productService from "@/services/productService";
+// import productService from "@/services/productService";
 import usePostData from "@/hooks/usePostData";
 import { useForm } from "antd/es/form/Form";
 import { ColumnsType } from "antd/es/table";
@@ -10,7 +10,7 @@ import { CiEdit } from "react-icons/ci";
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { fetchProductTypes } from "@/redux/store/slices/productSlices/get_type.slice";
+// import { fetchProductTypes } from "@/redux/store/slices/productSlices/get_type.slice";
 import {
   ICreateTypeOpportunitiesDto,
   IGetTypeOpportunitiesDto,

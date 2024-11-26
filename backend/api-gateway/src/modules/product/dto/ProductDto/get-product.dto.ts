@@ -1,30 +1,22 @@
-import { IsString, IsNumber, IsEnum } from 'class-validator';
+
+import { GetUnitProductDto } from '../UnitProductDto/get-unit_product.dto';
+import { GetTypeProductDto } from '../TypeProductDto/get-type_product.dto';
+import { GetSupplierProductDto } from '../SupplierProductDto/get-supplier_product.dto';
+import { GetPictureProductDto } from '../PictureProductDto/get-picture_product.dto';
+import { GetCodeProductDto } from '../CodeProductDto/get-code_product.dto';
 
 export class GetProductDto {
-  @IsString()
   product_id: string;
-
-  @IsString()
   name: string;
-
-  @IsString()
-  type: string;
-
-  @IsNumber()
+  type: GetTypeProductDto; // ID hoặc tên loại sản phẩm
   price: number;
-
-  @IsString()
   description: string;
-
-  @IsNumber()
-  vat: number;
-
-  @IsNumber()
+  vat: string;
+  profit: string;
   quantity: number;
-
-  @IsString()
-  unit_product: string;
-
-  @IsEnum(['active', 'delete', 'hide'])
+  unit_product: GetUnitProductDto; // ID hoặc tên đơn vị sản phẩm
   status: 'active' | 'delete' | 'hide';
+  supplier_product: GetSupplierProductDto; // ID hoặc tên nhà cung cấp
+  picture_urls: GetPictureProductDto[]; // URL của hình ảnh sản phẩm
+  code_product: GetCodeProductDto[]; // ID các mã sản phẩm
 }

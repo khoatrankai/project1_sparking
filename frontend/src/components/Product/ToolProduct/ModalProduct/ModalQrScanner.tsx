@@ -2,16 +2,16 @@
 import { Button, Modal, Table } from "antd";
 // import QrReader from "react-qr-reader";
 import { BiQrScan } from "react-icons/bi";
-import { ICodeProduct } from "@/models/productInterface";
 import { ColumnsType } from "antd/es/table";
 import productService from "@/services/productService";
 import { useEffect, useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
+import { IGetCodeProduct } from "@/models/productInterface";
 
 const ModalQrScanner = () => {
   const [startScan, setStartScan] = useState(false);
   const [scanText, setScanText] = useState<string | undefined>();
-  const [dataSource, setDataSource] = useState<ICodeProduct[]>([]);
+  const [dataSource, setDataSource] = useState<IGetCodeProduct[]>([]);
   const handleScan = (scanData: string) => {
     if (scanData && scanData !== "") {
       setScanText(scanData);
@@ -62,7 +62,7 @@ const ModalQrScanner = () => {
     setStartScan(false);
   };
 
-  const columns: ColumnsType<ICodeProduct> = [
+  const columns: ColumnsType<IGetCodeProduct> = [
     {
       title: "ID sản phẩm",
       dataIndex: "code_product_id",
@@ -142,13 +142,13 @@ const ModalQrScanner = () => {
                 <Scanner
                   onScan={(e) => {
                     // setStartScan(false);
-                    // console.log(e);
+                    console.log(e);
                     if (e.length > 0) handleScan(e[0].rawValue);
                   }}
                 />
               </div>
 
-              <Table<ICodeProduct>
+              <Table<IGetCodeProduct>
                 columns={columns}
                 className="flex-1 min-w-96"
                 dataSource={dataSource}

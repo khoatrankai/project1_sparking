@@ -1,4 +1,4 @@
-import { CreateInfoCustomer, IUpdateCustomerInfo } from '@/models/customerInterface';
+import { CreateGroupCustomer, CreateInfoCustomer, IUpdateCustomerInfo, UpdateGroupCustomer } from '@/models/customerInterface';
 import api from './api';
 
 const customerService = {
@@ -20,6 +20,14 @@ const customerService = {
   },
   createInfoCustomer: async (data:CreateInfoCustomer) => {
     const response = await api.post(`/customer/create-customer-info`,data);
+    return response.data;
+  },
+  createGroupCustomer: async (data:CreateGroupCustomer) => {
+    const response = await api.post(`/customer/create-group-customer`,data);
+    return response.data;
+  },
+  updateGroupCustomer: async (group_id:string,data:UpdateGroupCustomer) => {
+    const response = await api.put(`/customer/update-group-customer/${group_id}`,data);
     return response.data;
   },
 

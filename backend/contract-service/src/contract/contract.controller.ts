@@ -2,7 +2,7 @@ import { Controller, Get, UseFilters } from '@nestjs/common';
 
 import { ConflictExceptionFilter } from 'src/common/filters/conflict-exception.filter';
 import { ContractService } from './contract.service';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateTypeContractDto } from 'src/dto/TypeContractDto/create_type_contract.dto';
 import { UpdateTypeContractDto } from 'src/dto/TypeContractDto/update_type_contract.dto';
 import { CreateContractDto } from 'src/dto/ContractDto/create_contract.dto';
@@ -27,6 +27,11 @@ export class ContractController {
     return this.contractService.createTypeContract(createTypeContract);
   }
 
+  @MessagePattern({ cmd: 'get-type_contracts' })
+  async getTypeContract() {
+    return this.contractService.getAllTypeContracts();
+  }
+
   @MessagePattern({ cmd: 'update-type_contract' })
   async updateTypeContract(updateTypeContract: UpdateTypeContractDto) {
     return this.contractService.updateTypeContract(updateTypeContract);
@@ -45,7 +50,17 @@ export class ContractController {
 
   @MessagePattern({ cmd: 'get-contracts' })
   async getContracts() {
+    console.log("vao day")
     return this.contractService.getContracts();
+  }
+
+  @MessagePattern({ cmd: 'get-contract' })
+  async getContract(@Payload() data:{id:string}) {
+    return this.contractService.getContractID(data.id);
+  }
+  @MessagePattern({ cmd: 'get-contract_ids' })
+  async getContractIds(@Payload() data:string[]) {
+    return this.contractService.getContractIDs(data);
   }
 
   // Payment patterns

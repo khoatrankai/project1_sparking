@@ -43,7 +43,14 @@ const Sidebar = () => {
       icon: <TbZoomMoney />,
       children: [
         { key: "price_quote", label: "Báo giá" },
-        { key: "contract", label: "Hợp đồng" },
+        {
+          key: "contract",
+          label: (
+            <Link href="/admin/contract">
+              <span>Hợp đồng</span>
+            </Link>
+          ),
+        },
         {
           key: "propose",
           label: (
@@ -61,7 +68,16 @@ const Sidebar = () => {
       key: "user",
       label: "Nhân viên",
       icon: <FaUser />,
-      children: [{ key: "users", label: "Danh sách nhân viên" }],
+      children: [
+        {
+          key: "users",
+          label: (
+            <Link href="/admin/user">
+              <span>Danh sách nhân viên</span>
+            </Link>
+          ),
+        },
+      ],
     },
     {
       key: "opportunity",

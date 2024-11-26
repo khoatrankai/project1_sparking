@@ -5,9 +5,8 @@ export class CreatePictureActivityDto {
   @IsOptional()
   picture_id: string;
 
-  @IsString()
   @IsNotEmpty()
-  url: string;
+  url: File;
 
   @IsString()
   @IsNotEmpty()

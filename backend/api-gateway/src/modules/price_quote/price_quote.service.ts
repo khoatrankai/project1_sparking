@@ -17,8 +17,8 @@ export class PriceQuoteService {
     return this.priceQuoteClient.send({ cmd: 'create-price_quote' }, createPriceQuoteDto)
   }
 
-  async sendUpdatePriceQueto(updatePriceQuetoDto: UpdatePriceQuoteDto) {
-    return this.priceQuoteClient.send('update-price_quote', updatePriceQuetoDto)
+  async sendUpdatePriceQueto(id:string,updatePriceQuetoDto: UpdatePriceQuoteDto) {
+    return this.priceQuoteClient.send({ cmd: 'update-price_quote' }, {id,data:updatePriceQuetoDto})
   }
 
   async sendGetPriceQueto(filter?:PriceQuoteFilterDto) {

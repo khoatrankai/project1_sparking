@@ -24,6 +24,10 @@ export class UpdateProductDto {
     vat?: string;
 
     @IsOptional()
+    @IsString()
+    profit?: string;
+
+    @IsOptional()
     @IsNumber()
     quantity?: number;
 
@@ -34,4 +38,8 @@ export class UpdateProductDto {
     @IsOptional()
     @IsEnum(['active', 'delete', 'hide'])
     status?: 'active' | 'delete' | 'hide';
+
+    @IsString()
+    @IsOptional()
+    supplier_product?: string;
 }

@@ -3,7 +3,6 @@ import usePostData from "@/hooks/usePostData";
 import { ICreatePriceQuote } from "@/models/priceQuoteInterface";
 import { IGetProductInfo } from "@/models/productInterface";
 
-import { CreatePropose } from "@/models/proposeInterface";
 import { Vat } from "@/models/systemInterface";
 import { InfoUser } from "@/models/userInterface";
 import { RootState } from "@/redux/store/store";
@@ -22,13 +21,12 @@ import {
   Tabs,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
-import TextArea from "antd/es/input/TextArea";
 import { Option } from "antd/es/mentions";
 import { ColumnsType } from "antd/es/table";
 import TabPane from "antd/es/tabs/TabPane";
 import React, { useEffect, useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { useSelector } from "react-redux";
 
 // type Props = {}
@@ -41,7 +39,11 @@ export default function ModalAddPriceQuote() {
   const { datas: dataProducts } = useSelector(
     (state: RootState) => state.info_products
   );
-  const [tabFormProduct, setTabFormProduct] = useState<boolean>(false);
+
+  const { datas: dataProfits } = useSelector(
+    (state: RootState) => state.get_profits
+  );
+  // const [tabFormProduct, setTabFormProduct] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<IGetProductInfo[] | []>([]);
   const [discount, setDiscount] = useState<number>(0);
   const [typeDiscount, setTypeDiscount] = useState<string | undefined>(
@@ -69,11 +71,11 @@ export default function ModalAddPriceQuote() {
       key: "type",
       render: (value) => <div className="flex gap-1 items-center">{value}</div>,
     },
-    {
-      title: "Mã sản phẩm",
-      dataIndex: "product_id",
-      key: "product_id",
-    },
+    // {
+    //   title: "Mã sản phẩm",
+    //   dataIndex: "product_id",
+    //   key: "product_id",
+    // },
     {
       title: "Tên sản phẩm",
       dataIndex: "name",
@@ -84,9 +86,9 @@ export default function ModalAddPriceQuote() {
       dataIndex: "quantity",
       key: "quantity",
       render: (value, record) => {
-        const maxQuantity = dataProducts.find(
-          (dt) => dt.product_id === record.product_id
-        )?.quantity;
+        const maxQuantity = record.code_product.filter(
+          (dt) => dt.status === "inventory"
+        ).length;
         console.log(maxQuantity);
         return (
           <>
@@ -119,14 +121,69 @@ export default function ModalAddPriceQuote() {
       title: "Thuế VAT",
       dataIndex: "vat",
       key: "vat",
-      render: (value) => (
+      render: (value, record, index) => (
         <>
-          {
-            dataVats?.find((dt) => {
-              return dt.vat_id === value;
-            })?.type_vat
-          }
-          %
+          <Select
+            placeholder="Chọn loại thuế"
+            showSearch
+            defaultValue={value}
+            onChange={(e) => {
+              setDataSource((preValue) => {
+                return preValue.map((dt, i) => {
+                  if (index === i) {
+                    return { ...dt, vat: e };
+                  }
+                  return dt;
+                });
+              });
+            }}
+            filterOption={(input, option) => {
+              return (option?.children?.join("") ?? "")
+                .toLowerCase()
+                .includes(input.toLowerCase());
+            }}
+          >
+            {dataVats?.map((dt) => (
+              <Option key={dt.vat_id} value={dt.vat_id}>
+                {dt.type_vat}%
+              </Option>
+            ))}
+          </Select>
+        </>
+      ),
+    },
+    {
+      title: "Lợi nhuận",
+      dataIndex: "profit",
+      key: "profit",
+      render: (value, record, index) => (
+        <>
+          <Select
+            placeholder="Chọn loại thuế"
+            showSearch
+            defaultValue={value}
+            onChange={(e) => {
+              setDataSource((preValue) => {
+                return preValue.map((dt, i) => {
+                  if (index === i) {
+                    return { ...dt, profit: e };
+                  }
+                  return dt;
+                });
+              });
+            }}
+            filterOption={(input, option) => {
+              return (option?.children?.join("") ?? "")
+                .toLowerCase()
+                .includes(input.toLowerCase());
+            }}
+          >
+            {dataProfits?.map((dt) => (
+              <Option key={dt.profit_id} value={dt.profit_id}>
+                {dt.type_profit}%
+              </Option>
+            ))}
+          </Select>
         </>
       ),
     },
@@ -135,9 +192,31 @@ export default function ModalAddPriceQuote() {
       title: "Giá sản phẩm (VNĐ)",
       dataIndex: "price",
       key: "price",
-      render: (price) => {
-        return `${price.toLocaleString("vi-VN")}đ`;
-      }, // Định dạng số thành VNĐ
+      render: (price, record, index) => (
+        <>
+          <InputNumber
+            placeholder="Giá"
+            onChange={(e) => {
+              setDataSource((preValue) => {
+                return preValue.map((dt, i) => {
+                  if (index === i) {
+                    return { ...dt, price: e };
+                  }
+                  return dt;
+                });
+              });
+            }}
+            className="w-full"
+            defaultValue={price}
+            formatter={(value) =>
+              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }
+            parser={(value) =>
+              value?.replace(/\$\s?|(,*)/g, "") as unknown as number
+            }
+          />
+        </>
+      ),
     },
     {
       title: "",
@@ -163,7 +242,6 @@ export default function ModalAddPriceQuote() {
     },
   ];
   const [form] = useForm();
-  const [formProduct] = useForm();
   const { postdata } = usePostData();
 
   const { data: dataUsers } = useFetchData<InfoUser[]>(userService.getUsers);
@@ -188,6 +266,7 @@ export default function ModalAddPriceQuote() {
             product: dt.product_id,
             quantity: dt.quantity,
             vat: dt.vat,
+            profit: dt.profit,
           };
         }),
       })
@@ -197,14 +276,20 @@ export default function ModalAddPriceQuote() {
     }
   };
 
-  const handleAddProduct = () => {
-    formProduct.submit();
-  };
+  // const handleAddProduct = () => {
+  //   formProduct.submit();
+  // };
 
   useEffect(() => {
     if (dataSource) {
       const total = dataSource.reduce((preValue, currValue) => {
-        return currValue.price * currValue.quantity + preValue;
+        const priceProfit =
+          currValue.price *
+          currValue.quantity *
+          ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+            ?.type_profit ?? 0) /
+            100);
+        return currValue.price * currValue.quantity + priceProfit + preValue;
       }, 0);
 
       setPriceTotal(total);
@@ -213,8 +298,16 @@ export default function ModalAddPriceQuote() {
         const totalDiscount =
           typeDiscount === "percent"
             ? dataSource.reduce((preValue, currValue) => {
+                const priceProfit =
+                  currValue.price *
+                  currValue.quantity *
+                  ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                    ?.type_profit ?? 0) /
+                    100);
                 return (
-                  (currValue.price * currValue.quantity * discount) / 100 +
+                  ((currValue.price * currValue.quantity + priceProfit) *
+                    discount) /
+                    100 +
                   preValue
                 );
               }, 0)
@@ -222,9 +315,18 @@ export default function ModalAddPriceQuote() {
         const totalVat =
           typeDiscount === "percent"
             ? dataSource.reduce((preValue, currValue) => {
+                const priceProfit =
+                  currValue.price *
+                  currValue.quantity *
+                  ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                    ?.type_profit ?? 0) /
+                    100);
                 return (
-                  ((currValue.price * currValue.quantity -
-                    (currValue.price * currValue.quantity * discount) / 100) *
+                  ((currValue.price * currValue.quantity +
+                    priceProfit -
+                    ((currValue.price * currValue.quantity + priceProfit) *
+                      discount) /
+                      100) *
                     (dataVats?.find((dt) => dt.vat_id === currValue.vat)
                       ?.type_vat ?? 0)) /
                     100 +
@@ -232,9 +334,17 @@ export default function ModalAddPriceQuote() {
                 );
               }, 0)
             : dataSource.reduce((preValue, currValue) => {
+                const priceProfit =
+                  currValue.price *
+                  currValue.quantity *
+                  ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                    ?.type_profit ?? 0) /
+                    100);
                 return (
-                  ((currValue.price * currValue.quantity -
-                    ((currValue.price * currValue.quantity) / total) *
+                  ((currValue.price * currValue.quantity +
+                    priceProfit -
+                    ((currValue.price * currValue.quantity + priceProfit) /
+                      total) *
                       discount) *
                     (dataVats?.find((dt) => dt.vat_id === currValue.vat)
                       ?.type_vat ?? 0)) /
@@ -249,9 +359,14 @@ export default function ModalAddPriceQuote() {
         //   return currValue.price * currValue.quantity * discount/100 + preValue;
         // }, 0) : discount
         const totalVat = dataSource.reduce((preValue, currValue) => {
+          const priceProfit =
+            currValue.price *
+            currValue.quantity *
+            ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+              ?.type_profit ?? 0) /
+              100);
           return (
-            (currValue.price *
-              currValue.quantity *
+            ((currValue.price * currValue.quantity + priceProfit) *
               (dataVats?.find((dt) => dt.vat_id === currValue.vat)?.type_vat ??
                 0)) /
               100 +
@@ -261,10 +376,16 @@ export default function ModalAddPriceQuote() {
         const totalDiscount =
           typeDiscount === "percent"
             ? dataSource.reduce((preValue, currValue) => {
+                const priceProfit =
+                  currValue.price *
+                  currValue.quantity *
+                  ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                    ?.type_profit ?? 0) /
+                    100);
                 return (
-                  ((currValue.price * currValue.quantity -
-                    (currValue.price *
-                      currValue.quantity *
+                  ((currValue.price * currValue.quantity +
+                    priceProfit -
+                    ((currValue.price * currValue.quantity + priceProfit) *
                       (dataVats?.find((dt) => dt.vat_id === currValue.vat)
                         ?.type_vat ?? 0)) /
                       100) *
@@ -481,11 +602,20 @@ export default function ModalAddPriceQuote() {
                       .includes(input.toLowerCase());
                   }}
                 >
-                  {dataProducts?.map((dt) => (
-                    <Option key={dt.product_id} value={dt.product_id}>
-                      {dt.name}
-                    </Option>
-                  ))}
+                  {dataProducts?.map((dt) => {
+                    const maxQuantity = dt.code_product.filter(
+                      (dt) => dt.status === "inventory"
+                    ).length;
+                    return (
+                      <Option
+                        disabled={!(maxQuantity > 0)}
+                        key={dt.product_id}
+                        value={dt.product_id}
+                      >
+                        {dt.name} {maxQuantity === 0 && "(hết hàng)"}
+                      </Option>
+                    );
+                  })}
                 </Select>
                 {/* <Button
                   type="primary"

@@ -24,11 +24,14 @@ import { UpdateListUseProductDto } from 'src/dto/update_list_user_product.dto';
 import { CreateVatDto } from 'src/dto/create_vat.dto';
 import { Vats } from 'src/database/entities/vat.entity';
 import { UpdateVatDto } from 'src/dto/update_vat.dto';
+import { Profits } from 'src/database/entities/profit.entity';
+import { CreateProfitDto } from 'src/dto/create_profit.dto';
+import { UpdateProfitDto } from 'src/dto/update_profit.dto';
 
 @Injectable()
 export class SystemService {
 
-  constructor(@InjectRepository(Label) private readonly labelRepository:Repository<Label>,@InjectRepository(UnitProduct) private readonly unitProductRepository:Repository<UnitProduct>,@InjectRepository(Province) private readonly provinceRepository:Repository<Province>,@InjectRepository(Vats) private readonly vatRepository:Repository<Vats>,@InjectRepository(Product) private readonly productRepository:Repository<Product>,@InjectRepository(PictureProduct) private readonly pictureProductRepository:Repository<PictureProduct>,@InjectRepository(ListUseProduct) private readonly listUseProductRepository:Repository<ListUseProduct>){}
+  constructor(@InjectRepository(Label) private readonly labelRepository:Repository<Label>,@InjectRepository(UnitProduct) private readonly unitProductRepository:Repository<UnitProduct>,@InjectRepository(Province) private readonly provinceRepository:Repository<Province>,@InjectRepository(Vats) private readonly vatRepository:Repository<Vats>,@InjectRepository(Profits) private readonly profitRepository:Repository<Profits>,@InjectRepository(Product) private readonly productRepository:Repository<Product>,@InjectRepository(PictureProduct) private readonly pictureProductRepository:Repository<PictureProduct>,@InjectRepository(ListUseProduct) private readonly listUseProductRepository:Repository<ListUseProduct>){}
   getHello(): string {
     return 'Hello World!';
   }
@@ -132,6 +135,16 @@ export class SystemService {
     return await this.vatRepository.save(newVat);
   }
 
+  async createProfit(createProfit: CreateProfitDto) {
+    const newProfit = this.profitRepository.create(createProfit);
+    return await this.profitRepository.save(newProfit);
+  }
+
+  async createProfits(createProfitsDto: CreateProfitDto[]) {
+    const newProfit = this.profitRepository.create(createProfitsDto);
+    return await this.profitRepository.save(newProfit);
+  }
+
   async updateProvince(updateProvinceDto: UpdateProvinceDto) {
     await this.provinceRepository.update(updateProvinceDto.province_id, updateProvinceDto);
     return this.provinceRepository.findOne({ where: { province_id:updateProvinceDto.province_id } });
@@ -142,12 +155,21 @@ export class SystemService {
     return this.vatRepository.findOne({ where: { vat_id:updateVatDto.vat_id } });
   }
 
+  async updateProfit(updateProfitDto: UpdateProfitDto) {
+    await this.profitRepository.update(updateProfitDto.profit_id, updateProfitDto);
+    return this.profitRepository.findOne({ where: { profit_id:updateProfitDto.profit_id } });
+  }
+
   async getAllProvinces() {
     return await this.provinceRepository.find();
   }
 
   async getAllVats() {
     return await this.vatRepository.find();
+  }
+
+  async getAllProfits() {
+    return await this.profitRepository.find();
   }
 
   async getProvinceById(province_id: string) {

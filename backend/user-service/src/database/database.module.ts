@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountUsers } from './entities/account_users.entity';
 import { RoleTypeUser } from './entities/role_type_user.entity';
 import { RoleUser } from './entities/role_user.entity';
+import { CategoryRoleUser } from './entities/category_role_user.entity';
 
 
 @Module({
@@ -14,7 +15,7 @@ import { RoleUser } from './entities/role_user.entity';
       username: 'root',
       password: '123456789',
       database: 'db_sparking_2',
-      entities: [AccountUsers,RoleTypeUser,RoleUser],
+      entities: [AccountUsers,RoleTypeUser,RoleUser,CategoryRoleUser],
       // synchronize: true,
       // dropSchema: true,
     }),

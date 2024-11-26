@@ -22,6 +22,11 @@ export class UserController {
     return this.userService.getUserID(user_id)
   }
 
+  @MessagePattern({cmd:'get-user_id_admin'})
+  getUserIDAdmin(@Payload('user_id') user_id:string){
+    return this.userService.getUserIDAdmin(user_id)
+  }
+
   @MessagePattern({cmd:'get-user_ids'})
   getUserIDs(@Payload() user_ids:string[]){
     return this.userService.getUserIDs(user_ids)

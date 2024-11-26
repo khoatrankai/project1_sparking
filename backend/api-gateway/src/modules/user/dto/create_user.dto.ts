@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString, IsUrl, Length, IsEmail } from 'class-validator';
+import { IsEnum, IsOptional, IsString, Length, IsEmail } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -19,32 +19,26 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  @Length(1, 50)
   picture_url?: string;
 
   @IsOptional()
   @IsString()
-  @Length(1, 50)
   phone_number?: string;
 
   @IsOptional()
-  @IsUrl()
-  @Length(1, 50)
+  @IsString()
   link_facebook?: string;
 
   @IsOptional()
-  @IsUrl()
-  @Length(1, 50)
+  @IsString()
   link_in?: string;
 
   @IsOptional()
-  @IsUrl()
-  @Length(1, 50)
+  @IsString()
   link_skype?: string;
 
   @IsOptional()
   @IsString()
-  @Length(1, 50)
   sign_name?: string;
 
   @IsEnum(['active', 'delete', 'hide'])

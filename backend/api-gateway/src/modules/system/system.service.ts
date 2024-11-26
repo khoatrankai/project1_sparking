@@ -17,6 +17,8 @@ import { CreateVatDto } from './dto/create_vat.dto';
 import { UpdateVatDto } from './dto/update_vat.dto';
 import { CreateUnitProductDto } from './dto/create_unit_product.dto';
 import { UpdateUnitProductDto } from './dto/update_unit_product.dto';
+import { CreateProfitDto } from './dto/create_profit.dto';
+import { UpdateProfitDto } from './dto/update_profit.dto';
 
 
 
@@ -81,6 +83,10 @@ export class SystemService {
   async createVats(createVatsDto: CreateVatDto[]) {
     return this.systemClient.send({ cmd: 'create-vats' }, createVatsDto);
   }
+
+  async createProfits(createProfitsDto: CreateProfitDto[]) {
+    return this.systemClient.send({ cmd: 'create-profits' }, createProfitsDto);
+  }
   
   async updateProvince(updateProvinceDto: UpdateProvinceDto) {
     return this.systemClient.send({ cmd: 'update-province' }, updateProvinceDto);
@@ -88,6 +94,10 @@ export class SystemService {
 
   async updateVat(updateVatDto: UpdateVatDto) {
     return this.systemClient.send({ cmd: 'update-vat' }, updateVatDto);
+  }
+
+  async updateProfit(updateProfitDto: UpdateProfitDto) {
+    return this.systemClient.send({ cmd: 'update-profit' }, updateProfitDto);
   }
   
   async getAllProvinces():Promise<{statusCode:number,data:GetProvinceDto[]}> {
@@ -101,6 +111,13 @@ export class SystemService {
     return {
       statusCode:HttpStatus.OK,
       data:await firstValueFrom(this.systemClient.send({ cmd: 'get-vats' }, {}))
+    };
+  }
+
+  async getAllProfits() {
+    return {
+      statusCode:HttpStatus.OK,
+      data:await firstValueFrom(this.systemClient.send({ cmd: 'get-profits' }, {}))
     };
   }
   

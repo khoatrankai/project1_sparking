@@ -13,6 +13,10 @@ import { CreateTypeProductDto } from 'src/dto/TypeProductDto/create-type_product
 import { UpdateTypeProductDto } from 'src/dto/TypeProductDto/update-type_product.dto';
 import { CreateUnitProductDto } from 'src/dto/UnitProductDto/create-unit_product.dto';
 import { UpdateUnitProductDto } from 'src/dto/UnitProductDto/update-unit_product.dto';
+import { CreateSupplierProductDto } from 'src/dto/SupplierProductDto/create-supplier_product.dto';
+import { UpdateSupplierProductDto } from 'src/dto/SupplierProductDto/update-supplier_product.dto';
+import { CreateActivityContainerDto } from 'src/dto/ActivityContainerDto/create-activity_container.dto';
+import { UpdateActivityContainerDto } from 'src/dto/ActivityContainerDto/update-activity_container.dto';
 
 
 
@@ -164,5 +168,56 @@ export class LayerController {
     return this.layerService.updateUnitProduct(id, updateUnitProductDto);
   }
  
+  @MessagePattern({ cmd: 'create-supplier_product' })
+  async createSupplierProduct(@Payload() createSupplierProductDto: CreateSupplierProductDto) {
+    return this.layerService.createSupplierProduct(createSupplierProductDto);
+  }
+
+  @MessagePattern({ cmd: 'find-all_supplier_product' })
+  async findAllSupplierProducts() {
+    return this.layerService.findAllSupplierProducts();
+  }
+
+  @MessagePattern({ cmd: 'find-one_supplier_product' })
+  async findOneSupplierProduct(@Payload() id: string) {
+    return this.layerService.findOneSupplierProduct(id);
+  }
+
+  @MessagePattern({ cmd: 'update-supplier_product' })
+  async updateSupplierProduct(
+    @Payload() data: { id: string; updateSupplierProductDto: UpdateSupplierProductDto },
+  ) {
+    const { id, updateSupplierProductDto } = data;
+    return this.layerService.updateSupplierProduct(id, updateSupplierProductDto);
+  }
   
+  @MessagePattern({ cmd: 'create-activity_container' })
+  async createActivityExportContainer(
+    @Payload() createActivityContainerDto: CreateActivityContainerDto,
+  ) {
+    if(createActivityContainerDto.type === 'import'){
+      return await this.layerService.createActivityImportContainer(createActivityContainerDto);
+    }
+    return await this.layerService.createActivityExportContainer(createActivityContainerDto);
+  }
+
+
+  @MessagePattern({ cmd: 'find-all_activity_containers' })
+  async findAllActivityContainers(@Payload() data:{type:string}) {
+    return await this.layerService.findAllActivityContainers(data.type);
+  }
+
+  @MessagePattern({ cmd: 'find-one_activity_container' })
+  async findActivityContainerById(@Payload() id: string) {
+    return await this.layerService.findActivityContainerById(id);
+  }
+
+  @MessagePattern({ cmd: 'update-activity_container' })
+  async updateActivityContainer(
+    @Payload()
+    data: { id: string; updateActivityContainerDto: UpdateActivityContainerDto },
+  ) {
+    const { id, updateActivityContainerDto } = data;
+    return await this.layerService.updateActivityContainer(id, updateActivityContainerDto);
+  }
 }

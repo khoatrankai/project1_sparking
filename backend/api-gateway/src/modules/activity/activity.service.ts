@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateActivityDto } from './dto/ActivityDto/create-activity.dto';
 import { UpdateActivityDto } from './dto/ActivityDto/update-activity.dto';
@@ -19,23 +19,50 @@ import { UpdateTypeWorkDto } from './dto/TypeWorkDto/update-type_work.dto';
 import { CreateWorkDto } from './dto/WorkDto/create-work.dto';
 import { UpdateWorkDto } from './dto/WorkDto/update-work.dto';
 import { firstValueFrom } from 'rxjs';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 
 
 @Injectable()
 export class ActivityService {
 
-  constructor(@Inject('ACTIVITY') private readonly activityClient:ClientProxy){}
+  constructor(@Inject('ACTIVITY') private readonly activityClient:ClientProxy,private readonly cloudinaryService:CloudinaryService){}
   getHello(): string {
     return 'Hello World!';
   }
 
-  async sendCreateActivity(createActivityDto: CreateActivityDto) {
-    return await firstValueFrom(this.activityClient.send('create-activity', createActivityDto));
+  async sendCreateActivity(createActivityDto: CreateActivityDto,picture_urls:Express.Multer.File[]) {
+    if(picture_urls && picture_urls.length > 0){
+      const datas = await this.cloudinaryService.uploadFiles(picture_urls) 
+      if(datas.length > 0){
+        const {picture_url_type,...reqCreateActivity} = createActivityDto
+        
+        const resultImg = await firstValueFrom(this.activityClient.send('create-activity', {...reqCreateActivity,picture_urls:picture_url_type.map((dt,index)=>{
+          return {type:dt,url:datas[index]}
+        })}))
+        if(resultImg){
+          return { statusCode: HttpStatus.CREATED, message: 'Product and Picture created successfully' };
+        }
+      }
+     
+    }else{
+      return await firstValueFrom(this.activityClient.send('create-activity', createActivityDto));
+
+    }
   }
   
   async sendUpdateActivity(activity_id: string, updateActivityDto: UpdateActivityDto) {
     return await firstValueFrom(this.activityClient.send('update-activity', { activity_id, updateActivityDto }));
+  }
+
+  async sendUpdateStatusActivity(activity_id: string, updateActivityDto: UpdateActivityDto) {
+    const res = await firstValueFrom(this.activityClient.send('update-activity', { activity_id, updateActivityDto }));
+    if(res.statusCode === 200){
+      return {
+        statusCode:HttpStatus.OK,
+        message: `Trạng thái đã được cập nhật`
+      }
+    }
   }
   
   async sendGetActivity(activity_id: string) {
@@ -107,8 +134,26 @@ export class ActivityService {
   }
   
   // Work methods
-  async sendCreateWork(createWorkDto: CreateWorkDto) {
-    return await firstValueFrom(this.activityClient.send({ cmd: 'create-work' }, createWorkDto));
+  async sendCreateWork(createWorkDto: CreateWorkDto,picture_urls:Express.Multer.File[]) {
+
+    if(picture_urls && picture_urls.length > 0){
+      const datas = await this.cloudinaryService.uploadFiles(picture_urls) 
+      if(datas.length > 0){
+        const {picture_url_type,...reqCreateWork} = createWorkDto
+        
+        const resultImg = await firstValueFrom(this.activityClient.send('create-activity', {...reqCreateWork,picture_urls:picture_url_type.map((dt,index)=>{
+          return {type:dt,url:datas[index]}
+        })}))
+        if(resultImg){
+          return { statusCode: HttpStatus.CREATED, message: 'Work and Picture created successfully' };
+        }
+      }
+     
+    }else{
+      return await firstValueFrom(this.activityClient.send({ cmd: 'create-work' }, createWorkDto));
+
+    }
+    
   }
   
   async sendUpdateWork(id: string, updateWorkDto: UpdateWorkDto) {

@@ -1,7 +1,6 @@
 import useFetchData from "@/hooks/useFetchData";
 import usePostData from "@/hooks/usePostData";
 import { GroupInfo, IUpdateCustomerInfo } from "@/models/customerInterface";
-import { Province } from "@/models/systemInterface";
 import { InfoUser } from "@/models/userInterface";
 import { fetchCustomerAbout } from "@/redux/store/slices/customerSlices/about_customer.slice";
 import { fetchCustomerInfos } from "@/redux/store/slices/customerSlices/get_all_customer.slice";

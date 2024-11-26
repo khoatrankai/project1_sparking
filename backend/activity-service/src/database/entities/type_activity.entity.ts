@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToMany} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 import { Activities } from './activity.entity';
 import { StatusActivities } from './status_activity.entity';
 @Entity('Type_activity')
@@ -18,4 +18,9 @@ export class TypeActivities {
   @OneToMany(() => StatusActivities,  statusActivity => statusActivity.type_activity)
   status: StatusActivities[];
 
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }

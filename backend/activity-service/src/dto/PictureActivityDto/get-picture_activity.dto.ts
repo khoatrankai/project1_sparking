@@ -10,7 +10,7 @@ export class CreatePictureActivityDto {
   url: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   activity: string;
 
   @IsEnum(['start', 'end'])

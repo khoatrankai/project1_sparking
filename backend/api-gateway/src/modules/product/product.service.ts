@@ -15,6 +15,10 @@ import { UpdateUnitProductDto } from './dto/UnitProductDto/update-unit_product.d
 import { CloudinaryMiddleware } from 'src/middlewares/cloudinary.middleware';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CreateSupplierProductDto } from './dto/SupplierProductDto/create-supplier_product.dto';
+import { UpdateSupplierProductDto } from './dto/SupplierProductDto/update-supplier_product.dto';
+import { CreateActivityContainerDto } from './dto/ActivityContainerDto/create-activity_container.dto';
+import { UpdateActivityContainerDto } from './dto/ActivityContainerDto/update-activity_container.dto';
 
 
 
@@ -112,12 +116,9 @@ export class ProductService {
 
   // CodeProduct methods
   async createCodeProduct(createCodeProductDto: CreateCodeProductDto) {
-    const id = uuidv4();
-    const id2 = uuidv4();
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-code_product' }, { ...createCodeProductDto, code_product_id: id,code:id2 })) as CreateCodeProductDto;
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-code_product' }, { ...createCodeProductDto })) as CreateCodeProductDto;
       return { statusCode: HttpStatus.CREATED, message: 'CodeProduct created successfully', data: {
-        type:"code_product",
         code:result.code
       } };
     } catch (error) {
@@ -292,5 +293,120 @@ export class ProductService {
       throw error;
     }
   }
+
+  async createSupplierProduct(createSupplierProductDto: CreateSupplierProductDto) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'create-supplier_product' }, createSupplierProductDto),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException('Failed to create supplier product', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllSupplierProduct() {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_supplier_product' }, {}));
+      return result;
+    } catch (error) {
+      throw new HttpException('Failed to fetch supplier products', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async findOneSupplierProduct(id: string) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_supplier_product' }, id));
+      if (!result) throw new HttpException('Supplier product not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateSupplierProduct(id: string, updateSupplierProductDto: UpdateSupplierProductDto) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'update-supplier_product' }, { id, updateSupplierProductDto }),
+      );
+      if (!result) throw new HttpException('Supplier product not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createActivityContainer(createActivityContainerDto: CreateActivityContainerDto) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-activity_container' },
+          createActivityContainerDto,
+        ),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create activity container',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async findAllActivityContainers(type:string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_activity_containers' }, {type}),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch activity containers',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findActivityContainerById(id: string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_activity_container' }, id),
+      );
+      if (!result) {
+        throw new HttpException(
+          'Activity container not found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateActivityContainer(
+    id: string,
+    updateActivityContainerDto: UpdateActivityContainerDto,
+  ) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-activity_container' },
+          { id, updateActivityContainerDto },
+        ),
+      );
+      if (!result) {
+        throw new HttpException(
+          'Activity container not found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
  
 }

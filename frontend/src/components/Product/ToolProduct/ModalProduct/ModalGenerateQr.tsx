@@ -15,7 +15,7 @@ const ModalGenerateQr = ({ productID, fetchListCode }: Props) => {
   const generateQR = async () => {
     const data = await productService.createCodeProduct(productID);
     if (data.statusCode === 201) {
-      setValue(String(data.data.code + "@" + data.data.type));
+      setValue(String(data.data.code));
       fetchListCode();
     }
   };

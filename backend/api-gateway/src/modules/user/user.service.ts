@@ -6,10 +6,12 @@ import { CreateRoleTypeUserDto } from './dto/create_role.dto';
 import { UpdateRoleTypeUserDto } from './dto/update_role.dto';
 import { CreateRoleUserDto } from './dto/create_role_user.dto';
 import { UpdateRoleUserDto } from './dto/update_role_user.dto';
+import { CreateUserDto } from './dto/create_user.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 @Injectable()
 export class UserService {
 
-  constructor(@Inject('USER') private readonly usersClient:ClientProxy){}
+  constructor(private readonly cloudinaryService:CloudinaryService,@Inject('USER') private readonly usersClient:ClientProxy){}
   getHello(): string {
     return 'Hello World!';
   }
@@ -43,11 +45,24 @@ export class UserService {
     return this.usersClient.send({ cmd: 'update-role_user' }, updateRoleUserDto);
   }
 
+
+  async createUser(createUserDto: CreateUserDto,picture_url:Express.Multer.File) {
+    const data = await this.cloudinaryService.uploadFile(picture_url)
+    console.log(data)
+    return this.usersClient.send({cmd:'register-user'}, {...createUserDto,picture_url:data.secure_url});
+  }
+
   async getUsers(){
     return {
       statusCode:HttpStatus.OK,
       data:await firstValueFrom(this.usersClient.send({ cmd: 'get-users' }, {}))
     }
+    
+  }
+
+  
+  async getUserIDAdmin(user_id:string){
+    return await firstValueFrom(this.usersClient.send({ cmd: 'get-user_id_admin' }, user_id))
     
   }
 }

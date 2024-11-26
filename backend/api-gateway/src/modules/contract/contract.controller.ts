@@ -22,6 +22,11 @@ export class ContractController {
     return this.contractService.getHello();
   }
 
+  @Get('type-contract')
+  async getTypeContracts() {
+    return this.contractService.getTypeContracts();
+  }
+
   @Post('/type-contract')
   async createTypeContract(@Body() createTypeContractDto: CreateTypeContractDto) {
     return this.contractService.createTypeContract(createTypeContractDto);
@@ -52,6 +57,11 @@ export class ContractController {
   @Get('/all')
   async getContracts() {
     return this.contractService.getContracts();
+  }
+
+  @Get('/id/:id')
+  async getContract(@Param('id') id:string) {
+    return this.contractService.getContract(id);
   }
 
   // Create a new payment

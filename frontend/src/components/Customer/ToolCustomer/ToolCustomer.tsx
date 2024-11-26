@@ -3,6 +3,7 @@ import React from "react";
 import ModalAddCustomer from "./ModalCustomer/ModalAddCustomer";
 import { RootState } from "@/redux/store/store";
 import { useSelector } from "react-redux";
+import ModalGroupCustomer from "./ModalCustomer/ModalGroupCustomer/ModalGroupCustomer";
 
 // type Props = {};
 
@@ -12,8 +13,9 @@ export default function ToolCustomer() {
   );
   return (
     <div className="flex flex-col gap-2">
-      <div>
+      <div className="flex items-center gap-2">
         <ModalAddCustomer />
+        <ModalGroupCustomer />
       </div>
       <div>
         <h2 className="font-semibold text-white">Tổng quan khách hàng</h2>

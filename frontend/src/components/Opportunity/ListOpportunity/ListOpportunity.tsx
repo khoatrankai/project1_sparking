@@ -4,14 +4,13 @@ import Search from "antd/es/input/Search";
 import { TableRowSelection } from "antd/es/table/interface";
 import React, { useEffect, useState } from "react";
 import { FaArrowsRotate } from "react-icons/fa6";
-import usePostData from "@/hooks/usePostData";
-import { AppDispatch, RootState } from "@/redux/store/store";
-import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/redux/store/store";
+import { useSelector } from "react-redux";
 import ModalUpdateOpportunity from "../Tool/ModalOpportunity/ModalUpdateOpportunity";
 
 export default function ListOpportunities() {
-  const { postdata } = usePostData();
-  const dispatch = useDispatch<AppDispatch>();
+  // const { postdata } = usePostData();
+  // const dispatch = useDispatch<AppDispatch>();
 
   const { datas: dataSource } = useSelector(
     (state: RootState) => state.get_opportunities

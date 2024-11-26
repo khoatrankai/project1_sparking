@@ -10,7 +10,7 @@ export class Contract {
   @Column({ type: 'varchar', length: 50 })
   name_contract: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50,nullable:true })
   project: string;
 
   @Column({ type: 'varchar', length: 50 })

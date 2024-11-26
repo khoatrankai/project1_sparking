@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { InfoUserInterface } from './interfaces/info-user.interface';
 import { CreateRoleTypeUserDto } from './dto/create_role.dto';
 import { UpdateRoleTypeUserDto } from './dto/update_role.dto';
 import { CreateRoleUserDto } from './dto/create_role_user.dto';
 import { UpdateRoleUserDto } from './dto/update_role_user.dto';
+import { CreateUserDto } from './dto/create_user.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 // import { RoleGuard } from 'src/guards/role.guard';
 
 @Controller('user')
@@ -20,6 +22,12 @@ export class UserController {
   @Get('info')
   findOneInfo(@Query('user_id') user_id:string): Promise<InfoUserInterface>{
     return this.userService.findOneInfo(user_id)
+  }
+
+  @Post('create')
+  @UseInterceptors(FilesInterceptor('picture_url',1))
+  async createUser(@Body() createUserDto: CreateUserDto,@UploadedFiles() picture_url:Express.Multer.File[]) {
+    return await this.userService.createUser(createUserDto,picture_url?.[0]);
   }
  
   @Post('create-role-type')
@@ -53,6 +61,12 @@ export class UserController {
   @Get('all')
   async getUsers () {
     return await this.userService.getUsers();
+  }
+
+
+  @Get('/admin/id/:id')
+  async getUserIDAdmin (@Param('id') id:string) {
+    return await this.userService.getUserIDAdmin(id);
   }
  
 }

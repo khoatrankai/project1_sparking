@@ -3,7 +3,7 @@ import { PictureProduct } from './picture_product.entity';
 import { UnitProduct } from './unit_product.entity';
 import { TypeProducts } from './type_product.entity';
 import { CodeProduct } from './code_product.entity';
-
+import { SupplierProduct } from './supplier_product.entity';
 @Entity('Products')
 export class Products {
   @PrimaryColumn({ type: 'varchar', length: 50 })
@@ -25,6 +25,9 @@ export class Products {
   @Column({ type: 'varchar', length: 50 })
   vat: string;
 
+  @Column({ type: 'varchar', length: 50 })
+  profit: string;
+
   @Column({ type: 'int' ,default:0})
   quantity: number;
 
@@ -40,4 +43,8 @@ export class Products {
 
   @OneToMany(() => CodeProduct, codeProduct => codeProduct.product)
   code_product: CodeProduct[];
+
+  @ManyToOne(() => SupplierProduct)
+  @JoinColumn({ name: 'supplier_product' })
+  supplier_product: SupplierProduct;
 }

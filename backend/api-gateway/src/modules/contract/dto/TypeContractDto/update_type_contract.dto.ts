@@ -2,7 +2,7 @@ import { IsString, IsInt, Length, IsOptional } from 'class-validator';
 
 export class UpdateTypeContractDto {
   @IsString()
-  @Length(1, 50)
+  @IsOptional()
   type_id: string; // Có thể không bắt buộc khi cập nhật
 
   @IsString()

@@ -44,9 +44,9 @@ export class PriceQuoteController {
   }
 
   @MessagePattern({ cmd: 'update-price_quote' })
-  async updatePriceQuote(@Payload() payload: { id: string; updatePriceQuoteDto: UpdatePriceQuoteDto }) {
-    const { id, updatePriceQuoteDto } = payload;
-    const updatedPriceQuote = await this.priceQuoteService.updatePriceQuote(id, updatePriceQuoteDto);
+  async updatePriceQuote(@Payload() payload: { id: string; data: UpdatePriceQuoteDto }) {
+    const { id, data } = payload;
+    const updatedPriceQuote = await this.priceQuoteService.updatePriceQuote(id, data);
     return {
       statusCode: HttpStatus.OK,
       message: 'Price quote updated successfully',

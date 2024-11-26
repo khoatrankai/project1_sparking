@@ -45,6 +45,14 @@ interface CustomerInfo {
             count: number
   }
 
+  export  interface CreateGroupCustomer {
+            name_group: string,
+  }
+
+  export  interface UpdateGroupCustomer {
+    name_group: string,
+}
+
   interface CreateInfoCustomer {
     name_company: string;
     group_customer: string; // UUID

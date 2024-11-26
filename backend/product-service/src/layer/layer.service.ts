@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import {  In, Not, Repository } from 'typeorm';
@@ -17,12 +17,23 @@ import { CreateTypeProductDto } from 'src/dto/TypeProductDto/create-type_product
 import { UpdateTypeProductDto } from 'src/dto/TypeProductDto/update-type_product.dto';
 import { CreateUnitProductDto } from 'src/dto/UnitProductDto/create-unit_product.dto';
 import { UpdateUnitProductDto } from 'src/dto/UnitProductDto/update-unit_product.dto';
-
+import { SupplierProduct } from 'src/database/entities/supplier_product.entity';
+import { CreateSupplierProductDto } from 'src/dto/SupplierProductDto/create-supplier_product.dto';
+import { UpdateSupplierProductDto } from 'src/dto/SupplierProductDto/update-supplier_product.dto';
+import { ActivityContainer } from 'src/database/entities/activity_container.entity';
+import { CreateActivityContainerDto } from 'src/dto/ActivityContainerDto/create-activity_container.dto';
+import { UpdateActivityContainerDto } from 'src/dto/ActivityContainerDto/update-activity_container.dto';
+import { HistoryCodeProduct } from 'src/database/entities/history_code_product.entity';
+import { CreateHistoryCodeProductDto } from 'src/dto/HistoryCodeProduct/create-history_code_product.dto';
+import { UpdateHistoryCodeProductDto } from 'src/dto/HistoryCodeProduct/update-history_code_product.dto';
 
 @Injectable()
 export class LayerService {
 
-  constructor(  @InjectRepository(UnitProduct)
+  constructor(@InjectRepository(ActivityContainer)
+  private activityContainerRepository: Repository<ActivityContainer>,@InjectRepository(HistoryCodeProduct)
+  private readonly historyCodeProductRepository: Repository<HistoryCodeProduct>, @InjectRepository(SupplierProduct)
+  private supplierProductRepository: Repository<SupplierProduct>, @InjectRepository(UnitProduct)
   private unitProductRepository: Repository<UnitProduct>,@InjectRepository(TypeProducts)
   private typeProductRepository: Repository<TypeProducts>,@InjectRepository(PictureProduct)
   private pictureProductRepository: Repository<PictureProduct>,@InjectRepository(CodeProduct)
@@ -59,17 +70,18 @@ export class LayerService {
   async createProduct(createProductDto: CreateProductDto) {
     const type = await this.typeProductRepository.findOne({where:{type_product_id:createProductDto.type}})
     const unit_product = await this.unitProductRepository.findOne({where:{unit_id:createProductDto.unit_product}})
-    const product = this.productRepository.create({...createProductDto,type,unit_product});
+    const supplier_product = await this.supplierProductRepository.findOne({where:{supplier_id:createProductDto.supplier_product}})
+    const product = this.productRepository.create({...createProductDto,type,unit_product,supplier_product});
     return await this.productRepository.save(product);
   }
 
   async getProductIDs(product_ids:string[]){
-    const data = await this.productRepository.find({where:{product_id:In(product_ids)},relations:['type']});
+    const data = await this.productRepository.find({where:{product_id:In(product_ids)},relations:['type','unit_product','code_product']});
     const sortedData = product_ids.map(id => data.find(item => item.product_id === id))
     return sortedData
   }
   async findAllProduct(): Promise<Products[]> {
-    return await this.productRepository.find({where:{status:Not('delete')},relations:['type','unit_product']});
+    return await this.productRepository.find({where:{status:Not('delete')},relations:['type','unit_product','code_product']});
   }
 
   async findOneProduct(id: string): Promise<Products | undefined> {
@@ -78,6 +90,7 @@ export class LayerService {
     .leftJoinAndSelect('product.picture_urls', 'picture_urls')
     .leftJoinAndSelect('product.type', 'type')
     .leftJoinAndSelect('product.unit_product', 'unit_product')
+    .leftJoinAndSelect('product.supplier_product', 'supplier_product')
     .where('product.product_id = :id', { id })
     .orderBy('picture_urls.created_at', 'ASC') // Sắp xếp `picture_urls` theo `created_at`
     .getOne();
@@ -86,7 +99,8 @@ export class LayerService {
   async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Products> {
     const type = await this.typeProductRepository.findOne({where:{type_product_id:updateProductDto.type}})
     const unit_product = await this.unitProductRepository.findOne({where:{unit_id:updateProductDto.unit_product}})
-    await this.productRepository.update(id, {...updateProductDto,type,unit_product});
+    const supplier_product = await this.supplierProductRepository.findOne({where:{supplier_id:updateProductDto.supplier_product}})
+    await this.productRepository.update(id, {...updateProductDto,type,unit_product,supplier_product});
     return await this.productRepository.findOne({where:{product_id:id}});
   }
 
@@ -97,9 +111,10 @@ export class LayerService {
 
 
   async createCodeProduct(createCodeProductDto: CreateCodeProductDto): Promise<CodeProduct> {
+    const id = uuidv4()
     const product = await this.productRepository.findOne({where:{product_id:createCodeProductDto.product}})
-    const codeProduct = this.codeProductRepository.create({...createCodeProductDto,product});
-    await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    const codeProduct = this.codeProductRepository.create({...createCodeProductDto,product,code_product_id:id,code:id+"@"+"code_product"});
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
     return await this.codeProductRepository.save(codeProduct);
   }
 
@@ -113,15 +128,12 @@ export class LayerService {
   }
 
   async findOneCodeProduct(id: string): Promise<CodeProduct | undefined> {
-    return await this.codeProductRepository.findOne({ where: { code: id },relations:['product'] });
+    return await this.codeProductRepository.findOne({ where: { code: id,status:'inventory' },relations:['product','product.supplier_product','product.type','product.unit_product'] });
   }
 
   async updateCodeProduct(id: string, updateCodeProductDto: UpdateCodeProductDto): Promise<CodeProduct> {
     const product = await this.productRepository.findOne({where:{product_id:id}}) 
     await this.codeProductRepository.update(id, {...updateCodeProductDto,product});
-    if(updateCodeProductDto.status === "stored"){
-      await this.productRepository.update(id,{quantity:product.quantity+1})
-    }
     return await this.codeProductRepository.findOne({where:{code_product_id:id}});
   }
 
@@ -198,4 +210,207 @@ export class LayerService {
     await this.unitProductRepository.update(id, updateUnitProductDto);
     return await this.unitProductRepository.findOne({where:{unit_id:id}});
   }
+
+
+  async createSupplierProduct(
+    createSupplierProductDto: CreateSupplierProductDto,
+  ) {
+    const supplierProduct = this.supplierProductRepository.create({...createSupplierProductDto,supplier_id:uuidv4()});
+    const savedProduct = await this.supplierProductRepository.save(supplierProduct);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Supplier product created successfully',
+      data: savedProduct,
+    };
+  }
+
+  // Find All SupplierProducts
+  async findAllSupplierProducts() {
+    const supplierProducts = await this.supplierProductRepository.find({relations:['products']});
+    return {
+      statusCode: HttpStatus.OK,
+      data: supplierProducts,
+    };
+  }
+
+  // Find One SupplierProduct by ID
+  async findOneSupplierProduct(
+    id: string,
+  ){
+    const supplierProduct = await this.supplierProductRepository.findOne({ where: { supplier_id: id },relations:['products'] });
+    if (!supplierProduct) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Supplier product with ID ${id} not found`,
+      });
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Supplier product retrieved successfully',
+      data: supplierProduct,
+    };
+  }
+
+  // Update SupplierProduct by ID
+  async updateSupplierProduct(
+    id: string,
+    updateSupplierProductDto: UpdateSupplierProductDto,
+  ): Promise<{ statusCode: HttpStatus; message: string; data: SupplierProduct }> {
+    const updateResult = await this.supplierProductRepository.update(id, updateSupplierProductDto);
+    if (updateResult.affected === 0) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Supplier product with ID ${id} not found for update`,
+      });
+    }
+    const updatedSupplierProduct = await this.supplierProductRepository.findOne({ where: { supplier_id: id } });
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Supplier product updated successfully',
+      data: updatedSupplierProduct,
+    };
+  }
+
+  async createActivityExportContainer(createActivityContainerDto: CreateActivityContainerDto) {
+    const id = uuidv4();
+    const {list_code,...reqActivityContainer} = createActivityContainerDto
+    const activityContainer = this.activityContainerRepository.create({
+      ...reqActivityContainer,
+      activity_container_id: id,
+    });   
+    const activity_container = await this.activityContainerRepository.save(activityContainer);
+    if(activity_container && list_code){
+      const dataHistories =  await Promise.all(list_code.map(async(dt)=>{
+        const idCode = uuidv4()
+        const code = await this.codeProductRepository.findOne({where:{code:dt.code}}) 
+        await this.codeProductRepository.update(code.code_product_id,{status:dt.status})
+        return this.historyCodeProductRepository.create({
+          history_id: idCode,activity_container:activity_container,code_product:code,status:dt.status,price:dt.price,vat:dt.vat,profit:dt.profit
+        });
+      }))
+      await this.historyCodeProductRepository.save(dataHistories);
+    }
+    return {
+      statusCode:HttpStatus.CREATED,
+      data:activity_container
+    }
+  }
+
+  async createActivityImportContainer(createActivityContainerDto: CreateActivityContainerDto) {
+    console.log(createActivityContainerDto)
+    const id = uuidv4();
+    const listRes:{product:Products,list_code:string[]}[] = []
+    const {list_product,...reqActivityContainer} = createActivityContainerDto
+    const activityContainer = this.activityContainerRepository.create({
+      ...reqActivityContainer,
+      activity_container_id: id,
+    });   
+    const activity_container = await this.activityContainerRepository.save(activityContainer);
+    if(activity_container && list_product){
+      const dataHistories =  await Promise.all(list_product.map(async(dt)=>{
+        const product = await this.productRepository.findOne({where:{product_id:dt.product}})
+        const dataCodes = Array.from({length:dt.quantity}).map( () => {
+          const idCode = uuidv4()
+          const code = uuidv4() + "@"+'code_product'
+          return this.codeProductRepository.create({code_product_id:idCode,product,code})
+        })
+        const resCodes = await this.codeProductRepository.save(dataCodes)
+        listRes.push({product:product,list_code:resCodes.map(dt => dt.code)})
+        const dataCreateHistory = resCodes.map((dtt)=>{
+          const idHistory = uuidv4()
+          return this.historyCodeProductRepository.create({history_id:idHistory,code_product:dtt,price:dt.price,activity_container:activity_container})
+        })
+        return dataCreateHistory
+
+      }))
+       await this.historyCodeProductRepository.save(dataHistories.flat());
+      
+    }
+    return {
+      statusCode:HttpStatus.CREATED,
+      data:listRes
+    }
+  }
+
+  async findAllActivityContainers(type:string) {
+    return {
+      statusCode:HttpStatus.CREATED,
+      data:await this.activityContainerRepository.find({where:{type}, relations: ['list_code'] })
+    }
+    
+    
+  }
+
+  async findActivityContainerById(id: string) {
+    return {
+      statusCode:HttpStatus.OK,
+      data:await this.activityContainerRepository.findOne({
+        where: { activity_container_id: id },
+        relations: ['list_code'],
+      })
+    }
+    
+  }
+
+  async updateActivityContainer(
+    id: string,
+    updateActivityContainerDto: UpdateActivityContainerDto,
+  ) {
+    await this.activityContainerRepository.update(id, updateActivityContainerDto);
+
+    return {
+      statusCode:HttpStatus.CREATED,
+      data: await this.activityContainerRepository.findOne({
+        where: { activity_container_id: id },
+        relations: ['list_code'],
+      })
+    }
+   
+  }
+
+  async deleteActivityContainer(id: string): Promise<void> {
+    await this.activityContainerRepository.delete(id);
+  }
+
+  async createHistoryCodeProduct(createHistoryCodeProductDto: CreateHistoryCodeProductDto) {
+    const id = uuidv4();
+    const activity = await this.activityContainerRepository.findOne({where:{activity_container_id:createHistoryCodeProductDto.activity_container}}) 
+    const code = await this.codeProductRepository.findOne({where:{code_product_id:createHistoryCodeProductDto.code_product}}) 
+    const historyCodeProduct = this.historyCodeProductRepository.create({
+      ...createHistoryCodeProductDto,
+      history_id: id,activity_container:activity,code_product:code
+    });
+    return await this.historyCodeProductRepository.save(historyCodeProduct);
+  }
+
+  async findAllHistoryCodeProducts() {
+    return await this.historyCodeProductRepository.find({
+      relations: ['code_product', 'activity_container'],
+    });
+  }
+
+  async findHistoryCodeProductById(id: string) {
+    return await this.historyCodeProductRepository.findOne({
+      where: { history_id: id },
+      relations: ['code_product', 'activity_container'],
+    });
+  }
+
+  async updateHistoryCodeProduct(
+    id: string,
+    updateHistoryCodeProductDto: UpdateHistoryCodeProductDto,
+  ) {
+    const activity = await this.activityContainerRepository.findOne({where:{activity_container_id:updateHistoryCodeProductDto.activity_container}}) 
+    const code = await this.codeProductRepository.findOne({where:{code_product_id:updateHistoryCodeProductDto.code_product}}) 
+    await this.historyCodeProductRepository.update(id, {...updateHistoryCodeProductDto,code_product:code,activity_container:activity});
+    return await this.historyCodeProductRepository.findOne({
+      where: { history_id: id },
+      relations: ['code_product', 'activity_container'],
+    });
+  }
+
+  async deleteHistoryCodeProduct(id: string) {
+    await this.historyCodeProductRepository.delete(id);
+  }
+ 
 }

@@ -12,6 +12,7 @@ import { Vats } from './entities/vat.entity';
 import { ListMore } from './entities/list_more.entity';
 import { MoreDatas } from './entities/more_data.entity';
 import { TypeMores } from './entities/type_more.entity';
+import { Profits } from './entities/profit.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { TypeMores } from './entities/type_more.entity';
       username: 'root',
       password: '123456789',
       database: 'db_sparking_1',
-      entities: [Label,ListLabel,ListUseProduct,PictureProduct,Province,UnitProduct,Product,ListTBSP,Vats,ListMore,MoreDatas,TypeMores],
+      entities: [Label,ListLabel,ListUseProduct,PictureProduct,Province,UnitProduct,Product,ListTBSP,Vats,ListMore,MoreDatas,TypeMores,Profits],
       // synchronize: true,
       // dropSchema: true,
     }),

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateAccountCustomersDto } from './dto/create_account_customer.dto';
 import { CreateCustomerInfoDto } from './dto/create_customer_info.dto';
@@ -51,9 +51,9 @@ export class CustomerController {
     return this.customerService.getCustomerID(info_id);
   }
 
-  @Put('update-group-customer')
-  updateGroupCustomer(@Body() updateGroupCustomerDto: UpdateGroupCustomerDto) {
-    return this.customerService.updateGroupCustomer(updateGroupCustomerDto);
+  @Put('update-group-customer/:id')
+  updateGroupCustomer(@Param('id')id:string, @Body() updateGroupCustomerDto: UpdateGroupCustomerDto) {
+    return this.customerService.updateGroupCustomer({...updateGroupCustomerDto,group_id:id});
   }
 
   @Post('create-role-type-customer')

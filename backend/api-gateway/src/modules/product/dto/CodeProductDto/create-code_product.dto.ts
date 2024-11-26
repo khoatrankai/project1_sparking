@@ -1,19 +1,22 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
 
 export class CreateCodeProductDto {
-  @IsOptional() // The code_product_id is optional
   @IsString()
-  code_product_id?: string;
+  @IsOptional()
+  @MaxLength(50)
+  code_product_id: string;
 
   @IsString()
-  @IsOptional()  // The code is required
-  code?: string;
+  @IsOptional()
+  @MaxLength(50)
+  code: string;
 
-  @IsOptional() // The status is optional
-  @IsEnum(['error', 'pending', 'success']) // Validates that status is one of the specified values
-  status?: 'error' | 'pending' | 'success';
+  @IsEnum(['selled', 'borrowed', 'inventory', 'export'])
+  @IsOptional()
+  status?: 'selled' | 'borrowed' | 'inventory' | 'export';
 
-  @IsString() // Validates that product is a string
-  @IsNotEmpty() // Ensures the product ID is provided
-  product: string; // Foreign Key ID
+  @IsString()
+  @IsNotEmpty()
+  product: string;
+
 }

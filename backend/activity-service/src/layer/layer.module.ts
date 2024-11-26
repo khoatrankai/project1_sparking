@@ -26,6 +26,14 @@ ClientsModule.register([
       host:'localhost',
       port:3005
     }
+  },
+  {
+    name: 'CONTRACT',
+    transport:Transport.TCP,
+    options:{
+      host:'localhost',
+      port:3010
+    }
   }
 ])
 ],

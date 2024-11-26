@@ -22,6 +22,9 @@ export class ListProduct {
   @Column({ type: 'varchar', length: 50,nullable:true })
   vat:string
 
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  profit:string
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

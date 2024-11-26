@@ -1,4 +1,4 @@
-import {  Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {  Body, Controller, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/ActivityDto/create-activity.dto';
 import { UpdateActivityDto } from './dto/ActivityDto/update-activity.dto';
@@ -18,6 +18,7 @@ import { CreateTypeWorkDto } from './dto/TypeWorkDto/create-type_work.dto';
 import { UpdateTypeWorkDto } from './dto/TypeWorkDto/update-type_work.dto';
 import { CreateWorkDto } from './dto/WorkDto/create-work.dto';
 import { UpdateWorkDto } from './dto/WorkDto/update-work.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 
 
@@ -31,8 +32,9 @@ export class ActivityController {
   }
 
   @Post('create')
-  async sendCreateActivity(@Body() createActivityDto: CreateActivityDto) {
-    return this.activityService.sendCreateActivity(createActivityDto);
+  @UseInterceptors(FilesInterceptor('picture_urls'))
+  async sendCreateActivity(@Body() createActivityDto: CreateActivityDto,@UploadedFiles() picture_urls:Express.Multer.File[]) {
+    return this.activityService.sendCreateActivity(createActivityDto,picture_urls);
   }
 
   @Put('update/:id')
@@ -43,7 +45,15 @@ export class ActivityController {
     return this.activityService.sendUpdateActivity(activity_id, updateActivityDto);
   }
 
-  @Get(':id')
+  @Put('update/status/:id')
+  async sendUpdateStatusActivity(
+    @Param('id') activity_id: string,
+    @Body() updateActivityDto: UpdateActivityDto,
+  ) {
+    return this.activityService.sendUpdateStatusActivity(activity_id, updateActivityDto);
+  }
+
+  @Get('id/:id')
   async sendGetActivity(@Param('id') activity_id: string) {
     return this.activityService.sendGetActivity(activity_id);
   }
@@ -67,7 +77,7 @@ export class ActivityController {
     return this.activityService.sendUpdateTypeActivities(type_activity_id, updateTypeActivitiesDto);
   }
 
-  @Get('type/:id')
+  @Get('type/id/:id')
   async sendGetTypeActivities(@Param('id') type_activity_id: string) {
     return this.activityService.sendGetTypeActivities(type_activity_id);
   }
@@ -91,7 +101,7 @@ export class ActivityController {
     return this.activityService.sendUpdateStatusActivities(status_activity_id, updateStatusActivitiesDto);
   }
 
-  @Get('status/:id')
+  @Get('status/id/:id')
   async sendGetStatusActivities(@Param('id') status_activity_id: string) {
     return this.activityService.sendGetStatusActivities(status_activity_id);
   }
@@ -138,8 +148,9 @@ export class ActivityController {
 
   // Work Methods
   @Post('work/create')
-  async sendCreateWork(@Body() createWorkDto: CreateWorkDto) {
-    return this.activityService.sendCreateWork(createWorkDto);
+  @UseInterceptors(FilesInterceptor('picture_urls'))
+  async sendCreateWork(@Body() createWorkDto: CreateWorkDto,@UploadedFiles() picture_urls:Express.Multer.File[]) {
+    return this.activityService.sendCreateWork(createWorkDto,picture_urls);
   }
 
   @Put('work/update/:id')
@@ -147,7 +158,7 @@ export class ActivityController {
     return this.activityService.sendUpdateWork(work_id, updateWorkDto);
   }
 
-  @Get('work/:id')
+  @Get('work/id/:id')
   async sendGetWork(@Param('id') work_id: string) {
     return this.activityService.sendGetWork(work_id);
   }
@@ -168,7 +179,7 @@ export class ActivityController {
     return this.activityService.sendUpdateTypeWork(type_work_id, updateTypeWorkDto);
   }
 
-  @Get('type-work/:id')
+  @Get('type-work/id/:id')
   async sendGetTypeWork(@Param('id') type_work_id: string) {
     return this.activityService.sendGetTypeWork(type_work_id);
   }
@@ -189,7 +200,7 @@ export class ActivityController {
     return this.activityService.sendUpdateStatusWork(status_work_id, updateStatusWorkDto);
   }
 
-  @Get('status-work/:id')
+  @Get('status-work/id/:id')
   async sendGetStatusWork(@Param('id') status_work_id: string) {
     return this.activityService.sendGetStatusWork(status_work_id);
   }

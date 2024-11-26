@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AccountUsers } from 'src/database/entities/account_users.entity';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt'
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from 'src/dto/create_user.dto';
 import { ResultResponse } from 'src/common/interfaces/result.interface';
@@ -16,6 +16,7 @@ export class UserService {
   getHello(): string {
     return 'Hello World!';
   }
+
 
   async hashPassword(password: string): Promise<string> {
     const hashedPassword = await bcrypt.hash(password, Number(this.configService.get<string>('SALT')));
@@ -43,6 +44,7 @@ export class UserService {
 
       }
     }catch(err){
+      console.log(err)
       if (err.code === 'ER_DUP_ENTRY') {
         
         const errField = this.extractDuplicateField(err.sqlMessage);
@@ -55,9 +57,25 @@ export class UserService {
     
   }
 
-  async updateUser(user_id:string,updateDto:UpdateUserDto):Promise<AccountUsers>{
-    await this.accountUserRepository.update(user_id,updateDto);
-    return this.accountUserRepository.findOne({where:{user_id: user_id}})
+  async updateUser(user_id:string,updateDto:UpdateUserDto): Promise<ResultResponse>{
+    try{
+      const pass = await this.hashPassword(updateDto.password)
+      await  this.accountUserRepository.update(user_id,{...updateDto,password:pass})
+      return {
+        statusCode:HttpStatus.CREATED,
+        message: 'Cập nhật tài khoản thành công'
+
+      }
+    }catch(err){
+      console.log(err)
+      if (err.code === 'ER_DUP_ENTRY') {
+        
+        const errField = this.extractDuplicateField(err.sqlMessage);
+        throw new ConflictException(`${errField} đã tồn tại.`)
+      }
+      
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
   }
 
   async findUser(email:string):Promise<AccountUsers>{
@@ -66,13 +84,22 @@ export class UserService {
   }
 
   async getUsers(){
-    const data = await this.accountUserRepository.find({select:['first_name','last_name','email','picture_url','user_id'],where:{status:'active'}});
+    const data = await this.accountUserRepository.find({select:['first_name','last_name','email','phone_number','picture_url','user_id','status'],where:{status:Not('delete')}});
     return data
   }
 
   async getUserID(user_id:string){
     const data = await this.accountUserRepository.findOne({select:['first_name','last_name','email','picture_url','user_id'],where:{user_id}});
     return data
+  }
+
+  async getUserIDAdmin(user_id:string){
+    const data = await this.accountUserRepository.findOne({where:{user_id}});
+    console.log(data)
+    return {
+      statusCode:HttpStatus.OK,
+      data:data
+    }
   }
 
   async getUserIDs(user_ids:string[]){

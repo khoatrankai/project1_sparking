@@ -11,6 +11,7 @@ import { CreateProductDto } from 'src/dto/create_product.dto';
 import { CreateListUseProductDto } from 'src/dto/create_list_user_product.dto';
 import { CreateProvinceDto } from 'src/dto/create_province.dto';
 import { CreateVatDto } from 'src/dto/create_vat.dto';
+import { CreateProfitDto } from 'src/dto/create_profit.dto';
 
 @Controller('/system')
 @UseFilters(ConflictExceptionFilter)
@@ -62,6 +63,16 @@ export class SystemController {
   @MessagePattern({ cmd: 'get-vats' })
   getVats() {
     return this.systemService.getAllVats();
+  }
+
+  @MessagePattern({ cmd: 'create-profits' })
+  createProfits(@Payload() createProfits: CreateProfitDto[]) {
+    return this.systemService.createProfits(createProfits);
+  }
+
+  @MessagePattern({ cmd: 'get-profits' })
+  getProfits() {
+    return this.systemService.getAllProfits();
   }
 
 

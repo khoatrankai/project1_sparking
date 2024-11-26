@@ -4,6 +4,7 @@ import { CreateProductDto } from './dto/create_product.dto';
 import { CreateListUseProductDto } from './dto/create_list_user_product.dto';
 import { CreateProvinceDto } from './dto/create_province.dto';
 import { CreateVatDto } from './dto/create_vat.dto';
+import { CreateProfitDto } from './dto/create_profit.dto';
 
 
 
@@ -47,6 +48,15 @@ export class SystemController {
   @Get('vats')
   getVats(){
     return this.systemService.getAllVats()
+  }
+
+  @Post('create-profits')
+  createProfits(@Body() dataProfits:CreateProfitDto[]){
+    return this.systemService.createProfits(dataProfits)
+  }
+  @Get('profits')
+  getProfits(){
+    return this.systemService.getAllProfits()
   }
 
   

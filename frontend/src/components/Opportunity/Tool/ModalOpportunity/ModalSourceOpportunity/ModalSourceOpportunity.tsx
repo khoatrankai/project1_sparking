@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { Button, Form, Input, Modal, Table } from "antd";
-import productService from "@/services/productService";
 import usePostData from "@/hooks/usePostData";
 import { useForm } from "antd/es/form/Form";
 import { ColumnsType } from "antd/es/table";
@@ -13,13 +12,9 @@ import "./style.scss";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store/store";
 import { useSelector } from "react-redux";
-import { fetchProductUnits } from "@/redux/store/slices/productSlices/get_unit.slice";
-import { fetchProductInfos } from "@/redux/store/slices/productSlices/get_products";
-import { fetchProductAbout } from "@/redux/store/slices/productSlices/get_about.slice";
 import {
   ICreateOpportunitySourcesDto,
   IGetSourcesOpportunityDto,
-  IUpdateOpportunitySourcesDto,
 } from "@/models/opportunityInterface";
 import opportunityService from "@/services/opportunityService.";
 import { fetchSourcesOpportunity } from "@/redux/store/slices/opportunitySlices/get_source.slice";

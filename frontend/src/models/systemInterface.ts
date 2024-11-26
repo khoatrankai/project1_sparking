@@ -10,6 +10,11 @@ interface Vat {
   type_vat: number;
 }
 
+interface Profit {
+  profit_id: string; 
+  type_profit: number;
+}
+
 interface ProductInfo{
   code_product:string,
   name_product:string,
@@ -23,5 +28,5 @@ interface ProductInfo{
 }
 
 export type {
- Province,ProductInfo,Vat
+ Province,ProductInfo,Vat,Profit
 }

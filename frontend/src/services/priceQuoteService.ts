@@ -1,10 +1,14 @@
 
-import { FilterPriceQuote, ICreatePriceQuote } from '@/models/priceQuoteInterface';
+import { FilterPriceQuote, ICreatePriceQuote, IUpdatePriceQuote } from '@/models/priceQuoteInterface';
 import api from './api';
 
 const priceQuoteService = {
   createPriceQuote: async (data:ICreatePriceQuote) => {
     const response = await api.post(`/price_quote`,data);
+    return response.data;
+  },
+  updatePriceQuote: async (id:string,data:IUpdatePriceQuote) => {
+    const response = await api.put(`/price_quote/${id}`,data);
     return response.data;
   },
   getPriceQuotes: async (filters?: FilterPriceQuote) => {

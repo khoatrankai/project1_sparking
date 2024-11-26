@@ -24,12 +24,11 @@ export class PriceQuoteService {
   }
   async createPriceQuote(createPriceQuoteDto: CreatePriceQuoteDto) {
     const {products,...dataPriceQuote} = createPriceQuoteDto
-    console.log(dataPriceQuote)
     const priceQuote = this.priceQuoteRepository.create({...dataPriceQuote,price_quote_id:uuidv4()});
     const resPriceQuote =  await this.priceQuoteRepository.save(priceQuote);
     if(resPriceQuote){
       const resList = await this.createListProducts(products.map((dt)=>{
-        return {...dt,price_quote:resPriceQuote.price_quote_id}
+        return {...dt,price_quote:resPriceQuote.price_quote_id,profit:dt.profit}
       }),resPriceQuote)
       if(resList.length>0){
         return {
@@ -137,12 +136,28 @@ export class PriceQuoteService {
   }
 
   async updatePriceQuote(id: string, updatePriceQuoteDto: UpdatePriceQuoteDto) {
-    await this.priceQuoteRepository.update(id, updatePriceQuoteDto);
+    const {products,...reqUpdatePriceQuote} = updatePriceQuoteDto
+    await this.priceQuoteRepository.update(id, reqUpdatePriceQuote);
     const updatedPriceQuote = await this.priceQuoteRepository.findOne({ where: { price_quote_id: id } });
     if (!updatedPriceQuote) {
       throw new NotFoundException(`PriceQuote with ID ${id} not found`);
     }
-    return updatedPriceQuote;
+    await this.listProductRepository.delete({price_quote:updatedPriceQuote})
+     await this.createListProducts(products.map((dt)=>{
+      return {...dt,price_quote:updatedPriceQuote.price_quote_id}
+    }),updatedPriceQuote)
+    return []
+    // if(resList.length>0){
+    //   return {
+    //     statusCode:HttpStatus.CREATED,
+    //     message:"Cập nhật báo giá thành công"
+    //   }
+    // }
+    // return {
+    //   statusCode:HttpStatus.CREATED,
+    //   message:"Cập nhật báo giá thành công nhưng danh sách không được tạo"
+    // }
+  
   }
 
 

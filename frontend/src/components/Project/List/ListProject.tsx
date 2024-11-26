@@ -1,25 +1,16 @@
 import { IGetProject } from "@/models/projectInterface"; // Import the IGetProject interface
-import {
-  Button,
-  Dropdown,
-  Select,
-  Switch,
-  Table,
-  TableColumnsType,
-  Tag,
-} from "antd";
+import { Button, Dropdown, Select, Table, TableColumnsType, Tag } from "antd";
 import Search from "antd/es/input/Search";
 import { TableRowSelection } from "antd/es/table/interface";
 import React, { useEffect, useState } from "react";
 import { FaArrowsRotate } from "react-icons/fa6";
-import usePostData from "@/hooks/usePostData";
-import { AppDispatch, RootState } from "@/redux/store/store";
-import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/redux/store/store";
+import { useSelector } from "react-redux";
 import ModalUpdateProject from "../Tool/Modal/ModalUpdateProject";
 
 export default function ListProject() {
-  const { postdata } = usePostData();
-  const dispatch = useDispatch<AppDispatch>();
+  // const { postdata } = usePostData();
+  // const dispatch = useDispatch<AppDispatch>();
   const [pageLimit, setPageLimit] = useState<number>(25);
   const [dataFilter, setDataFilter] = useState<
     IGetProject[] | [] | undefined

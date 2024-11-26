@@ -26,7 +26,6 @@ import { ColumnsType } from "antd/es/table";
 import TabPane from "antd/es/tabs/TabPane";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { IoAddOutline } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { useSelector } from "react-redux";
 
@@ -39,10 +38,12 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
   const { datas: dataProjects } = useSelector(
     (state: RootState) => state.get_projects
   );
+  const { datas: dataProfits } = useSelector(
+    (state: RootState) => state.get_profits
+  );
   const { datas: dataProducts } = useSelector(
     (state: RootState) => state.info_products
   );
-  const [tabFormProduct, setTabFormProduct] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<IGetProductInfo[] | []>([]);
   const [discount, setDiscount] = useState<number>(0);
   const [typeDiscount, setTypeDiscount] = useState<string | undefined>(
@@ -85,9 +86,9 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
       dataIndex: "quantity",
       key: "quantity",
       render: (value, record) => {
-        const maxQuantity = dataProducts.find(
-          (dt) => dt.product_id === record.product_id
-        )?.quantity;
+        const maxQuantity = record.code_product.filter(
+          (dt) => dt.status === "inventory"
+        ).length;
         console.log(maxQuantity);
         return (
           <>
@@ -120,25 +121,101 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
       title: "Thuế VAT",
       dataIndex: "vat",
       key: "vat",
-      render: (value) => (
+      render: (value, record, index) => (
         <>
-          {
-            dataVats?.find((dt) => {
-              return dt.vat_id === value;
-            })?.type_vat
-          }
-          %
+          <Select
+            placeholder="Chọn loại thuế"
+            showSearch
+            defaultValue={value}
+            onChange={(e) => {
+              setDataSource((preValue) => {
+                return preValue.map((dt, i) => {
+                  if (index === i) {
+                    return { ...dt, vat: e };
+                  }
+                  return dt;
+                });
+              });
+            }}
+            filterOption={(input, option) => {
+              return (option?.children?.join("") ?? "")
+                .toLowerCase()
+                .includes(input.toLowerCase());
+            }}
+          >
+            {dataVats?.map((dt) => (
+              <Option key={dt.vat_id} value={dt.vat_id}>
+                {dt.type_vat}%
+              </Option>
+            ))}
+          </Select>
         </>
       ),
     },
-
+    {
+      title: "Lợi nhuận",
+      dataIndex: "profit",
+      key: "profit",
+      render: (value, record, index) => (
+        <>
+          <Select
+            placeholder="Chọn loại thuế"
+            showSearch
+            defaultValue={value}
+            onChange={(e) => {
+              setDataSource((preValue) => {
+                return preValue.map((dt, i) => {
+                  if (index === i) {
+                    return { ...dt, profit: e };
+                  }
+                  return dt;
+                });
+              });
+            }}
+            filterOption={(input, option) => {
+              return (option?.children?.join("") ?? "")
+                .toLowerCase()
+                .includes(input.toLowerCase());
+            }}
+          >
+            {dataProfits?.map((dt) => (
+              <Option key={dt.profit_id} value={dt.profit_id}>
+                {dt.type_profit}%
+              </Option>
+            ))}
+          </Select>
+        </>
+      ),
+    },
     {
       title: "Giá sản phẩm (VNĐ)",
       dataIndex: "price",
       key: "price",
-      render: (price) => {
-        return `${price.toLocaleString("vi-VN")}đ`;
-      }, // Định dạng số thành VNĐ
+      render: (price, record, index) => (
+        <>
+          <InputNumber
+            placeholder="Giá"
+            onChange={(e) => {
+              setDataSource((preValue) => {
+                return preValue.map((dt, i) => {
+                  if (index === i) {
+                    return { ...dt, price: e };
+                  }
+                  return dt;
+                });
+              });
+            }}
+            className="w-full"
+            defaultValue={price}
+            formatter={(value) =>
+              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }
+            parser={(value) =>
+              value?.replace(/\$\s?|(,*)/g, "") as unknown as number
+            }
+          />
+        </>
+      ),
     },
     {
       title: "",
@@ -164,7 +241,6 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
     },
   ];
   const [form] = useForm();
-  const [formProduct] = useForm();
   const { postdata } = usePostData();
 
   const { data: dataUsers } = useFetchData<InfoUser[]>(userService.getUsers);
@@ -173,6 +249,7 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
 
   const showModal = () => {
     setIsModalVisible(true);
+    fetchData();
   };
 
   const handleCancel = () => {
@@ -181,7 +258,7 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
 
   const handleSubmit = async (values: ICreatePriceQuote) => {
     const res = await postdata(() =>
-      priceQuoteService.createPriceQuote({
+      priceQuoteService.updatePriceQuote(ID, {
         ...values,
         products: dataSource.map((dt) => {
           return {
@@ -189,6 +266,7 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
             product: dt.product_id,
             quantity: dt.quantity,
             vat: dt.vat,
+            profit: dt.profit,
           };
         }),
       })
@@ -198,30 +276,27 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
     }
   };
 
-  const handleAddProduct = () => {
-    formProduct.submit();
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await priceQuoteService.getPriceQuoteID(ID);
-      if (res.statusCode === 200) {
-        setDataSource(res.data.products);
-        form.setFieldsValue({
-          ...res.data,
-          date_start: "2024-11-04T01:45:00.000Z",
-        });
-      }
-    };
-    if (ID) {
-      fetchData();
+  const fetchData = async () => {
+    const res = await priceQuoteService.getPriceQuoteID(ID);
+    if (res.statusCode === 200) {
+      setDataSource(res.data.products);
+      form.setFieldsValue({
+        ...res.data,
+        date_start: "2024-11-04T01:45:00.000Z",
+      });
     }
-  }, [ID]);
+  };
 
   useEffect(() => {
     if (dataSource) {
       const total = dataSource.reduce((preValue, currValue) => {
-        return currValue.price * currValue.quantity + preValue;
+        const priceProfit =
+          currValue.price *
+          currValue.quantity *
+          ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+            ?.type_profit ?? 0) /
+            100);
+        return currValue.price * currValue.quantity + priceProfit + preValue;
       }, 0);
 
       setPriceTotal(total);
@@ -230,8 +305,16 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
         const totalDiscount =
           typeDiscount === "percent"
             ? dataSource.reduce((preValue, currValue) => {
+                const priceProfit =
+                  currValue.price *
+                  currValue.quantity *
+                  ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                    ?.type_profit ?? 0) /
+                    100);
                 return (
-                  (currValue.price * currValue.quantity * discount) / 100 +
+                  ((currValue.price * currValue.quantity + priceProfit) *
+                    discount) /
+                    100 +
                   preValue
                 );
               }, 0)
@@ -239,9 +322,18 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
         const totalVat =
           typeDiscount === "percent"
             ? dataSource.reduce((preValue, currValue) => {
+                const priceProfit =
+                  currValue.price *
+                  currValue.quantity *
+                  ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                    ?.type_profit ?? 0) /
+                    100);
                 return (
-                  ((currValue.price * currValue.quantity -
-                    (currValue.price * currValue.quantity * discount) / 100) *
+                  ((currValue.price * currValue.quantity +
+                    priceProfit -
+                    ((currValue.price * currValue.quantity + priceProfit) *
+                      discount) /
+                      100) *
                     (dataVats?.find((dt) => dt.vat_id === currValue.vat)
                       ?.type_vat ?? 0)) /
                     100 +
@@ -249,9 +341,17 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
                 );
               }, 0)
             : dataSource.reduce((preValue, currValue) => {
+                const priceProfit =
+                  currValue.price *
+                  currValue.quantity *
+                  ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                    ?.type_profit ?? 0) /
+                    100);
                 return (
-                  ((currValue.price * currValue.quantity -
-                    ((currValue.price * currValue.quantity) / total) *
+                  ((currValue.price * currValue.quantity +
+                    priceProfit -
+                    ((currValue.price * currValue.quantity + priceProfit) /
+                      total) *
                       discount) *
                     (dataVats?.find((dt) => dt.vat_id === currValue.vat)
                       ?.type_vat ?? 0)) /
@@ -266,9 +366,14 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
         //   return currValue.price * currValue.quantity * discount/100 + preValue;
         // }, 0) : discount
         const totalVat = dataSource.reduce((preValue, currValue) => {
+          const priceProfit =
+            currValue.price *
+            currValue.quantity *
+            ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+              ?.type_profit ?? 0) /
+              100);
           return (
-            (currValue.price *
-              currValue.quantity *
+            ((currValue.price * currValue.quantity + priceProfit) *
               (dataVats?.find((dt) => dt.vat_id === currValue.vat)?.type_vat ??
                 0)) /
               100 +
@@ -278,10 +383,16 @@ export default function ModalUpdatePriceQuote({ ID }: Props) {
         const totalDiscount =
           typeDiscount === "percent"
             ? dataSource.reduce((preValue, currValue) => {
+                const priceProfit =
+                  currValue.price *
+                  currValue.quantity *
+                  ((dataProfits.find((dt) => dt.profit_id === currValue.profit)
+                    ?.type_profit ?? 0) /
+                    100);
                 return (
-                  ((currValue.price * currValue.quantity -
-                    (currValue.price *
-                      currValue.quantity *
+                  ((currValue.price * currValue.quantity +
+                    priceProfit -
+                    ((currValue.price * currValue.quantity + priceProfit) *
                       (dataVats?.find((dt) => dt.vat_id === currValue.vat)
                         ?.type_vat ?? 0)) /
                       100) *

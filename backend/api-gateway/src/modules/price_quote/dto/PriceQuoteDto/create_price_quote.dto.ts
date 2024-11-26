@@ -19,6 +19,7 @@ export class CreatePriceQuoteDto {
   status: string;
 
   @IsEnum(['vnd', 'usd'])
+  @IsOptional()
   type_money: string;
 
   @IsInt()
@@ -26,6 +27,7 @@ export class CreatePriceQuoteDto {
   discount: number;
 
   @IsString()
+  @IsOptional()
   reference_code: string;
 
   @IsOptional()

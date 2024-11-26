@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsOptional, IsDate, IsArray } from 'class-validator';
+import { CreatePictureWorkDto } from '../PicturesWorkDto/get-picture_work.dto';
 
 export class CreateWorkDto {
   @IsString()
@@ -26,4 +27,13 @@ export class CreateWorkDto {
 
   @IsDate()
   time_end: Date;
+
+  @IsArray()
+  @IsOptional()
+  picture_urls?: CreatePictureWorkDto[];
+
+  @IsArray()
+  @IsOptional()
+  list_users?: string[];
+
 }

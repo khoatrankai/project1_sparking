@@ -18,4 +18,8 @@ export class UpdateListProductDto {
   @IsOptional()
   vat?: string;
 
+  @IsString()
+  @IsOptional()
+  profit?: string;
+
 }

@@ -39,6 +39,7 @@ export interface IUpdatePriceQuote {
   type_discount?: 'percent' | 'money';
   discount?: number;
   description?: string | null;   
+  products?:IUpdatePriceQuoteProduct[]
  
 }
 
@@ -66,14 +67,19 @@ export interface ICreatePriceQuoteProduct {
   price: number;
   quantity: number;
   vat?: string | null; 
+  profit?: string | null; 
   }
 
   export interface IUpdatePriceQuoteProduct {
-    price_quote?: string; // Có thể cập nhật `price_quote_id`
     product?: string;
     price?: number;
     quantity?: number;
     vat?: string | null;
+    profit?: string | null; 
+  }
+
+  export interface IDeletePriceQuoteProduct {
+    PQ_product_id:string
   }
 
   export interface IGetPriceQuoteProduct {
@@ -81,6 +87,7 @@ export interface ICreatePriceQuoteProduct {
     price_quote: string; // Quan hệ với `PriceQuote` chỉ giữ `price_quote_id` hoặc đối tượng đầy đủ nếu cần
     product: string;
     price: number;
+    profit: string;
     quantity: number;
     vat: string | null;
     created_at: Date;

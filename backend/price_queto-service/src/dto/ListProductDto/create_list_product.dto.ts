@@ -15,12 +15,19 @@ export class CreateListProductDto {
 
   @IsInt()
   @Min(0)
+  @IsOptional()
   price: number;
+
+  @IsString()
+  @IsOptional()
+  profit: string;
 
   @IsInt()
   @Min(1)
+  @IsOptional()
   quantity: number;
 
   @IsString()
+  @IsOptional()
   vat: string;
 }

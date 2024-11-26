@@ -27,6 +27,10 @@ export class CreateProductDto {
   @IsNotEmpty() // The VAT is required
   vat: string;
 
+  @IsString()
+  @IsNotEmpty() // The VAT is required
+  profit: string;
+
   @IsOptional() // The quantity is optional
   @IsNumber()
   quantity?: number;
@@ -38,4 +42,8 @@ export class CreateProductDto {
   @IsOptional() // The status is optional
   @IsEnum(['active', 'delete', 'hide']) // The status can only be one of these values
   status?: 'active' | 'delete' | 'hide';
+
+  @IsString()
+    @IsOptional()
+    supplier_product: string;
 }

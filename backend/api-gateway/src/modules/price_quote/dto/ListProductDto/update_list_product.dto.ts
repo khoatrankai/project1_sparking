@@ -2,6 +2,8 @@ import { IsOptional, IsInt, Min, IsString } from 'class-validator';
 
 export class UpdateListProductDto {
 
+
+
   @IsInt()
   @IsOptional()
   @Min(0)
@@ -15,5 +17,9 @@ export class UpdateListProductDto {
   @IsString()
   @IsOptional()
   vat?: string;
+
+  @IsString()
+  @IsOptional()
+  profit?: string;
 
 }

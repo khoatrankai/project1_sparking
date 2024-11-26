@@ -3,6 +3,7 @@ import { IsString, Length, IsInt, IsOptional } from 'class-validator';
 export class UpdateGroupCustomerDto {
 
   @IsString()
+  @IsOptional()
   @Length(1, 50)
   group_id: string;
 

@@ -43,6 +43,12 @@ const ModalAddProduct = () => {
   const { datas: dataTypes } = useSelector(
     (state: RootState) => state.type_product
   );
+  const { datas: dataProfits } = useSelector(
+    (state: RootState) => state.get_profits
+  );
+  const { datas: dataSupplier } = useSelector(
+    (state: RootState) => state.get_supplier
+  );
   const { datas: dataUnits } = useSelector(
     (state: RootState) => state.unit_product
   );
@@ -71,6 +77,7 @@ const ModalAddProduct = () => {
 
   const handleSubmit = async (values: ProductInfo) => {
     const dataImg = fileList.map((dt) => dt.originFileObj as File);
+    console.log(dataImg);
     const data = { ...values, images: dataImg };
     const formData = CustomFormData(data);
     try {
@@ -131,11 +138,34 @@ const ModalAddProduct = () => {
             <Input placeholder="Tên sản phẩm" />
           </Form.Item>
           <Form.Item
+            name="supplier_product"
+            className="!m-0"
+            label="Nhà cung cấp"
+            // rules={[{ required: true, message: "Vui lòng chọn loại!" }]}
+            style={{ minWidth: "245px", flex: "1 1 0%" }}
+          >
+            <Select
+              placeholder="Chọn nhà cung cấp"
+              showSearch
+              filterOption={(input, option) => {
+                return (option?.children?.join("") ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase());
+              }}
+            >
+              {dataSupplier?.map((dt) => (
+                <Option key={dt.supplier_id} value={dt.supplier_id}>
+                  {dt.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
             name="type"
             className="!m-0"
             label="Loại sản phẩm"
             // rules={[{ required: true, message: "Vui lòng chọn loại!" }]}
-            style={{ minWidth: "320px", flex: "1 1 0%" }}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
           >
             <Select
               placeholder="Chọn loại"
@@ -158,7 +188,7 @@ const ModalAddProduct = () => {
             className="!m-0 flex"
             label="Giá trị"
             rules={[{ required: true, message: "Vui lòng nhập giá trị!" }]}
-            style={{ minWidth: "320px", flex: "1 1 0%" }}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
           >
             <InputNumber defaultValue={0} className="w-full" />
           </Form.Item>
@@ -181,7 +211,7 @@ const ModalAddProduct = () => {
             className="!m-0"
             label="Thuế"
             // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
-            style={{ minWidth: "320px", flex: "1 1 0%" }}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
           >
             <Select
               placeholder="Chọn loại thuế"
@@ -200,11 +230,34 @@ const ModalAddProduct = () => {
             </Select>
           </Form.Item>
           <Form.Item
+            name="profit"
+            className="!m-0"
+            label="Lợi nhuận"
+            // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
+          >
+            <Select
+              placeholder="Chọn loại lợi nhuận"
+              showSearch
+              filterOption={(input, option) => {
+                return (option?.children?.join("") ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase());
+              }}
+            >
+              {dataProfits?.map((dt) => (
+                <Option key={dt.profit_id} value={dt.profit_id}>
+                  {dt.type_profit}%
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
             name="unit_product"
             className="!m-0"
             label="Đơn vị sản phẩm"
             // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
-            style={{ minWidth: "320px", flex: "1 1 0%" }}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
           >
             <Select
               placeholder="Chọn loại đơn vị"

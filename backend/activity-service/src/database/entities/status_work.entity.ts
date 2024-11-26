@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToMany, ManyToOne, JoinColumn} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 import {  Works } from './work.entity';
 import { TypeWork } from './type_work.entity';
 @Entity('Status_work')
@@ -19,4 +19,9 @@ export class StatusWork {
   @OneToMany(() => Works, work => work.status)
   work: Works[];
 
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }

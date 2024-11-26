@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { RoleUser } from './role_user.entity';
 
 @Entity('Account_users')
 export class AccountUsers {
@@ -17,19 +18,19 @@ export class AccountUsers {
   @Column({ type: 'varchar', length: 100 })
   password: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   picture_url: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50,default:"" })
   phone_number: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50,default:"" })
   link_facebook: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50,default:"" })
   link_in: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50,default:"" })
   link_skype: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
@@ -37,4 +38,8 @@ export class AccountUsers {
 
   @Column({ type: 'enum', enum: ['active', 'delete', 'hide'], default: 'active' })
   status: string;
+
+
+  @OneToMany(() => RoleUser, roleUser => roleUser.user_info)
+  role_user: RoleUser[];
 }

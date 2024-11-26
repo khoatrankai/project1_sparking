@@ -67,7 +67,7 @@ const ModalUnitProduct = () => {
                 }}
               >
                 <Form.Item
-                  name="name"
+                  name="name_unit"
                   rules={[
                     {
                       required: true,
@@ -197,7 +197,7 @@ const ModalUnitProduct = () => {
               }}
             >
               <Form.Item
-                name="name"
+                name="name_unit"
                 rules={[
                   {
                     required: true,

@@ -29,4 +29,9 @@ export class CreateProductDto {
     @IsOptional()
     @IsIn(['active', 'delete', 'hide'])
     status?: 'active' | 'delete' | 'hide';
+
+
+    @IsString()
+    @IsOptional()
+    supplier_product: string;
 }

@@ -21,7 +21,7 @@ export class PriceQuote {
   @Column({ type: 'enum', enum: ['vnd', 'usd'], default: 'vnd' })
   type_money: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50,nullable:true })
   reference_code: string;
 
   @Column({ type: 'varchar', length: 50,nullable:true })

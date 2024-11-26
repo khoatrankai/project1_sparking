@@ -5,6 +5,7 @@ export class GetListProductDto {
     price: number;
     quantity: number;
     vat: number;
+    profit:string
     created_at: Date;
     updated_at: Date;
   }

@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ToolCustomer from "./ToolCustomer/ToolCustomer";
 import ListCustomer from "./ListCustomer/ListCustomer";
-import customerService from "@/services/customerService";
-import { CustomerInfo } from "@/models/customerInterface";
 
 // type Props = {};
 

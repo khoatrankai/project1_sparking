@@ -51,6 +51,7 @@ export class CustomerService {
   async getCustomerIDs(customer_ids:string[]){
     const data = await this.customerInfoRepository.find({where:{info_id:In(customer_ids)}});
     const sortedData = customer_ids.map(id => data.find(user => user.info_id === id))
+    console.log(sortedData)
     return sortedData
   }
 
