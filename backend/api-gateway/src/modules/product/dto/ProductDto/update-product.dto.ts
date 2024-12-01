@@ -10,6 +10,10 @@ export class UpdateProductDto {
     @IsString()
     type?: string; // Foreign Key ID
 
+    @IsString()
+    @IsOptional()
+    code_original?: string;
+
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
@@ -22,6 +26,14 @@ export class UpdateProductDto {
     @IsOptional()
     @IsString()
     vat?: string;
+
+    @IsString()
+    @IsOptional()
+    brand?: string;
+
+    @IsString()
+    @IsOptional()
+    original?: string;
 
     @IsOptional()
     @IsString()

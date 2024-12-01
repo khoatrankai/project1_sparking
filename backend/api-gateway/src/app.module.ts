@@ -18,6 +18,8 @@ import { ActivityModule } from './modules/activity/activity.module';
 import { ProjectModule } from './modules/project/project.module';
 import { ContractModule } from './modules/contract/contract.module';
 import { OpportunityModule } from './modules/opportunity/opportunity.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 // import { CloudinaryModule } from './cloudinary/cloudinary.module';
 // import { FriendModule } from './modules/friend/friend.module';
 // import { PagesModule } from './modules/page/page.module';
@@ -25,11 +27,16 @@ import { OpportunityModule } from './modules/opportunity/opportunity.module';
 // import { MyGateway } from './configs/socket/socket.module';
 
 @Module({
-  imports: [ActivityModule,ProjectModule,ContractModule,OpportunityModule,AuthModule,ProposeModule,UserModule,CustomerModule,PriceQuoteModule,SystemModule,ProductModule,
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+    ActivityModule,ProjectModule,ContractModule,OpportunityModule,AuthModule,ProposeModule,UserModule,CustomerModule,PriceQuoteModule,SystemModule,ProductModule,
    ConfigModule.forRoot({
     isGlobal: true, 
     envFilePath: '.env',
-  }),
+  },
+),
   JwtModule.registerAsync({
     imports: [ConfigModule], 
     inject: [ConfigService],

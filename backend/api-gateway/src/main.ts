@@ -4,6 +4,7 @@ import { BadRequestException, HttpStatus, ValidationPipe } from '@nestjs/common'
 import { ValidationError } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
 
+
 async function bootstrap() {
   const customValidationPipe = new ValidationPipe({
     whitelist: true,

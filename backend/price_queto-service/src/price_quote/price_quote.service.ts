@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PriceQuote } from 'src/database/entities/price_quote.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-import {Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import {Between, In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { UpdatePriceQuoteDto } from 'src/dto/PriceQuoteDto/update_price_quote.dto';
 import { CreateListProductDto } from 'src/dto/ListProductDto/create_list_product.dto';
 import { ListProduct } from 'src/database/entities/list_product.entity';
@@ -12,24 +12,25 @@ import { UpdateListProductDto } from 'src/dto/ListProductDto/update_list_product
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { PriceQuoteFilterDto } from 'src/dto/PriceQuoteDto/get_filter_price_quote.dto';
+import { ListParts } from 'src/database/entities/list_part.entity';
+import { CreateListPartDto } from 'src/dto/ListPartDto/create_list_part.dto';
+import { UpdateListPartDto } from 'src/dto/ListPartDto/update_list_part.dto';
 
 
 @Injectable()
 export class PriceQuoteService {
 
-  constructor(@Inject('USER') private readonly usersClient:ClientProxy,@Inject('PRODUCT') private readonly productsClient:ClientProxy,@Inject('PROJECT') private readonly projectsClient:ClientProxy,@InjectRepository(PriceQuote) private readonly priceQuoteRepository:Repository<PriceQuote>, @InjectRepository(ListProduct)
+  constructor(@Inject('USER') private readonly usersClient:ClientProxy,@Inject('PRODUCT') private readonly productsClient:ClientProxy,@Inject('SYSTEM') private readonly systemClient:ClientProxy,@Inject('PROJECT') private readonly projectsClient:ClientProxy,@InjectRepository(PriceQuote) private readonly priceQuoteRepository:Repository<PriceQuote>,@InjectRepository(ListParts) private readonly listPartRepository:Repository<ListParts>, @InjectRepository(ListProduct)
   private listProductRepository: Repository<ListProduct>){}
   getHello(): string {
     return 'Hello World!';
   }
   async createPriceQuote(createPriceQuoteDto: CreatePriceQuoteDto) {
-    const {products,...dataPriceQuote} = createPriceQuoteDto
+    const {parts,...dataPriceQuote} = createPriceQuoteDto
     const priceQuote = this.priceQuoteRepository.create({...dataPriceQuote,price_quote_id:uuidv4()});
     const resPriceQuote =  await this.priceQuoteRepository.save(priceQuote);
     if(resPriceQuote){
-      const resList = await this.createListProducts(products.map((dt)=>{
-        return {...dt,price_quote:resPriceQuote.price_quote_id,profit:dt.profit}
-      }),resPriceQuote)
+      const resList = await this.createListParts(parts,resPriceQuote)
       if(resList.length>0){
         return {
           statusCode:HttpStatus.CREATED,
@@ -48,15 +49,35 @@ export class PriceQuoteService {
   }
 
   async findOnePriceQuote(id: string) {
-    const priceQuote = await this.priceQuoteRepository.findOne({ where: { price_quote_id: id },relations: ['products'] });
-    const productIds = priceQuote.products.map((dt)=>dt.product)
-    const dataProducts = await firstValueFrom(this.productsClient.send({cmd:'get-product_ids'},productIds))
-    if (!priceQuote) {
-      throw new NotFoundException(`PriceQuote with ID ${id} not found`);
-    }
-    return {...priceQuote,products:dataProducts.map((dt,index)=>{
-      return {...dt,...priceQuote?.products[index]}
-    })??[]};
+    const priceQuote = await this.priceQuoteRepository.findOne({ where: { price_quote_id: id },relations: ['parts','parts.products'] });
+
+    const resParts = await Promise.all(priceQuote.parts.map(async(dt)=>{
+      const productIds = dt.products.map((dt)=>dt.product)
+      const dataProducts = await firstValueFrom(this.productsClient.send({cmd:'get-product_ids'},productIds))
+      return {...dt,products:dataProducts.map((dtt,index)=>{
+        return {...dtt,...dt?.products[index]}
+      })??[]};
+    }))
+    return {...priceQuote,parts:resParts}
+    
+  }
+
+  async findOneFullPriceQuote(id: string) {
+    const priceQuote = await this.priceQuoteRepository.findOne({ where: { price_quote_id: id },relations: ['parts','parts.products'] });
+    const dataProject = await firstValueFrom(this.projectsClient.send({cmd:'find-one_full_project'},priceQuote.project))
+    const dataUser = await firstValueFrom(this.usersClient.send({cmd:'get-user_id'},priceQuote.user_support))
+
+    const resParts = await Promise.all(priceQuote.parts.map(async(dt)=>{
+      const productIds = dt.products.map((dt)=>dt.product)
+      const profitIds = dt.products.map((dt)=> dt.profit)
+      const dataProducts = await firstValueFrom(this.productsClient.send({cmd:'get-product_ids'},productIds))
+      const dataProfits = await firstValueFrom(this.systemClient.send({cmd:'get-profit_ids'},profitIds))
+      return {...dt,products:dataProducts.map((dtt,index)=>{
+        return {...dtt,...dt?.products[index],profit:dataProfits[index]}
+      })??[]};
+    }))
+    return {...priceQuote,parts:resParts.reverse(),project:dataProject.data,user_support:dataUser}
+    
   }
 
   async findAllPriceQuote(filter?:PriceQuoteFilterDto) {
@@ -119,7 +140,7 @@ export class PriceQuoteService {
   
     // Lấy dữ liệu từ repository dựa trên điều kiện whereCondition
     const result = await this.priceQuoteRepository.find({
-      where: whereCondition,relations:['products']
+      where: whereCondition,relations:['parts','parts.products']
     });
 
      const userIds = result.map((dt)=>dt.user_support)
@@ -136,16 +157,15 @@ export class PriceQuoteService {
   }
 
   async updatePriceQuote(id: string, updatePriceQuoteDto: UpdatePriceQuoteDto) {
-    const {products,...reqUpdatePriceQuote} = updatePriceQuoteDto
+    const {parts,...reqUpdatePriceQuote} = updatePriceQuoteDto
     await this.priceQuoteRepository.update(id, reqUpdatePriceQuote);
-    const updatedPriceQuote = await this.priceQuoteRepository.findOne({ where: { price_quote_id: id } });
+    const updatedPriceQuote = await this.priceQuoteRepository.findOne({ where: { price_quote_id: id } ,relations:['parts','parts.products']});
     if (!updatedPriceQuote) {
       throw new NotFoundException(`PriceQuote with ID ${id} not found`);
     }
-    await this.listProductRepository.delete({price_quote:updatedPriceQuote})
-     await this.createListProducts(products.map((dt)=>{
-      return {...dt,price_quote:updatedPriceQuote.price_quote_id}
-    }),updatedPriceQuote)
+    await this.listProductRepository.delete({PQ_product_id:In(updatedPriceQuote.parts.map(dt => dt.products.map(dtt => dtt.PQ_product_id)).flat())})
+    await this.listPartRepository.delete({price_quote:updatedPriceQuote})
+    await this.createListParts(parts,updatedPriceQuote)
     return []
     // if(resList.length>0){
     //   return {
@@ -161,9 +181,9 @@ export class PriceQuoteService {
   }
 
 
-  async createListProducts(createListProductDto: CreateListProductDto[],price_quote:PriceQuote) {
+  async createListProducts(createListProductDto: CreateListProductDto[],part:ListParts) {
     const listProduct = createListProductDto.map((dt)=>{
-      return this.listProductRepository.create({...dt,PQ_product_id:uuidv4(),price_quote})
+      return this.listProductRepository.create({...dt,PQ_product_id:uuidv4(),part})
     })
     return await this.listProductRepository.save(listProduct);
   }
@@ -188,6 +208,47 @@ export class PriceQuoteService {
     const result = await this.listProductRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException('ListProduct not found');
+    }
+  }
+
+
+  async createListParts(createListPartDto: CreateListPartDto[],price_quote:PriceQuote) {
+    
+    const listPart = createListPartDto.map((dt)=>{
+      const id = uuidv4()
+      return this.listPartRepository.create({title:dt.title,part_id:id,price_quote})
+      
+    })
+   
+    const dataListPart = await this.listPartRepository.save(listPart);
+    Promise.all(dataListPart.map(async(dt,index)=>{
+       await this.createListProducts(createListPartDto[index].products,dt)
+    }))
+    return dataListPart
+  }
+
+  async findOneListPart(id: string) {
+    const listPart = await this.listPartRepository.findOne({ where: { part_id: id } });
+    if (!listPart) {
+      throw new NotFoundException('ListPart not found');
+    }
+    return listPart;
+  }
+
+
+
+  async findAllListPart() {
+    return await this.listPartRepository.find();
+  }
+
+  async updateListPart(id: string, updateListPartDto: UpdateListPartDto) {
+    return await this.listPartRepository.update(id,updateListPartDto);
+  }
+
+  async removeListPart(id: string) {
+    const result = await this.listPartRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('ListPart not found');
     }
   }
  

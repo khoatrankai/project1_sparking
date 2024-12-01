@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import {  Repository } from 'typeorm';
+import {  In, Repository } from 'typeorm';
 
 import { Label } from 'src/database/entities/label.entity';
 import { CreateLabelDto } from 'src/dto/label/create_label.dto';
@@ -170,6 +170,12 @@ export class SystemService {
 
   async getAllProfits() {
     return await this.profitRepository.find();
+  }
+
+  async getProfitIDs(profit_ids:string[]){
+    const data = await this.profitRepository.find({where:{profit_id:In(profit_ids)}});
+    const sortedData = profit_ids.map(id => data.find(item => item.profit_id === id))
+    return sortedData
   }
 
   async getProvinceById(province_id: string) {

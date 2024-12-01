@@ -3,7 +3,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import { CreatePriceQuoteDto } from './dto/PriceQuoteDto/create_price_quote.dto';
 import { UpdatePriceQuoteDto } from './dto/PriceQuoteDto/update_price_quote.dto';
 import { PriceQuoteFilterDto } from './dto/PriceQuoteDto/get_filter_price_quote.dto';
-
+import { firstValueFrom } from 'rxjs';
+// import { IGetPriceQuote } from './dto/PriceQuoteDto/get-price_quote.dto';
 
 @Injectable()
 export class PriceQuoteService {
@@ -12,6 +13,8 @@ export class PriceQuoteService {
   getHello(): string {
     return 'Hello World!';
   }
+
+  
 
   async sendCreatePriceQueto(createPriceQuoteDto: CreatePriceQuoteDto) {
     return this.priceQuoteClient.send({ cmd: 'create-price_quote' }, createPriceQuoteDto)
@@ -26,6 +29,18 @@ export class PriceQuoteService {
   }
   async sendGetPriceQuetoID(id:string) {
     return this.priceQuoteClient.send({ cmd: 'find-one_price_quote' }, id)
+  }
+
+  async sendGetFullPriceQuetoID(id:string) {
+    return firstValueFrom(this.priceQuoteClient.send({ cmd: 'find-one_full_price_quote' }, id))
+  }
+
+  async exportExcelPriceQuote(id:string){
+    const data = await this.sendGetFullPriceQuetoID(id)
+    console.log(data)
+    // await this.createExcelPriceQuote(data.data)
+    return data
+
   }
   // async sendGetFilterPriceQuote(getFilterPriceQuote: GetPriceQuoteDto) {
   //   return this.priceQuoteClient.send('get-filter_price_quote', getFilterPriceQuote)

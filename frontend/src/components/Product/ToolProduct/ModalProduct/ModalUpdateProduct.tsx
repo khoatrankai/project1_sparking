@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -64,6 +64,7 @@ const ModalUpdateProduct = (props: Props) => {
   const dispatch = useDispatch<AppDispatch>();
   const fetchListCode = async () => {
     const data = await productService.getProductsID(props.productID);
+    console.log(data);
     if (data.statusCode === 200) {
       dispatch(fetchProductInfos());
       dispatch(fetchProductAbout());
@@ -90,17 +91,21 @@ const ModalUpdateProduct = (props: Props) => {
         let text = "";
 
         switch (status) {
-          case "stored":
+          case "inventory":
             color = "bg-blue-500";
             text = "Lưu kho";
             break;
-          case "ordered":
+          case "selled":
             color = "bg-purple-500";
-            text = "Đã đặt hàng";
+            text = "Đã bán";
             break;
-          case "hired":
+          case "borrowed":
             color = "bg-orange-500";
             text = "Đã thuê";
+            break;
+          case "export":
+            color = "bg-yellow-500";
+            text = "Đã xuất kho";
             break;
           case "error":
             color = "bg-red-500";
@@ -127,6 +132,12 @@ const ModalUpdateProduct = (props: Props) => {
   const { datas: dataSupplier } = useSelector(
     (state: RootState) => state.get_supplier
   );
+  const { datas: dataBrands } = useSelector(
+    (state: RootState) => state.brand_product
+  );
+  const { datas: dataOriginals } = useSelector(
+    (state: RootState) => state.original_product
+  );
   const [form] = useForm();
   const { data: dataVats } = useFetchData<Vat[]>(systemService.getVats);
   const { data: dataUnits } = useFetchData<IUnitProduct[]>(
@@ -139,6 +150,8 @@ const ModalUpdateProduct = (props: Props) => {
       form.setFieldsValue({
         ...res.data,
         type: res.data?.type?.type_product_id,
+        brand: res.data?.brand?.brand_id,
+        original: res.data?.original?.original_id,
         unit_product: res.data?.unit_product?.unit_id,
         supplier_product: res.data.supplier_product?.supplier_id,
       });
@@ -162,6 +175,7 @@ const ModalUpdateProduct = (props: Props) => {
   const showModal = () => {
     setIsModalVisible(true);
     fetchData();
+    fetchListCode();
   };
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -216,9 +230,6 @@ const ModalUpdateProduct = (props: Props) => {
     </button>
   );
 
-  useEffect(() => {
-    fetchListCode();
-  }, []);
   return (
     <>
       <Button
@@ -256,11 +267,22 @@ const ModalUpdateProduct = (props: Props) => {
                 <Input placeholder="Tên sản phẩm" />
               </Form.Item>
               <Form.Item
+                name="code_original"
+                className="!m-0"
+                label="Mã sản phẩm"
+                rules={[
+                  { required: true, message: "Vui lòng nhập mã sản phẩm!" },
+                ]}
+                style={{ minWidth: "240px", flex: "1 1 0%" }}
+              >
+                <Input placeholder="Mã sản phẩm" />
+              </Form.Item>
+              <Form.Item
                 name="supplier_product"
                 className="!m-0"
                 label="Nhà cung cấp"
                 // rules={[{ required: true, message: "Vui lòng chọn loại!" }]}
-                style={{ minWidth: "320px", flex: "1 1 0%" }}
+                style={{ minWidth: "240px", flex: "1 1 0%" }}
               >
                 <Select
                   placeholder="Chọn nhà cung cấp"
@@ -283,7 +305,7 @@ const ModalUpdateProduct = (props: Props) => {
                 className="!m-0"
                 label="Loại sản phẩm"
                 // rules={[{ required: true, message: "Vui lòng chọn loại!" }]}
-                style={{ minWidth: "320px", flex: "1 1 0%" }}
+                style={{ minWidth: "240px", flex: "1 1 0%" }}
               >
                 <Select
                   placeholder="Chọn loại"
@@ -343,6 +365,52 @@ const ModalUpdateProduct = (props: Props) => {
                   {dataVats?.map((dt) => (
                     <Option key={dt.vat_id} value={dt.vat_id}>
                       {dt.type_vat}%
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="brand"
+                className="!m-0"
+                label="Thương hiệu"
+                // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
+                style={{ minWidth: "240px", flex: "1 1 0%" }}
+              >
+                <Select
+                  placeholder="Chọn loại thương hiệu"
+                  showSearch
+                  filterOption={(input, option) => {
+                    return (option?.children?.join("") ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase());
+                  }}
+                >
+                  {dataBrands?.map((dt) => (
+                    <Option key={dt.brand_id} value={dt.brand_id}>
+                      {dt.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="original"
+                className="!m-0"
+                label="Xuất xứ"
+                // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
+                style={{ minWidth: "240px", flex: "1 1 0%" }}
+              >
+                <Select
+                  placeholder="Chọn loại xuất xứ"
+                  showSearch
+                  filterOption={(input, option) => {
+                    return (option?.children?.join("") ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase());
+                  }}
+                >
+                  {dataOriginals?.map((dt) => (
+                    <Option key={dt.original_id} value={dt.original_id}>
+                      {dt.name}
                     </Option>
                   ))}
                 </Select>

@@ -7,6 +7,8 @@ import ModalTypeProduct from "./ModalProduct/ModalTypeProduct/ModalTypeProduct";
 import ModalUnitProduct from "./ModalProduct/ModalUnitProduct/ModalUnitProduct";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store/store";
+import ModalBrandProduct from "./ModalProduct/ModalBrandProduct/ModalBrandProduct";
+import ModalOriginalProduct from "./ModalProduct/ModalOriginalProduct/ModalOriginalProduct";
 
 export default function ToolProduct() {
   const { datas: dataAbout } = useSelector(
@@ -18,6 +20,8 @@ export default function ToolProduct() {
         <ModalAddProduct />
         <ModalTypeProduct />
         <ModalUnitProduct />
+        <ModalBrandProduct />
+        <ModalOriginalProduct />
         <ModalQrScanner />
       </div>
       <div>

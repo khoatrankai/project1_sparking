@@ -14,6 +14,10 @@ export class CreateProductDto {
   @IsNotEmpty() // The type should not be empty
   type: string;
 
+  @IsString()
+  @IsOptional()
+  code_original?: string;
+
   @Type(() => Number)
   @IsNumber()
   @IsOptional() // The price is required
@@ -26,6 +30,14 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty() // The VAT is required
   vat: string;
+
+  @IsString()
+  @IsOptional()
+  brand: string;
+
+  @IsString()
+  @IsOptional()
+  original: string;
 
   @IsString()
   @IsNotEmpty() // The VAT is required

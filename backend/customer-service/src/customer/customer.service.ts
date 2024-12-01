@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { GroupCustomer } from 'src/database/entities/group_customer.entity';
 import { CreateGroupCustomerDto } from 'src/dto/create_group.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,12 +23,14 @@ import { CreateRoleCustomerDto } from 'src/dto/create_role_customer.dto';
 import { RoleCustomer } from 'src/database/entities/role_customer.entity';
 import { UpdateRoleCustomerDto } from 'src/dto/update_role_customer.dto';
 import { formatInTimeZone } from 'date-fns-tz';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 
 
 @Injectable()
 export class CustomerService {
 
-  constructor(@InjectRepository(RoleCustomer) private readonly roleCustomerRepository:Repository<RoleCustomer>,@InjectRepository(InfoContact) private readonly infoContactRepository:Repository<InfoContact>,@InjectRepository(GroupCustomer) private readonly groupCustomerRepository:Repository<GroupCustomer>,@InjectRepository(CustomerInfo) private readonly customerInfoRepository:Repository<CustomerInfo>,@InjectRepository(RoleTypeCustomer) private readonly roleTypeCustomerRepository:Repository<RoleTypeCustomer>,@InjectRepository(AccountCustomers) private readonly accountCustomerRepository:Repository<AccountCustomers>,private configService: ConfigService){}
+  constructor(@InjectRepository(RoleCustomer) private readonly roleCustomerRepository:Repository<RoleCustomer>,@InjectRepository(InfoContact) private readonly infoContactRepository:Repository<InfoContact>,@InjectRepository(GroupCustomer) private readonly groupCustomerRepository:Repository<GroupCustomer>,@InjectRepository(CustomerInfo) private readonly customerInfoRepository:Repository<CustomerInfo>,@InjectRepository(RoleTypeCustomer) private readonly roleTypeCustomerRepository:Repository<RoleTypeCustomer>,@InjectRepository(AccountCustomers) private readonly accountCustomerRepository:Repository<AccountCustomers>,private configService: ConfigService,@Inject('SYSTEM') private readonly systemClient:ClientProxy){}
   getHello(): string {
     return 'Hello World!';
   }
@@ -374,6 +376,27 @@ export class CustomerService {
      return {
       statusCode: HttpStatus.OK,
       data: data
+      
+
+     }
+    }catch(err){
+      console.log(err)
+      return{
+        statusCode: HttpStatus.BAD_REQUEST
+      }
+    }
+   
+  }
+
+  async getFullCustomerID(info_id:string){
+    try{
+      const data = await this.customerInfoRepository.findOne({where:{info_id},relations:['group_customer']})
+
+      const dataProvince = await firstValueFrom(this.systemClient.send({cmd:"get-province_id"},data.province_delivery))
+      console.log(dataProvince)
+     return {
+      statusCode: HttpStatus.OK,
+      data: {...data,province_delivery:dataProvince}
       
 
      }

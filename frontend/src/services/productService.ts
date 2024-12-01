@@ -38,6 +38,42 @@ const productService = {
     }
     return res.data ;
   },
+  getBrands: async()=>{
+    const response = await api.get(`/product/brand`);
+    return response.data;
+  },
+  createBrand: async(data:{name:string})=>{
+    const res = await api.post('/product/brand', data);
+    if (!res) {
+        throw new Error("Failed to create brand product: No response");
+    }
+    return res.data ;
+  },
+  updateBrand: async(brand_id:string,data:string)=>{
+    const res = await api.put(`/product/brand/${brand_id}`, {name:data});
+    if (!res) {
+        throw new Error("Failed to update brand product: No response");
+    }
+    return res.data ;
+  },
+  getOriginals: async()=>{
+    const response = await api.get(`/product/original`);
+    return response.data;
+  },
+  createOriginal: async(data:{name:string})=>{
+    const res = await api.post('/product/original', data);
+    if (!res) {
+        throw new Error("Failed to create original product: No response");
+    }
+    return res.data ;
+  },
+  updateOriginal: async(original_id:string,data:string)=>{
+    const res = await api.put(`/product/original/${original_id}`, {name:data});
+    if (!res) {
+        throw new Error("Failed to update original product: No response");
+    }
+    return res.data ;
+  },
   createUnit: async(data:{name_unit:string})=>{
     const res = await api.post('/product/unit', data);
     if (!res) {

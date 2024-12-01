@@ -27,12 +27,16 @@ import statusWorkSlice from './slices/activitySlices/status_work.slice';
 import supplierSlice from './slices/productSlices/get_supplier.slice';
 import activityContainerSlice from './slices/productSlices/get_activity_container.slice';
 import profitSystemSlice from './slices/systemSlices/get_profit.slice';
+import brandProductSlice from './slices/productSlices/get_brand.slice';
+import originalProductSlice from './slices/productSlices/get_original.slice';
 
 
 export const store = configureStore({
   reducer: {
     type_product:typeProductReducer,
     unit_product:unitProductSlice,
+    brand_product:brandProductSlice,
+    original_product:originalProductSlice,
     vat_system:vatSystemSlice,
     info_products:infoProductSlice,
     about_product:aboutProductSlice,

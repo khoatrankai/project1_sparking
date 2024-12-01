@@ -39,6 +39,12 @@ export class CustomerController {
    
   }
 
+  @MessagePattern({cmd:'get-full_info_customer_id'})
+  getFullCustomerID(@Payload() info_id:string){
+    return this.customerService.getFullCustomerID(info_id)
+   
+  }
+
   @MessagePattern({cmd:'get-customer_ids'})
   getCustomerIDs(@Payload() customer_ids:string[]){
     return this.customerService.getCustomerIDs(customer_ids)

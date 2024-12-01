@@ -43,6 +43,12 @@ const ModalAddProduct = () => {
   const { datas: dataTypes } = useSelector(
     (state: RootState) => state.type_product
   );
+  const { datas: dataBrands } = useSelector(
+    (state: RootState) => state.brand_product
+  );
+  const { datas: dataOriginals } = useSelector(
+    (state: RootState) => state.original_product
+  );
   const { datas: dataProfits } = useSelector(
     (state: RootState) => state.get_profits
   );
@@ -138,11 +144,20 @@ const ModalAddProduct = () => {
             <Input placeholder="Tên sản phẩm" />
           </Form.Item>
           <Form.Item
+            name="code_original"
+            className="!m-0"
+            label="Mã sản phẩm"
+            rules={[{ required: true, message: "Vui lòng nhập mã sản phẩm!" }]}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
+          >
+            <Input placeholder="Mã sản phẩm" />
+          </Form.Item>
+          <Form.Item
             name="supplier_product"
             className="!m-0"
             label="Nhà cung cấp"
             // rules={[{ required: true, message: "Vui lòng chọn loại!" }]}
-            style={{ minWidth: "245px", flex: "1 1 0%" }}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
           >
             <Select
               placeholder="Chọn nhà cung cấp"
@@ -225,6 +240,52 @@ const ModalAddProduct = () => {
               {dataVats?.map((dt) => (
                 <Option key={dt.vat_id} value={dt.vat_id}>
                   {dt.type_vat}%
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="brand"
+            className="!m-0"
+            label="Thương hiệu"
+            // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
+          >
+            <Select
+              placeholder="Chọn loại thương hiệu"
+              showSearch
+              filterOption={(input, option) => {
+                return (option?.children?.join("") ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase());
+              }}
+            >
+              {dataBrands?.map((dt) => (
+                <Option key={dt.brand_id} value={dt.brand_id}>
+                  {dt.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="original"
+            className="!m-0"
+            label="Xuất xứ"
+            // rules={[{ required: true, message: "Vui lòng chọn loại thuế!" }]}
+            style={{ minWidth: "240px", flex: "1 1 0%" }}
+          >
+            <Select
+              placeholder="Chọn loại xuất xứ"
+              showSearch
+              filterOption={(input, option) => {
+                return (option?.children?.join("") ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase());
+              }}
+            >
+              {dataOriginals?.map((dt) => (
+                <Option key={dt.original_id} value={dt.original_id}>
+                  {dt.name}
                 </Option>
               ))}
             </Select>

@@ -24,8 +24,12 @@ export class PriceQuoteController {
 
   @Get('id/:id')
   getOne(@Param() data:{id:string}) {
-    console.log(data.id)
     return this.priceQuetoService.sendGetPriceQuetoID(data.id);
+  }
+
+  @Get('export/:id')
+  getOneExport(@Param() data:{id:string}) {
+    return this.priceQuetoService.exportExcelPriceQuote(data.id);
   }
 
   @Post()

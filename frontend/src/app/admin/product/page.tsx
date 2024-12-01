@@ -2,6 +2,8 @@
 "use client";
 import Product from "@/components/Product/Product";
 import { fetchProductAbout } from "@/redux/store/slices/productSlices/get_about.slice";
+import { fetchProductBrands } from "@/redux/store/slices/productSlices/get_brand.slice";
+import { fetchProductOriginals } from "@/redux/store/slices/productSlices/get_original.slice";
 import { fetchProductInfos } from "@/redux/store/slices/productSlices/get_products";
 import { fetchSuppliers } from "@/redux/store/slices/productSlices/get_supplier.slice";
 import { fetchProductTypes } from "@/redux/store/slices/productSlices/get_type.slice";
@@ -19,6 +21,8 @@ export default function page() {
 
   useEffect(() => {
     dispatch(fetchProductTypes());
+    dispatch(fetchProductBrands());
+    dispatch(fetchProductOriginals());
     dispatch(fetchProductUnits());
     dispatch(fetchSuppliers());
     dispatch(fetchProductInfos());

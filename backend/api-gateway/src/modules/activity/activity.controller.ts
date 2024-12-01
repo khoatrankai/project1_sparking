@@ -28,6 +28,7 @@ export class ActivityController {
 
   @Get()
   getHello(): string {
+
     return this.activityService.getHello();
   }
 

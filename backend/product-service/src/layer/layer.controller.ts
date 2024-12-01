@@ -17,6 +17,10 @@ import { CreateSupplierProductDto } from 'src/dto/SupplierProductDto/create-supp
 import { UpdateSupplierProductDto } from 'src/dto/SupplierProductDto/update-supplier_product.dto';
 import { CreateActivityContainerDto } from 'src/dto/ActivityContainerDto/create-activity_container.dto';
 import { UpdateActivityContainerDto } from 'src/dto/ActivityContainerDto/update-activity_container.dto';
+import { CreateBrandDto } from 'src/dto/BrandDto/create-brand.dto';
+import { UpdateBrandDto } from 'src/dto/BrandDto/update-brand.dto';
+import { CreateOriginalDto } from 'src/dto/OriginalDto/create-original.dto';
+import { UpdateOriginalDto } from 'src/dto/OriginalDto/update-original.dto';
 
 
 
@@ -145,6 +149,48 @@ export class LayerController {
   async updateTypeProduct(@Payload() data: { id: string; updateTypeProductDto: UpdateTypeProductDto }) {
     const { id, updateTypeProductDto } = data;
     return this.layerService.updateTypeProduct(id, updateTypeProductDto);
+  }
+
+  @MessagePattern({ cmd: 'create-brand' })
+  async createBrand(@Payload() createBrandDto: CreateBrandDto) {
+    return this.layerService.createBrand(createBrandDto);
+  }
+
+  @MessagePattern({ cmd: 'find-all_brand' })
+  async findAllBrand() {
+    return this.layerService.findAllBrand();
+  }
+
+  @MessagePattern({ cmd: 'find-one_brand' })
+  async findOneBrand(@Payload() id: string) {
+    return this.layerService.findOneBrand(id);
+  }
+
+  @MessagePattern({ cmd: 'update-brand' })
+  async updateBrand(@Payload() data: { id: string; updateBrandDto: UpdateBrandDto }) {
+    const { id, updateBrandDto } = data;
+    return this.layerService.updateBrand(id, updateBrandDto);
+  }
+
+  @MessagePattern({ cmd: 'create-original' })
+  async createOriginal(@Payload() createOriginalDto: CreateOriginalDto) {
+    return this.layerService.createOriginal(createOriginalDto);
+  }
+
+  @MessagePattern({ cmd: 'find-all_original' })
+  async findAllOriginal() {
+    return this.layerService.findAllOriginal();
+  }
+
+  @MessagePattern({ cmd: 'find-one_original' })
+  async findOneOriginal(@Payload() id: string) {
+    return this.layerService.findOneOriginal(id);
+  }
+
+  @MessagePattern({ cmd: 'update-original' })
+  async updateOriginal(@Payload() data: { id: string; updateOriginalDto: UpdateOriginalDto }) {
+    const { id, updateOriginalDto } = data;
+    return this.layerService.updateOriginal(id, updateOriginalDto);
   }
 
   @MessagePattern({ cmd: 'create-unit_product' })

@@ -1,5 +1,5 @@
 import { IsString, IsEnum, IsInt, IsOptional, IsDateString, IsArray } from 'class-validator';
-import { CreateListProductDto } from '../ListProductDto/create_list_product.dto';
+import { CreateListPartDto } from '../ListPartDto/create_list_part.dto';
 
 export class UpdatePriceQuoteDto {
   @IsOptional()
@@ -21,7 +21,6 @@ export class UpdatePriceQuoteDto {
   @IsOptional()
   @IsEnum(['vnd', 'usd'])
   type_money?: string;
-
 
   @IsOptional()
   @IsString()
@@ -49,5 +48,5 @@ export class UpdatePriceQuoteDto {
 
   @IsOptional()
   @IsArray()
-  products?: CreateListProductDto[];
+  parts?: CreateListPartDto[];
 }

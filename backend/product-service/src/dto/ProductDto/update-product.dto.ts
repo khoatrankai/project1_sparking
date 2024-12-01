@@ -11,6 +11,10 @@ export class UpdateProductDto {
   @IsOptional()
   type?: string;
 
+  @IsString()
+  @IsOptional()
+  code_original?: string;
+
   @IsInt()
   @IsOptional()
   price?: number;
@@ -23,6 +27,16 @@ export class UpdateProductDto {
   @IsOptional()
   @MaxLength(50)
   vat?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(50)
+  brand?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(50)
+  original?: string;
 
   @IsInt()
   @IsOptional()

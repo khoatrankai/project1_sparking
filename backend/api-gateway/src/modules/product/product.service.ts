@@ -19,6 +19,10 @@ import { CreateSupplierProductDto } from './dto/SupplierProductDto/create-suppli
 import { UpdateSupplierProductDto } from './dto/SupplierProductDto/update-supplier_product.dto';
 import { CreateActivityContainerDto } from './dto/ActivityContainerDto/create-activity_container.dto';
 import { UpdateActivityContainerDto } from './dto/ActivityContainerDto/update-activity_container.dto';
+import { CreateBrandDto } from './dto/BrandDto/create-brand.dto';
+import { UpdateBrandDto } from './dto/BrandDto/update-brand.dto';
+import { CreateOriginalDto } from './dto/OriginalDto/create-original.dto';
+import { UpdateOriginalDto } from './dto/OriginalDto/update-original.dto';
 
 
 
@@ -249,6 +253,86 @@ export class ProductService {
       const result = await firstValueFrom(this.productClient.send({ cmd: 'update-type_product' }, { id, updateTypeProductDto }));
       if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, message: 'TypeProduct updated successfully', data: result };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  async createBrand(createBrandDto: CreateBrandDto) {
+    const id = uuidv4();
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-brand' }, { ...createBrandDto, brand_id: id }));
+      return { statusCode: HttpStatus.CREATED, message: 'Brand created successfully', data: result };
+    } catch (error) {
+      console.log(error)
+      throw new HttpException('Failed to create brand product', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllBrand() {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_brand' }, {}));
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async findOneBrand(id: string) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_brand' }, id));
+      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateBrand(id: string, updateBrandDto: UpdateBrandDto) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-brand' }, { id, updateBrandDto }));
+      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return { statusCode: HttpStatus.OK, message: 'TypeProduct updated successfully', data: result };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createOriginal(createOriginalDto: CreateOriginalDto) {
+    const id = uuidv4();
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-original' }, { ...createOriginalDto, original_id: id }));
+      return { statusCode: HttpStatus.CREATED, message: 'Brand created successfully', data: result };
+    } catch (error) {
+      throw new HttpException('Failed to create type product', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllOriginal() {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_original' }, {}));
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async findOneOriginal(id: string) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_original' }, id));
+      if (!result) throw new HttpException('original not found', HttpStatus.NOT_FOUND);
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateOriginal(id: string, updateOriginalDto: UpdateOriginalDto) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-original' }, { id, updateOriginalDto }));
+      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return { statusCode: HttpStatus.OK, message: 'Original updated successfully', data: result };
     } catch (error) {
       throw error;
     }

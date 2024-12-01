@@ -10,6 +10,10 @@ export class CreateProductDto {
     @IsString()
     type: string;
 
+    @IsString()
+    @IsOptional()
+    code_original: string;
+
     @IsNumber()
     price: number;
 
@@ -18,6 +22,12 @@ export class CreateProductDto {
 
     @IsString()
     vat: string;
+
+    @IsString()
+    brand: string;
+
+    @IsString()
+    original: string;
 
     @IsOptional()
     @IsNumber()

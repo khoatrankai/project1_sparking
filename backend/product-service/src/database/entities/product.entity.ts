@@ -4,10 +4,15 @@ import { UnitProduct } from './unit_product.entity';
 import { TypeProducts } from './type_product.entity';
 import { CodeProduct } from './code_product.entity';
 import { SupplierProduct } from './supplier_product.entity';
+import { Brands } from './brand.entity';
+import { Originals } from './original.entity';
 @Entity('Products')
 export class Products {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   product_id: string;
+
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  code_original: string;
 
   @Column({ type: 'varchar', length: 50 })
   name: string;
@@ -15,6 +20,14 @@ export class Products {
   @ManyToOne(() => TypeProducts)
   @JoinColumn({ name: 'type' })
   type: TypeProducts;
+
+  @ManyToOne(() => Brands)
+  @JoinColumn({ name: 'brand' })
+  brand: Brands;
+
+  @ManyToOne(() => Originals)
+  @JoinColumn({ name: 'original' })
+  original: Originals;
 
   @Column({ type: 'int' })
   price: number;

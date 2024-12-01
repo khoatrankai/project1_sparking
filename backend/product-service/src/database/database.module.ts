@@ -8,6 +8,8 @@ import { PictureProduct } from './entities/picture_product.entity';
 import { SupplierProduct } from './entities/supplier_product.entity';
 import { ActivityContainer } from './entities/activity_container.entity';
 import { HistoryCodeProduct } from './entities/history_code_product.entity';
+import { Brands } from './entities/brand.entity';
+import { Originals } from './entities/original.entity';
 
 
 @Module({
@@ -19,7 +21,7 @@ import { HistoryCodeProduct } from './entities/history_code_product.entity';
       username: 'root',
       password: '123456789',
       database: 'db_sparking_product',
-      entities: [Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct],
+      entities: [Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals],
       // synchronize: true,
       // dropSchema: true,
     }),

@@ -44,13 +44,16 @@ export default function ModalAddPriceQuote() {
     (state: RootState) => state.get_profits
   );
   // const [tabFormProduct, setTabFormProduct] = useState<boolean>(false);
-  const [dataSource, setDataSource] = useState<IGetProductInfo[] | []>([]);
+  // const [dataSource, setDataSource] = useState<IGetProductInfo[] | []>([]);
   const [discount, setDiscount] = useState<number>(0);
   const [typeDiscount, setTypeDiscount] = useState<string | undefined>(
     "percent"
   );
   const [typeVat, setTypeVat] = useState<string | undefined>("none");
   const [priceTotal, setPriceTotal] = useState<number>(0);
+  const [listPart, setListPart] = useState<
+    { title: string; products: IGetProductInfo[] }[]
+  >([]);
   const [priceDiscount, setPriceDiscount] = useState<number>(0);
   const [priceVat, setPriceVat] = useState<number>(0);
   const selectAfter = (
@@ -64,183 +67,241 @@ export default function ModalAddPriceQuote() {
       <Option value="money">vnđ</Option>
     </Select>
   );
-  const columns: ColumnsType<IGetProductInfo> = [
-    {
-      title: "Loại sản phẩm",
-      dataIndex: ["type", "name"],
-      key: "type",
-      render: (value) => <div className="flex gap-1 items-center">{value}</div>,
-    },
-    // {
-    //   title: "Mã sản phẩm",
-    //   dataIndex: "product_id",
-    //   key: "product_id",
-    // },
-    {
-      title: "Tên sản phẩm",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Số lượng",
-      dataIndex: "quantity",
-      key: "quantity",
-      render: (value, record) => {
-        const maxQuantity = record.code_product.filter(
-          (dt) => dt.status === "inventory"
-        ).length;
-        console.log(maxQuantity);
-        return (
+  const customColumns = (index: number) => {
+    const columns: ColumnsType<IGetProductInfo> = [
+      {
+        title: "Loại sản phẩm",
+        dataIndex: ["type", "name"],
+        key: "type",
+        render: (value) => (
+          <div className="flex gap-1 items-center">{value}</div>
+        ),
+      },
+      // {
+      //   title: "Mã sản phẩm",
+      //   dataIndex: "product_id",
+      //   key: "product_id",
+      // },
+      {
+        title: "Tên sản phẩm",
+        dataIndex: "name",
+        key: "name",
+      },
+      {
+        title: "Số lượng",
+        dataIndex: "quantity",
+        key: "quantity",
+        render: (value, record, i) => {
+          const maxQuantity = record.code_product.filter(
+            (dt) => dt.status === "inventory"
+          ).length;
+          const currQuantity = listPart.reduce((preValue, currValue) => {
+            const countProduct =
+              currValue.products.find(
+                (dtt) => dtt.product_id === record.product_id
+              )?.quantity ?? 0;
+            return countProduct + preValue;
+          }, 0);
+          const quantity =
+            listPart[index].products.find(
+              (dtt) => dtt.product_id === record.product_id
+            )?.quantity ?? 0;
+          return (
+            <>
+              <InputNumber
+                onChange={(e) => {
+                  const item = maxQuantity - currQuantity;
+                  if (item > 0 || quantity > e)
+                    setListPart((preValue) => {
+                      return preValue.map((dt, idt) => {
+                        if (idt === index) {
+                          return {
+                            ...dt,
+                            products: dt.products.map((dtt, idtt) => {
+                              if (idtt === i) {
+                                return { ...dtt, quantity: e };
+                              }
+                              return dtt;
+                            }),
+                          };
+                        }
+                        return dt;
+                      });
+                    });
+                }}
+                min={1}
+                disabled={maxQuantity === 0}
+                value={value}
+                max={maxQuantity}
+              />
+            </>
+          );
+        },
+      },
+      // {
+      //   title: "Mô tả",
+      //   dataIndex: "description",
+      //   key: "description",
+      // },
+      {
+        title: "Thuế VAT",
+        dataIndex: "vat",
+        key: "vat",
+        render: (value, record, i) => (
           <>
-            <InputNumber
+            <Select
+              placeholder="Chọn loại thuế"
+              showSearch
+              defaultValue={value}
               onChange={(e) => {
-                setDataSource((preValue) => {
-                  return preValue.map((dt) => {
-                    if (dt.product_id === record.product_id) {
-                      return { ...dt, quantity: e };
+                setListPart((preValue) => {
+                  return preValue.map((dt, idt) => {
+                    if (idt === index) {
+                      return {
+                        ...dt,
+                        products: dt.products.map((dtt, idtt) => {
+                          if (idtt === i) {
+                            return { ...dtt, vat: e };
+                          }
+                          return dtt;
+                        }),
+                      };
                     }
                     return dt;
                   });
                 });
               }}
-              min={1}
-              disabled={maxQuantity === 0}
-              value={value}
-              max={maxQuantity}
+              filterOption={(input, option) => {
+                return (option?.children?.join("") ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase());
+              }}
+            >
+              {dataVats?.map((dt) => (
+                <Option key={dt.vat_id} value={dt.vat_id}>
+                  {dt.type_vat}%
+                </Option>
+              ))}
+            </Select>
+          </>
+        ),
+      },
+      {
+        title: "Lợi nhuận",
+        dataIndex: "profit",
+        key: "profit",
+        render: (value, record, i) => (
+          <>
+            <Select
+              placeholder="Chọn loại thuế"
+              showSearch
+              defaultValue={value}
+              onChange={(e) => {
+                setListPart((preValue) => {
+                  return preValue.map((dt, idt) => {
+                    if (idt === index) {
+                      return {
+                        ...dt,
+                        products: dt.products.map((dtt, idtt) => {
+                          if (idtt === i) {
+                            return { ...dtt, profit: e };
+                          }
+                          return dtt;
+                        }),
+                      };
+                    }
+                    return dt;
+                  });
+                });
+              }}
+              filterOption={(input, option) => {
+                return (option?.children?.join("") ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase());
+              }}
+            >
+              {dataProfits?.map((dt) => (
+                <Option key={dt.profit_id} value={dt.profit_id}>
+                  {dt.type_profit}%
+                </Option>
+              ))}
+            </Select>
+          </>
+        ),
+      },
+
+      {
+        title: "Giá sản phẩm (VNĐ)",
+        dataIndex: "price",
+        key: "price",
+        render: (price, record, i) => (
+          <>
+            <InputNumber
+              placeholder="Giá"
+              onChange={(e) => {
+                setListPart((preValue) => {
+                  return preValue.map((dt, idt) => {
+                    if (idt === index) {
+                      return {
+                        ...dt,
+                        products: dt.products.map((dtt, idtt) => {
+                          if (idtt === i) {
+                            return { ...dtt, price: e };
+                          }
+                          return dtt;
+                        }),
+                      };
+                    }
+                    return dt;
+                  });
+                });
+              }}
+              className="w-full"
+              defaultValue={price}
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) =>
+                value?.replace(/\$\s?|(,*)/g, "") as unknown as number
+              }
             />
           </>
-        );
+        ),
       },
-    },
-    // {
-    //   title: "Mô tả",
-    //   dataIndex: "description",
-    //   key: "description",
-    // },
-    {
-      title: "Thuế VAT",
-      dataIndex: "vat",
-      key: "vat",
-      render: (value, record, index) => (
-        <>
-          <Select
-            placeholder="Chọn loại thuế"
-            showSearch
-            defaultValue={value}
-            onChange={(e) => {
-              setDataSource((preValue) => {
-                return preValue.map((dt, i) => {
-                  if (index === i) {
-                    return { ...dt, vat: e };
-                  }
-                  return dt;
+      {
+        title: "",
+        dataIndex: "",
+        key: "",
+        render: (value, record, i) => (
+          <div className="flex gap-2 items-center">
+            {/* <Button type="primary" className="bg-yellow-500" icon={<MdEdit />} /> */}
+            <Button
+              type="primary"
+              onClick={() => {
+                setListPart((preValue) => {
+                  return preValue.map((dt, idt) => {
+                    if (idt === index) {
+                      return {
+                        ...dt,
+                        products: dt.products.filter((dtt, idtt) => {
+                          return idtt !== i;
+                        }),
+                      };
+                    }
+                    return dt;
+                  });
                 });
-              });
-            }}
-            filterOption={(input, option) => {
-              return (option?.children?.join("") ?? "")
-                .toLowerCase()
-                .includes(input.toLowerCase());
-            }}
-          >
-            {dataVats?.map((dt) => (
-              <Option key={dt.vat_id} value={dt.vat_id}>
-                {dt.type_vat}%
-              </Option>
-            ))}
-          </Select>
-        </>
-      ),
-    },
-    {
-      title: "Lợi nhuận",
-      dataIndex: "profit",
-      key: "profit",
-      render: (value, record, index) => (
-        <>
-          <Select
-            placeholder="Chọn loại thuế"
-            showSearch
-            defaultValue={value}
-            onChange={(e) => {
-              setDataSource((preValue) => {
-                return preValue.map((dt, i) => {
-                  if (index === i) {
-                    return { ...dt, profit: e };
-                  }
-                  return dt;
-                });
-              });
-            }}
-            filterOption={(input, option) => {
-              return (option?.children?.join("") ?? "")
-                .toLowerCase()
-                .includes(input.toLowerCase());
-            }}
-          >
-            {dataProfits?.map((dt) => (
-              <Option key={dt.profit_id} value={dt.profit_id}>
-                {dt.type_profit}%
-              </Option>
-            ))}
-          </Select>
-        </>
-      ),
-    },
+              }}
+              className="bg-red-500"
+              icon={<MdDelete />}
+            />
+          </div>
+        ), // Định dạng số thành VNĐ
+      },
+    ];
+    return columns;
+  };
 
-    {
-      title: "Giá sản phẩm (VNĐ)",
-      dataIndex: "price",
-      key: "price",
-      render: (price, record, index) => (
-        <>
-          <InputNumber
-            placeholder="Giá"
-            onChange={(e) => {
-              setDataSource((preValue) => {
-                return preValue.map((dt, i) => {
-                  if (index === i) {
-                    return { ...dt, price: e };
-                  }
-                  return dt;
-                });
-              });
-            }}
-            className="w-full"
-            defaultValue={price}
-            formatter={(value) =>
-              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            }
-            parser={(value) =>
-              value?.replace(/\$\s?|(,*)/g, "") as unknown as number
-            }
-          />
-        </>
-      ),
-    },
-    {
-      title: "",
-      dataIndex: "",
-      key: "",
-      render: (value, record) => (
-        <div className="flex gap-2 items-center">
-          {/* <Button type="primary" className="bg-yellow-500" icon={<MdEdit />} /> */}
-          <Button
-            type="primary"
-            onClick={() => {
-              setDataSource((preValue) => {
-                return preValue.filter(
-                  (dt) => dt.product_id !== record.product_id
-                );
-              });
-            }}
-            className="bg-red-500"
-            icon={<MdDelete />}
-          />
-        </div>
-      ), // Định dạng số thành VNĐ
-    },
-  ];
   const [form] = useForm();
   const { postdata } = usePostData();
 
@@ -260,13 +321,18 @@ export default function ModalAddPriceQuote() {
     const res = await postdata(() =>
       priceQuoteService.createPriceQuote({
         ...values,
-        products: dataSource.map((dt) => {
+        parts: listPart.map((dt) => {
           return {
-            price: dt.price,
-            product: dt.product_id,
-            quantity: dt.quantity,
-            vat: dt.vat,
-            profit: dt.profit,
+            title: dt.title,
+            products: dt.products.map((dtt) => {
+              return {
+                product: dtt.product_id,
+                price: dtt.price,
+                quantity: dtt.quantity,
+                vat: dtt.vat,
+                profit: dtt.profit,
+              };
+            }),
           };
         }),
       })
@@ -281,7 +347,8 @@ export default function ModalAddPriceQuote() {
   // };
 
   useEffect(() => {
-    if (dataSource) {
+    if (listPart) {
+      const dataSource = listPart.map((dt) => dt.products).flat();
       const total = dataSource.reduce((preValue, currValue) => {
         const priceProfit =
           currValue.price *
@@ -355,9 +422,6 @@ export default function ModalAddPriceQuote() {
         setPriceVat(totalVat);
         setPriceDiscount(totalDiscount);
       } else {
-        // const totalDiscount = typeDiscount === "percent"? dataSource.reduce((preValue, currValue) => {
-        //   return currValue.price * currValue.quantity * discount/100 + preValue;
-        // }, 0) : discount
         const totalVat = dataSource.reduce((preValue, currValue) => {
           const priceProfit =
             currValue.price *
@@ -399,35 +463,68 @@ export default function ModalAddPriceQuote() {
         setPriceDiscount(totalDiscount);
       }
     }
-  }, [dataSource, typeDiscount, typeVat, discount]);
+  }, [listPart, typeDiscount, typeVat, discount]);
 
-  const handlePush = async (data?: IGetProductInfo) => {
+  const handlePush = async (index: number, data?: IGetProductInfo) => {
     if (data) {
-      setDataSource((prevDataSource) => {
-        const check = prevDataSource.find(
-          (dt) => dt.product_id === data.product_id
-        );
-        const quantityMax =
-          dataProducts.find((dt) => dt.product_id === check?.product_id)
+      const maxQuantity = data.code_product.filter(
+        (dt) => dt.status === "inventory"
+      ).length;
+      const currQuantity = listPart.reduce((preValue, currValue) => {
+        const countProduct =
+          currValue.products.find((dtt) => dtt.product_id === data.product_id)
             ?.quantity ?? 0;
-        if (check) {
-          if (quantityMax > check.quantity)
-            return prevDataSource.map((dt) => {
-              if (dt.product_id === data.product_id) {
-                return { ...dt, quantity: dt.quantity + 1 };
+        return countProduct + preValue;
+      }, 0);
+      if (currQuantity < maxQuantity) {
+        setListPart((preValue) => {
+          return preValue.map((dt, idt: number) => {
+            if (idt === index) {
+              const check = dt.products.find(
+                (dtt) => dtt.product_id === data.product_id
+              );
+              if (check) {
+                return {
+                  ...dt,
+                  products: dt.products.map((dtt) => {
+                    if (dtt.product_id === data.product_id) {
+                      return { ...dtt, quantity: dtt.quantity + 1 };
+                    }
+                    return dtt;
+                  }),
+                };
+              } else {
+                return {
+                  ...dt,
+                  products: [...dt.products, { ...data, quantity: 1 }],
+                };
               }
-              return dt;
-            });
-          return prevDataSource;
-        } else {
-          return [...prevDataSource, { ...data, quantity: 1 }];
-        }
-      });
+            }
+            return dt;
+          });
+        });
+      }
     }
   };
 
+  const handlePushPart = async () => {
+    setListPart((preValue) => {
+      return [...preValue, { title: "", products: [] }];
+    });
+  };
   const btnSubmit = async () => {
     form.submit();
+  };
+
+  const handleChangeTitle = async (index: number, value: string) => {
+    setListPart((preValue) => {
+      return preValue.map((dt, idt) => {
+        if (idt === index) {
+          return { ...dt, title: value };
+        }
+        return dt;
+      });
+    });
   };
 
   return (
@@ -587,167 +684,103 @@ export default function ModalAddPriceQuote() {
             </Form>
           </TabPane>
           <TabPane tab="Thông tin sản phẩm" key={2}>
+            <Button type="primary" className="mb-4" onClick={handlePushPart}>
+              Thêm thành phần
+            </Button>
             <div className="flex flex-col gap-2">
-              <div className="flex gap-2">
-                <Select
-                  placeholder="Chọn sản phẩm cần thêm"
-                  showSearch
-                  onSelect={(e) => {
-                    const data = dataProducts.find((dt) => dt.product_id === e);
-                    handlePush(data);
-                  }}
-                  filterOption={(input, option) => {
-                    return (option?.children?.join("") ?? "")
-                      .toLowerCase()
-                      .includes(input.toLowerCase());
-                  }}
-                >
-                  {dataProducts?.map((dt) => {
-                    const maxQuantity = dt.code_product.filter(
-                      (dt) => dt.status === "inventory"
-                    ).length;
-                    return (
-                      <Option
-                        disabled={!(maxQuantity > 0)}
-                        key={dt.product_id}
-                        value={dt.product_id}
-                      >
-                        {dt.name} {maxQuantity === 0 && "(hết hàng)"}
-                      </Option>
-                    );
-                  })}
-                </Select>
-                {/* <Button
-                  type="primary"
-                  onClick={() => {
-                    formProduct.resetFields();
-                    setTabFormProduct(!tabFormProduct);
-                  }}
-                >
-                  Thêm khác
-                </Button> */}
-              </div>
-              {/* <div
-                className="bg-slate-200 px-1 py-2 rounded-md"
-                hidden={!tabFormProduct}
-              >
-                <Form
-                  form={formProduct}
-                  onFinish={handlePush}
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                  }}
-                >
-                  <Form.Item
-                    name="code_product"
-                    rules={[
-                      {
-                        required: false,
-                      },
-                    ]}
-                    style={{ minWidth: "200px", flex: "1 1 0%", margin: "0" }}
-                  >
-                    <Input placeholder="Mã sản phẩm" />
-                  </Form.Item>
-                  <Form.Item
-                    name="name_product"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng nhập thông tin sản phẩm",
-                      },
-                    ]}
-                    style={{ minWidth: "240px", flex: "1 1 0%", margin: "0" }}
-                  >
-                    <Input placeholder="Tên sản phẩm" />
-                  </Form.Item>
+              {listPart.map((dt, index) => {
+                return (
+                  <>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <Select
+                          placeholder="Chọn sản phẩm cần thêm"
+                          showSearch
+                          onSelect={(e) => {
+                            const data = dataProducts.find(
+                              (dt) => dt.product_id === e
+                            );
+                            handlePush(index, data);
+                          }}
+                          filterOption={(input, option) => {
+                            return (option?.children?.join("") ?? "")
+                              .toLowerCase()
+                              .includes(input.toLowerCase());
+                          }}
+                        >
+                          {dataProducts?.map((dt) => {
+                            const maxQuantity = dt.code_product.filter(
+                              (dt) => dt.status === "inventory"
+                            ).length;
+                            return (
+                              <Option
+                                disabled={!(maxQuantity > 0)}
+                                key={dt.product_id}
+                                value={dt.product_id}
+                              >
+                                {dt.name} {maxQuantity === 0 && "(hết hàng)"}
+                              </Option>
+                            );
+                          })}
+                        </Select>
+                        {listPart.length > 1 && (
+                          <Input
+                            defaultValue={dt.title}
+                            onChange={(e) => {
+                              handleChangeTitle(index, e.target.value);
+                            }}
+                            placeholder="Nhập tên tiêu đề"
+                          />
+                        )}
+                      </div>
+                      <div className=" w-full overflow-x-auto">
+                        <div className="min-w-fit">
+                          <Table<IGetProductInfo>
+                            columns={customColumns(index)}
+                            showHeader={index === 0}
+                            footer={() => {
+                              const total = listPart[index].products.reduce(
+                                (preValue, currValue) => {
+                                  const priceProfit =
+                                    currValue.price *
+                                    currValue.quantity *
+                                    ((dataProfits.find(
+                                      (dt) => dt.profit_id === currValue.profit
+                                    )?.type_profit ?? 0) /
+                                      100);
+                                  return (
+                                    currValue.price * currValue.quantity +
+                                    priceProfit +
+                                    preValue
+                                  );
+                                },
+                                0
+                              );
 
-                  <Form.Item
-                    name="quantity_product"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng nhập thông tin số lượng",
-                      },
-                    ]}
-                    style={{ minWidth: "150px", flex: "1 1 0%", margin: "0" }}
-                  >
-                    <InputNumber className="w-full" placeholder="Số lượng" />
-                  </Form.Item>
-                  <Form.Item
-                    name="price_product"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng nhập thông tin giá trị",
-                      },
-                    ]}
-                    style={{ minWidth: "150px", flex: "1 1 0%", margin: "0" }}
-                  >
-                    <InputNumber className="w-full" placeholder="Giá trị" />
-                  </Form.Item>
-                  <Form.Item
-                    name="type"
-                    rules={[{ required: false }]}
-                    style={{ minWidth: "100px", flex: "1 1 0%", margin: "0" }}
-                  >
-                    <Select placeholder="Chọn loại sản phẩm">
-                      <Option key={"TB"} value={"TB"}>
-                        Thiết bị
-                      </Option>
-                      <Option key={"VT"} value={"VT"}>
-                        Vật tư
-                      </Option>
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item
-                    name="description"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng nhập thông tin mô tả",
-                      },
-                    ]}
-                    style={{ width: "100%", margin: "0" }}
-                  >
-                    <TextArea placeholder="Mô tả" autoSize={{ minRows: 3 }} />
-                  </Form.Item>
-                  <Form.Item
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      justifyContent: "end",
-                      margin: "0",
-                    }}
-                  >
-                    <Button
-                      className="bg-green-500 text-white font-semibold"
-                      onClick={handleAddProduct}
-                    >
-                      Thêm
-                    </Button>
-                  </Form.Item>
-                </Form>
-              </div> */}
-              <div className="border-t-2 w-full overflow-x-auto">
-                <div className="min-w-fit">
-                  <Table<IGetProductInfo>
-                    columns={columns}
-                    // rowSelection={rowSelection}
-                    dataSource={dataSource}
-                    pagination={{
-                      pageSize: 10,
-                      showTotal: (total, range) =>
-                        `${range[0]}-${range[1]} of ${total} items`,
-                    }}
-                    scroll={{ x: "max-content", y: 200 }}
-                    showSorterTooltip={{ target: "sorter-icon" }}
-                  />
-                </div>
-              </div>
+                              return (
+                                <div className="flex gap-2">
+                                  <strong>Giá trị:</strong>{" "}
+                                  {/* {dataSource.length} */}
+                                  {total.toLocaleString("vi-VN")} VNĐ
+                                </div>
+                              );
+                            }}
+                            // rowSelection={rowSelection}
+                            dataSource={dt.products}
+                            pagination={{
+                              pageSize: 10,
+                              showTotal: (total, range) =>
+                                `${range[0]}-${range[1]} of ${total} items`,
+                            }}
+                            scroll={{ x: "max-content", y: 200 }}
+                            showSorterTooltip={{ target: "sorter-icon" }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })}
             </div>
           </TabPane>
         </Tabs>

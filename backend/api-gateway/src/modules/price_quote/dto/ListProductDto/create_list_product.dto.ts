@@ -7,7 +7,7 @@ export class CreateListProductDto {
 
   @IsString()
   @IsOptional()
-  price_quote: string;
+  part: string;
 
   @IsString()
   @IsNotEmpty()
@@ -31,4 +31,3 @@ export class CreateListProductDto {
   @IsOptional()
   vat: string;
 }
-

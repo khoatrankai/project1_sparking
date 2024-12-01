@@ -10,10 +10,12 @@ import { PictureProduct } from 'src/database/entities/picture_product.entity';
 import { SupplierProduct } from 'src/database/entities/supplier_product.entity';
 import { ActivityContainer } from 'src/database/entities/activity_container.entity';
 import { HistoryCodeProduct } from 'src/database/entities/history_code_product.entity';
+import { Brands } from 'src/database/entities/brand.entity';
+import { Originals } from 'src/database/entities/original.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct])],
+  imports: [TypeOrmModule.forFeature([Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals])],
   controllers: [LayerController],
   providers: [LayerService],
   // exports:[TypeOrmModule]

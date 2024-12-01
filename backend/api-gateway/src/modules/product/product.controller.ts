@@ -15,6 +15,10 @@ import { UpdateSupplierProductDto } from './dto/SupplierProductDto/update-suppli
 import { CreateSupplierProductDto } from './dto/SupplierProductDto/create-supplier_product.dto';
 import { CreateActivityContainerDto } from './dto/ActivityContainerDto/create-activity_container.dto';
 import { UpdateActivityContainerDto } from './dto/ActivityContainerDto/update-activity_container.dto';
+import { CreateBrandDto } from './dto/BrandDto/create-brand.dto';
+import { UpdateBrandDto } from './dto/BrandDto/update-brand.dto';
+import { CreateOriginalDto } from './dto/OriginalDto/create-original.dto';
+import { UpdateOriginalDto } from './dto/OriginalDto/update-original.dto';
 
 
 
@@ -138,6 +142,47 @@ export class ProductController {
   @Put('type/:id')
   async updateTypeProduct(@Param('id') id: string, @Body() updateTypeProductDto: UpdateTypeProductDto) {
     return this.productService.updateTypeProduct(id, updateTypeProductDto);
+  }
+
+
+  @Post('brand')
+  async createBrand(@Body() createBrandDto: CreateBrandDto) {
+    return this.productService.createBrand(createBrandDto);
+  }
+
+  @Get('brand')
+  async findAllBrand() {
+    return this.productService.findAllBrand();
+  }
+
+  @Get('brand/:id')
+  async findOneBrand(@Param('id') id: string) {
+    return this.productService.findOneBrand(id);
+  }
+
+  @Put('brand/:id')
+  async updateBrand(@Param('id') id: string, @Body() updateBrandDto: UpdateBrandDto) {
+    return this.productService.updateBrand(id, updateBrandDto);
+  }
+
+  @Post('original')
+  async createOriginal(@Body() createOriginalDto: CreateOriginalDto) {
+    return this.productService.createOriginal(createOriginalDto);
+  }
+
+  @Get('original')
+  async findAllOriginal() {
+    return this.productService.findAllOriginal();
+  }
+
+  @Get('original/:id')
+  async findOneOriginal(@Param('id') id: string) {
+    return this.productService.findOneOriginal(id);
+  }
+
+  @Put('original/:id')
+  async updateOriginal(@Param('id') id: string, @Body() updateOriginalDto: UpdateOriginalDto) {
+    return this.productService.updateOriginal(id, updateOriginalDto);
   }
 
   // UnitProduct endpoints

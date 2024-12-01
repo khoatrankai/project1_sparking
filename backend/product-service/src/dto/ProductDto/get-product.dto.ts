@@ -1,5 +1,7 @@
 
+import { GetBrandDto } from "../BrandDto/get-brand.dto";
 import { GetCodeProductDto } from "../CodeProductDto/get-code_product.dto";
+import { GetOriginalDto } from "../OriginalDto/get-original.dto";
 import { GetPictureProductDto } from "../PictureProductDto/get-picture_product.dto";
 import { GetSupplierProductDto } from "../SupplierProductDto/get-supplier_product.dto";
 import { GetTypeProductDto } from "../TypeProductDto/get-type_product.dto";
@@ -9,6 +11,9 @@ export class GetProductDto {
   product_id: string;
   name: string;
   type: GetTypeProductDto; // ID hoặc tên loại sản phẩm
+  code_original:string
+  brand: GetBrandDto; // ID hoặc tên loại sản phẩm
+  original: GetOriginalDto; // ID hoặc tên loại sản phẩm
   price: number;
   description: string;
   vat: string;

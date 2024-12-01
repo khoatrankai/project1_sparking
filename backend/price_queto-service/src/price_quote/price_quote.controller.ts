@@ -33,6 +33,16 @@ export class PriceQuoteController {
     };
   }
 
+  @MessagePattern({ cmd: 'find-one_full_price_quote' })
+  async findOneFullPriceQuote(@Payload() id: string) {
+    const priceQuote = await this.priceQuoteService.findOneFullPriceQuote(id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Price quote retrieved successfully',
+      data: priceQuote,
+    };
+  }
+
   @MessagePattern({ cmd: 'find-all_price_quotes' })
   async findAllPriceQuote(@Payload() filter?: PriceQuoteFilterDto) {
     const priceQuotes = await this.priceQuoteService.findAllPriceQuote(filter);

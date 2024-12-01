@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { ListProduct } from './list_product.entity';
+import { ListParts } from './list_part.entity';
 
 @Entity()
 export class PriceQuote {
@@ -45,7 +45,6 @@ export class PriceQuote {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-
-  @OneToMany(() => ListProduct, listProduct => listProduct.price_quote)
-  products: ListProduct[];
+  @OneToMany(() => ListParts, listPart => listPart.price_quote)
+  parts: ListParts[];
 }

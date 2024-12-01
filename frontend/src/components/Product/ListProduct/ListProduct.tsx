@@ -41,22 +41,20 @@ export default function ListProduct() {
     {
       title: "#",
       className: "text-xl",
-      dataIndex: "product_id",
-      render: (value: string, record, index) => (
+      dataIndex: "code_original",
+      render: (value: string, record) => (
         <div className="flex flex-col gap-1 ">
-          <strong>
-            #{index + 1}.{`${value.slice(0, 10)}...`}
-          </strong>
+          <strong>#{`${value ?? "".slice(0, 10)}...`}</strong>
           <div className="flex gap-2">
             <Button type="text" ghost className="text-xl text-blue-600">
               View
             </Button>
-            <ModalUpdateProduct productID={value} />
+            <ModalUpdateProduct productID={record.product_id} />
           </div>
         </div>
       ),
       sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
-        a.product_id.localeCompare(b.product_id),
+        (a.code_original ?? "").localeCompare(b.code_original ?? ""),
     },
     {
       title: "Tên sản phẩm",
@@ -167,7 +165,7 @@ export default function ListProduct() {
     setDataFilter(
       dataSource?.filter((dt) => {
         return String(
-          dt.product_id +
+          dt.code_original +
             " " +
             dt.name +
             " " +

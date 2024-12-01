@@ -7,7 +7,7 @@ export class CreateListProductDto {
 
   @IsString()
   @IsOptional()
-  price_quote: string;
+  part: string;
 
   @IsString()
   @IsNotEmpty()

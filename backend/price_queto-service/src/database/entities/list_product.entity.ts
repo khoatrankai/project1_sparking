@@ -1,14 +1,14 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { PriceQuote } from './price_quote.entity';
+import { ListParts } from './list_part.entity';
 
 @Entity()
 export class ListProduct {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   PQ_product_id: string;
 
-  @ManyToOne(() => PriceQuote, priceQuote => priceQuote.products)
-  @JoinColumn({ name: 'price_quote' })
-  price_quote: PriceQuote;
+  @ManyToOne(() => ListParts, part => part.products)
+  @JoinColumn({ name: 'part' })
+  part: ListParts;
 
   @Column({ type: 'varchar', length: 50 })
   product: string;

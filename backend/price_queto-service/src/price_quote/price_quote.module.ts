@@ -5,6 +5,7 @@ import { PriceQuoteService } from './price_quote.service';
 import { PriceQuote } from 'src/database/entities/price_quote.entity';
 import { ListProduct } from 'src/database/entities/list_product.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ListParts } from 'src/database/entities/list_part.entity';
 
 
 @Module({
@@ -32,9 +33,17 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         host:'localhost',
         port:3012
       }
+    },
+    {
+      name: 'SYSTEM',
+      transport:Transport.TCP,
+      options:{
+        host:'localhost',
+        port:3004
+      }
     }
   ]),
-    TypeOrmModule.forFeature([PriceQuote,ListProduct])
+    TypeOrmModule.forFeature([PriceQuote,ListProduct,ListParts])
   ],
   controllers: [PriceQuoteController],
   providers: [PriceQuoteService],

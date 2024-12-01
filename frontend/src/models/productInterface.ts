@@ -8,8 +8,11 @@ interface ProductInfo{
   type: string;
   price: number;
   profit:string
+  code_original:string
   description: string;
   vat: string;
+  brand: string;
+  original: string;
   quantity: number;
   unit_product: string;
   status: 'active' | 'delete' | 'hide';
@@ -32,8 +35,11 @@ interface IGetProductInfo{
   type: ITypeProduct; // ID hoặc chi tiết loại sản phẩm
   price: number;
   profit?:string
+  code_original?:string
   description: string;
   vat?: string; // VAT của sản phẩm
+  brand?: IBrand; // VAT của sản phẩm
+  original?: IOriginal; // VAT của sản phẩm
   vat_borrowed?:string
   profit_borrowed?:string
   quantity: number;
@@ -52,6 +58,16 @@ interface IUnitProduct {
 }
 interface ITypeProduct {
   type_product_id: string;
+    name: string;
+}
+
+export interface IBrand {
+  brand_id: string;
+    name: string;
+}
+
+export interface IOriginal {
+  original_id: string;
     name: string;
 }
 export interface IGetCodeProduct {

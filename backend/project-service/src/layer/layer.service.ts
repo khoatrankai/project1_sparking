@@ -87,6 +87,29 @@ export class LayerService {
       message: 'Project retrieved successfully',
     };
   }
+
+  async findOneFullProject(id: string): Promise<any> {
+    const project = await this.projectsRepository.findOne({
+      where: { project_id: id },
+    });
+    
+    if (!project) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          data: null,
+          message: `Project with ID ${id} not found`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const infoCustomer = await firstValueFrom(this.customersClient.send({cmd:"get-full_info_customer_id"},project.customer))
+    return {
+      statusCode: HttpStatus.OK,
+      data: {...project,customer:infoCustomer.data},
+      message: 'Project retrieved successfully',
+    };
+  }
   
   // Update a project by ID
   async updateProject(id: string, updateProjectDto: UpdateProjectDto): Promise<any> {

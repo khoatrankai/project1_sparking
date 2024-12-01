@@ -1,6 +1,8 @@
+import { GetListPartDto } from "../ListPartDto/get_list_part.dto";
+
 export class GetListProductDto {
     PQ_product_id: string;
-    price_quote: string;
+    part: GetListPartDto;
     product: string;
     price: number;
     quantity: number;

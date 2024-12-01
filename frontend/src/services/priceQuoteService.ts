@@ -7,7 +7,7 @@ const priceQuoteService = {
     const response = await api.post(`/price_quote`,data);
     return response.data;
   },
-  updatePriceQuote: async (id:string,data:IUpdatePriceQuote) => {
+  updatePriceQuote: async (id:string,data:ICreatePriceQuote) => {
     const response = await api.put(`/price_quote/${id}`,data);
     return response.data;
   },
@@ -28,6 +28,11 @@ const priceQuoteService = {
   getPriceQuoteID: async (id:string) => {
    
     const response = await api.get(`/price_quote/id/${id}`);
+    return response.data;
+  },
+
+  getExportPriceQuote: async(id:string)=>{
+    const response = await api.get(`/price_quote/export/${id}`);
     return response.data;
   }
 

@@ -89,7 +89,7 @@ export class UserService {
   }
 
   async getUserID(user_id:string){
-    const data = await this.accountUserRepository.findOne({select:['first_name','last_name','email','picture_url','user_id'],where:{user_id}});
+    const data = await this.accountUserRepository.findOne({select:['first_name','last_name','email','picture_url','user_id','phone_number'],where:{user_id}});
     return data
   }
 

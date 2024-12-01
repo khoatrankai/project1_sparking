@@ -87,17 +87,21 @@ const ModalQrScanner = () => {
         let text = "";
 
         switch (status) {
-          case "stored":
+          case "inventory":
             color = "bg-blue-500";
             text = "Lưu kho";
             break;
-          case "ordered":
+          case "selled":
             color = "bg-purple-500";
-            text = "Đã đặt hàng";
+            text = "Đã bán";
             break;
-          case "hired":
+          case "borrowed":
             color = "bg-orange-500";
             text = "Đã thuê";
+            break;
+          case "export":
+            color = "bg-yellow-500";
+            text = "Đã xuất kho";
             break;
           case "error":
             color = "bg-red-500";

@@ -75,6 +75,16 @@ export class SystemController {
     return this.systemService.getAllProfits();
   }
 
+  @MessagePattern({ cmd: 'get-profit_ids' })
+  getProfitIds(profit_ids:string[]) {
+    return this.systemService.getProfitIDs(profit_ids);
+  }
+
+  @MessagePattern({ cmd: 'get-province_id' })
+  getProfitId(profit_id:string) {
+    return this.systemService.getProvinceById(profit_id);
+  }
+
 
   @MessagePattern({ cmd: 'get-all_unit_products' })
   getAllTypeProducts() {

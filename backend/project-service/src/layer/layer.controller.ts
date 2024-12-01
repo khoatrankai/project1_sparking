@@ -35,6 +35,11 @@ export class LayerController {
     return await this.layerService.findOneProject(id);
   }
 
+  @MessagePattern({ cmd: 'find-one_full_project' })
+  async findOneFullProject(@Payload() id: string) {
+    return await this.layerService.findOneFullProject(id);
+  }
+
   // Handle updating a project by ID
   @MessagePattern({ cmd: 'update-project' })
   async updateProject(@Payload() payload: { id: string; updateProjectDto: UpdateProjectDto }) {

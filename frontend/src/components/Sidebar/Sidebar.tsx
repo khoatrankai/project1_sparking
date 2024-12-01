@@ -119,7 +119,7 @@ const Sidebar = () => {
         {
           key: "activity_work",
           label: (
-            <Link href="/admin/activity/work">
+            <Link href="/admin/work">
               <span>Danh sách công việc</span>
             </Link>
           ),
@@ -148,9 +148,17 @@ const Sidebar = () => {
           ),
         },
         {
+          key: "list_supplier",
+          label: (
+            <Link href="/admin/supplier">
+              <span>Nhà cung ứng</span>
+            </Link>
+          ),
+        },
+        {
           key: "list_product_input",
           label: (
-            <Link href="/admin/product/input">
+            <Link href="/admin/activity_import">
               <span>Nhập kho</span>
             </Link>
           ),
@@ -158,7 +166,7 @@ const Sidebar = () => {
         {
           key: "list_product_output",
           label: (
-            <Link href="/admin/product/output">
+            <Link href="/admin/activity_export">
               <span>Xuất kho</span>
             </Link>
           ),

@@ -1,3 +1,4 @@
+
 import { IGetProject } from "./projectInterface";
 import { InfoUser } from "./userInterface";
 
@@ -14,7 +15,7 @@ export interface ICreatePriceQuote {
   type_discount?: 'percent' | 'money'; // Mặc định là 'percent'
   discount?: number; // Mặc định là 0
   description?: string | null;
-  products: ICreatePriceQuoteProduct[];       
+  parts: ICreateListPartProduct[];       
  
 }
 
@@ -58,9 +59,117 @@ export interface IGetPriceQuote {
   description: string | null;
   created_at: Date;
   updated_at: Date;
-  products: IGetPriceQuoteProduct[];       
+  parts: IGetPartProduct[];       
  
 }
+
+export interface IExportPriceQuote {
+  price_quote_id: string;
+  project: {
+    project_id: string;
+    name: string;
+    status: string;
+    price: number;
+    time_job: number;
+    user_support: string;
+    customer: {
+      info_id: string;
+      name_company: string;
+      tax_code: string;
+      province: string;
+      opportunity: string;
+      phone_number: string;
+      website: string;
+      type_money: string;
+      status_active: string;
+      date_establish: string;
+      address_payment: string;
+      address_delivery: string;
+      province_payment: string;
+      province_delivery: {
+        province_id: string;
+        name_province: string;
+      };
+      staff_support: string;
+      created_at: string;
+      updated_at: string;
+      group_customer: {
+        group_id: string;
+        name_group: string;
+        count: number;
+      };
+    };
+    start_date: string;
+    end_date: string;
+    description: string;
+    created_at: string;
+    updated_at: string;
+  };
+  date_start: string;
+  date_expired: string;
+  status: string;
+  type_money: string;
+  reference_code: string;
+  user_support: {
+    user_id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    picture_url: string;
+    phone_number: string;
+  };
+  type_vat: string;
+  type_discount: string;
+  discount: number;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  parts: {
+    part_id: string;
+    title: string;
+    created_at: string;
+    updated_at: string;
+    products: {
+      product_id: string;
+      code_original: string | null;
+      name: string;
+      price: number;
+      description: string;
+      vat: string;
+      profit:{
+        profit_id:string;
+        type_profit:number;
+      };
+      type_profit: number;
+      quantity: number;
+      status: string;
+      type_product: {
+        type_product_id: string;
+        name: string;
+      };
+      unit_product: {
+        unit_id: string;
+        name_unit: string;
+      };
+      code_product: {
+        code_product_id: string;
+        code: string;
+        status: string;
+        created_at: string;
+        updated_at: string;
+      }[];
+      brand: {
+        brand_id: string;
+        name: string;
+      };
+      original: {
+        original_id: string;
+        name: string;
+      };
+    }[];
+  }[];
+}
+
 
 export interface ICreatePriceQuoteProduct {
   product: string;
@@ -69,6 +178,13 @@ export interface ICreatePriceQuoteProduct {
   vat?: string | null; 
   profit?: string | null; 
   }
+
+  export interface ICreateListPartProduct{
+    title?:string,
+    products:ICreatePriceQuoteProduct[]
+  }
+
+
 
   export interface IUpdatePriceQuoteProduct {
     product?: string;
@@ -90,6 +206,14 @@ export interface ICreatePriceQuoteProduct {
     profit: string;
     quantity: number;
     vat: string | null;
+    created_at: Date;
+    updated_at: Date;
+  }
+
+  export interface IGetPartProduct {
+    part_id: string;
+    title:string,
+    products:IGetPriceQuoteProduct[],
     created_at: Date;
     updated_at: Date;
   }

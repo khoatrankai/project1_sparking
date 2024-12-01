@@ -26,11 +26,19 @@ import { UpdateActivityContainerDto } from 'src/dto/ActivityContainerDto/update-
 import { HistoryCodeProduct } from 'src/database/entities/history_code_product.entity';
 import { CreateHistoryCodeProductDto } from 'src/dto/HistoryCodeProduct/create-history_code_product.dto';
 import { UpdateHistoryCodeProductDto } from 'src/dto/HistoryCodeProduct/update-history_code_product.dto';
+import { Brands } from 'src/database/entities/brand.entity';
+import { Originals } from 'src/database/entities/original.entity';
+import { CreateBrandDto } from 'src/dto/BrandDto/create-brand.dto';
+import { UpdateBrandDto } from 'src/dto/BrandDto/update-brand.dto';
+import { CreateOriginalDto } from 'src/dto/OriginalDto/create-original.dto';
+import { UpdateOriginalDto } from 'src/dto/OriginalDto/update-original.dto';
 
 @Injectable()
 export class LayerService {
 
-  constructor(@InjectRepository(ActivityContainer)
+  constructor(@InjectRepository(Brands)
+  private brandRepository: Repository<Brands>,@InjectRepository(Originals)
+  private readonly originalRepository: Repository<Originals>,@InjectRepository(ActivityContainer)
   private activityContainerRepository: Repository<ActivityContainer>,@InjectRepository(HistoryCodeProduct)
   private readonly historyCodeProductRepository: Repository<HistoryCodeProduct>, @InjectRepository(SupplierProduct)
   private supplierProductRepository: Repository<SupplierProduct>, @InjectRepository(UnitProduct)
@@ -70,13 +78,15 @@ export class LayerService {
   async createProduct(createProductDto: CreateProductDto) {
     const type = await this.typeProductRepository.findOne({where:{type_product_id:createProductDto.type}})
     const unit_product = await this.unitProductRepository.findOne({where:{unit_id:createProductDto.unit_product}})
+    const brand = await this.brandRepository.findOne({where:{brand_id:createProductDto.brand}})
+    const original = await this.originalRepository.findOne({where:{original_id:createProductDto.original}})
     const supplier_product = await this.supplierProductRepository.findOne({where:{supplier_id:createProductDto.supplier_product}})
-    const product = this.productRepository.create({...createProductDto,type,unit_product,supplier_product});
+    const product = this.productRepository.create({...createProductDto,type,unit_product,supplier_product,brand,original});
     return await this.productRepository.save(product);
   }
 
   async getProductIDs(product_ids:string[]){
-    const data = await this.productRepository.find({where:{product_id:In(product_ids)},relations:['type','unit_product','code_product']});
+    const data = await this.productRepository.find({where:{product_id:In(product_ids)},relations:['type','unit_product','code_product','brand','original']});
     const sortedData = product_ids.map(id => data.find(item => item.product_id === id))
     return sortedData
   }
@@ -89,6 +99,8 @@ export class LayerService {
     .createQueryBuilder('product')
     .leftJoinAndSelect('product.picture_urls', 'picture_urls')
     .leftJoinAndSelect('product.type', 'type')
+    .leftJoinAndSelect('product.brand', 'brand')
+    .leftJoinAndSelect('product.original', 'original')
     .leftJoinAndSelect('product.unit_product', 'unit_product')
     .leftJoinAndSelect('product.supplier_product', 'supplier_product')
     .where('product.product_id = :id', { id })
@@ -99,8 +111,10 @@ export class LayerService {
   async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Products> {
     const type = await this.typeProductRepository.findOne({where:{type_product_id:updateProductDto.type}})
     const unit_product = await this.unitProductRepository.findOne({where:{unit_id:updateProductDto.unit_product}})
+    const brand = await this.brandRepository.findOne({where:{brand_id:updateProductDto.brand}})
+    const original = await this.originalRepository.findOne({where:{original_id:updateProductDto.original}})
     const supplier_product = await this.supplierProductRepository.findOne({where:{supplier_id:updateProductDto.supplier_product}})
-    await this.productRepository.update(id, {...updateProductDto,type,unit_product,supplier_product});
+    await this.productRepository.update(id, {...updateProductDto,type,unit_product,supplier_product,brand,original});
     return await this.productRepository.findOne({where:{product_id:id}});
   }
 
@@ -190,6 +204,42 @@ export class LayerService {
   async updateTypeProduct(id: string, updateTypeProductDto: UpdateTypeProductDto) {
     await this.typeProductRepository.update(id, updateTypeProductDto);
     return await this.typeProductRepository.findOne({where:{type_product_id:id}});
+  }
+
+  async createBrand(createBrandDto: CreateBrandDto): Promise<Brands> {
+    const brand = this.brandRepository.create(createBrandDto);
+    return this.brandRepository.save(brand);
+  }
+
+  async findAllBrand(): Promise<Brands[]> {
+    return this.brandRepository.find();
+  }
+
+  async findOneBrand(id: string): Promise<Brands | undefined> {
+    return this.brandRepository.findOne({ where: { brand_id: id } });
+  }
+
+  async updateBrand(id: string, updateBrandDto: UpdateBrandDto) {
+    await this.brandRepository.update(id, updateBrandDto);
+    return await this.brandRepository.findOne({where:{brand_id:id}});
+  }
+
+  async createOriginal(createOriginalDto: CreateOriginalDto): Promise<Originals> {
+    const original = this.originalRepository.create(createOriginalDto);
+    return this.originalRepository.save(original);
+  }
+
+  async findAllOriginal(): Promise<Originals[]> {
+    return this.originalRepository.find();
+  }
+
+  async findOneOriginal(id: string): Promise<Originals | undefined> {
+    return this.originalRepository.findOne({ where: { original_id: id } });
+  }
+
+  async updateOriginal(id: string, updateOriginalDto: UpdateOriginalDto) {
+    await this.originalRepository.update(id, updateOriginalDto);
+    return await this.originalRepository.findOne({where:{original_id:id}});
   }
 
 
