@@ -103,14 +103,17 @@ const productService = {
     }
     return res.data ;
   },
-  getCodeID: async (id:string) => {
+  getCodeID: async (url:string) => {
     try{
-      const res = await api.get(`/product/code/${id}`);
-      console.log(res)
+      const res = await api.get(`/product/code_url?url=${url}`);
       if (!res) {
           throw new Error("Failed to create product: No response");
       }
+      if(res.data.statusCode !== 200){
+        toast.error(res.data.message)
+      }
       return res.data ;
+
     }catch{
       toast.error("Sản phẩm đã xuất kho hoặc không tồn tại");
     }

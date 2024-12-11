@@ -6,17 +6,20 @@ import { TbActivityHeartbeat, TbZoomMoney } from "react-icons/tb";
 import { PiProjectorScreenChartFill } from "react-icons/pi";
 import { AiOutlineFundProjectionScreen } from "react-icons/ai";
 import { LuContainer } from "react-icons/lu";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store/store";
 
 // type Props = {};
 
 type MenuItem = Required<MenuProps>["items"][number];
 
 const Sidebar = () => {
+  const isOpen = useSelector((state: RootState) => state.status_tab_menu);
   const itemsMenu: MenuItem[] = [
     {
       key: "customer",
       label: (
-        <Link href="/admin/customer">
+        <Link href="/admin/customer" className="">
           <span>Khách hàng</span>
         </Link>
       ),
@@ -42,7 +45,14 @@ const Sidebar = () => {
       label: "Bán hàng",
       icon: <TbZoomMoney />,
       children: [
-        { key: "price_quote", label: "Báo giá" },
+        {
+          key: "price_quote",
+          label: (
+            <Link href="/admin/price_quote">
+              <span>Báo giá</span>
+            </Link>
+          ),
+        },
         {
           key: "contract",
           label: (
@@ -158,7 +168,7 @@ const Sidebar = () => {
         {
           key: "list_product_input",
           label: (
-            <Link href="/admin/activity_import">
+            <Link href="/admin/activity-import">
               <span>Nhập kho</span>
             </Link>
           ),
@@ -166,7 +176,7 @@ const Sidebar = () => {
         {
           key: "list_product_output",
           label: (
-            <Link href="/admin/activity_export">
+            <Link href="/admin/activity-export">
               <span>Xuất kho</span>
             </Link>
           ),
@@ -175,10 +185,14 @@ const Sidebar = () => {
     },
   ];
   return (
-    <div className="w-52 bg-[#1A2A36] h-full fixed bottom-0 left-0 top-16 overflow-y-auto py-4">
+    <div
+      className={`transition-all bg-[#1A2A36] h-full fixed bottom-0 left-0 top-16 overflow-y-auto py-4 ${
+        isOpen.isOpen ? "w-52" : "w-0 "
+      }`}
+    >
       <Menu
         //   onClick={onClick}
-        className="bg-[#1A2A36]"
+        className="bg-[#1A2A36] !text-white"
         style={{ width: "100%" }}
         theme="dark"
         color="white"

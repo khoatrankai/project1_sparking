@@ -13,12 +13,12 @@ export default function ToolCustomer() {
   );
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 border-b-[1px] pb-4 border-black/5">
         <ModalAddCustomer />
         <ModalGroupCustomer />
       </div>
       <div>
-        <h2 className="font-semibold text-white">Tổng quan khách hàng</h2>
+        <h2 className="font-semibold text-[#1BA399]">Tổng quan khách hàng</h2>
         <div className="flex justify-around gap-2 flex-wrap">
           <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 border-0 shadow-lg shadow-black/20 bg-[#EB8823]">
             <p className="font-bold text-3xl text-white">

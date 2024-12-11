@@ -11,10 +11,10 @@ import { Invoice } from './entities/invoice.entity';
       port: 3306,
       username: 'root',
       password: '123456789',
-      database: 'db_sparking_6',
+      database: 'db_sparking_invoice',
       entities: [Invoice],
-      synchronize: true,
-      dropSchema: true,
+      // synchronize: true,
+      // dropSchema: true,
     }),
   ],
 })

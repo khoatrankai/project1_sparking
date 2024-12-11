@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Projects } from './entities/project.entity';
 import { createConnection } from 'mysql2/promise';
+import { TypeProject } from './entities/type_project.entity';
 
 
 @Module({
@@ -25,7 +26,7 @@ import { createConnection } from 'mysql2/promise';
           username: 'root',
           password: '123456789',
           database: 'db_sparking_project',
-          entities: [Projects],
+          entities: [Projects,TypeProject],
           // synchronize: true,
           // dropSchema: true,
         };

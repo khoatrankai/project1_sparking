@@ -16,7 +16,7 @@ import { InfoContact } from './entities/info_contact.entity';
       port: 3306,
       username: 'root',
       password: '123456789',
-      database: 'db_sparking_3',
+      database: 'db_sparking_customer',
       entities: [AccountCustomers,CustomerInfo,GroupCustomer,RoleCustomer,RoleTypeCustomer,InfoContact],
       // synchronize: true,
       // dropSchema: true,

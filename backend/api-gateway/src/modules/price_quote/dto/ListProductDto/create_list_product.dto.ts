@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsInt, Min, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, Min, IsOptional, IsArray } from 'class-validator';
+import { CreateListDetailProductDto } from '../ListDetailDto/create_list_detail.dto';
 
 export class CreateListProductDto {
   @IsString()
@@ -12,6 +13,10 @@ export class CreateListProductDto {
   @IsString()
   @IsNotEmpty()
   product: string;
+
+  @IsArray()
+  @IsOptional()
+  list_detail:CreateListDetailProductDto[]
 
   @IsInt()
   @Min(0)

@@ -7,11 +7,11 @@ import ListUser from "./List/ListUser";
 
 export default function User() {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="bg-[#00A9AE] p-2 rounded-md">
+    <div className="flex flex-col rounded-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] bg-white">
+      <div className="rounded-md">
         <ToolPriceQuote />
       </div>
-      <div className="bg-[#00A9AE] p-2 rounded-md">
+      <div className="rounded-md">
         <ListUser />
       </div>
     </div>

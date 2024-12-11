@@ -29,7 +29,7 @@ import { UpdateOriginalDto } from './dto/OriginalDto/update-original.dto';
 @Injectable()
 export class ProductService {
   private cloudinaryMiddleware: CloudinaryMiddleware;
-  constructor(@Inject('PRODUCT') private readonly productClient:ClientProxy,private readonly configService: ConfigService,private readonly cloudinaryService:CloudinaryService){
+  constructor(@Inject('PRODUCT') private readonly productClient:ClientProxy,@Inject('SYSTEM') private readonly systemClient:ClientProxy,private readonly configService: ConfigService,private readonly cloudinaryService:CloudinaryService){
     this.cloudinaryMiddleware = new CloudinaryMiddleware(this.configService)
   }
   getHello(): string {
@@ -62,7 +62,6 @@ export class ProductService {
   }
 
   async getAboutProduct() {
-    console.log("goi vao dat")
     return {
       statusCode:HttpStatus.OK,
       data: await firstValueFrom(this.productClient.send({ cmd: 'get-about_product' },{}))
@@ -153,6 +152,27 @@ export class ProductService {
       const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_code_product' }, id));
       if (!result) throw new HttpException('Code product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findOneUrlCodeProduct(url: string) {
+    try {
+      const name_tag = url.split('@')?.[1]
+      if(name_tag){
+        const linkCode = await firstValueFrom(this.systemClient.send({ cmd: 'get-link_system' }, name_tag))
+        if(linkCode && url.includes(linkCode.link)){
+          const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_code_product' }, url.replace(linkCode.link,'')));
+          if (!result) throw new HttpException('Code product not found', HttpStatus.NOT_FOUND);
+          if (result.length === 0) throw new HttpException('Sản phẩm đã xuất kho', HttpStatus.NOT_FOUND);
+          return { statusCode: HttpStatus.OK, data: result };
+        }
+       
+      }
+      return { statusCode: HttpStatus.NOT_FOUND, data: {},message:"Sản phẩm không tìm thấy" };
+     
+      
     } catch (error) {
       throw error;
     }

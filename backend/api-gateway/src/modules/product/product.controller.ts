@@ -1,4 +1,4 @@
-import {  Body, Controller, Delete, Get,  Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {  Body, Controller, Delete, Get,  Param, Post, Put, Query, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/ProductDto/create-product.dto';
 import { UpdateProductDto } from './dto/ProductDto/update-product.dto';
@@ -19,6 +19,7 @@ import { CreateBrandDto } from './dto/BrandDto/create-brand.dto';
 import { UpdateBrandDto } from './dto/BrandDto/update-brand.dto';
 import { CreateOriginalDto } from './dto/OriginalDto/create-original.dto';
 import { UpdateOriginalDto } from './dto/OriginalDto/update-original.dto';
+import { Request } from 'express';
 
 
 
@@ -90,6 +91,18 @@ export class ProductController {
   @Get('code/:id')
   async findOneCodeProduct(@Param('id') id: string) {
     return this.productService.findOneCodeProduct(id);
+  }
+
+  @Get('code_url')
+  async findOneUrlCodeProduct(@Query('url') url: string) {
+    return this.productService.findOneUrlCodeProduct(url);
+  }
+
+  
+  @Get('code_client')
+  async findOneClientCodeProduct(@Req() req:Request) {
+    const linkClient = req.headers.origin
+    return this.productService.findOneUrlCodeProduct(linkClient);
   }
 
   @Put('code/:id')

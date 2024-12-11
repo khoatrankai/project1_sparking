@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsEnum, IsInt, IsDate, Length } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsInt, IsDate, Length, IsNotEmpty } from 'class-validator';
 
 export class CreateProjectDto {
   @IsString()
@@ -11,6 +11,10 @@ export class CreateProjectDto {
   @IsOptional()
   @Length(1, 100)
   name?: string;
+
+  @IsString()
+  @IsNotEmpty() // The type should not be empty
+  type: string;
 
   @IsEnum(['waiting', 'start', 'pause', 'cancel', 'completed'])
   @IsOptional()

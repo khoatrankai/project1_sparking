@@ -27,11 +27,14 @@ import { UpdateVatDto } from 'src/dto/update_vat.dto';
 import { Profits } from 'src/database/entities/profit.entity';
 import { CreateProfitDto } from 'src/dto/create_profit.dto';
 import { UpdateProfitDto } from 'src/dto/update_profit.dto';
+import { CreateLinkSystemDto } from 'src/dto/create_link_system.dto';
+import { LinkSystems } from 'src/database/entities/link_system.entity';
+import { UpdateLinkSystemDto } from 'src/dto/update_link_system.dto';
 
 @Injectable()
 export class SystemService {
 
-  constructor(@InjectRepository(Label) private readonly labelRepository:Repository<Label>,@InjectRepository(UnitProduct) private readonly unitProductRepository:Repository<UnitProduct>,@InjectRepository(Province) private readonly provinceRepository:Repository<Province>,@InjectRepository(Vats) private readonly vatRepository:Repository<Vats>,@InjectRepository(Profits) private readonly profitRepository:Repository<Profits>,@InjectRepository(Product) private readonly productRepository:Repository<Product>,@InjectRepository(PictureProduct) private readonly pictureProductRepository:Repository<PictureProduct>,@InjectRepository(ListUseProduct) private readonly listUseProductRepository:Repository<ListUseProduct>){}
+  constructor(@InjectRepository(Label) private readonly labelRepository:Repository<Label>,@InjectRepository(LinkSystems) private readonly linkSystemRepository:Repository<LinkSystems>,@InjectRepository(UnitProduct) private readonly unitProductRepository:Repository<UnitProduct>,@InjectRepository(Province) private readonly provinceRepository:Repository<Province>,@InjectRepository(Vats) private readonly vatRepository:Repository<Vats>,@InjectRepository(Profits) private readonly profitRepository:Repository<Profits>,@InjectRepository(Product) private readonly productRepository:Repository<Product>,@InjectRepository(PictureProduct) private readonly pictureProductRepository:Repository<PictureProduct>,@InjectRepository(ListUseProduct) private readonly listUseProductRepository:Repository<ListUseProduct>){}
   getHello(): string {
     return 'Hello World!';
   }
@@ -111,6 +114,11 @@ export class SystemService {
     return await this.unitProductRepository.findOne({ where: { unit_id } });
   }
 
+  async getLinkSystemByNameTag(name_tag: string) {
+    return await this.linkSystemRepository.findOne({ where: { name_tag } });
+  }
+
+
   async deleteUnitProduct(unit_id: string) {
     return await this.unitProductRepository.delete(unit_id);
   }
@@ -120,9 +128,35 @@ export class SystemService {
     return await this.provinceRepository.save(newProvince);
   }
 
+  async updateLinkSystem(id:string,updateLinkSystemDto: UpdateLinkSystemDto) {
+    try{
+      await this.linkSystemRepository.update(id,updateLinkSystemDto);
+      return {
+        statusCode:HttpStatus.OK,
+        message:"Cập nhật thành công"
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Cập nhật thất bại"
+      }
+    }
+     
+  }
+
   async createProvinces(createProvincesDto: CreateProvinceDto[]) {
     const newProvince = this.provinceRepository.create(createProvincesDto);
     return await this.provinceRepository.save(newProvince);
+  }
+
+  async createLinkSystem(createLinkSystemDto: CreateLinkSystemDto) {
+    const newLinkSystem = this.linkSystemRepository.create(createLinkSystemDto);
+    return await this.linkSystemRepository.save(newLinkSystem);
+  }
+
+  async createLinkSystems(createLinkSystemsDto: CreateLinkSystemDto[]) {
+    const newLinkSystem = this.linkSystemRepository.create(createLinkSystemsDto);
+    return await this.linkSystemRepository.save(newLinkSystem);
   }
 
   async createVat(createVat: CreateVatDto) {

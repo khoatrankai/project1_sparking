@@ -15,6 +15,10 @@ export class UpdateProjectDto {
   @IsOptional()
   price?: number;
 
+  @IsString()
+  @IsOptional() // The type should not be empty
+  type: string;
+
   @IsInt()
   @IsOptional()
   time_job?: number;

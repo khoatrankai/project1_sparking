@@ -24,6 +24,10 @@ const ModalAddProject = () => {
   const { datas: dataUsers } = useSelector(
     (state: RootState) => state.get_users
   );
+
+  const { datas: dataTypes } = useSelector(
+    (state: RootState) => state.type_projects
+  );
   const { datas: dataCustomer } = useSelector(
     (state: RootState) => state.infos_customer
   );
@@ -97,6 +101,20 @@ const ModalAddProject = () => {
               {dataCustomer?.map((item) => (
                 <Select.Option key={item.info_id} value={item.info_id}>
                   {item.name_company}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="type"
+            label="Loại dự án"
+            style={{ minWidth: "320px", flex: "1 1 0%" }}
+            rules={[{ required: true, message: "Vui lòng chọn loại dự án" }]}
+          >
+            <Select placeholder="Chọn loại">
+              {dataTypes?.map((item) => (
+                <Select.Option key={item.type_id} value={item.type_id}>
+                  {item.name_type}
                 </Select.Option>
               ))}
             </Select>

@@ -5,6 +5,8 @@ import { LayerService } from './layer.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateProjectDto } from 'src/dto/ProjectDto/create-project.dto';
 import { UpdateProjectDto } from 'src/dto/ProjectDto/update-project.dto';
+import { CreateTypeProjectDto } from 'src/dto/TypeProjectDto/create-type_project.dto';
+import { UpdateTypeProjectDto } from 'src/dto/TypeProjectDto/update-type_project.dto';
 
 
 
@@ -52,6 +54,26 @@ export class LayerController {
     return this.layerService.getProjectIDs(project_ids)
   }
  
+  @MessagePattern({ cmd: 'create-type_project' })
+  async createTypeProject(@Payload() createTypeProjectDto: CreateTypeProjectDto) {
+    return this.layerService.createTypeProject(createTypeProjectDto);
+  }
+
+  @MessagePattern({ cmd: 'find-all_type_project' })
+  async findAllTypeProject() {
+    return this.layerService.findAllTypeProject();
+  }
+
+  @MessagePattern({ cmd: 'find-one_type_project' })
+  async findOneTypeProject(@Payload() id: string) {
+    return this.layerService.findOneTypeProject(id);
+  }
+
+  @MessagePattern({ cmd: 'update-type_project' })
+  async updateTypeProject(@Payload() data: { id: string; updateTypeProjectDto: UpdateTypeProjectDto }) {
+    const { id, updateTypeProjectDto } = data;
+    return this.layerService.updateTypeProject(id, updateTypeProjectDto);
+  }
 
  
   

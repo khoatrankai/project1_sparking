@@ -1,3 +1,4 @@
+import { ICreateListDetailProduct } from "./priceQuoteInterface";
 
 
 
@@ -38,10 +39,13 @@ interface IGetProductInfo{
   code_original?:string
   description: string;
   vat?: string; // VAT của sản phẩm
+  key?:number;
+  ikey?:number;
   brand?: IBrand; // VAT của sản phẩm
   original?: IOriginal; // VAT của sản phẩm
   vat_borrowed?:string
   profit_borrowed?:string
+  children?:ICreateListDetailProduct[]
   quantity: number;
   unit_product: IUnitProduct; // ID hoặc chi tiết đơn vị sản phẩm
   status: 'active' | 'delete' | 'hide';

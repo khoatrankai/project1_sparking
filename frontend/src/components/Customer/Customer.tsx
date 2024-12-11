@@ -7,11 +7,11 @@ import ListCustomer from "./ListCustomer/ListCustomer";
 export default function Customer() {
   return (
     <div>
-      <div className="flex flex-col gap-2">
-        <div className="bg-[#00A9AE] p-2 rounded-md">
+      <div className="flex flex-col rounded-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] bg-white">
+        <div className="rounded-md">
           <ToolCustomer />
         </div>
-        <div className="bg-[#00A9AE] p-2 rounded-md">
+        <div className="rounded-md">
           <ListCustomer />
         </div>
       </div>

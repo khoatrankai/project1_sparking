@@ -1,10 +1,11 @@
-import {  Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {  Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { SystemService } from './system.service';
 import { CreateProductDto } from './dto/create_product.dto';
 import { CreateListUseProductDto } from './dto/create_list_user_product.dto';
 import { CreateProvinceDto } from './dto/create_province.dto';
 import { CreateVatDto } from './dto/create_vat.dto';
 import { CreateProfitDto } from './dto/create_profit.dto';
+import { CreateLinkSystemDto } from './dto/create_link_system.dto';
 
 
 
@@ -39,6 +40,15 @@ export class SystemController {
   @Get('provinces')
   getProvinces(){
     return this.systemService.getAllProvinces()
+  }
+
+  @Post('create-links_system')
+  createLinksSystem(@Body() dataLinksSystem:CreateLinkSystemDto[]){
+    return this.systemService.createLinksSystem(dataLinksSystem)
+  }
+  @Get('link/:name_tag')
+  getLinkSystem(@Param('name_tag') name_tag:string){
+    return this.systemService.getLinkSystemByNameTag(name_tag)
   }
 
   @Post('create-vats')

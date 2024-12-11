@@ -21,6 +21,18 @@ export const fetchActivities = createAsyncThunk(
   }
 );
 
+export const fetchYearActivities = createAsyncThunk(
+  'activity/fetchYearActivities',
+  async (year:number, thunkAPI) => {
+    try {
+      const response = await activityService.getAllYearActivities(year);
+      return response;
+    } catch {
+      return thunkAPI.rejectWithValue('Failed to fetch activities');
+    }
+  }
+);
+
 export const createActivity = createAsyncThunk(
   'activity/createActivity',
   async (data: ICreateActivity, thunkAPI) => {
@@ -60,6 +72,18 @@ const activitySlice = createSlice({
         state.datas = action.payload.data;
       })
       .addCase(fetchActivities.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchYearActivities.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchYearActivities.fulfilled, (state, action) => {
+        state.loading = false;
+        state.datas = action.payload.data;
+      })
+      .addCase(fetchYearActivities.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })

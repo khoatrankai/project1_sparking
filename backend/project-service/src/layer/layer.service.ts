@@ -7,6 +7,9 @@ import { CreateProjectDto } from 'src/dto/ProjectDto/create-project.dto';
 import { UpdateProjectDto } from 'src/dto/ProjectDto/update-project.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { CreateTypeProjectDto } from 'src/dto/TypeProjectDto/create-type_project.dto';
+import { TypeProject } from 'src/database/entities/type_project.entity';
+import { UpdateTypeProjectDto } from 'src/dto/TypeProjectDto/update-type_project.dto';
 
 
 
@@ -16,7 +19,8 @@ export class LayerService {
 
   constructor(@Inject('CUSTOMER') private readonly customersClient:ClientProxy,
     @InjectRepository(Projects)
-    private readonly projectsRepository: Repository<Projects>,
+    private readonly projectsRepository: Repository<Projects>, @InjectRepository(TypeProject)
+    private readonly typeProjectRepository: Repository<TypeProject>,
   ) {}
 
   // Create a new project
@@ -60,6 +64,43 @@ export class LayerService {
     return {
       statusCode: HttpStatus.OK,
       data: dataRes,
+      message: 'Projects retrieved successfully',
+    };
+  }
+
+  async getAboutProject(): Promise<any> {
+    const projects = await this.projectsRepository.find();
+    
+
+    if (!projects || projects.length === 0) {
+     
+      return {
+        statusCode: HttpStatus.NO_CONTENT,
+        data: [],
+        message: 'No projects found',
+      };
+    }
+    let projWaiting = 0
+    let projStart = 0
+    let projPause = 0
+    let projCancel = 0
+    let projCompleted = 0
+    projects.forEach(dt =>{
+      if(dt.status === 'waiting') projWaiting++
+      if(dt.status === 'start') projStart++
+      if(dt.status === 'pause') projPause++
+      if(dt.status === 'cancel') projCancel++
+      if(dt.status === 'completed') projCompleted++
+    })
+    return {
+      statusCode: HttpStatus.OK,
+      data: {
+        totalWaiting:projWaiting,
+        totalStart:projStart,
+        totalPause:projPause,
+        totalCancel:projCancel,
+        totalCompleted:projCompleted,
+      },
       message: 'Projects retrieved successfully',
     };
   }
@@ -135,6 +176,45 @@ export class LayerService {
       data: updatedProject,
       message: 'Project updated successfully',
     };
+  }
+
+  async createTypeProject(createTypeProjectDto: CreateTypeProjectDto) {
+    const typeProject = this.typeProjectRepository.create({...createTypeProjectDto,type_id:uuidv4()});
+    await this.typeProjectRepository.save(typeProject);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message:"Loại dự án tạo thành công"
+    }
+  }
+
+  async findAllTypeProject() {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.typeProjectRepository.find()
+    
+    }
+    
+    
+  }
+
+  async findOneTypeProject(id: string) {
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.typeProjectRepository.findOne({ where: { type_id: id } })
+    
+    }
+  }
+
+  async updateTypeProject(id: string, updateTypeProjectDto: UpdateTypeProjectDto) {
+    await this.typeProjectRepository.update(id, updateTypeProjectDto);
+    return {
+      statusCode: HttpStatus.OK,
+      data:  await this.typeProjectRepository.findOne({where:{type_id:id}}),
+      message:"Cập nhật thành công"
+    
+    }
+    
   }
  
   getHello(): string {

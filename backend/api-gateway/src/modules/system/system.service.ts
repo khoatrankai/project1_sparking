@@ -19,6 +19,7 @@ import { CreateUnitProductDto } from './dto/create_unit_product.dto';
 import { UpdateUnitProductDto } from './dto/update_unit_product.dto';
 import { CreateProfitDto } from './dto/create_profit.dto';
 import { UpdateProfitDto } from './dto/update_profit.dto';
+import { CreateLinkSystemDto } from './dto/create_link_system.dto';
 
 
 
@@ -67,6 +68,18 @@ export class SystemService {
   async createProvinces(createProvincesDto: CreateProvinceDto[]) {
     console.log(createProvincesDto)
     return this.systemClient.send({ cmd: 'create-provinces' }, createProvincesDto);
+  }
+
+  async createLinkSystem(createLinkSystemDto: CreateLinkSystemDto) {
+    return this.systemClient.send({ cmd: 'create-link_system' }, createLinkSystemDto);
+  }
+
+  async createLinksSystem(createLinksSystemDto: CreateLinkSystemDto[]) {
+    return this.systemClient.send({ cmd: 'create-links_system' }, createLinksSystemDto);
+  }
+
+  async getLinkSystemByNameTag(name_tag: string) {
+    return this.systemClient.send({ cmd: 'get-link_system' }, name_tag);
   }
 
   async createVat(createVatDto: CreateVatDto) {

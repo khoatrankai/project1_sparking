@@ -14,7 +14,7 @@ import { CategoryRoleUser } from './entities/category_role_user.entity';
       port: 3306,
       username: 'root',
       password: '123456789',
-      database: 'db_sparking_2',
+      database: 'db_sparking_user',
       entities: [AccountUsers,RoleTypeUser,RoleUser,CategoryRoleUser],
       // synchronize: true,
       // dropSchema: true,

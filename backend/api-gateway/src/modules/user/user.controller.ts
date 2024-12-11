@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { InfoUserInterface } from './interfaces/info-user.interface';
 import { CreateRoleTypeUserDto } from './dto/create_role.dto';
@@ -7,6 +7,7 @@ import { CreateRoleUserDto } from './dto/create_role_user.dto';
 import { UpdateRoleUserDto } from './dto/update_role_user.dto';
 import { CreateUserDto } from './dto/create_user.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
 // import { RoleGuard } from 'src/guards/role.guard';
 
 @Controller('user')
@@ -67,6 +68,12 @@ export class UserController {
   @Get('/admin/id/:id')
   async getUserIDAdmin (@Param('id') id:string) {
     return await this.userService.getUserIDAdmin(id);
+  }
+
+  @Get('/profile')
+  async getUserIDProfile (@Req() req:Request) {
+    console.log(req['user'])
+    return await this.userService.getUserIDProfile(req);
   }
  
 }

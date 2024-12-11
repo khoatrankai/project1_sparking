@@ -95,7 +95,7 @@ export class UserService {
 
   async getUserIDAdmin(user_id:string){
     const data = await this.accountUserRepository.findOne({where:{user_id}});
-    console.log(data)
+    delete data.password
     return {
       statusCode:HttpStatus.OK,
       data:data

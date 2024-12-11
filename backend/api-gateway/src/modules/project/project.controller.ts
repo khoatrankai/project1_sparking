@@ -2,6 +2,8 @@ import {  Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/ProjectDto/create-project.dto';
 import { UpdateProjectDto } from './dto/ProjectDto/update-project.dto';
+import { CreateTypeProjectDto } from './dto/TypeProjectDto/create-type_project.dto';
+import { UpdateTypeProjectDto } from './dto/TypeProjectDto/update-type_project.dto';
 
 
 
@@ -41,5 +43,23 @@ export class ProjectController {
   ) {
     return this.projectService.sendUpdateProject(id, updateProjectDto);
   }
-  
+  @Post('type')
+  async createTypeProject(@Body() createTypeProjectDto: CreateTypeProjectDto) {
+    return this.projectService.createTypeProject(createTypeProjectDto);
+  }
+
+  @Get('type')
+  async findAllTypeProject() {
+    return this.projectService.findAllTypeProject();
+  }
+
+  @Get('type/:id')
+  async findOneTypeProject(@Param('id') id: string) {
+    return this.projectService.findOneTypeProject(id);
+  }
+
+  @Put('type/:id')
+  async updateTypeProject(@Param('id') id: string, @Body() updateTypeProjectDto: UpdateTypeProjectDto) {
+    return this.projectService.updateTypeProject(id, updateTypeProjectDto);
+  }
 }

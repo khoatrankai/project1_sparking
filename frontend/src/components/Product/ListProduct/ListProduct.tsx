@@ -40,13 +40,13 @@ export default function ListProduct() {
   const columns: TableColumnsType<IGetProductInfo> = [
     {
       title: "#",
-      className: "text-xl",
+      className: "",
       dataIndex: "code_original",
       render: (value: string, record) => (
         <div className="flex flex-col gap-1 ">
           <strong>#{`${value ?? "".slice(0, 10)}...`}</strong>
           <div className="flex gap-2">
-            <Button type="text" ghost className="text-xl text-blue-600">
+            <Button type="text" ghost className=" text-blue-600">
               View
             </Button>
             <ModalUpdateProduct productID={record.product_id} />
@@ -58,7 +58,7 @@ export default function ListProduct() {
     },
     {
       title: "Tên sản phẩm",
-      className: "text-xl",
+      className: "",
       dataIndex: "name",
       render: (value: string) => (
         <>{value.length > 15 ? `${value.slice(0, 15)}...` : value}</>
@@ -68,7 +68,7 @@ export default function ListProduct() {
     },
     {
       title: "Loại sản phẩm",
-      className: "text-xl",
+      className: "",
       dataIndex: ["type", "name"],
       sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
         a.type.name.localeCompare(b.type.name),
@@ -76,14 +76,14 @@ export default function ListProduct() {
     },
     {
       title: "Giá trị",
-      className: "text-xl",
+      className: "",
       dataIndex: "price",
       render: (value: number) => `${value.toLocaleString("vi-VN")}đ`,
       sorter: (a: IGetProductInfo, b: IGetProductInfo) => a.price - b.price,
     },
     {
       title: "Thuế",
-      className: "text-xl",
+      className: "",
       dataIndex: "vat",
       sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
         (a.vat ?? "").localeCompare(b.vat ?? ""),
@@ -100,7 +100,7 @@ export default function ListProduct() {
     },
     {
       title: "Lợi nhuận",
-      className: "text-xl",
+      className: "",
       dataIndex: "profit",
       sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
         (a.profit ?? "").localeCompare(b.profit ?? ""),
@@ -117,7 +117,7 @@ export default function ListProduct() {
     },
     {
       title: "Trạng thái",
-      className: "text-xl",
+      className: "",
       dataIndex: "status",
       render: (value: string, record: IGetProductInfo) => (
         <>
@@ -142,14 +142,14 @@ export default function ListProduct() {
     },
     {
       title: "Số lượng",
-      className: "text-xl",
+      className: "",
       dataIndex: "quantity",
       sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
         a.quantity - b.quantity,
     },
     {
       title: "Đơn vị",
-      className: "text-xl",
+      className: "",
       dataIndex: ["unit_product", "name_unit"],
       sorter: (a: IGetProductInfo, b: IGetProductInfo) =>
         a.unit_product.name_unit.localeCompare(b.unit_product.name_unit),

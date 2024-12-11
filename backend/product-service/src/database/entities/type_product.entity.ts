@@ -8,6 +8,12 @@ export class TypeProducts {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
+  @Column({ type: 'varchar', length: 50,nullable:true,unique:true })
+  name_tag: string;
+
+  @Column({ type: 'boolean', default:false })
+  type: boolean;
+
   @OneToMany(() => Products, product => product.type)
   products: Products[];
 

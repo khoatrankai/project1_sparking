@@ -12,10 +12,23 @@ import { ActivityContainer } from 'src/database/entities/activity_container.enti
 import { HistoryCodeProduct } from 'src/database/entities/history_code_product.entity';
 import { Brands } from 'src/database/entities/brand.entity';
 import { Originals } from 'src/database/entities/original.entity';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals])],
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'SYSTEM',
+        transport:Transport.TCP,
+        options:{
+          host:'localhost',
+          port:3004
+        }
+      }
+    ]),
+
+    TypeOrmModule.forFeature([Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals])],
   controllers: [LayerController],
   providers: [LayerService],
   // exports:[TypeOrmModule]

@@ -59,19 +59,13 @@ export default function ToolPriceQuote() {
     }
   }, [dataProjects]);
   return (
-    <div className="flex items-start gap-2 w-full flex-col">
+    <div className="flex items-start gap-4 w-full flex-col">
       <div className="flex gap-1 items-center">
-        {/* <Button
-          className="bg-blue-400 border-0 text-white font-semibold"
-          icon={<IoAddOutline />}
-        >
-          Thêm đề xuất
-        </Button> */}
         <ModalPropose />
         <Button icon={<FaChartPie />} />
       </div>
-
-      <div className="flex flex-wrap w-full items-center justify-end gap-2 ">
+      <p className="text-sm font-semibold text-[#1BA399]">Được lọc theo:</p>
+      <div className="flex flex-wrap w-full items-center justify-end gap-2 border-b-[1px] border-black/5 pb-4 ">
         <Select
           placeholder="Dự án"
           style={{ minWidth: 120, flex: "1 1 0%" }}

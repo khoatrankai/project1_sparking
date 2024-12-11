@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ToolPropose from "./ToolPropose/ToolPropose";
 import { FilterPropose } from "@/models/proposeInterface";
+import ListPropose from "./ListPropose/ListPropose";
 
 // type Props = {}
 
@@ -17,12 +18,12 @@ export default function Propose() {
   //   fetchData(filterData);
   // }, [filterData]);
   return (
-    <div className="flex flex-col gap-2">
-      <div className="bg-[#00A9AE] p-2 rounded-md">
+    <div className="flex flex-col rounded-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] bg-white">
+      <div className="rounded-md">
         <ToolPropose filterData={filterData} setFilterData={setFilterData} />
       </div>
-      <div className="bg-[#00A9AE] p-2 rounded-md">
-        {/* <ListPropose dataSource={dataSource} /> */}
+      <div className="rounded-md">
+        <ListPropose dataSource={[]} />
       </div>
     </div>
   );

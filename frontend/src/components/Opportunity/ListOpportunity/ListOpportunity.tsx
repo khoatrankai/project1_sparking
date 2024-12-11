@@ -22,7 +22,7 @@ export default function ListOpportunities() {
   const columns: TableColumnsType<IGetOpportunitiesDto> = [
     {
       title: "#",
-      className: "text-xl",
+      className: "",
       dataIndex: "opportunity_id",
       render: (value: string, record, index) => (
         <div className="flex flex-col gap-1">
@@ -30,7 +30,7 @@ export default function ListOpportunities() {
             #{index + 1}.{`${value.slice(0, 10)}...`}
           </strong>
           <div className="flex gap-2">
-            <Button type="text" ghost className="text-xl text-blue-600">
+            <Button type="text" ghost className=" text-blue-600">
               View
             </Button>
             <ModalUpdateOpportunity ID={value} />
@@ -41,7 +41,7 @@ export default function ListOpportunities() {
     },
     {
       title: "Tên liên hệ",
-      className: "text-xl",
+      className: "",
       dataIndex: "name_contact",
       render: (value: string | undefined) =>
         value && value.length > 15 ? `${value.slice(0, 15)}...` : value,
@@ -50,7 +50,7 @@ export default function ListOpportunities() {
     },
     {
       title: "Công ty",
-      className: "text-xl",
+      className: "",
       dataIndex: "company_name",
       sorter: (a, b) =>
         (a.company_name || "").localeCompare(b.company_name || ""),
@@ -58,7 +58,7 @@ export default function ListOpportunities() {
     },
     {
       title: "Email",
-      className: "text-xl",
+      className: "",
       dataIndex: "email",
       sorter: (a, b) =>
         (a.company_name || "").localeCompare(b.company_name || ""),
@@ -66,7 +66,7 @@ export default function ListOpportunities() {
     },
     {
       title: "Số điện thoại",
-      className: "text-xl",
+      className: "",
       dataIndex: "phone_number",
       sorter: (a, b) =>
         (a.company_name || "").localeCompare(b.company_name || ""),
@@ -74,7 +74,7 @@ export default function ListOpportunities() {
     },
     {
       title: "Nhân viên hỗ trợ",
-      className: "text-xl",
+      className: "",
       dataIndex: ["user_support"], // Specify the main object to access nested properties
       sorter: (a, b) =>
         (a.user_support?.last_name || "").localeCompare(
@@ -89,7 +89,7 @@ export default function ListOpportunities() {
 
     {
       title: "Tình trạng",
-      className: "text-xl",
+      className: "",
       dataIndex: ["type_opportunity", "name"],
       sorter: (a, b) =>
         (a.company_name || "").localeCompare(b.company_name || ""),
@@ -97,7 +97,7 @@ export default function ListOpportunities() {
     },
     {
       title: "Nguồn cơ hội",
-      className: "text-xl",
+      className: "",
       dataIndex: ["type_source", "name"],
       sorter: (a, b) =>
         (a.company_name || "").localeCompare(b.company_name || ""),
@@ -106,7 +106,7 @@ export default function ListOpportunities() {
 
     {
       title: "Ngày tạo",
-      className: "text-xl",
+      className: "",
       dataIndex: "created_at",
       render: (value: Date) => new Date(value).toLocaleDateString("vi-VN"),
       sorter: (a, b) =>

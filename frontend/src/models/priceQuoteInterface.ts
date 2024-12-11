@@ -19,6 +19,29 @@ export interface ICreatePriceQuote {
  
 }
 
+export interface ICreateListDetailProduct {
+  description:string;
+  price: number; // Price of the product
+  quantity: number; // Quantity of the product
+  unit: string; // Unit of measurement for the product (e.g., kg, pcs)
+}
+export interface IUpdateListDetailProduct {
+  description?:string;
+  price?: number; // Optional: Update price of the product
+  quantity?: number; // Optional: Update quantity of the product
+  unit?: string; // Optional: Update unit of measurement
+}
+
+export interface IGetListDetailProduct {
+  detail_id: string; // Unique identifier for the detail product
+  PQ_product: string; // Reference to the ListProduct
+  price: number; // Price of the product
+  quantity: number; // Quantity of the product
+  unit: string; // Unit of measurement
+  created_at: Date; // Timestamp of creation
+  updated_at: Date; // Timestamp of last update
+}
+
 export interface FilterPriceQuote{
   project?:string;
   type_date?:string;
@@ -166,6 +189,15 @@ export interface IExportPriceQuote {
         original_id: string;
         name: string;
       };
+      list_detail:{
+        detail_id:string;
+        description:string;
+        quantity:number;
+        unit:string;
+        price:number;
+        created_at:Date;
+        updated_at:Date;
+      }[];
     }[];
   }[];
 }
@@ -177,6 +209,7 @@ export interface ICreatePriceQuoteProduct {
   quantity: number;
   vat?: string | null; 
   profit?: string | null; 
+  list_detail?:ICreateListDetailProduct[]
   }
 
   export interface ICreateListPartProduct{

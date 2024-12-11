@@ -72,6 +72,10 @@ export class ActivityService {
   async sendGetAllActivities() {
     return await firstValueFrom(this.activityClient.send('get-all_activities', {}));
   }
+
+  async sendGetAllYearActivities(year:string) {
+    return await firstValueFrom(this.activityClient.send('get-all_year_activities', year));
+  }
   
   // Type Activities methods
   async sendCreateTypeActivities(createTypeActivitiesDto: CreateTypeActivitiesDto) {

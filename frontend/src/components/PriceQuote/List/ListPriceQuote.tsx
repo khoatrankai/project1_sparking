@@ -25,6 +25,9 @@ export default function ListPropose() {
   const { datas: dataSources } = useSelector(
     (state: RootState) => state.get_price_quotes
   );
+  const { datas: dataUnits } = useSelector(
+    (state: RootState) => state.unit_product
+  );
   // const { datas: dataProfits } = useSelector(
   //   (state: RootState) => state.get_profits
   // );
@@ -57,8 +60,12 @@ export default function ListPropose() {
             quantity: dtt.quantity,
             profit: dtt.profit.type_profit,
             price: dtt.price,
+            list_detail: dtt.list_detail,
           };
         }),
+        type: dt.products.find((dtt) => dtt.list_detail.length > 0)
+          ? true
+          : false,
       };
     });
     const workbook = new ExcelJS.Workbook();
@@ -205,7 +212,12 @@ export default function ListPropose() {
     worksheet.getCell("G15").value = {
       richText: [
         { text: "Ngày báo giá/Date: ", font: { bold: false } },
-        { text: dataPriceQuote.created_at, font: { bold: true } },
+        {
+          text:
+            new Date(dataPriceQuote.created_at).toLocaleDateString("vi-VN") ??
+            "N/A",
+          font: { bold: true },
+        },
       ],
     };
     worksheet.getCell("G16").value = {
@@ -397,7 +409,16 @@ export default function ListPropose() {
         };
 
         worksheet.getCell(`O${row}`).value = {
-          formula: `SUBTOTAL(9,O${row + 1}:O${dt.list.length + row})`, // Công thức
+          formula: `SUBTOTAL(9,O${row + 1}:O${
+            dt.list.length +
+            dt.list.reduce((preValue, currValue) => {
+              if (currValue?.list_detail.length > 0) {
+                return currValue.list_detail.length + preValue;
+              }
+              return preValue;
+            }, 0) +
+            row
+          })`,
           result: 0,
         };
         worksheet.getCell(`O${row}`).font = {
@@ -451,143 +472,375 @@ export default function ListPropose() {
           left: { style: "thin" },
         };
         row++;
-        dt.list.forEach((dtt) => {
-          worksheet.getRow(row).height = calculateRowHeight(
-            dtt.description,
-            30,
-            18
-          );
-          worksheet.getCell(row, 2).value = count++;
-          worksheet.getCell(row, 2).alignment = {
-            vertical: "middle",
-            horizontal: "center",
-            wrapText: true,
-          };
-          // worksheet.getCell(row,2).border = { top: { style: 'thin' },
-          // left: { style: 'thin' },
-          // bottom: { style: 'thin' },
-          // right: { style: 'thin' }
-          // };
-          for (let col = 2; col < 11; col++) {
-            worksheet.getCell(row, col).border = {
-              top: { style: "thin" },
-              left: { style: "thin" },
-              bottom: { style: "thin" },
-              right: { style: "thin" },
+        if (dt.type) {
+          dt.list.forEach((dtt, iProduct) => {
+            // let count = 1;
+            worksheet.getRow(row).height = calculateRowHeight(
+              dtt.description,
+              30,
+              18
+            );
+            worksheet.getCell(row, 2).value = iProduct + 1;
+            worksheet.getCell(row, 2).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
             };
-          }
-          worksheet.getCell(row, 3).value = dtt.name;
-          worksheet.getCell(row, 3).alignment = {
-            vertical: "middle",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 4).value = dtt.description;
-          worksheet.getCell(row, 4).alignment = {
-            vertical: "middle",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 5).value = dtt.refresh_code;
-          worksheet.getCell(row, 5).alignment = {
-            vertical: "middle",
-            horizontal: "center",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 6).value = dtt.brand;
-          worksheet.getCell(row, 6).alignment = {
-            vertical: "middle",
-            horizontal: "center",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 7).value = dtt.unit;
-          worksheet.getCell(row, 7).alignment = {
-            vertical: "middle",
-            horizontal: "center",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 8).value = dtt.quantity;
-          worksheet.getCell(row, 8).alignment = {
-            vertical: "middle",
-            horizontal: "center",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 9).value = {
-            formula: `ROUNDUP(P${row},-4)`,
-          };
-          worksheet.getCell(row, 9).alignment = {
-            vertical: "middle",
-            horizontal: "right",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 9).numFmt = "#,##0";
-          worksheet.getCell(row, 10).numFmt = "#,##0";
-          worksheet.getCell(row, 15).numFmt = "#,##0";
-          worksheet.getCell(row, 16).numFmt = "#,##0";
-
-          worksheet.getCell(row, 10).value = {
-            formula: `H${row}*I${row}`,
-          };
-          worksheet.getCell(row, 10).alignment = {
-            vertical: "middle",
-            horizontal: "right",
-            wrapText: true,
-          };
-
-          worksheet.getCell(row, 13).value = dtt.price;
-          worksheet.getCell(row, 13).numFmt = "#,##0";
-          worksheet.getCell(row, 13).alignment = {
-            vertical: "middle",
-            horizontal: "center",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 13).font = { color: { argb: "FF0000" } };
-          worksheet.getCell(row, 13).fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "F2F2F2" },
-          };
-
-          worksheet.getCell(row, 14).value = dtt.profit / 100;
-          worksheet.getCell(row, 14).numFmt = "0%";
-          worksheet.getCell(row, 14).alignment = {
-            vertical: "middle",
-            horizontal: "right",
-            wrapText: true,
-          };
-
-          worksheet.getCell(row, 15).value = {
-            formula: `M${row}*H${row}`,
-          };
-          worksheet.getCell(row, 15).alignment = {
-            vertical: "middle",
-            horizontal: "right",
-            wrapText: true,
-          };
-          worksheet.getCell(row, 15).fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "FFFFCC" },
-          };
-
-          worksheet.getCell(row, 16).value = {
-            formula: `M${row}*N${row}+M${row}`,
-          };
-
-          worksheet.getCell(row, 16).alignment = {
-            vertical: "middle",
-            horizontal: "right",
-            wrapText: true,
-          };
-
-          for (let col = 13; col < 17; col++) {
-            worksheet.getCell(row, col).border = {
-              top: { style: "dashed" },
-              left: { style: "dashed" },
-              bottom: { style: "dashed" },
-              right: { style: "dashed" },
+            for (let col = 2; col < 11; col++) {
+              worksheet.getCell(row, col).border = {
+                top: { style: "thin" },
+                left: { style: "thin" },
+                bottom: { style: "thin" },
+                right: { style: "thin" },
+              };
+            }
+            worksheet.getCell(row, 3).value = dtt.name;
+            worksheet.getCell(row, 3).alignment = {
+              vertical: "middle",
+              wrapText: true,
             };
-          }
-          row++;
-        });
+            worksheet.getCell(row, 4).value = dtt.description;
+            worksheet.getCell(row, 4).alignment = {
+              vertical: "middle",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 5).value = dtt.refresh_code;
+            worksheet.getCell(row, 5).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 6).value = dtt.brand;
+            worksheet.getCell(row, 6).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 7).value = dtt.unit;
+            worksheet.getCell(row, 7).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 8).value = dtt.quantity;
+            worksheet.getCell(row, 8).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 9).value = {
+              formula: `ROUNDUP(P${row},-4)`,
+            };
+            worksheet.getCell(row, 9).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 9).numFmt = "#,##0";
+            worksheet.getCell(row, 10).numFmt = "#,##0";
+            worksheet.getCell(row, 15).numFmt = "#,##0";
+            worksheet.getCell(row, 16).numFmt = "#,##0";
+
+            worksheet.getCell(row, 10).value = {
+              formula: `H${row}*I${row}`,
+            };
+            worksheet.getCell(row, 10).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+
+            worksheet.getCell(row, 13).value = {
+              formula: `O${row}`,
+            };
+            worksheet.getCell(row, 13).numFmt = "#,##0";
+            worksheet.getCell(row, 13).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 13).font = { color: { argb: "FF0000" } };
+            worksheet.getCell(row, 13).fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "F2F2F2" },
+            };
+
+            worksheet.getCell(row, 14).value = dtt.profit / 100;
+            worksheet.getCell(row, 14).numFmt = "0%";
+            worksheet.getCell(row, 14).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+
+            worksheet.getCell(row, 15).value = {
+              formula: `SUBTOTAL(9,O${row + 1}:O${
+                dtt.list_detail.length + row
+              })`,
+            };
+
+            worksheet.getCell(row, 15).font = {
+              bold: true,
+            };
+            worksheet.getCell(row, 15).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 15).fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FFFFCC" },
+            };
+
+            worksheet.getCell(row, 16).value = {
+              formula: `M${row}*N${row}+M${row}`,
+            };
+
+            worksheet.getCell(row, 16).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+
+            for (let col = 13; col < 17; col++) {
+              worksheet.getCell(row, col).border = {
+                top: { style: "dashed" },
+                left: { style: "dashed" },
+                bottom: { style: "dashed" },
+                right: { style: "dashed" },
+              };
+            }
+            row++;
+            dtt.list_detail.forEach((dataDetail) => {
+              const name_unit = dataUnits.find(
+                (dataUnit) => dataUnit.unit_id === dataDetail.unit
+              )?.name_unit;
+              worksheet.getCell(row, 2).border = {
+                left: { style: "thin" },
+                top: { style: "dashed" },
+                bottom: { style: "dashed" },
+                right: { style: "dashed" },
+              };
+              worksheet.getCell(row, 10).border = {
+                left: { style: "dashed" },
+                top: { style: "dashed" },
+                bottom: { style: "dashed" },
+                right: { style: "thin" },
+              };
+              for (let col = 3; col < 10; col++) {
+                worksheet.getCell(row, col).border = {
+                  top: { style: "dashed" },
+                  left: { style: "dashed" },
+                  bottom: { style: "dashed" },
+                  right: { style: "dashed" },
+                };
+              }
+
+              worksheet.getCell(row, 4).value = dataDetail.description;
+              worksheet.getCell(row, 4).alignment = {
+                vertical: "middle",
+                wrapText: true,
+              };
+
+              worksheet.getCell(row, 7).alignment = {
+                vertical: "middle",
+                horizontal: "center",
+                wrapText: true,
+              };
+              worksheet.getCell(row, 8).value = dataDetail.quantity;
+              worksheet.getCell(row, 8).alignment = {
+                vertical: "middle",
+                horizontal: "center",
+                wrapText: true,
+              };
+              worksheet.getCell(row, 13).value = dataDetail.price;
+              worksheet.getCell(row, 13).numFmt = "#,##0";
+              worksheet.getCell(row, 13).alignment = {
+                vertical: "middle",
+                horizontal: "center",
+                wrapText: true,
+              };
+              worksheet.getCell(row, 13).fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "F2F2F2" },
+              };
+
+              if (!isNaN(Number(name_unit))) {
+                worksheet.getCell(row, 7).value = Number(name_unit);
+                worksheet.getCell(row, 15).value = {
+                  formula: `M${row}/G${row}*H${row}`,
+                };
+              } else {
+                worksheet.getCell(row, 7).value = name_unit;
+                worksheet.getCell(row, 15).value = {
+                  formula: `M${row}*H${row}`,
+                };
+              }
+
+              worksheet.getCell(row, 15).alignment = {
+                vertical: "middle",
+                horizontal: "right",
+                wrapText: true,
+              };
+              worksheet.getCell(row, 15).numFmt = "#,##0";
+              worksheet.getCell(row, 15).fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "FFFFCC" },
+              };
+              for (let col = 13; col < 17; col++) {
+                worksheet.getCell(row, col).border = {
+                  top: { style: "dashed" },
+                  left: { style: "dashed" },
+                  bottom: { style: "dashed" },
+                  right: { style: "dashed" },
+                };
+              }
+              row++;
+            });
+          });
+        } else {
+          dt.list.forEach((dtt) => {
+            worksheet.getRow(row).height = calculateRowHeight(
+              dtt.description,
+              30,
+              18
+            );
+            worksheet.getCell(row, 2).value = count++;
+            worksheet.getCell(row, 2).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            // worksheet.getCell(row,2).border = { top: { style: 'thin' },
+            // left: { style: 'thin' },
+            // bottom: { style: 'thin' },
+            // right: { style: 'thin' }
+            // };
+            for (let col = 2; col < 11; col++) {
+              worksheet.getCell(row, col).border = {
+                top: { style: "thin" },
+                left: { style: "thin" },
+                bottom: { style: "thin" },
+                right: { style: "thin" },
+              };
+            }
+            worksheet.getCell(row, 3).value = dtt.name;
+            worksheet.getCell(row, 3).alignment = {
+              vertical: "middle",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 4).value = dtt.description;
+            worksheet.getCell(row, 4).alignment = {
+              vertical: "middle",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 5).value = dtt.refresh_code;
+            worksheet.getCell(row, 5).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 6).value = dtt.brand;
+            worksheet.getCell(row, 6).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 7).value = dtt.unit;
+            worksheet.getCell(row, 7).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 8).value = dtt.quantity;
+            worksheet.getCell(row, 8).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 9).value = {
+              formula: `ROUNDUP(P${row},-4)`,
+            };
+            worksheet.getCell(row, 9).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 9).numFmt = "#,##0";
+            worksheet.getCell(row, 10).numFmt = "#,##0";
+            worksheet.getCell(row, 15).numFmt = "#,##0";
+            worksheet.getCell(row, 16).numFmt = "#,##0";
+
+            worksheet.getCell(row, 10).value = {
+              formula: `H${row}*I${row}`,
+            };
+            worksheet.getCell(row, 10).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+
+            worksheet.getCell(row, 13).value = dtt.price;
+            worksheet.getCell(row, 13).numFmt = "#,##0";
+            worksheet.getCell(row, 13).alignment = {
+              vertical: "middle",
+              horizontal: "center",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 13).font = { color: { argb: "FF0000" } };
+            worksheet.getCell(row, 13).fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "F2F2F2" },
+            };
+
+            worksheet.getCell(row, 14).value = dtt.profit / 100;
+            worksheet.getCell(row, 14).numFmt = "0%";
+            worksheet.getCell(row, 14).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+
+            worksheet.getCell(row, 15).value = {
+              formula: `M${row}*H${row}`,
+            };
+            worksheet.getCell(row, 15).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+            worksheet.getCell(row, 15).fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FFFFCC" },
+            };
+
+            worksheet.getCell(row, 16).value = {
+              formula: `M${row}*N${row}+M${row}`,
+            };
+
+            worksheet.getCell(row, 16).alignment = {
+              vertical: "middle",
+              horizontal: "right",
+              wrapText: true,
+            };
+
+            for (let col = 13; col < 17; col++) {
+              worksheet.getCell(row, col).border = {
+                top: { style: "dashed" },
+                left: { style: "dashed" },
+                bottom: { style: "dashed" },
+                right: { style: "dashed" },
+              };
+            }
+            row++;
+          });
+        }
       });
       for (let col = 3; col <= 10; col++) {
         worksheet.getCell(row, col).fill = {
@@ -747,9 +1000,15 @@ export default function ListPropose() {
         cell.font.size = 12;
       });
     });
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: "application/octet-stream" });
-    saveAs(blob, dataPriceQuote.price_quote_id + ".xlsx");
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, dataPriceQuote.price_quote_id + ".xlsx");
+    } catch (err) {
+      console.log(err);
+    }
   };
   const [dataFilter, setDataFilter] = useState<
     IGetPriceQuote[] | [] | undefined
@@ -773,7 +1032,7 @@ export default function ListPropose() {
                 handleExport(value);
               }}
             >
-              Xem
+              Xuất
             </Button>
             <ModalUpdatePriceQuote ID={value} />
           </div>
@@ -797,6 +1056,8 @@ export default function ListPropose() {
       title: "Ngày báo giá",
       className: "text-xs",
       dataIndex: "date_start",
+      render: (value?: Date) =>
+        value ? new Date(value).toLocaleDateString("vi-VN") : "N/A",
       sorter: (a: IGetPriceQuote, b: IGetPriceQuote) =>
         a.date_start.toString().localeCompare(b.date_start.toString()),
     },
@@ -804,6 +1065,8 @@ export default function ListPropose() {
       title: "Ngày hết hạn",
       className: "text-xs",
       dataIndex: "date_expired",
+      render: (value?: Date) =>
+        value ? new Date(value).toLocaleDateString("vi-VN") : "N/A",
       sorter: (a: IGetPriceQuote, b: IGetPriceQuote) =>
         a.date_expired.toString().localeCompare(b.date_expired.toString()),
     },

@@ -1,4 +1,4 @@
-import {  Body, Controller, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {  Body, Controller, Get, Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/ActivityDto/create-activity.dto';
 import { UpdateActivityDto } from './dto/ActivityDto/update-activity.dto';
@@ -62,6 +62,11 @@ export class ActivityController {
   @Get('all')
   async sendGetAllActivities() {
     return this.activityService.sendGetAllActivities();
+  }
+
+  @Get('all_year')
+  async sendGetAllYearActivities(@Query('year') year:string) {
+    return this.activityService.sendGetAllYearActivities(year);
   }
 
   // Type Activities Methods

@@ -5,6 +5,7 @@ export interface IGetProject {
     name?: string;
     status: 'waiting' | 'start' | 'pause' | 'cancel' | 'completed';
     price?: number;
+    type?:ITypeProject
     time_job?: number;
     user_support?: string;
     customer?: CustomerInfo;
@@ -15,10 +16,16 @@ export interface IGetProject {
     updated_at: Date;
   }
 
+  export interface ITypeProject {
+    type_id: string;
+      name_type: string;
+  }
+
   export interface ICreateProject {
     name: string;
     status: 'waiting' | 'start' | 'pause' | 'cancel' | 'completed';
     price?: number;
+    type?:string;
     time_job?: number;
     user_support?: string;
     customer: string;
@@ -32,6 +39,7 @@ export interface IGetProject {
     status?: 'waiting' | 'start' | 'pause' | 'cancel' | 'completed';
     price?: number;
     time_job?: number;
+    type?:string;
     user_support?: string;
     customer?: string;
     start_date?: Date;

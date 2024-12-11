@@ -3,6 +3,7 @@
 import Project from "@/components/Project/Project";
 import { fetchCustomerInfos } from "@/redux/store/slices/customerSlices/get_all_customer.slice";
 import { fetchProjects } from "@/redux/store/slices/projectSlices/get_all_project.slice";
+import { fetchProjectTypes } from "@/redux/store/slices/projectSlices/get_type.slice";
 import { fetchUserInfo } from "@/redux/store/slices/userSlices/get_users.slice";
 import { AppDispatch } from "@/redux/store/store";
 import React, { useEffect } from "react";
@@ -17,6 +18,7 @@ export default function page() {
     dispatch(fetchProjects());
     dispatch(fetchCustomerInfos());
     dispatch(fetchUserInfo());
+    dispatch(fetchProjectTypes());
   }, [dispatch]);
   return (
     <div className="p-4">

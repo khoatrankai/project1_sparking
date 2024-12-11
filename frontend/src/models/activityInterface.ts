@@ -1,6 +1,19 @@
 import { IGetContract } from "./contractInterface";
 import { InfoUser } from "./userInterface";
 
+export const STATUS_TAGS_ACTIVITY = {
+  not_started: { label: "Chưa bắt đầu", color: "default" },
+  pending: { label: "Đang chờ xử lý", color: "orange" },
+  in_progress: { label: "Đang tiến hành", color: "blue" },
+  on_hold: { label: "Tạm dừng", color: "purple" },
+  awaiting_review: { label: "Chờ kiểm tra", color: "gold" },
+  requires_revision: { label: "Yêu cầu sửa đổi", color: "red" },
+  completed: { label: "Hoàn thành", color: "green" },
+  delivered: { label: "Đã bàn giao", color: "cyan" },
+  canceled: { label: "Đã hủy", color: "volcano" },
+  not_feasible: { label: "Không thực hiện được", color: "magenta" },
+};
+
 export interface IGetActivity {
   activity_id: string;
   type: IGetTypeActivity; // type_activity_id

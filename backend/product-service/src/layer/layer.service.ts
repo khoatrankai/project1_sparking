@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import {  In, Not, Repository } from 'typeorm';
@@ -32,12 +32,14 @@ import { CreateBrandDto } from 'src/dto/BrandDto/create-brand.dto';
 import { UpdateBrandDto } from 'src/dto/BrandDto/update-brand.dto';
 import { CreateOriginalDto } from 'src/dto/OriginalDto/create-original.dto';
 import { UpdateOriginalDto } from 'src/dto/OriginalDto/update-original.dto';
+import { firstValueFrom } from 'rxjs';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class LayerService {
 
   constructor(@InjectRepository(Brands)
-  private brandRepository: Repository<Brands>,@InjectRepository(Originals)
+  private brandRepository: Repository<Brands>,@Inject('SYSTEM') private readonly systemClient:ClientProxy,@InjectRepository(Originals)
   private readonly originalRepository: Repository<Originals>,@InjectRepository(ActivityContainer)
   private activityContainerRepository: Repository<ActivityContainer>,@InjectRepository(HistoryCodeProduct)
   private readonly historyCodeProductRepository: Repository<HistoryCodeProduct>, @InjectRepository(SupplierProduct)
@@ -347,7 +349,6 @@ export class LayerService {
   }
 
   async createActivityImportContainer(createActivityContainerDto: CreateActivityContainerDto) {
-    console.log(createActivityContainerDto)
     const id = uuidv4();
     const listRes:{product:Products,list_code:string[]}[] = []
     const {list_product,...reqActivityContainer} = createActivityContainerDto
@@ -365,7 +366,8 @@ export class LayerService {
           return this.codeProductRepository.create({code_product_id:idCode,product,code})
         })
         const resCodes = await this.codeProductRepository.save(dataCodes)
-        listRes.push({product:product,list_code:resCodes.map(dt => dt.code)})
+        const linkCode = await firstValueFrom(this.systemClient.send({ cmd: 'get-link_system' }, 'code_product'))
+        listRes.push({product:product,list_code:resCodes.map(dt => linkCode.link + dt.code)})
         const dataCreateHistory = resCodes.map((dtt)=>{
           const idHistory = uuidv4()
           return this.historyCodeProductRepository.create({history_id:idHistory,code_product:dtt,price:dt.price,activity_container:activity_container})

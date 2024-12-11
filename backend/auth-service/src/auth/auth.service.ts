@@ -32,7 +32,7 @@ export class AuthService {
 
   async register(otpUserDto:CreateUserDto){
     const checkUser =  await firstValueFrom(this.usersClient.send({cmd:'login-user'},otpUserDto.email))
-
+    console.log(checkUser)
     if(checkUser){
       return {
         statusCode: HttpStatus.BAD_REQUEST,message:'Tài khoản đã tồn tại'
@@ -92,6 +92,22 @@ export class AuthService {
 
       const newAccessToken = this.jwtService.sign({ ...payload }, { expiresIn: process.env['JWT_ACCESS_TOKEN_EXPIRES_IN'] });
       return {newAccessToken}
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  async comfirmAccessToken(accessToken:string) {  
+    try {
+      const payload = this.jwtService.verify(accessToken, {
+        secret: process.env['JWT_ACCESS_TOKEN_SECRET'],
+      });
+
+      // const newAccessToken = this.jwtService.sign({ ...payload }, { expiresIn: process.env['JWT_ACCESS_TOKEN_EXPIRES_IN'] });
+      return {
+        statusCode:HttpStatus.OK,
+        data:payload
+      }
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }

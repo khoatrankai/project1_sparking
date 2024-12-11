@@ -41,8 +41,8 @@ export default function ToolPropose({ setFilterData, filterData }: Props) {
     { value: "accept", label: "Accept" },
   ];
   return (
-    <div className="flex items-start gap-2 w-full flex-col">
-      <div className="flex gap-1 items-center">
+    <div className="flex items-start gap-4 w-full flex-col">
+      <div className="flex gap-1">
         {/* <Button
           className="bg-blue-400 border-0 text-white font-semibold"
           icon={<IoAddOutline />}
@@ -53,7 +53,7 @@ export default function ToolPropose({ setFilterData, filterData }: Props) {
         <Button icon={<FaChartPie />} />
       </div>
 
-      <div className="flex flex-wrap w-full items-center justify-end gap-2 ">
+      <div className="flex flex-wrap w-full items-center justify-end gap-2  border-b-[1px] pb-4 border-black/5">
         <Select
           defaultValue="0"
           style={{ minWidth: 120, flex: "1 1 0%" }}

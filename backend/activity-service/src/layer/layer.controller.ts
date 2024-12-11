@@ -57,6 +57,11 @@ export class LayerController {
     return await this.layerService.getAllActivities();
   }
 
+  @MessagePattern('get-all_year_activities')
+  async getAllYearActivities(year:string) {
+    return await this.layerService.getAllYearActivities(year);
+  }
+
   @MessagePattern('create-type_activity')
   async createTypeActivities(@Payload() createTypeActivitiesDto: CreateTypeActivitiesDto) {
     return await this.layerService.createTypeActivities(createTypeActivitiesDto);

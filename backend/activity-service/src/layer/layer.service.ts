@@ -111,6 +111,25 @@ export class LayerService {
     }
    
   }
+
+  async getAllYearActivities(year:string) {
+    const activities = await this.activitiesRepository
+    .createQueryBuilder('activity')
+    .leftJoinAndSelect('activity.type', 'type')
+    .leftJoinAndSelect('activity.status', 'status')
+    .leftJoinAndSelect('activity.picture_urls', 'picture_urls')
+    .leftJoinAndSelect('activity.list_code_product', 'list_code_product')
+    .where('YEAR(activity.created_at) = :year', { year })
+    .getMany();
+    if(activities){
+      const ids = activities.map((dt)=>dt.contract)
+      const dataContracts = await firstValueFrom(this.contractsClient.send({ cmd: 'get-contract_ids' },ids))
+      return { statusCode: HttpStatus.OK, data: activities.map((dt,index)=>{
+        return {...dt,contract:dataContracts[index]??dt.contract}
+      }) };
+    }
+   
+  }
   
   async createTypeActivities(createTypeActivitiesDto: CreateTypeActivitiesDto) {
     const newTypeActivity = this.typeActivitiesRepository.create({ ...createTypeActivitiesDto, type_activity_id: uuidv4() });

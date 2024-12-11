@@ -134,7 +134,8 @@ export default function ListCustomer() {
       title: "Ngày tạo",
       className: "text-xs",
       dataIndex: "created_at",
-
+      render: (value?: Date) =>
+        value ? new Date(value).toLocaleDateString("vi-VN") : "N/A",
       sorter: (a: CustomerInfo, b: CustomerInfo) =>
         a.created_at.localeCompare(b.created_at),
     },

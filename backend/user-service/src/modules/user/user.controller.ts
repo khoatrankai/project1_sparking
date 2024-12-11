@@ -24,6 +24,7 @@ export class UserController {
 
   @MessagePattern({cmd:'get-user_id_admin'})
   getUserIDAdmin(@Payload('user_id') user_id:string){
+    console.log(" goi toi ne",user_id)
     return this.userService.getUserIDAdmin(user_id)
   }
 

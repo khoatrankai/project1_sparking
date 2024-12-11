@@ -13,6 +13,7 @@ import { ListMore } from './entities/list_more.entity';
 import { MoreDatas } from './entities/more_data.entity';
 import { TypeMores } from './entities/type_more.entity';
 import { Profits } from './entities/profit.entity';
+import { LinkSystems } from './entities/link_system.entity';
 
 @Module({
   imports: [
@@ -22,8 +23,8 @@ import { Profits } from './entities/profit.entity';
       port: 3306,
       username: 'root',
       password: '123456789',
-      database: 'db_sparking_1',
-      entities: [Label,ListLabel,ListUseProduct,PictureProduct,Province,UnitProduct,Product,ListTBSP,Vats,ListMore,MoreDatas,TypeMores,Profits],
+      database: 'db_sparking_system',
+      entities: [Label,ListLabel,ListUseProduct,PictureProduct,Province,UnitProduct,Product,ListTBSP,Vats,ListMore,MoreDatas,TypeMores,Profits,LinkSystems],
       // synchronize: true,
       // dropSchema: true,
     }),

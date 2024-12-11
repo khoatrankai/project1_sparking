@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Tag } from "antd";
 import React from "react";
 import { FaChartPie } from "react-icons/fa";
 import ModalAddWork from "./Modal/ModalWork";
@@ -52,8 +52,8 @@ export default function ToolWork() {
   //   }
   // }, [dataProjects]);
   return (
-    <div className="flex items-start gap-2 w-full flex-col">
-      <div className="flex gap-2 items-center">
+    <div className="flex items-start gap-4 w-full flex-col">
+      <div className="flex gap-2 items-center border-b-[1px] pb-4 w-full">
         {/* <Button
           className="bg-blue-400 border-0 text-white font-semibold"
           icon={<IoAddOutline />}
@@ -65,7 +65,59 @@ export default function ToolWork() {
         <ModalStatusWork />
         <Button icon={<FaChartPie />} />
       </div>
-
+      <div className="w-full">
+        <h2 className="font-semibold text-[#1BA399]">Tổng quan khách hàng</h2>
+        <div className="flex justify-around gap-2 flex-wrap">
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 border-0 shadow-lg shadow-black/20 bg-[#EB8823]">
+            <p className="font-bold text-3xl text-white">
+              {/* {dataAbout?.totalCustomer.toLocaleString("vi-VN")} */}
+            </p>
+            <p className="text-xs text-wrap text-slate-50/80">
+              Tổng số khách hàng
+            </p>
+          </Tag>
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
+            <p className="font-bold text-3xl text-white">
+              {/* {dataAbout?.totalActive.toLocaleString("vi-VN")} */}
+            </p>
+            <p className="text-xs text-wrap text-slate-50/80">
+              Khách hàng đang hoạt động
+            </p>
+          </Tag>
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
+            <p className="font-bold text-3xl text-white">
+              {/* {dataAbout?.totalInActive.toLocaleString("vi-VN")} */}
+            </p>
+            <p className="text-xs text-wrap text-slate-50/80">
+              Khách hàng không hoạt động
+            </p>
+          </Tag>
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
+            <p className="font-bold text-3xl text-white">
+              {/* {dataAbout?.contactActive.toLocaleString("vi-VN")} */}
+            </p>
+            <p className="text-xs text-wrap text-slate-50/80">
+              Liên hệ đang hoạt động
+            </p>
+          </Tag>
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
+            <p className="font-bold text-3xl text-white">
+              {/* {dataAbout?.contactInactive.toLocaleString("vi-VN")} */}
+            </p>
+            <p className="text-xs text-wrap text-slate-50/80">
+              Liên hệ ít hoạt động
+            </p>
+          </Tag>
+          <Tag className="lex flex-col pl-4 pt-8 rounded-lg gap-2 min-w-40 flex-1 h-32 bg-[#EB8823] border-0 shadow-lg  shadow-black/20">
+            <p className="font-bold text-3xl text-white">
+              {/* {dataAbout?.contactActiveToday.toLocaleString("vi-VN")} */}
+            </p>
+            <p className="text-xs text-wrap text-slate-50/80">
+              Liên hệ đăng nhập hôm nay
+            </p>
+          </Tag>
+        </div>
+      </div>
       {/* <div className="flex flex-wrap w-full items-center justify-end gap-2 ">
         <Select
           placeholder="Dự án"

@@ -16,7 +16,7 @@ export default function ToolProduct() {
   );
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex gap-1">
+      <div className="flex gap-1 border-b-[1px] pb-4 border-black/5">
         <ModalAddProduct />
         <ModalTypeProduct />
         <ModalUnitProduct />

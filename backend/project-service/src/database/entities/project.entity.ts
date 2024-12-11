@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { TypeProject } from './type_project.entity';
 
 @Entity('Projects')
 export class Projects {
@@ -36,6 +37,11 @@ export class Projects {
 
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  @ManyToOne(() => TypeProject)
+  @JoinColumn({ name: 'type', })
+  type: TypeProject;
+  
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

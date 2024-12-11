@@ -6,11 +6,11 @@ import ToolActivity from "./Tool/ToolActivity";
 
 export default function Activity() {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="bg-[#00A9AE] p-2 rounded-md">
+    <div className="flex flex-col rounded-md p-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] bg-white">
+      <div className=" p-2 ">
         <ToolActivity />
       </div>
-      <div className="bg-[#00A9AE] p-2 rounded-md">
+      <div className=" p-2">
         <ListActivity />
       </div>
     </div>

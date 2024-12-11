@@ -33,5 +33,10 @@ export class AuthController {
   refreshToken(data:string){
     return this.authService.refreshTokens(data)
   }
+
+  @MessagePattern({cmd:'comfirm-access-token'})
+  comfirmAccessToken(data:string){
+    return this.authService.comfirmAccessToken(data)
+  }
   
 }

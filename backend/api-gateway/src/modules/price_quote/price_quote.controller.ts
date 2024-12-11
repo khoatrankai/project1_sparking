@@ -34,7 +34,9 @@ export class PriceQuoteController {
 
   @Post()
   async createPriceQuote(@Body() createPriceQuoteDto: CreatePriceQuoteDto) {
+    // console.log(createPriceQuoteDto.parts[0].products[0].list_detail)
     return this.priceQuetoService.sendCreatePriceQueto(createPriceQuoteDto);
+    return ""
   }
 
   @Put(':id')

@@ -8,6 +8,10 @@ const activityService = {
     const response = await api.get('/activity/all');
     return response.data;
   },
+  getAllYearActivities: async (year:number) => {
+    const response = await api.get(`/activity/all_year?year=${year}`);
+    return response.data;
+  },
   getActivityById: async (id: string) => {
     const response = await api.get(`/activity/id/${id}`);
     return response.data;

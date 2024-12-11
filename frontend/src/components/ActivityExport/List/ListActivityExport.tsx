@@ -93,7 +93,8 @@ export default function ListActivityExport() {
       title: "Ngày xuất kho",
       dataIndex: ["created_at"],
       className: "text-xs",
-      render: (value?: string) => value || "N/A",
+      render: (value?: Date) =>
+        value ? new Date(value).toLocaleDateString("vi-VN") : "N/A",
       sorter: (a: IGetActivityContainer, b: IGetActivityContainer) =>
         (a.created_at.toString() || "").localeCompare(
           b.created_at.toString() || ""

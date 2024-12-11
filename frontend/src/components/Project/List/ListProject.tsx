@@ -24,7 +24,7 @@ export default function ListProject() {
   const columns: TableColumnsType<IGetProject> = [
     {
       title: "#",
-      className: "text-xl",
+      className: "",
       dataIndex: "project_id",
       render: (value: string, record, index) => (
         <div className="flex flex-col gap-1">
@@ -44,7 +44,7 @@ export default function ListProject() {
     },
     {
       title: "Tên dự án",
-      className: "text-xl",
+      className: "",
       dataIndex: "name",
       render: (value: string) => (
         <>{value && value.length > 15 ? `${value.slice(0, 15)}...` : value}</>
@@ -54,14 +54,14 @@ export default function ListProject() {
     },
     {
       title: "Khách hàng",
-      className: "text-xl",
+      className: "",
       dataIndex: ["customer", "name_company"],
       render: (value: string) => <>{value || "N/A"}</>,
     },
 
     {
       title: "Giá trị",
-      className: "text-xl",
+      className: "",
       dataIndex: "price",
       render: (value: number) =>
         value ? `${value.toLocaleString("vi-VN")}đ` : "N/A",
@@ -71,19 +71,19 @@ export default function ListProject() {
 
     {
       title: "Ngày bắt đầu",
-      className: "text-xl",
+      className: "",
       dataIndex: "start_date",
       render: (value: Date) => new Date(value).toLocaleDateString("vi-VN"),
     },
     {
       title: "Ngày kết thúc",
-      className: "text-xl",
+      className: "",
       dataIndex: "end_date",
       render: (value: Date) => new Date(value).toLocaleDateString("vi-VN"),
     },
     {
       title: "Trạng thái",
-      className: "text-xl",
+      className: "",
       dataIndex: "status",
       render: (
         status: "waiting" | "start" | "pause" | "cancel" | "completed"
@@ -118,7 +118,7 @@ export default function ListProject() {
         }
 
         return (
-          <Tag className="text-xl" color={color}>
+          <Tag className="" color={color}>
             {text}
           </Tag>
         );

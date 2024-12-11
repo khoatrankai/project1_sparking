@@ -70,6 +70,8 @@ export default function ListPropose({ dataSource }: Props) {
       title: "Ngày đề xuất",
       className: "text-xs",
       dataIndex: "date_start",
+      render: (value?: Date) =>
+        value ? new Date(value).toLocaleDateString("vi-VN") : "N/A",
       sorter: (a: GetPropose, b: GetPropose) =>
         a.date_start.localeCompare(b.date_start),
     },
@@ -77,6 +79,8 @@ export default function ListPropose({ dataSource }: Props) {
       title: "Ngày hết hạn",
       className: "text-xs",
       dataIndex: "date_end",
+      render: (value?: Date) =>
+        value ? new Date(value).toLocaleDateString("vi-VN") : "N/A",
       sorter: (a: GetPropose, b: GetPropose) =>
         a.date_end.localeCompare(b.date_end),
     },
@@ -84,6 +88,8 @@ export default function ListPropose({ dataSource }: Props) {
       title: "Ngày tạo",
       className: "text-xs",
       dataIndex: "created_at",
+      render: (value?: Date) =>
+        value ? new Date(value).toLocaleDateString("vi-VN") : "N/A",
       sorter: (a: GetPropose, b: GetPropose) =>
         a.created_at.localeCompare(b.created_at),
     },

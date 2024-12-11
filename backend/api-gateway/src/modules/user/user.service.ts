@@ -8,6 +8,7 @@ import { CreateRoleUserDto } from './dto/create_role_user.dto';
 import { UpdateRoleUserDto } from './dto/update_role_user.dto';
 import { CreateUserDto } from './dto/create_user.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Request } from 'express';
 @Injectable()
 export class UserService {
 
@@ -63,6 +64,20 @@ export class UserService {
   
   async getUserIDAdmin(user_id:string){
     return await firstValueFrom(this.usersClient.send({ cmd: 'get-user_id_admin' }, user_id))
+    
+  }
+  async getUserIDProfile(req:Request){
+    const user = req['user']
+    if(user){
+      // console.log(user)
+      console.log(user)
+      return await firstValueFrom(this.usersClient.send({ cmd: 'get-user_id_admin' }, {user_id:user.sub}))
+
+    }
+    return {
+      statusCode:HttpStatus.BAD_REQUEST,
+      message: "Lấy thông tin thất bại"
+    }
     
   }
 }

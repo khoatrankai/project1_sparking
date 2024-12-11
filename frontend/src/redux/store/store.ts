@@ -29,6 +29,9 @@ import activityContainerSlice from './slices/productSlices/get_activity_containe
 import profitSystemSlice from './slices/systemSlices/get_profit.slice';
 import brandProductSlice from './slices/productSlices/get_brand.slice';
 import originalProductSlice from './slices/productSlices/get_original.slice';
+import statusMenu from './slices/menu.slice'
+import userProfileSlice from './slices/userSlices/get_profile.slice';
+import typeProjectSlice from './slices/projectSlices/get_type.slice';
 
 
 export const store = configureStore({
@@ -48,6 +51,7 @@ export const store = configureStore({
     get_users:userInfoSlice,
     get_opportunities:opportunitySlice,
     get_projects:projectsSlice,
+    type_projects:typeProjectSlice,
     get_price_quotes:priceQuoteSlice,
     get_type_method:typeMethodSlice,
     get_type_contract:typeContractSlice,
@@ -62,7 +66,9 @@ export const store = configureStore({
     get_status_work:statusWorkSlice,
     get_supplier:supplierSlice,
     get_activity_container:activityContainerSlice,
-    get_profits:profitSystemSlice
+    get_profits:profitSystemSlice,
+    status_tab_menu:statusMenu,
+    get_profile:userProfileSlice
   },
 });
 

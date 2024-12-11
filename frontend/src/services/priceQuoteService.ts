@@ -1,5 +1,5 @@
 
-import { FilterPriceQuote, ICreatePriceQuote, IUpdatePriceQuote } from '@/models/priceQuoteInterface';
+import { FilterPriceQuote, ICreatePriceQuote } from '@/models/priceQuoteInterface';
 import api from './api';
 
 const priceQuoteService = {

@@ -17,6 +17,24 @@ const projectService = {
   updateProject: async(id:string,data:IUpdateProject)=>{
     const response = await api.put(`/project/update/${id}`,data);
     return response.data;
+  },
+  getTypes: async()=>{
+    const response = await api.get(`/project/type`);
+    return response.data;
+  },
+  createType: async(data:{name_type:string})=>{
+    const res = await api.post('/project/type', data);
+    if (!res) {
+        throw new Error("Failed to create type project: No response");
+    }
+    return res.data ;
+  },
+  updateType: async(type_id:string,data:string)=>{
+    const res = await api.put(`/project/type/${type_id}`, {name:data});
+    if (!res) {
+        throw new Error("Failed to update unit project: No response");
+    }
+    return res.data ;
   }
 
 

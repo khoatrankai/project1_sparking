@@ -54,8 +54,8 @@ export default function ToolSupplier() {
   //   }
   // }, [dataProjects]);
   return (
-    <div className="flex items-start gap-2 w-full flex-col">
-      <div className="flex gap-2 items-center">
+    <div className="flex items-start gap-4 w-full flex-col">
+      <div className="flex gap-2 items-center border-b-[1px] pb-4 w-full border-black/5">
         {/* <Button
           className="bg-blue-400 border-0 text-white font-semibold"
           icon={<IoAddOutline />}

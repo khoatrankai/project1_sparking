@@ -12,7 +12,7 @@ import { ListProduct } from './entities/list_product.entity';
       port: 3306,
       username: 'root',
       password: '123456789',
-      database: 'db_sparking_4',
+      database: 'db_sparking_propose',
       entities: [Propose,ListProduct],
       // synchronize: true,
       // dropSchema: true,

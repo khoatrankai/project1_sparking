@@ -7,8 +7,11 @@ export class Contract {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   contract_id: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50,unique:true })
   name_contract: string;
+
+  @Column({ type: 'varchar', length: 50,unique:true })
+  code_contract: string;
 
   @Column({ type: 'varchar', length: 50,nullable:true })
   project: string;

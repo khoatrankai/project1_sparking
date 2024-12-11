@@ -14,7 +14,7 @@ import { TypeMethod } from './entities/type_method.entity';
       port: 3306,
       username: 'root',
       password: '123456789',
-      database: 'db_sparking_7',
+      database: 'db_sparking_contract',
       entities: [TypeContract,Contract,Payment,TypeMethod],
       // synchronize: true,
       // dropSchema: true,

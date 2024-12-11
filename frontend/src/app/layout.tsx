@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { StoreProvider } from "./StoreProvider";
+import { DispatchProvider } from "./DispatchProvider";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -28,15 +29,17 @@ export default function RootLayout({
 }>) {
   return (
     <StoreProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}
-        >
-          {children}
+      <DispatchProvider>
+        <html lang="en">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}
+          >
+            {children}
 
-          <ToastContainer />
-        </body>
-      </html>
+            <ToastContainer />
+          </body>
+        </html>
+      </DispatchProvider>
     </StoreProvider>
   );
 }

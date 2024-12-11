@@ -12,6 +12,7 @@ import { CreateListUseProductDto } from 'src/dto/create_list_user_product.dto';
 import { CreateProvinceDto } from 'src/dto/create_province.dto';
 import { CreateVatDto } from 'src/dto/create_vat.dto';
 import { CreateProfitDto } from 'src/dto/create_profit.dto';
+import { CreateLinkSystemDto } from 'src/dto/create_link_system.dto';
 
 @Controller('/system')
 @UseFilters(ConflictExceptionFilter)
@@ -40,13 +41,22 @@ export class SystemController {
 
   @MessagePattern({ cmd: 'create-provinces' })
   createProvinces(@Payload() createProvincesDto: CreateProvinceDto[]) {
-    console.log("goi toi")
     return this.systemService.createProvinces(createProvincesDto);
+  }
+
+  @MessagePattern({ cmd: 'create-links_system' })
+  createLinksSystem(@Payload() createLinksSystemDto: CreateLinkSystemDto[]) {
+    return this.systemService.createLinkSystems(createLinksSystemDto);
   }
 
   @MessagePattern({ cmd: 'get-provinces' })
   getProvinces() {
     return this.systemService.getAllProvinces();
+  }
+
+  @MessagePattern({ cmd: 'get-link_system' })
+  getLinkSystemByNameTag(name_tag:string) {
+    return this.systemService.getLinkSystemByNameTag(name_tag);
   }
 
   @MessagePattern({ cmd: 'update-unit_product' })

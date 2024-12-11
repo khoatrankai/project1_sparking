@@ -22,8 +22,8 @@ export default function ToolPriceQuote() {
   // }, [filterData]);
 
   return (
-    <div className="flex items-start gap-2 w-full flex-col">
-      <div className="flex gap-1 items-center">
+    <div className="flex items-start gap-4 w-full flex-col">
+      <div className="flex gap-1 items-center border-b-[1px] pb-4 border-black/5 w-full">
         {/* <Button
           className="bg-blue-400 border-0 text-white font-semibold"
           icon={<IoAddOutline />}
@@ -34,7 +34,7 @@ export default function ToolPriceQuote() {
         <Button icon={<FaChartPie />} />
       </div>
 
-      <div className="flex flex-wrap w-full items-center justify-end gap-2 "></div>
+      {/* <div className="flex flex-wrap w-full items-center justify-end gap-2 "></div> */}
     </div>
   );
 }

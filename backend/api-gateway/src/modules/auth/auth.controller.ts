@@ -38,5 +38,11 @@ export class AuthController {
   refreshTokenUser(@Res() res:Response,@Req() req:Request){
     return this.authService.refreshToken(res,req)
   }
+
+  @Post('/comfirm-access-token')
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  comfirmAccessTokenUser(@Res() res:Response,@Req() req:Request){
+    return this.authService.comfirmAccessToken(res,req)
+  }
   
 }

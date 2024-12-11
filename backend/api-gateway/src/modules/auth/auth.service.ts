@@ -34,13 +34,15 @@ export class AuthService {
       res.cookie('accessToken', data.accessToken, {
         httpOnly: true,
         secure: true,
-        sameSite: 'strict',
+        // domain:"localhost",
+        sameSite: 'none',
         });
   
         res.cookie('refreshToken', data.refreshToken, {
         httpOnly: true,
         secure: true,
-        sameSite: 'strict',
+        // domain:"localhost",
+        sameSite: 'none',
         });
         return res.json({
           statusCode:HttpStatus.OK,
@@ -71,6 +73,21 @@ export class AuthService {
       return res.json({
         statusCode:HttpStatus.BAD_REQUEST,
         message:'RefreshToken Fail'
+      })
+    }
+    
+  }
+
+  async comfirmAccessToken(res:Response,req:Request){
+    try{
+      const data = await firstValueFrom(this.authClient.send({cmd:'comfirm-access-token'},req.cookies['accessToken']))
+      if(data.statusCode === 200){
+        return data
+      }
+    }catch(err){
+      return res.json({
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:'accessToken Fail'
       })
     }
     

@@ -11,9 +11,10 @@ import { Province } from 'src/database/entities/province.entity';
 import { UnitProduct } from 'src/database/entities/unit_product.entity';
 import { Vats } from 'src/database/entities/vat.entity';
 import { Profits } from 'src/database/entities/profit.entity';
+import { LinkSystems } from 'src/database/entities/link_system.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Label,ListLabel,ListUseProduct,PictureProduct,Product,Province,UnitProduct,Vats,Profits])],
+  imports: [TypeOrmModule.forFeature([Label,ListLabel,ListUseProduct,PictureProduct,Product,Province,UnitProduct,Vats,Profits,LinkSystems])],
   controllers: [SystemController],
   providers: [SystemService],
   // exports:[TypeOrmModule]
