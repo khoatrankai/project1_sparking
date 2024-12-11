@@ -59,13 +59,19 @@ export class UserService {
 
   async updateUser(user_id:string,updateDto:UpdateUserDto): Promise<ResultResponse>{
     try{
-      const pass = await this.hashPassword(updateDto.password)
-      await  this.accountUserRepository.update(user_id,{...updateDto,password:pass})
+      if(updateDto.password){
+        const pass = await this.hashPassword(updateDto.password)
+        await  this.accountUserRepository.update(user_id,{...updateDto,password:pass})
+        
+      }else{
+        await  this.accountUserRepository.update(user_id,{...updateDto})
+      }
       return {
         statusCode:HttpStatus.CREATED,
         message: 'Cập nhật tài khoản thành công'
 
       }
+      
     }catch(err){
       console.log(err)
       if (err.code === 'ER_DUP_ENTRY') {

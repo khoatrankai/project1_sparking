@@ -6,6 +6,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateUserDto } from 'src/dto/create_user.dto';
 import { ResultResponse } from 'src/common/interfaces/result.interface';
 import { AccountUsers } from 'src/database/entities/account_users.entity';
+import { UpdateUserDto } from 'src/dto/update_user.dto';
 
 @Controller()
 @UseFilters(ConflictExceptionFilter)
@@ -36,6 +37,11 @@ export class UserController {
   @MessagePattern({cmd:'register-user'})
   createUser(createUserDto:CreateUserDto): Promise<ResultResponse>{
     return this.userService.createUser(createUserDto)
+  }
+
+  @MessagePattern({cmd:'update-user'})
+  updateUser( data:{user_id:string,updateUserDto:UpdateUserDto}): Promise<ResultResponse>{
+    return this.userService.updateUser(data.user_id,data.updateUserDto)
   }
 
   @MessagePattern({cmd:'login-user'})

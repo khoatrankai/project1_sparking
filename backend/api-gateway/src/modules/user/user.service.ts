@@ -9,6 +9,7 @@ import { UpdateRoleUserDto } from './dto/update_role_user.dto';
 import { CreateUserDto } from './dto/create_user.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Request } from 'express';
+import { UpdateUserDto } from './dto/update_user.dto';
 @Injectable()
 export class UserService {
 
@@ -51,6 +52,11 @@ export class UserService {
     const data = await this.cloudinaryService.uploadFile(picture_url)
     console.log(data)
     return this.usersClient.send({cmd:'register-user'}, {...createUserDto,picture_url:data.secure_url});
+  }
+
+  async updateUser(user_id:string,updateUserDto: UpdateUserDto,picture_url:Express.Multer.File) {
+    const data = await this.cloudinaryService.uploadFile(picture_url)
+    return this.usersClient.send({cmd:'update-user'}, {user_id,updateUserDto:{...updateUserDto,picture_url:data.secure_url}});
   }
 
   async getUsers(){

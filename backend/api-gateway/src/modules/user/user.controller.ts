@@ -8,6 +8,7 @@ import { UpdateRoleUserDto } from './dto/update_role_user.dto';
 import { CreateUserDto } from './dto/create_user.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
+import { UpdateUserDto } from './dto/update_user.dto';
 // import { RoleGuard } from 'src/guards/role.guard';
 
 @Controller('user')
@@ -23,6 +24,12 @@ export class UserController {
   @Get('info')
   findOneInfo(@Query('user_id') user_id:string): Promise<InfoUserInterface>{
     return this.userService.findOneInfo(user_id)
+  }
+
+  @Put('update/:id')
+  @UseInterceptors(FilesInterceptor('picture_url',1))
+  async updateUser(@Param('id') id:string,@Body() updateUserDto: UpdateUserDto,@UploadedFiles() picture_url:Express.Multer.File[]) {
+    return await this.userService.updateUser(id,updateUserDto,picture_url?.[0]);
   }
 
   @Post('create')
