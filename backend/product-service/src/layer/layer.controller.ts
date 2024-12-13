@@ -21,6 +21,8 @@ import { CreateBrandDto } from 'src/dto/BrandDto/create-brand.dto';
 import { UpdateBrandDto } from 'src/dto/BrandDto/update-brand.dto';
 import { CreateOriginalDto } from 'src/dto/OriginalDto/create-original.dto';
 import { UpdateOriginalDto } from 'src/dto/OriginalDto/update-original.dto';
+import { CreateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/create-classify_type.dto';
+import { UpdateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/update-classify_type.dto';
 
 
 
@@ -149,6 +151,27 @@ export class LayerController {
   async updateTypeProduct(@Payload() data: { id: string; updateTypeProductDto: UpdateTypeProductDto }) {
     const { id, updateTypeProductDto } = data;
     return this.layerService.updateTypeProduct(id, updateTypeProductDto);
+  }
+
+  @MessagePattern({ cmd: 'create-classify_type' })
+  async createClassifyType(@Payload() createClassifyTypeDto: CreateClassifyTypeDto) {
+    return this.layerService.createClassifyType(createClassifyTypeDto);
+  }
+
+  @MessagePattern({ cmd: 'find-all_classify_type' })
+  async findAllClassifyType() {
+    return this.layerService.findAllClassifyType();
+  }
+
+  @MessagePattern({ cmd: 'find-one_classify_type' })
+  async findOneClassifyType(@Payload() id: string) {
+    return this.layerService.findOneClassifyType(id);
+  }
+
+  @MessagePattern({ cmd: 'update-classify_type' })
+  async updateClassifyType(@Payload() data: { id: string; updateClassifyTypeDto: UpdateClassifyTypeDto }) {
+    const { id, updateClassifyTypeDto } = data;
+    return this.layerService.updateClassifyType(id, updateClassifyTypeDto);
   }
 
   @MessagePattern({ cmd: 'create-brand' })

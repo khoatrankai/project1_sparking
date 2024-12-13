@@ -34,13 +34,17 @@ import { CreateOriginalDto } from 'src/dto/OriginalDto/create-original.dto';
 import { UpdateOriginalDto } from 'src/dto/OriginalDto/update-original.dto';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
+import { ClassifyType } from 'src/database/entities/classify_type.entity';
+import { CreateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/create-classify_type.dto';
+import { UpdateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/update-classify_type.dto';
 
 @Injectable()
 export class LayerService {
 
   constructor(@InjectRepository(Brands)
   private brandRepository: Repository<Brands>,@Inject('SYSTEM') private readonly systemClient:ClientProxy,@InjectRepository(Originals)
-  private readonly originalRepository: Repository<Originals>,@InjectRepository(ActivityContainer)
+  private readonly originalRepository: Repository<Originals>,@InjectRepository(ClassifyType)
+  private readonly classifyTypeRepository: Repository<ClassifyType>,@InjectRepository(ActivityContainer)
   private activityContainerRepository: Repository<ActivityContainer>,@InjectRepository(HistoryCodeProduct)
   private readonly historyCodeProductRepository: Repository<HistoryCodeProduct>, @InjectRepository(SupplierProduct)
   private supplierProductRepository: Repository<SupplierProduct>, @InjectRepository(UnitProduct)
@@ -191,12 +195,13 @@ export class LayerService {
   }
 
   async createTypeProduct(createTypeProductDto: CreateTypeProductDto): Promise<TypeProducts> {
-    const typeProduct = this.typeProductRepository.create(createTypeProductDto);
+    const classifyType = await this.classifyTypeRepository.findOne({where:{classify_id:createTypeProductDto.classify_type}}) 
+    const typeProduct = this.typeProductRepository.create({...createTypeProductDto,classify_type:classifyType,type_product_id:uuidv4()});
     return this.typeProductRepository.save(typeProduct);
   }
 
-  async findAllTypeProduct(): Promise<TypeProducts[]> {
-    return this.typeProductRepository.find();
+  async findAllTypeProduct() {
+    return (await this.typeProductRepository.find({relations:['classify_type']})).map(dt => {return {...dt,classify_type:dt.classify_type.classify_id}});
   }
 
   async findOneTypeProduct(id: string): Promise<TypeProducts | undefined> {
@@ -204,8 +209,28 @@ export class LayerService {
   }
 
   async updateTypeProduct(id: string, updateTypeProductDto: UpdateTypeProductDto) {
-    await this.typeProductRepository.update(id, updateTypeProductDto);
+    const classifyType = await this.classifyTypeRepository.findOne({where:{classify_id:updateTypeProductDto.classify_type}}) 
+    console.log(classifyType)
+    await this.typeProductRepository.update(id, {...updateTypeProductDto,classify_type:classifyType});
     return await this.typeProductRepository.findOne({where:{type_product_id:id}});
+  }
+
+  async createClassifyType(createClassifyTypeDto: CreateClassifyTypeDto): Promise<ClassifyType> {
+    const classifyType = this.classifyTypeRepository.create({...createClassifyTypeDto,classify_id:uuidv4()});
+    return this.classifyTypeRepository.save(classifyType);
+  }
+
+  async findAllClassifyType(): Promise<ClassifyType[]> {
+    return this.classifyTypeRepository.find();
+  }
+
+  async findOneClassifyType(id: string): Promise<ClassifyType | undefined> {
+    return this.classifyTypeRepository.findOne({ where: { classify_id: id } });
+  }
+
+  async updateClassifyType(id: string, updateClassifyTypeDto: UpdateClassifyTypeDto) {
+    await this.classifyTypeRepository.update(id, updateClassifyTypeDto);
+    return await this.classifyTypeRepository.findOne({where:{classify_id:id}});
   }
 
   async createBrand(createBrandDto: CreateBrandDto): Promise<Brands> {

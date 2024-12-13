@@ -50,8 +50,12 @@ export class ContractController {
 
   @MessagePattern({ cmd: 'get-contracts' })
   async getContracts() {
-    console.log("vao day")
     return this.contractService.getContracts();
+  }
+
+  @MessagePattern({ cmd: 'get-year_contracts' })
+  async getYearContracts(@Payload('year') year:number) {
+    return this.contractService.getYearContracts(year);
   }
 
   @MessagePattern({ cmd: 'get-contract' })

@@ -23,6 +23,8 @@ import { CreateBrandDto } from './dto/BrandDto/create-brand.dto';
 import { UpdateBrandDto } from './dto/BrandDto/update-brand.dto';
 import { CreateOriginalDto } from './dto/OriginalDto/create-original.dto';
 import { UpdateOriginalDto } from './dto/OriginalDto/update-original.dto';
+import { CreateClassifyTypeDto } from './dto/ClassifyTypeDto/create-classify_type.dto';
+import { UpdateClassifyTypeDto } from './dto/ClassifyTypeDto/update-classify_type.dto';
 
 
 
@@ -273,6 +275,44 @@ export class ProductService {
       const result = await firstValueFrom(this.productClient.send({ cmd: 'update-type_product' }, { id, updateTypeProductDto }));
       if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, message: 'TypeProduct updated successfully', data: result };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createClassifyType(createClassifyTypeDto: CreateClassifyTypeDto) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-classify_type' }, { ...createClassifyTypeDto }));
+      return { statusCode: HttpStatus.CREATED, message: 'classify_type created successfully', data: result };
+    } catch (error) {
+      throw new HttpException('Failed to create classify_type', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findAllClassifyType() {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_classify_type' }, {}));
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async findOneClassifyType(id: string) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_classify_type' }, id));
+      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateClassifyType(id: string, updateClassifyTypeDto: UpdateClassifyTypeDto) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-classify_type' }, { id, updateClassifyTypeDto }));
+      if (!result) throw new HttpException('classify_type not found', HttpStatus.NOT_FOUND);
+      return { statusCode: HttpStatus.OK, message: 'classify_type updated successfully', data: result };
     } catch (error) {
       throw error;
     }

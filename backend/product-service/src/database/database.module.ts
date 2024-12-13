@@ -10,6 +10,7 @@ import { ActivityContainer } from './entities/activity_container.entity';
 import { HistoryCodeProduct } from './entities/history_code_product.entity';
 import { Brands } from './entities/brand.entity';
 import { Originals } from './entities/original.entity';
+import { ClassifyType } from './entities/classify_type.entity';
 
 
 @Module({
@@ -21,7 +22,7 @@ import { Originals } from './entities/original.entity';
       username: 'root',
       password: '123456789',
       database: 'db_sparking_product',
-      entities: [Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals],
+      entities: [Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals,ClassifyType],
       // synchronize: true,
       // dropSchema: true,
     }),

@@ -5,8 +5,11 @@ export class Invoice {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   invoice_id: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50,nullable:true })
   customer: string;
+
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  contract: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_start: Date;

@@ -13,6 +13,7 @@ import { HistoryCodeProduct } from 'src/database/entities/history_code_product.e
 import { Brands } from 'src/database/entities/brand.entity';
 import { Originals } from 'src/database/entities/original.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClassifyType } from 'src/database/entities/classify_type.entity';
 
 
 @Module({
@@ -28,7 +29,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       }
     ]),
 
-    TypeOrmModule.forFeature([Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals])],
+    TypeOrmModule.forFeature([Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals,ClassifyType])],
   controllers: [LayerController],
   providers: [LayerService],
   // exports:[TypeOrmModule]

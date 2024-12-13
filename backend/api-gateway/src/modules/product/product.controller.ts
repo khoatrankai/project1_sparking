@@ -20,6 +20,8 @@ import { UpdateBrandDto } from './dto/BrandDto/update-brand.dto';
 import { CreateOriginalDto } from './dto/OriginalDto/create-original.dto';
 import { UpdateOriginalDto } from './dto/OriginalDto/update-original.dto';
 import { Request } from 'express';
+import { UpdateClassifyTypeDto } from './dto/ClassifyTypeDto/update-classify_type.dto';
+import { CreateClassifyTypeDto } from './dto/ClassifyTypeDto/create-classify_type.dto';
 
 
 
@@ -154,7 +156,28 @@ export class ProductController {
 
   @Put('type/:id')
   async updateTypeProduct(@Param('id') id: string, @Body() updateTypeProductDto: UpdateTypeProductDto) {
+    console.log(updateTypeProductDto)
     return this.productService.updateTypeProduct(id, updateTypeProductDto);
+  }
+
+  @Post('classify_type')
+  async createClassifyType(@Body() createClassifyTypeDto: CreateClassifyTypeDto) {
+    return this.productService.createClassifyType(createClassifyTypeDto);
+  }
+
+  @Get('classify_type')
+  async findAllClassifyType() {
+    return this.productService.findAllClassifyType();
+  }
+
+  @Get('classify_type/:id')
+  async findOneClassifyType(@Param('id') id: string) {
+    return this.productService.findOneClassifyType(id);
+  }
+
+  @Put('classify_type/:id')
+  async updateClassifyType(@Param('id') id: string, @Body() updateClassifyTypeDto: UpdateClassifyTypeDto) {
+    return this.productService.updateClassifyType(id, updateClassifyTypeDto);
   }
 
 

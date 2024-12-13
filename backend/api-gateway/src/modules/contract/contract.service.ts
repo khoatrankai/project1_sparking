@@ -54,6 +54,10 @@ export class ContractService {
     return firstValueFrom(this.contractClient.send({ cmd: 'get-contracts' }, {}));
   }
 
+  async getYearContracts(year:number) {
+    return firstValueFrom(this.contractClient.send({ cmd: 'get-year_contracts' }, {year}));
+  }
+
   async getContract(id:string) {
     return firstValueFrom(this.contractClient.send({ cmd: 'get-contract' }, id));
   }

@@ -2,8 +2,9 @@ import { Type } from 'class-transformer';
 import { IsOptional, IsString, IsNumber, IsEnum } from 'class-validator';
 
 export class UpdateProductDto {
+
+    @Type(() => String)
     @IsOptional()
-    @IsString()
     name?: string;
 
     @IsOptional()

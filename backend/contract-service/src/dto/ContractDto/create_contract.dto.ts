@@ -12,6 +12,10 @@ export class CreateContractDto {
 
   @IsString()
   @IsOptional()
+  code_contract?: string;
+
+  @IsString()
+  @IsOptional()
   project?: string;
 
   @IsString()

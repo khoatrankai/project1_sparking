@@ -10,10 +10,27 @@ export class CreatePaymentDto {
   contract: string; // hoặc là ID của `Contract`
 
   @IsEnum(['pending', 'fail', 'success'])
+  @IsOptional()
   status: string;
 
   @IsInt()
   price: number;
+
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @IsString()
+  @IsOptional()
+  type_product: string;
+
+  @IsString()
+  @IsOptional()
+  supplier: string;
+
+  @IsEnum(['import','export'])
+  @IsOptional()
+  type: string;
 
   @IsDate()
   @Type(() => Date)

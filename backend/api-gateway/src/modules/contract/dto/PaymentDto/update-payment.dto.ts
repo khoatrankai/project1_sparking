@@ -18,6 +18,22 @@ export class UpdatePaymentDto {
   @IsOptional()
   price?: number;
 
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @IsString()
+  @IsOptional()
+  type_product: string;
+
+  @IsString()
+  @IsOptional()
+  supplier: string;
+
+  @IsEnum(['import','export'])
+  @IsOptional()
+  type: string;
+
   @IsDate()
   @IsOptional()
   @Type(() => Date)

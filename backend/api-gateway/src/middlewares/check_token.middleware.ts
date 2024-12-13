@@ -11,7 +11,7 @@ export class CheckTokenMiddleware implements NestMiddleware {
   }
   use(req: Request, res: Response, next: NextFunction) {
     try{
-      console.log(req.cookies)
+      // console.log(req.cookies)
       const token = req.cookies['accessToken'] || req.headers['authorization']?.split(' ')[1];
       if(token){
         try{

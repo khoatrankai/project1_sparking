@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 
 
-import { In, Repository } from 'typeorm';
+import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { TypeContract } from 'src/database/entities/type_contract.entity';
 import { UpdateTypeContractDto } from 'src/dto/TypeContractDto/update_type_contract.dto';
 import { UpdateContractDto } from 'src/dto/ContractDto/update_contract.dto';
@@ -23,7 +23,7 @@ import { firstValueFrom } from 'rxjs';
 @Injectable()
 export class ContractService {
 
-  constructor(@Inject('CUSTOMER') private readonly customersClient:ClientProxy,@InjectRepository(Contract) private readonly contractRepository:Repository<Contract>,@InjectRepository(TypeContract) private readonly typeContractRepository:Repository<TypeContract>,@InjectRepository(Payment)
+  constructor(@Inject('CUSTOMER') private readonly customersClient:ClientProxy,@Inject('PROJECT') private readonly projectsClient:ClientProxy,@InjectRepository(Contract) private readonly contractRepository:Repository<Contract>,@InjectRepository(TypeContract) private readonly typeContractRepository:Repository<TypeContract>,@InjectRepository(Payment)
   private paymentRepository: Repository<Payment>,
  @InjectRepository(TypeMethod)
   private typeMethodRepository: Repository<TypeMethod>){}
@@ -132,6 +132,19 @@ async getContracts() {
     data: result.map((dt,index)=>{
       return {...dt,customer:customerInfos[index]}
     }),
+  };
+}
+
+async getYearContracts(year:number) {
+  const result = await this.contractRepository.find({where:{date_expired:MoreThanOrEqual(new Date(`${year}-01-01`))},relations:['type_contract']});
+  const projectIds = result.map((dt)=> dt.project)
+  const projectInfos = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},projectIds))
+  return {
+    statusCode: HttpStatus.OK,
+    message: 'Contracts retrieved successfully',
+    data: result.map((dt,index)=>{
+      return {...dt,project:projectInfos[index]}
+    }).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
   };
 }
 

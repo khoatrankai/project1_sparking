@@ -1,4 +1,4 @@
-import {  Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {  Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ContractService } from './contract.service';
 import { CreateContractDto } from './dto/ContractDto/create_contract.dto';
 import { UpdateContractDto } from './dto/ContractDto/update_contract.dto';
@@ -57,6 +57,12 @@ export class ContractController {
   @Get('/all')
   async getContracts() {
     return this.contractService.getContracts();
+  }
+
+  @Get('/all/filter')
+  async getYearContracts(@Query('year') year:number) {
+    console.log("Vao day",year)
+    return this.contractService.getYearContracts(year);
   }
 
   @Get('/id/:id')

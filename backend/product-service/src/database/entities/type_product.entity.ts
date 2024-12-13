@@ -1,5 +1,6 @@
-import { Entity, PrimaryColumn, Column, OneToMany} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany, ManyToOne, JoinColumn} from 'typeorm';
 import { Products } from './product.entity';
+import { ClassifyType } from './classify_type.entity';
 @Entity('Type_product')
 export class TypeProducts {
   @PrimaryColumn({ type: 'varchar', length: 50 })
@@ -8,11 +9,15 @@ export class TypeProducts {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
+  @Column({ type: 'text',nullable:true})
+  description: string;
+
   @Column({ type: 'varchar', length: 50,nullable:true,unique:true })
   name_tag: string;
 
-  @Column({ type: 'boolean', default:false })
-  type: boolean;
+  @ManyToOne(() => ClassifyType)
+  @JoinColumn({ name: 'classify_type' })
+  classify_type: ClassifyType;
 
   @OneToMany(() => Products, product => product.type)
   products: Products[];

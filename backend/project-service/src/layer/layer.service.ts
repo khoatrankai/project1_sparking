@@ -39,7 +39,7 @@ export class LayerService {
   }
   
   async getProjectIDs(project_ids:string[]){
-    const data = await this.projectsRepository.find({select:['project_id','name'],where:{project_id:In(project_ids)}});
+    const data = await this.projectsRepository.find({select:['project_id','name','type'],where:{project_id:In(project_ids)},relations:['type']});
     const sortedData = project_ids.map(id => data.find(project => project.project_id === id))
     return sortedData
   }

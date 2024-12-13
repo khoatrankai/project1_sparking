@@ -17,6 +17,18 @@ export class Payment {
   @Column({ type: 'int' })
   price: number;
 
+  @Column({ type: 'enum', enum: ['export','import'], default: 'export' })
+  type:string
+
+  @Column({ type: 'text',nullable:true })
+  description: string;
+
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  type_product: string;
+
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  supplier: string;
+
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_expired: Date;
 
