@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { Contract } from './contract.entity';
 
 @Entity()
 export class TypeContract {
@@ -10,4 +11,7 @@ export class TypeContract {
 
   @Column({ type: 'int', default: 0 })
   count: number;
+
+  @OneToMany(() => Contract,  contract => contract.type_contract)
+  contracts: Contract[];
 }

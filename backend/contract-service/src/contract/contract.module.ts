@@ -26,6 +26,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         host:'localhost',
         port:3013
       }
+    },
+    {
+      name: 'PRODUCT',
+      transport:Transport.TCP,
+      options:{
+        host:'localhost',
+        port:3012
+      }
     }
   ]),
     TypeOrmModule.forFeature([TypeContract,Contract,Payment,TypeMethod])

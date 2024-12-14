@@ -23,7 +23,7 @@ import { firstValueFrom } from 'rxjs';
 @Injectable()
 export class ContractService {
 
-  constructor(@Inject('CUSTOMER') private readonly customersClient:ClientProxy,@Inject('PROJECT') private readonly projectsClient:ClientProxy,@InjectRepository(Contract) private readonly contractRepository:Repository<Contract>,@InjectRepository(TypeContract) private readonly typeContractRepository:Repository<TypeContract>,@InjectRepository(Payment)
+  constructor(@Inject('CUSTOMER') private readonly customersClient:ClientProxy,@Inject('PRODUCT') private readonly productsClient:ClientProxy,@Inject('PROJECT') private readonly projectsClient:ClientProxy,@InjectRepository(Contract) private readonly contractRepository:Repository<Contract>,@InjectRepository(TypeContract) private readonly typeContractRepository:Repository<TypeContract>,@InjectRepository(Payment)
   private paymentRepository: Repository<Payment>,
  @InjectRepository(TypeMethod)
   private typeMethodRepository: Repository<TypeMethod>){}
@@ -123,7 +123,6 @@ async updateContract(updateContract: UpdateContractDto) {
 // Get all Contracts
 async getContracts() {
   const result = await this.contractRepository.find({relations:['type_contract']});
-  console.log(result)
   const customerIds = result.map((dt)=> dt.customer)
   const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},customerIds))
   return {
@@ -136,16 +135,30 @@ async getContracts() {
 }
 
 async getYearContracts(year:number) {
-  const result = await this.contractRepository.find({where:{date_expired:MoreThanOrEqual(new Date(`${year}-01-01`))},relations:['type_contract']});
-  const projectIds = result.map((dt)=> dt.project)
-  const projectInfos = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},projectIds))
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'Contracts retrieved successfully',
-    data: result.map((dt,index)=>{
-      return {...dt,project:projectInfos[index]}
-    }).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
-  };
+  if(year){
+    const result = await this.contractRepository.find({where:{date_expired:MoreThanOrEqual(new Date(`${year}-01-01`))},relations:['type_contract']});
+    const projectIds = result.map((dt)=> dt.project)
+    const projectInfos = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},projectIds))
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Contracts retrieved successfully',
+      data: result.map((dt,index)=>{
+        return {...dt,project:projectInfos[index]}
+      }).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+    };
+  }else{
+    const result = await this.contractRepository.find({relations:['type_contract']});
+    const projectIds = result.map((dt)=> dt.project)
+    const projectInfos = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},projectIds))
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Contracts retrieved successfully',
+      data: result.map((dt,index)=>{
+        return {...dt,project:projectInfos[index]}
+      }).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+    };
+  }
+  
 }
 
 async getContractID(id:string) {
@@ -253,10 +266,14 @@ async getPayment(payment_id: string) {
 // Get all Payments
 async getAllPayments() {
   const result = await this.paymentRepository.find({ relations: ['contract'] });
+  const dataSuppliers = await firstValueFrom(this.productsClient.send({cmd:'find-all_supplier_ids'},result.map(dt => dt.supplier)))
+  const dataTypeProducts = await firstValueFrom(this.productsClient.send({cmd:'find-all_type_ids'},result.map(dt => dt.type_product)))
   return {
     statusCode: HttpStatus.OK,
     message: 'Payments retrieved successfully',
-    data: result,
+    data: result.map((dt,index) => {
+      return {...dt,type_product:dataTypeProducts[index],supplier:dataSuppliers[index]}
+    }),
   };
 }
 
@@ -349,6 +366,15 @@ async getTypeContract(type_id: string) {
 // Get all TypeContracts
 async getAllTypeContracts() {
   const result = await this.typeContractRepository.find();
+  return {
+    statusCode: HttpStatus.OK,
+    message: 'TypeContracts retrieved successfully',
+    data: result,
+  };
+}
+
+async getFullTypeContracts() {
+  const result = await this.typeContractRepository.find({relations:['contracts']});
   return {
     statusCode: HttpStatus.OK,
     message: 'TypeContracts retrieved successfully',

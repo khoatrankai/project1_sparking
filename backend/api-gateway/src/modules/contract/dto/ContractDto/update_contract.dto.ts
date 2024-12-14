@@ -20,6 +20,10 @@ export class UpdateContractDto {
 
   @IsString()
   @IsOptional()
+  vat?: string;
+
+  @IsString()
+  @IsOptional()
   customer?: string;
 
   @IsInt()
@@ -48,7 +52,7 @@ export class UpdateContractDto {
   @Type(() => Date)
   date_expired?: Date;
 
-  @IsEnum(['delete', 'active', 'hide'])
+  @IsEnum(['delete', 'active', 'hide','completed'])
   @IsOptional()
   status?: string;
 

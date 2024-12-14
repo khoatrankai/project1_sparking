@@ -147,6 +147,11 @@ export class LayerController {
     return this.layerService.findOneTypeProduct(id);
   }
 
+  @MessagePattern({ cmd: 'find-all_type_ids' })
+  async findAllTypeIds(@Payload() ids: string[]) {
+    return this.layerService.getTypeProductIDs(ids);
+  }
+
   @MessagePattern({ cmd: 'update-type_product' })
   async updateTypeProduct(@Payload() data: { id: string; updateTypeProductDto: UpdateTypeProductDto }) {
     const { id, updateTypeProductDto } = data;
@@ -166,6 +171,11 @@ export class LayerController {
   @MessagePattern({ cmd: 'find-one_classify_type' })
   async findOneClassifyType(@Payload() id: string) {
     return this.layerService.findOneClassifyType(id);
+  }
+
+  @MessagePattern({ cmd: 'find-one-name_classify_type' })
+  async findOneClassifyTypeName(@Payload() name: string) {
+    return this.layerService.findOneClassifyTypeName(name);
   }
 
   @MessagePattern({ cmd: 'update-classify_type' })
@@ -250,6 +260,11 @@ export class LayerController {
   @MessagePattern({ cmd: 'find-one_supplier_product' })
   async findOneSupplierProduct(@Payload() id: string) {
     return this.layerService.findOneSupplierProduct(id);
+  }
+
+  @MessagePattern({ cmd: 'find-all_supplier_ids' })
+  async findAllSupplierIds(@Payload() ids: string[]) {
+    return this.layerService.getSupplierProductIDs(ids);
   }
 
   @MessagePattern({ cmd: 'update-supplier_product' })

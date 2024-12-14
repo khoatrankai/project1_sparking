@@ -22,6 +22,10 @@ export class CreateContractDto {
   @IsOptional()
   customer?: string;
 
+  @IsString()
+  @IsOptional()
+  vat?: string;
+
   @IsInt()
   @IsOptional()
   price?: number;
@@ -48,7 +52,7 @@ export class CreateContractDto {
   @Type(() => Date)
   date_expired?: Date;
 
-  @IsEnum(['delete', 'active', 'hide'])
+  @IsEnum(['delete', 'active', 'hide','completed'])
   @IsOptional()
   status?: string;
 

@@ -175,6 +175,11 @@ export class ProductController {
     return this.productService.findOneClassifyType(id);
   }
 
+  @Get('classify_type_name/:name')
+  async findOneClassifyTypeName(@Param('name') name: string) {
+    return this.productService.findOneClassifyTypeName(name);
+  }
+
   @Put('classify_type/:id')
   async updateClassifyType(@Param('id') id: string, @Body() updateClassifyTypeDto: UpdateClassifyTypeDto) {
     return this.productService.updateClassifyType(id, updateClassifyTypeDto);

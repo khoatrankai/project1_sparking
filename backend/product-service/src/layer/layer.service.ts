@@ -208,6 +208,12 @@ export class LayerService {
     return this.typeProductRepository.findOne({ where: { type_product_id: id } });
   }
 
+  async getTypeProductIDs(type_ids:string[]){
+    const data = await this.typeProductRepository.find({where:{type_product_id:In(type_ids)}});
+    const sortedData = type_ids.map(id => data.find(type => type.type_product_id === id))
+    return sortedData
+  }
+
   async updateTypeProduct(id: string, updateTypeProductDto: UpdateTypeProductDto) {
     const classifyType = await this.classifyTypeRepository.findOne({where:{classify_id:updateTypeProductDto.classify_type}}) 
     console.log(classifyType)
@@ -221,11 +227,15 @@ export class LayerService {
   }
 
   async findAllClassifyType(): Promise<ClassifyType[]> {
-    return this.classifyTypeRepository.find();
+    return this.classifyTypeRepository.find({relations:['types_product']});
   }
 
   async findOneClassifyType(id: string): Promise<ClassifyType | undefined> {
     return this.classifyTypeRepository.findOne({ where: { classify_id: id } });
+  }
+
+  async findOneClassifyTypeName(name: string): Promise<ClassifyType | undefined> {
+    return this.classifyTypeRepository.findOne({ where: { name } ,relations:['types_product']});
   }
 
   async updateClassifyType(id: string, updateClassifyTypeDto: UpdateClassifyTypeDto) {
@@ -326,6 +336,12 @@ export class LayerService {
       message: 'Supplier product retrieved successfully',
       data: supplierProduct,
     };
+  }
+
+  async getSupplierProductIDs(supplier_ids:string[]){
+    const data = await this.supplierProductRepository.find({where:{supplier_id:In(supplier_ids)}});
+    const sortedData = supplier_ids.map(id => data.find(supplier => supplier.supplier_id === id))
+    return sortedData
   }
 
   // Update SupplierProduct by ID

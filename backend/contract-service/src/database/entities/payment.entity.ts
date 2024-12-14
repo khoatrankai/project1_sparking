@@ -27,6 +27,9 @@ export class Payment {
   type_product: string;
 
   @Column({ type: 'varchar', length: 50,nullable:true })
+  vat: string;
+
+  @Column({ type: 'varchar', length: 50,nullable:true })
   supplier: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })

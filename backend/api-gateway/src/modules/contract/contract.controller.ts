@@ -27,6 +27,11 @@ export class ContractController {
     return this.contractService.getTypeContracts();
   }
 
+  @Get('full-type-contract')
+  async getFullTypeContracts() {
+    return this.contractService.getFullTypeContracts();
+  }
+
   @Post('/type-contract')
   async createTypeContract(@Body() createTypeContractDto: CreateTypeContractDto) {
     return this.contractService.createTypeContract(createTypeContractDto);

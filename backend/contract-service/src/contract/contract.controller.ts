@@ -32,6 +32,11 @@ export class ContractController {
     return this.contractService.getAllTypeContracts();
   }
 
+  @MessagePattern({ cmd: 'get-type-full_contracts' })
+  async getTypeFullContract() {
+    return this.contractService.getFullTypeContracts();
+  }
+
   @MessagePattern({ cmd: 'update-type_contract' })
   async updateTypeContract(updateTypeContract: UpdateTypeContractDto) {
     return this.contractService.updateTypeContract(updateTypeContract);

@@ -308,6 +308,16 @@ export class ProductService {
     }
   }
 
+  async findOneClassifyTypeName(name: string) {
+    try {
+      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one-name_classify_type' }, name));
+      if (!result) throw new HttpException('classify product not found', HttpStatus.NOT_FOUND);
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async updateClassifyType(id: string, updateClassifyTypeDto: UpdateClassifyTypeDto) {
     try {
       const result = await firstValueFrom(this.productClient.send({ cmd: 'update-classify_type' }, { id, updateClassifyTypeDto }));

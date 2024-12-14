@@ -32,6 +32,12 @@ export class ContractService {
     );
   }
 
+  async getFullTypeContracts() {
+    return firstValueFrom(
+      this.contractClient.send({ cmd: 'get-type-full_contracts' }, {})
+    );
+  }
+
   async updateTypeContract(updateTypeContractDto: UpdateTypeContractDto) {
     return firstValueFrom(
       this.contractClient.send({ cmd: 'update-type_contract' }, updateTypeContractDto)
