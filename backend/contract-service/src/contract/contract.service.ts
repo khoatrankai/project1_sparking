@@ -268,11 +268,13 @@ async getAllPayments() {
   const result = await this.paymentRepository.find({ relations: ['contract'] });
   const dataSuppliers = await firstValueFrom(this.productsClient.send({cmd:'find-all_supplier_ids'},result.map(dt => dt.supplier)))
   const dataTypeProducts = await firstValueFrom(this.productsClient.send({cmd:'find-all_type_ids'},result.map(dt => dt.type_product)))
+  const dataProjects = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},result.map(dt => dt.contract.project)))
+  const dataCustomerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},result.map(dt => dt.contract.customer)))
   return {
     statusCode: HttpStatus.OK,
     message: 'Payments retrieved successfully',
     data: result.map((dt,index) => {
-      return {...dt,type_product:dataTypeProducts[index],supplier:dataSuppliers[index]}
+      return {...dt,type_product:dataTypeProducts[index],supplier:dataSuppliers[index],contract:{...dt.contract,project:dataProjects[index],customer:dataCustomerInfos[index]}}
     }),
   };
 }

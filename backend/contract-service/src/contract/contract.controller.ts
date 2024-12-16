@@ -64,8 +64,8 @@ export class ContractController {
   }
 
   @MessagePattern({ cmd: 'get-contract' })
-  async getContract(@Payload() data:{id:string}) {
-    return this.contractService.getContractID(data.id);
+  async getContract(@Payload() id:string) {
+    return this.contractService.getContractID(id);
   }
   @MessagePattern({ cmd: 'get-contract_ids' })
   async getContractIds(@Payload() data:string[]) {

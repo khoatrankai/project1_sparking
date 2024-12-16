@@ -209,7 +209,7 @@ export class LayerService {
   }
 
   async getTypeProductIDs(type_ids:string[]){
-    const data = await this.typeProductRepository.find({where:{type_product_id:In(type_ids)}});
+    const data = await this.typeProductRepository.find({where:{type_product_id:In(type_ids)},relations:['classify_type']});
     const sortedData = type_ids.map(id => data.find(type => type.type_product_id === id))
     return sortedData
   }
