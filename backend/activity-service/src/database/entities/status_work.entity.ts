@@ -12,6 +12,9 @@ export class StatusWork {
   @Column({ type: 'varchar', length: 50 })
   name_tag: string;
 
+  @Column({ type: 'int', nullable: true })
+  position:number
+
   @ManyToOne(() => TypeWork,typework => typework.status)
   @JoinColumn({ name: 'type_work' })
   type_work: TypeWork;

@@ -1,5 +1,6 @@
-import { IsArray, IsOptional, IsString } from "class-validator";
-import { CreatePictureActivityDto } from "../PictureActivityDto/get-picture_activity.dto";
+import { IsArray, IsDate, IsInt, IsOptional, IsString } from "class-validator";
+import { CreatePictureActivityDto } from "../PictureActivityDto/create-picture_activity.dto";
+import { Type } from "class-transformer";
 
 export class UpdateActivityDto {
   @IsString()
@@ -18,6 +19,20 @@ export class UpdateActivityDto {
   @IsOptional()
   description?: string;
 
+  @IsInt()
+  @IsOptional()
+  position: number;
+
+  @IsOptional()
+  @IsDate()
+  @Type(()=> Date)
+  time_end: Date;
+
+  @IsOptional()
+  @Type(()=> Date)
+  @IsDate()
+  time_start: Date;
+
   @IsString()
   @IsOptional()
   contract?: string;
@@ -25,4 +40,8 @@ export class UpdateActivityDto {
   @IsArray()
   @IsOptional()
   picture_urls?: CreatePictureActivityDto[];
+
+  @IsArray()
+  @IsOptional()
+  picture_url_type?: string[];
 }

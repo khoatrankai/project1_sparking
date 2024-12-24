@@ -21,6 +21,7 @@ import { CreateTypeWorkDto } from 'src/dto/TypeWorkDto/create-type_work.dto';
 import { UpdateTypeWorkDto } from 'src/dto/TypeWorkDto/update-type_work.dto';
 import { CreateWorkDto } from 'src/dto/WorkDto/create-work.dto';
 import { UpdateWorkDto } from 'src/dto/WorkDto/update-work.dto';
+import { GetActivityDto } from 'src/dto/ActivityDto/get-activity.dto';
 
 
 
@@ -47,9 +48,20 @@ export class LayerController {
     return await this.layerService.updateActivity(payload.activity_id, payload.updateActivityDto);
   }
 
+  @MessagePattern('update-list_status_activity')
+  async updateStatusPositionActivitiesID(@Payload() updateActivityDto: GetActivityDto[] ) {
+    return await this.layerService.updateStatusPositionActivitiesID(updateActivityDto);
+  }
+
   @MessagePattern('get-activity')
   async getActivity(@Payload() activity_id: string) {
     return await this.layerService.getActivity(activity_id);
+  }
+
+  @MessagePattern('get-activity_by_contract')
+  async getActivityByContract(@Payload() contract_id: string) {
+    console.log(contract_id)
+    return await this.layerService.getActivityByContract(contract_id);
   }
 
   @MessagePattern('get-all_activities')
@@ -77,9 +89,19 @@ export class LayerController {
     return await this.layerService.getTypeActivities(type_activity_id);
   }
 
+  @MessagePattern('get-id_full_type_activity')
+  async getFullTypeActivitiesID(@Payload() type_activity_id: string) {
+    return await this.layerService.getFullTypeActivitiesID(type_activity_id);
+  }
+
   @MessagePattern('get-all_type_activities')
   async getAllTypeActivities() {
     return await this.layerService.getAllTypeActivities();
+  }
+
+  @MessagePattern('get-full_type_activities')
+  async getFullTypeActivities() {
+    return await this.layerService.getFullTypeActivities();
   }
 
   @MessagePattern('create-status_activity')
@@ -106,6 +128,17 @@ export class LayerController {
   async createPictureActivity(@Payload() createPictureActivityDto: CreatePictureActivityDto[]) {
     return await this.layerService.createPictureActivity(createPictureActivityDto);
   }
+
+  @MessagePattern('create-one-picture_activity')
+  async createOnePictureActivity(@Payload() createPictureActivityDto: CreatePictureActivityDto) {
+    return await this.layerService.createOnePictureActivity(createPictureActivityDto);
+  }
+
+  @MessagePattern('delete-picture_activity')
+  async deletePictureActivity(@Payload() picture_id: string) {
+    return await this.layerService.deletePictureActivity(picture_id);
+  }
+  
 
   @MessagePattern('get-all_picture_activity')
   async getAllPictureActivity(@Payload() activity_id: string) {

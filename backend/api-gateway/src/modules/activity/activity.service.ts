@@ -6,7 +6,6 @@ import { CreateListCodeProductDto } from './dto/ListCodeProductDto/create-list_c
 import { UpdateListCodeProductDto } from './dto/ListCodeProductDto/update-list_code_product.dto';
 import { CreateListUserDto } from './dto/ListUserDto/create-list_user.dto';
 import { UpdateListUserDto } from './dto/ListUserDto/update-list_user.dto';
-import { CreatePictureActivityDto } from './dto/PictureActivityDto/get-picture_activity.dto';
 import { CreatePictureWorkDto } from './dto/PicturesWorkDto/get-picture_work.dto';
 import { CreateStatusActivitiesDto } from './dto/StatusActivityDto/create-status_activity.dto';
 import { UpdateStatusActivitiesDto } from './dto/StatusActivityDto/update-status_activity.dto';
@@ -20,6 +19,8 @@ import { CreateWorkDto } from './dto/WorkDto/create-work.dto';
 import { UpdateWorkDto } from './dto/WorkDto/update-work.dto';
 import { firstValueFrom } from 'rxjs';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CreatePictureActivityDto } from './dto/PictureActivityDto/create-picture_activity.dto';
+import { GetActivityDto } from './dto/ActivityDto/get-activity.dto';
 
 
 
@@ -55,6 +56,31 @@ export class ActivityService {
     return await firstValueFrom(this.activityClient.send('update-activity', { activity_id, updateActivityDto }));
   }
 
+  async sendUpdateStatusListActivity( updateActivityDto: GetActivityDto[]) {
+    return await firstValueFrom(this.activityClient.send('update-list_status_activity', updateActivityDto));
+  }
+
+  async sendUpdateImageActivity(activity_id:string,updateActivityDto: UpdateActivityDto,picture_urls:Express.Multer.File[]) {
+    // return await firstValueFrom(this.activityClient.send('update-activity', { activity_id, updateActivityDto }));
+    if(picture_urls && picture_urls.length > 0){
+      const datas = await this.cloudinaryService.uploadFiles(picture_urls) 
+      if(datas.length > 0){
+        const {picture_url_type,...reqUpdateActivity} = updateActivityDto
+        
+        const resultImg = await firstValueFrom(this.activityClient.send('update-activity', {...reqUpdateActivity,picture_urls:picture_url_type.map((dt,index)=>{
+          return {type:dt,url:datas[index]}
+        })}))
+        if(resultImg){
+          return { statusCode: HttpStatus.CREATED, message: 'Product and Picture update successfully' };
+        }
+      }
+     
+    }else{
+      return await firstValueFrom(this.activityClient.send('update-activity', updateActivityDto));
+
+    }
+  }
+
   async sendUpdateStatusActivity(activity_id: string, updateActivityDto: UpdateActivityDto) {
     const res = await firstValueFrom(this.activityClient.send('update-activity', { activity_id, updateActivityDto }));
     if(res.statusCode === 200){
@@ -67,6 +93,10 @@ export class ActivityService {
   
   async sendGetActivity(activity_id: string) {
     return await firstValueFrom(this.activityClient.send('get-activity', activity_id));
+  }
+
+  async sendGetActivityByContract(contract_id: string) {
+    return await firstValueFrom(this.activityClient.send('get-activity_by_contract', contract_id));
   }
   
   async sendGetAllActivities() {
@@ -81,6 +111,8 @@ export class ActivityService {
   async sendCreateTypeActivities(createTypeActivitiesDto: CreateTypeActivitiesDto) {
     return await firstValueFrom(this.activityClient.send('create-type_activity', createTypeActivitiesDto));
   }
+
+  
   
   async sendUpdateTypeActivities(type_activity_id: string, updateTypeActivitiesDto: UpdateTypeActivitiesDto) {
     return await firstValueFrom(this.activityClient.send('update-type_activity', { type_activity_id, updateTypeActivitiesDto }));
@@ -89,9 +121,17 @@ export class ActivityService {
   async sendGetTypeActivities(type_activity_id: string) {
     return await firstValueFrom(this.activityClient.send('get-type_activity', type_activity_id));
   }
+
+  async sendGetFullTypeActivitiesID(type_activity_id: string) {
+    return await firstValueFrom(this.activityClient.send('get-id_full_type_activity', type_activity_id));
+  }
   
   async sendGetAllTypeActivities() {
     return await firstValueFrom(this.activityClient.send('get-all_type_activities', {}));
+  }
+
+  async sendGetFullTypeActivities() {
+    return await firstValueFrom(this.activityClient.send('get-full_type_activities', {}));
   }
   
   // Status Activities methods
@@ -112,8 +152,46 @@ export class ActivityService {
   }
   
   // Picture Activity methods
-  async sendCreatePictureActivity(createPictureActivityDto: CreatePictureActivityDto[]) {
-    return await firstValueFrom(this.activityClient.send('create-picture_activity', createPictureActivityDto));
+  // async sendCreatePictureActivity(createPictureActivityDto: CreatePictureActivityDto[]) {
+  //   return await firstValueFrom(this.activityClient.send('create-picture_activity', createPictureActivityDto));
+  // }
+  
+  async sendCreatePictureActivity(createPictureActivityDto: CreatePictureActivityDto,picture_urls:Express.Multer.File[]) {
+    try{
+      // console.log(picture_urls)
+      if(picture_urls && picture_urls.length > 0){
+        const datas = await this.cloudinaryService.uploadFiles(picture_urls) 
+        if(datas.length > 0){
+          
+          const resultImg = await firstValueFrom(this.activityClient.send('create-one-picture_activity', {...createPictureActivityDto,url:datas[0]}))
+          if(resultImg){
+            return { statusCode: HttpStatus.CREATED, message: 'Product and Picture created successfully' };
+          }
+        }
+       
+      }else{
+       return { statusCode: HttpStatus.BAD_REQUEST, message: 'Picture dont successfully' }
+  
+      }
+    }catch(err){
+      console.log(err)
+    }
+   
+  }
+
+  // async sendCreateOnePictureActivity(createPictureActivityDto: CreatePictureActivityDto[]) {
+  //   return await firstValueFrom(this.activityClient.send('create-picture_activity', createPictureActivityDto));
+  // }
+
+  async sendDeletePictureActivity(picture_id: string) {
+    const dataDelete = await firstValueFrom(this.activityClient.send('delete-picture_activity', picture_id));
+    if(dataDelete.data){
+      const data = await this.cloudinaryService.deleteFile(dataDelete.data) 
+      if(data){
+        return {statusCode:dataDelete.statusCode,message:dataDelete.message}
+      }
+    }
+    return dataDelete
   }
   
   async sendGetAllPictureActivity(activity_id: string) {

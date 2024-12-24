@@ -23,4 +23,12 @@ export class CloudinaryService {
     const data = (await Promise.all((files as Express.Multer.File[]).map((file)=> this.uploadFile(file)))).map((dt)=> dt.secure_url);
     return data
   }
+  async deleteFile(publicId: string): Promise<{ result: string }> {
+    return await new Promise<{ result: string }>((resolve, reject) => {
+      cloudinary.uploader.destroy(publicId, (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      });
+    });
+  }
 }

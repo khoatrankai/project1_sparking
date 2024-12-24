@@ -35,9 +35,18 @@ import { Works } from './work.entity';
 
     @Column({ type: 'varchar', length: 50,nullable:true })
     contract: string;
-  
+
+    @Column({ type: 'int', nullable: true })
+    position:number
+
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date;
+
+    @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP" })
+    time_start: Date;
+
+    @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP + INTERVAL '1 day'" })
+    time_end: Date;
   
     @UpdateDateColumn({ type: 'timestamp' })
     updated_at: Date;

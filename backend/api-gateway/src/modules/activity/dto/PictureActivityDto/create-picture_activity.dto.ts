@@ -1,16 +1,16 @@
-import { IsString, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsOptional } from 'class-validator';
 
-export class GetPictureActivityDto {
+export class CreatePictureActivityDto {
   @IsString()
   @IsOptional()
   picture_id: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   url: File;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   activity: string;
 
   @IsEnum(['start', 'end'])

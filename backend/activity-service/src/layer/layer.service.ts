@@ -33,6 +33,7 @@ import { CreateListUserDto } from 'src/dto/ListUserDto/create-list_user.dto';
 import { UpdateListUserDto } from 'src/dto/ListUserDto/update-list_user.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { GetActivityDto } from 'src/dto/ActivityDto/get-activity.dto';
 
 
 
@@ -58,10 +59,14 @@ export class LayerService {
   }
   async createActivity(createActivityDto: CreateActivityDto) {
     const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: createActivityDto.type } });
-    const status = await this.statusActivitiesRepository.findOne({ where: { status_activity_id: createActivityDto.status } });
+    const status = await this.statusActivitiesRepository.findOne({ where: { status_activity_id: createActivityDto.status },relations:['activity'] });
+    console.log(status)
+    const maxPosition = status.activity.reduce((preValue,currValue) => {
+      return preValue < currValue.position ? currValue.position : preValue;
+    },0)
     if(createActivityDto.picture_urls){
       const {picture_urls,...reqActivity} = createActivityDto
-      const newActivity = this.activitiesRepository.create({ ...reqActivity, activity_id: uuidv4(), type, status });
+      const newActivity = this.activitiesRepository.create({ ...reqActivity, activity_id: uuidv4(), type, status,position:maxPosition+1 });
       const result = await this.activitiesRepository.save(newActivity);
       if(result){
         await this.createPictureActivity(picture_urls.map((dt)=>{
@@ -72,7 +77,7 @@ export class LayerService {
 
     }else{
       const {picture_urls,...reqActivity} = createActivityDto
-      const newActivity = this.activitiesRepository.create({ ...reqActivity, activity_id: uuidv4(), type, status });
+      const newActivity = this.activitiesRepository.create({ ...reqActivity, activity_id: uuidv4(), type, status,position:maxPosition+1 });
       const result = await this.activitiesRepository.save(newActivity);
       return { statusCode: HttpStatus.CREATED, message: 'Activity created successfully', data: result };
 
@@ -81,13 +86,26 @@ export class LayerService {
   }
   
   async updateActivity(activity_id: string, updateActivityDto: UpdateActivityDto) {
-    const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: updateActivityDto.type } });
-    const status = await this.statusActivitiesRepository.findOne({ where: { status_activity_id: updateActivityDto.status } });
-    const {picture_urls,...reqActivity} = updateActivityDto
-    const result = await this.activitiesRepository.update(activity_id, { ...reqActivity, type, status });
-    if(result.affected !== 0 && picture_urls){
-      await this.createPictureActivity(picture_urls)
-    }
+    const { picture_urls, type: typeId, status: statusId, ...reqActivity } = updateActivityDto;
+
+  const updateData: any = { ...reqActivity };
+
+  if (typeId !== null && typeId !== undefined) {
+    const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: typeId } });
+    if (type) updateData.type = type;
+  }
+
+  if (statusId !== null && statusId !== undefined) {
+    const status = await this.statusActivitiesRepository.findOne({ where: { status_activity_id: statusId } });
+    if (status) updateData.status = status;
+  }
+
+  const result = await this.activitiesRepository.update(activity_id, updateData);
+
+  if (result.affected !== 0 && picture_urls) {
+    await this.createPictureActivity(picture_urls);
+  }
+
     return { statusCode: HttpStatus.OK, message: 'Activity updated successfully', data: result };
   }
   
@@ -97,7 +115,18 @@ export class LayerService {
       relations: ['type', 'status', 'picture_urls', 'list_code_product','works','works.list_user','works.status'],
     });
     if (!activity) throw new NotFoundException(`Activity with ID ${activity_id} not found`);
-    return { statusCode: HttpStatus.OK, data: {...activity,status:activity.status.status_activity_id,type:activity.type.type_activity_id} };
+    return { statusCode: HttpStatus.OK, data: {...activity,status:activity.status.status_activity_id,type:activity.type.type_activity_id,picture_urls:activity.picture_urls.sort((a, b) =>
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    )} };
+  }
+
+  async getActivityByContract(contract_id: string) {
+    const activity = await this.activitiesRepository.find({
+      where: { contract:contract_id },
+      relations: ['type', 'status', 'picture_urls', 'list_code_product','works','works.list_user','works.status'],
+    });
+    if (!activity) throw new NotFoundException(`Activity with ID ${contract_id} not found`);
+    return { statusCode: HttpStatus.OK, data: activity  };
   }
   
   async getAllActivities() {
@@ -150,6 +179,26 @@ export class LayerService {
     if (!typeActivity) throw new NotFoundException(`TypeActivity with ID ${type_activity_id} not found`);
     return { statusCode: HttpStatus.OK, data: typeActivity };
   }
+
+  async getFullTypeActivitiesID(type_activity_id: string) {
+    const typeActivity = await this.typeActivitiesRepository.findOne({
+      where: { type_activity_id },
+      relations: ['status','status.activity','status.activity.picture_urls'],
+    });
+    if (!typeActivity) throw new NotFoundException(`TypeActivity with ID ${type_activity_id} not found`);
+    return { statusCode: HttpStatus.OK, data: typeActivity.status.length > 0 ? {...typeActivity,status:typeActivity.status.map(dt => {
+      return {...dt,activity:dt.activity.sort((a,b) => a.position - b.position)}
+    }).sort((a,b)=> a.position-b.position)}: typeActivity };
+  }
+
+  async updateStatusPositionActivitiesID(listActivity:GetActivityDto[]) {
+     const data = Promise.all(listActivity.map(async(dt)=>{
+      const status = await this.statusActivitiesRepository.findOne({where:{status_activity_id:dt.status}})
+      return status ? await this.activitiesRepository.update(dt.activity_id,{position:dt.position,status}) : await this.activitiesRepository.update(dt.activity_id,{position:dt.position})
+     }))
+     return {statusCode: HttpStatus.OK,message:'Cập nhật vị trí thành công'}
+  }
+  
   
   async getAllTypeActivities() {
     const typeActivities = await this.typeActivitiesRepository.find({ relations: ['status'] });
@@ -164,10 +213,32 @@ export class LayerService {
    
     return { statusCode: HttpStatus.OK, data: dataRes };
   }
+
+  async getFullTypeActivities() {
+    const typeActivities = await this.typeActivitiesRepository.find({ relations: ['status','status.activity'] });
+    const dataRes = typeActivities.map(dt=>{
+      if (dt && dt.status) {
+        const sortedStatuses = dt.status.sort((a, b) =>
+          a.position - b.position
+        );
+       return {...dt,status:sortedStatuses.map(dtt => {
+        return {
+          ...dtt,activity:dtt.activity.sort((a,b)=> a.position - b.position)
+        }
+       })}
+      }
+      return dt
+    })
+   
+    return { statusCode: HttpStatus.OK, data: dataRes };
+  }
   
   async createStatusActivities(createStatusActivitiesDto: CreateStatusActivitiesDto) {
-    const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: createStatusActivitiesDto.type_activity } });
-    const newStatusActivity = this.statusActivitiesRepository.create({ ...createStatusActivitiesDto, type_activity: type, status_activity_id: uuidv4() });
+    const type = await this.typeActivitiesRepository.findOne({ where: { type_activity_id: createStatusActivitiesDto.type_activity },relations:['status'] });
+    const maxPosition = type.status.reduce((preValue,currValue) => {
+      return preValue < currValue.position ? currValue.position : preValue;
+    },0)
+    const newStatusActivity = this.statusActivitiesRepository.create({ ...createStatusActivitiesDto, type_activity: type, status_activity_id: uuidv4(),position:maxPosition+1 });
     const result = await this.statusActivitiesRepository.save(newStatusActivity);
     return { statusCode: HttpStatus.CREATED, message: 'Status Activity created successfully', data: result };
   }
@@ -197,6 +268,27 @@ export class LayerService {
     const newPictureActivity = this.pictureActivityRepository.create(createPictureActivityDto.map((dt) => ({ ...dt, activity,picture_id:uuidv4() })));
     const result = await this.pictureActivityRepository.save(newPictureActivity);
     return { statusCode: HttpStatus.CREATED, message: 'Picture Activity created successfully', data: result };
+  }
+
+  async createOnePictureActivity(createPictureActivityDto: CreatePictureActivityDto) {
+    const activity = await this.activitiesRepository.findOne({ where: { activity_id: createPictureActivityDto.activity } });
+    const newPictureActivity = this.pictureActivityRepository.create({ ...createPictureActivityDto, activity,picture_id:uuidv4() });
+    const result = await this.pictureActivityRepository.save(newPictureActivity);
+    return { statusCode: HttpStatus.CREATED, message: 'Picture Activity created successfully', data: result };
+  }
+
+ 
+  async deletePictureActivity(picture_id: string) {
+    function extractPublicId(url: string): string {
+      const parts = url.split('/');
+      const fileName = parts[parts.length - 1]; // Lấy phần cuối cùng của URL
+      const publicId = fileName.split('.')[0]; // Loại bỏ phần mở rộng (.jpg, .png, ...)
+      return publicId;
+    }
+    const dataDelete = await this.pictureActivityRepository.findOne({where:{picture_id}})
+    await this.pictureActivityRepository.delete({picture_id})
+    const publicId = extractPublicId(dataDelete.url)
+    return { statusCode: HttpStatus.OK, message: 'Picture Activity deleted successfully',data:publicId };
   }
   
   async getAllPictureActivity(activity_id: string) {
@@ -235,11 +327,13 @@ export class LayerService {
   async createWork(createWorkDto: CreateWorkDto) {
     const activity = await this.activitiesRepository.findOne({ where: { activity_id: createWorkDto.activity } });
     const type = await this.typeWorkRepository.findOne({ where: { type_work_id: createWorkDto.type } });
-    const status = await this.statusWorkRepository.findOne({ where: { status_work_id: createWorkDto.status } });
-
+    const status = await this.statusWorkRepository.findOne({ where: { status_work_id: createWorkDto.status },relations:['work'] });
+    const maxPosition = status.work.reduce((preValue,currValue) => {
+      return preValue < currValue.position ? currValue.position : preValue;
+    },0)
     if(createWorkDto.picture_urls){
         const {picture_urls,...reqWork} = createWorkDto
-        const newWork = this.worksRepository.create({ ...reqWork, work_id: uuidv4(), type, status, activity });
+        const newWork = this.worksRepository.create({ ...reqWork, work_id: uuidv4(), type, status, activity,position:maxPosition+1 });
         const savedWork = await this.worksRepository.save(newWork);
       if(savedWork){
        
@@ -338,8 +432,11 @@ export class LayerService {
   }
   
   async createStatusWork(createStatusWorkDto: CreateStatusWorkDto) {
-    const type = await this.typeWorkRepository.findOne({ where: { type_work_id: createStatusWorkDto.type_work } });
-    const newStatusWork = this.statusWorkRepository.create({ ...createStatusWorkDto, type_work: type,status_work_id:uuidv4() });
+    const type = await this.typeWorkRepository.findOne({ where: { type_work_id: createStatusWorkDto.type_work } ,relations:['status']});
+    const maxPosition = type.status.reduce((preValue,currValue) => {
+      return preValue < currValue.position ? currValue.position : preValue;
+    },0)
+    const newStatusWork = this.statusWorkRepository.create({ ...createStatusWorkDto, type_work: type,status_work_id:uuidv4(),position:maxPosition+1 });
     const savedStatusWork = await this.statusWorkRepository.save(newStatusWork);
     return { statusCode: HttpStatus.CREATED, data: savedStatusWork };
   }

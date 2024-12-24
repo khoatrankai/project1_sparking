@@ -1,11 +1,11 @@
 import { IsString, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 
-export class CreatePictureActivityDto {
+export class GetPictureActivityDto {
   @IsString()
   @IsOptional()
   picture_id: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   url: File;
 
   @IsString()

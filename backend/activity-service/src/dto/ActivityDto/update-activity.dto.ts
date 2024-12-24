@@ -1,4 +1,4 @@
-import { IsArray, IsOptional, IsString } from "class-validator";
+import { IsArray, IsDate, IsInt, IsOptional, IsString } from "class-validator";
 import { CreatePictureActivityDto } from "../PictureActivityDto/get-picture_activity.dto";
 
 export class UpdateActivityDto {
@@ -17,6 +17,18 @@ export class UpdateActivityDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsInt()
+  @IsOptional()
+  position: number;
+
+  @IsOptional()
+  @IsDate()
+  time_end: Date;
+
+  @IsOptional()
+  @IsDate()
+  time_start: Date;
 
   @IsString()
   @IsOptional()

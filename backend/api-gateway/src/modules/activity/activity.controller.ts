@@ -1,4 +1,4 @@
-import {  Body, Controller, Get, Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {  Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { CreateActivityDto } from './dto/ActivityDto/create-activity.dto';
 import { UpdateActivityDto } from './dto/ActivityDto/update-activity.dto';
@@ -6,7 +6,6 @@ import { CreateListCodeProductDto } from './dto/ListCodeProductDto/create-list_c
 import { UpdateListCodeProductDto } from './dto/ListCodeProductDto/update-list_code_product.dto';
 import { CreateListUserDto } from './dto/ListUserDto/create-list_user.dto';
 import { UpdateListUserDto } from './dto/ListUserDto/update-list_user.dto';
-import { CreatePictureActivityDto } from './dto/PictureActivityDto/get-picture_activity.dto';
 import { CreatePictureWorkDto } from './dto/PicturesWorkDto/get-picture_work.dto';
 import { CreateStatusActivitiesDto } from './dto/StatusActivityDto/create-status_activity.dto';
 import { UpdateStatusActivitiesDto } from './dto/StatusActivityDto/update-status_activity.dto';
@@ -19,6 +18,8 @@ import { UpdateTypeWorkDto } from './dto/TypeWorkDto/update-type_work.dto';
 import { CreateWorkDto } from './dto/WorkDto/create-work.dto';
 import { UpdateWorkDto } from './dto/WorkDto/update-work.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { CreatePictureActivityDto } from './dto/PictureActivityDto/create-picture_activity.dto';
+import { GetActivityDto } from './dto/ActivityDto/get-activity.dto';
 
 
 
@@ -38,13 +39,22 @@ export class ActivityController {
     return this.activityService.sendCreateActivity(createActivityDto,picture_urls);
   }
 
-  @Put('update/:id')
+  @Put('update/id/:id')
   async sendUpdateActivity(
     @Param('id') activity_id: string,
     @Body() updateActivityDto: UpdateActivityDto,
   ) {
     return this.activityService.sendUpdateActivity(activity_id, updateActivityDto);
   }
+
+  @Put('update/list')
+  async sendUpdateStatusListActivity(
+    @Body() updateActivityDto: GetActivityDto[],
+  ) {
+    return this.activityService.sendUpdateStatusListActivity(updateActivityDto);
+  }
+
+  
 
   @Put('update/status/:id')
   async sendUpdateStatusActivity(
@@ -57,6 +67,11 @@ export class ActivityController {
   @Get('id/:id')
   async sendGetActivity(@Param('id') activity_id: string) {
     return this.activityService.sendGetActivity(activity_id);
+  }
+
+  @Get('contract/:id')
+  async sendGetActivityByContract(@Param('id') contract_id: string) {
+    return this.activityService.sendGetActivityByContract(contract_id);
   }
 
   @Get('all')
@@ -88,9 +103,19 @@ export class ActivityController {
     return this.activityService.sendGetTypeActivities(type_activity_id);
   }
 
+  @Get('type/full/id/:id')
+  async sendGetFullTypeActivitiesID(@Param('id') type_activity_id: string) {
+    return this.activityService.sendGetFullTypeActivitiesID(type_activity_id);
+  }
+
   @Get('type/all')
   async sendGetAllTypeActivities() {
     return this.activityService.sendGetAllTypeActivities();
+  }
+
+  @Get('type/full')
+  async sendGetFullTypeActivities() {
+    return this.activityService.sendGetFullTypeActivities();
   }
 
   // Status Activities Methods
@@ -119,8 +144,14 @@ export class ActivityController {
 
   // Picture Activities Methods
   @Post('picture/create')
-  async sendCreatePictureActivity(@Body() createPictureActivityDto: CreatePictureActivityDto[]) {
-    return this.activityService.sendCreatePictureActivity(createPictureActivityDto);
+  @UseInterceptors(FilesInterceptor('url'))
+  async sendCreatePictureActivity(@Body() createPictureActivityDto: CreatePictureActivityDto,@UploadedFiles() url:Express.Multer.File[]) {
+    return this.activityService.sendCreatePictureActivity(createPictureActivityDto,url);
+  }
+
+  @Delete('picture/delete')
+  async sendDeletePictureActivity(@Query('id') picture_id: string) {
+    return this.activityService.sendDeletePictureActivity(picture_id);
   }
 
   @Get('picture/all/:activity_id')

@@ -33,6 +33,9 @@ import { ListUser } from './list_user.entity';
     @Column({ type: 'text', nullable: true })
     description: string;
 
+    @Column({ type: 'int', nullable: true })
+    position:number
+
     @ManyToOne(() => Activities, (activity) =>   activity.works)
     @JoinColumn({ name: 'activity' })
     activity: Activities;

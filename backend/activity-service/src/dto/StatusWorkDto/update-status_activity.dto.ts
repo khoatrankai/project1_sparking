@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdateStatusWorkDto {
 
@@ -9,6 +9,10 @@ export class UpdateStatusWorkDto {
   @IsString()
   @IsOptional()
   name_tag: string;
+
+  @IsInt()
+  @IsOptional()
+  position:number
 
   @IsString()
   @IsOptional()

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsOptional, IsDate, IsInt } from 'class-validator';
 
 export class CreateWorkDto {
   @IsString()
@@ -16,6 +16,10 @@ export class CreateWorkDto {
   @IsOptional()
   @IsString()
   description?: string;
+  
+  @IsInt()
+  @IsOptional()
+  position: number;
 
   @IsOptional()
   @IsString()

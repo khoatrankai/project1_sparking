@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsArray } from 'class-validator';
-import { CreatePictureActivityDto } from '../PictureActivityDto/get-picture_activity.dto';
+import { CreatePictureActivityDto } from '../PictureActivityDto/create-picture_activity.dto';
 
 export class CreateWorkDto {
   @IsString()

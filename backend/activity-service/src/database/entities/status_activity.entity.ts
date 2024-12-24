@@ -12,6 +12,9 @@ export class StatusActivities {
   @Column({ type: 'varchar', length: 50 })
   name_tag: string;
 
+  @Column({ type: 'int', nullable: true })
+  position:number
+
   @ManyToOne(() => TypeActivities,typeActivity => typeActivity.status)
   @JoinColumn({ name: 'type_activity' })
   type_activity: TypeActivities;
