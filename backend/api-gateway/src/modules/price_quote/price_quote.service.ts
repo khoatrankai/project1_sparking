@@ -37,7 +37,6 @@ export class PriceQuoteService {
 
   async exportExcelPriceQuote(id:string){
     const data = await this.sendGetFullPriceQuetoID(id)
-    console.log(data)
     // await this.createExcelPriceQuote(data.data)
     return data
 
