@@ -2,7 +2,7 @@ import { Controller, Get, UseFilters } from '@nestjs/common';
 
 import { ConflictExceptionFilter } from 'src/common/filters/conflict-exception.filter';
 import { LayerService } from './layer.service';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UpdateOpportunitiesDto } from 'src/dto/OpportunityDto/update-opportunity.dto';
 import { CreateOpportunitiesDto } from 'src/dto/OpportunityDto/create-opportunity.dto';
 import { CreateTypeOpportunitiesDto } from 'src/dto/TypeOpportunityDto/create-type_opportunity.dto';
@@ -53,6 +53,11 @@ export class LayerController {
     return this.layerService.findAllTypeOpportunity();
   }
 
+  @MessagePattern({ cmd: 'get-full_type_opportunities' })
+  async findFullTypeOpportunity() {
+    return this.layerService.findFullTypeOpportunity();
+  }
+
   @MessagePattern({ cmd: 'get-type_opportunity' })
   async findOneTypeOpportunity(id: string) {
     return this.layerService.findOneTypeOpportunity(id);
@@ -72,6 +77,16 @@ export class LayerController {
   @MessagePattern({ cmd: 'get-all_type_sources' })
   async findAllTypeSource() {
     return this.layerService.findAllTypeSource();
+  }
+
+  @MessagePattern({cmd:'get-opportunity_filter'})
+  getOpportunityFilter(@Payload('time_first') time_first?:number, @Payload('time_end') time_end?:number){
+    return this.layerService.getOpportunityFilter(time_first?new Date(time_first):null,time_end?new Date(time_end):null)
+  }
+
+  @MessagePattern({ cmd: 'get-full_type_sources' })
+  async findFullTypeSource() {
+    return this.layerService.findFullTypeSource();
   }
 
   @MessagePattern({ cmd: 'get-type_source' })

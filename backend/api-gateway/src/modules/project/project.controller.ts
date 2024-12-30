@@ -1,9 +1,10 @@
-import {  Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {  Body, Controller, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/ProjectDto/create-project.dto';
 import { UpdateProjectDto } from './dto/ProjectDto/update-project.dto';
 import { CreateTypeProjectDto } from './dto/TypeProjectDto/create-type_project.dto';
 import { UpdateTypeProjectDto } from './dto/TypeProjectDto/update-type_project.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 
 
@@ -19,8 +20,9 @@ export class ProjectController {
 
   // Endpoint to create a new project
   @Post()
-  async createProject(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectService.sendCreateProject(createProjectDto);
+  @UseInterceptors(FilesInterceptor('picture_url',1))
+  async createProject(@Body() createProjectDto: CreateProjectDto,@UploadedFiles() picture_url:Express.Multer.File[]) {
+    return this.projectService.sendCreateProject(createProjectDto,picture_url?.[0]);
   }
 
   // Endpoint to retrieve all projects
@@ -37,11 +39,13 @@ export class ProjectController {
 
   // Endpoint to update a project by ID
   @Put('update/:id')
+  @UseInterceptors(FilesInterceptor('picture_url',1))
   async updateProject(
     @Param('id') id: string,
-    @Body() updateProjectDto: UpdateProjectDto,
+    @Body() updateProjectDto: UpdateProjectDto,@UploadedFiles() picture_url:Express.Multer.File[]
   ) {
-    return this.projectService.sendUpdateProject(id, updateProjectDto);
+    // console.log(updateProjectDto,picture_url,id)
+    return this.projectService.sendUpdateProject(id, updateProjectDto,picture_url?.[0]);
   }
   @Post('type')
   async createTypeProject(@Body() createTypeProjectDto: CreateTypeProjectDto) {
@@ -51,6 +55,11 @@ export class ProjectController {
   @Get('type')
   async findAllTypeProject() {
     return this.projectService.findAllTypeProject();
+  }
+
+  @Get('type-full')
+  async findFullTypeProject() {
+    return this.projectService.findFullTypeProject();
   }
 
   @Get('type/:id')

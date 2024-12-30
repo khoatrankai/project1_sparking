@@ -39,9 +39,14 @@ export class PriceQuoteController {
     return ""
   }
 
-  @Put(':id')
+  @Put('id/:id')
   async updatePriceQuote(@Param('id') id:string,@Body() updatePriceQuoteDto: UpdatePriceQuoteDto) {
     return this.priceQuetoService.sendUpdatePriceQueto(id,updatePriceQuoteDto);
+  }
+
+  @Put('list')
+  async updateStatusPriceQuote(@Body() updatePriceQuoteDto: {price_quote_id:string,status:string}[]) {
+    return this.priceQuetoService.sendUpdateStatusPriceQueto(updatePriceQuoteDto);
   }
 
   // @Get('get-filter')

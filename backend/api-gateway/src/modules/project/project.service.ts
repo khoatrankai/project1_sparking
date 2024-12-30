@@ -5,18 +5,20 @@ import { CreateProjectDto } from './dto/ProjectDto/create-project.dto';
 import { CreateTypeProjectDto } from './dto/TypeProjectDto/create-type_project.dto';
 import { firstValueFrom } from 'rxjs';
 import { UpdateTypeProjectDto } from './dto/TypeProjectDto/update-type_project.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 
 @Injectable()
 export class ProjectService {
 
-  constructor(@Inject('PROJECT') private readonly projectClient:ClientProxy){}
+  constructor(private readonly cloudinaryService:CloudinaryService,@Inject('PROJECT') private readonly projectClient:ClientProxy){}
   getHello(): string {
     return 'Hello World!';
   }
 
-  async sendCreateProject(createProjectDto: CreateProjectDto) {
-    return this.projectClient.send({ cmd: 'create-project' }, createProjectDto).toPromise();
+  async sendCreateProject(createProjectDto: CreateProjectDto,picture_url:Express.Multer.File) {
+    const data = await this.cloudinaryService.uploadFile(picture_url)
+    return this.projectClient.send({ cmd: 'create-project' }, {...createProjectDto,picture_url:data.secure_url}).toPromise();
   }
 
   // Send request to retrieve all projects
@@ -30,9 +32,11 @@ export class ProjectService {
   }
 
   // Send request to update a project by ID
-  async sendUpdateProject(id: string, updateProjectDto: UpdateProjectDto) {
-    const payload = { id, updateProjectDto };
-    return this.projectClient.send({ cmd: 'update-project' }, payload).toPromise();
+  async sendUpdateProject(id: string, updateProjectDto: UpdateProjectDto,picture_url:Express.Multer.File) {
+    const data = await this.cloudinaryService.uploadFile(picture_url)
+    const dataUpload = {...updateProjectDto,picture_url:data.secure_url}
+    const payload = { id,  updateProjectDto:dataUpload};
+    return await  firstValueFrom(this.projectClient.send({ cmd: 'update-project' }, payload))
   }
   
   async createTypeProject(createTypeProjectDto: CreateTypeProjectDto) {
@@ -47,6 +51,15 @@ export class ProjectService {
   async findAllTypeProject() {
     try {
       const result = await firstValueFrom(this.projectClient.send({ cmd: 'find-all_type_project' }, {}));
+      return result;
+    } catch (error) {
+      throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async findFullTypeProject() {
+    try {
+      const result = await firstValueFrom(this.projectClient.send({ cmd: 'find-full_type_project' }, {}));
       return result;
     } catch (error) {
       throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);

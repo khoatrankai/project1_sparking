@@ -44,6 +44,14 @@ export class OpportunityService {
   async sendGetAllTypeOpportunities() {
     return this.opportunityClient.send({ cmd: 'get-all_type_opportunities' }, {});
   }
+
+  async getOpportunityFilter(time_first?:number,time_end?:number) {
+    return await firstValueFrom(this.opportunityClient.send({ cmd: 'get-opportunity_filter' }, {time_first,time_end}));
+  }
+
+  async sendGetFullTypeOpportunities() {
+    return this.opportunityClient.send({ cmd: 'get-full_type_opportunities' }, {});
+  }
   
   async sendGetTypeOpportunity(id: string) {
     return this.opportunityClient.send({ cmd: 'get-type_opportunity' }, id);
@@ -59,6 +67,10 @@ export class OpportunityService {
   
   async sendGetAllTypeSources() {
     return this.opportunityClient.send({ cmd: 'get-all_type_sources' }, {});
+  }
+
+  async sendGetFullTypeSources() {
+    return this.opportunityClient.send({ cmd: 'get-full_type_sources' }, {});
   }
   
   async sendGetTypeSource(id: string) {

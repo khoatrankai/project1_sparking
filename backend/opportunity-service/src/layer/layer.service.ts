@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import {  Repository } from 'typeorm';
+import {  Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Opportunities } from 'src/database/entities/opportunity.entity';
 import { TypeOpportunities } from 'src/database/entities/type_opportunity.entity';
 import { TypeSources } from 'src/database/entities/type_source.entity';
@@ -88,6 +88,39 @@ async findAllTypeOpportunity() {
     };
 }
 
+async findFullTypeOpportunity() {
+    const typeOpportunities = await this.typeOpportunitiesRepository.find({relations:['opportunities']});
+    return {
+        statusCode: HttpStatus.OK,
+        data: typeOpportunities,
+    };
+}
+
+async getOpportunityFilter(time_first?:Date,time_end?:Date){
+
+
+    const whereCondition: any = {};
+    if (time_first || time_end) {
+        if (time_first && time_end) {
+          whereCondition.created_at = Between(time_first, time_end);
+        } else {
+          if (time_first) {
+            whereCondition.created_at = MoreThanOrEqual(time_first);
+          }
+          if (time_end) {
+            whereCondition.created_at = LessThanOrEqual(time_end);
+          }
+        }
+      
+    }
+
+    const data = await this.opportunitiesRepository.find({where:whereCondition,relations:['type_source','type_opportunity']});
+    return {
+      statusCode:HttpStatus.OK,
+      data
+    }
+  }
+
 async findOneTypeOpportunity(id: string) {
     const typeOpportunity = await this.typeOpportunitiesRepository.findOne({ where: { type_opportunity_id: id } });
     if (!typeOpportunity) {
@@ -118,8 +151,15 @@ async createTypeSource(createTypeSourcesDto: CreateTypeSourcesDto) {
 }
 
 async findAllTypeSource() {
-    console.log("vao")
     const typeSources = await this.typeSourcesRepository.find();
+    return {
+        statusCode: HttpStatus.OK,
+        data: typeSources,
+    };
+}
+
+async findFullTypeSource() {
+    const typeSources = await this.typeSourcesRepository.find({relations:['opportunities']});
     return {
         statusCode: HttpStatus.OK,
         data: typeSources,

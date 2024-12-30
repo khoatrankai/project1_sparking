@@ -14,12 +14,13 @@ import { UpdateRoleCustomerDto } from './dto/update_role_customer.dto';
 import { CreateGroupCustomerDto } from './dto/create_group.dto';
 import { GetAllCustomerDto } from './dto/get_all_customer.dto';
 import { firstValueFrom } from 'rxjs';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 // import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class CustomerService {
 
-  constructor(@Inject('CUSTOMER') private readonly customerClient:ClientProxy){}
+  constructor(private readonly cloudinaryService:CloudinaryService,@Inject('CUSTOMER') private readonly customerClient:ClientProxy){}
   getHello(): string {
     return 'Hello World!';
   }
@@ -38,6 +39,14 @@ export class CustomerService {
 
   async getCustomerID(info_id:string) {
     return await firstValueFrom(this.customerClient.send({ cmd: 'get-customer_id' }, {info_id}));
+  }
+
+  async getCustomerFilter(group?:string,time_first?:number,time_end?:number) {
+    return await firstValueFrom(this.customerClient.send({ cmd: 'get-customer_filter' }, {group,time_first,time_end}));
+  }
+
+  async getCustomerDashboard() {
+    return await firstValueFrom(this.customerClient.send({ cmd: 'get-customer_dashboard' }, {}));
   }
 
   async createGroupCustomer(creategroupCustomerDto: CreateGroupCustomerDto) {
@@ -64,12 +73,14 @@ export class CustomerService {
     return this.customerClient.send({ cmd: 'update-account_customer' }, updateAccountCustomerDto);
   }
 
-  async createCustomerInfo(createCustomerInfoDto: CreateCustomerInfoDto) {
-    return this.customerClient.send({ cmd: 'create-customer_info' }, createCustomerInfoDto);
+  async createCustomerInfo(createCustomerInfoDto: CreateCustomerInfoDto,picture_url:Express.Multer.File) {
+    const data = await this.cloudinaryService.uploadFile(picture_url)
+    return this.customerClient.send({ cmd: 'create-customer_info' }, {...createCustomerInfoDto,picture_url:data.secure_url});
   }
 
-  async updateCustomerInfo(updateCustomerInfoDto: UpdateCustomerInfoDto) {
-    return this.customerClient.send({ cmd: 'update-customer_info' }, updateCustomerInfoDto);
+  async updateCustomerInfo(updateCustomerInfoDto: UpdateCustomerInfoDto,picture_url:Express.Multer.File) {
+    const data = await this.cloudinaryService.uploadFile(picture_url)
+    return this.customerClient.send({ cmd: 'update-customer_info' }, {...updateCustomerInfoDto,picture_url:data?.secure_url});
   }
 
   async updateStatusCustomer(updateCustomerInfoDto: UpdateCustomerInfoDto) {

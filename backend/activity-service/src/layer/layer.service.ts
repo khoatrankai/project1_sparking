@@ -391,12 +391,41 @@ export class LayerService {
     }
     return { statusCode: HttpStatus.OK, data: dataRes };
   }
+
+  async getAllYearWorks(year:string) {
+    const works = await this.worksRepository
+    .createQueryBuilder('work')
+    .leftJoinAndSelect('work.type', 'type')
+    .leftJoinAndSelect('work.status', 'status')
+    .leftJoinAndSelect('work.picture_urls', 'picture_urls')
+    .where('YEAR(work.created_at) = :year', { year })
+    .getMany();
+    if(works){
+      // const ids = works.map((dt)=>dt.contract)
+      // const dataContracts = await firstValueFrom(this.contractsClient.send({ cmd: 'get-contract_ids' },ids))
+      return { statusCode: HttpStatus.OK, data: works.map((dt,index)=>{
+        return {...dt}
+      }) };
+    }
+   
+  }
   
   async getAllWork() {
     const works = await this.worksRepository.find({
       relations: ['type', 'status', 'picture_urls', 'list_user','activity'],
     });
     return { statusCode: HttpStatus.OK, data: works };
+  }
+
+  async getFullTypeWorksID(type_work_id: string) {
+    const typeWork = await this.typeWorkRepository.findOne({
+      where: { type_work_id },
+      relations: ['status','status.work','status.work.picture_urls'],
+    });
+    if (!typeWork) throw new NotFoundException(`TypeWork with ID ${type_work_id} not found`);
+    return { statusCode: HttpStatus.OK, data: typeWork.status.length > 0 ? {...typeWork,status:typeWork.status.map(dt => {
+      return {...dt,work:dt.work.sort((a,b) => a.position - b.position)}
+    }).sort((a,b)=> a.position-b.position)}: typeWork };
   }
   
   async createTypeWork(createTypeWorkDto: CreateTypeWorkDto) {

@@ -64,6 +64,12 @@ export class PriceQuoteController {
     };
   }
 
+  @MessagePattern({ cmd: 'update-status_price_quote' })
+  async updateStatusPriceQuote(@Payload() data: {price_quote_id:string,status:string}[] ) {
+    const updatedPriceQuote = await this.priceQuoteService.updateStatusPriceQuote(data);
+    return updatedPriceQuote
+  }
+
   // @MessagePattern({ cmd: 'create-list_product' })
   // async createListProduct(@Payload() createListProductDto: CreateListProductDto) {
   //   const listProduct = await this.priceQuoteService.createListProduct(createListProductDto);

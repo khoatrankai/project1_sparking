@@ -25,6 +25,11 @@ export class GetProjectDto {
   @IsOptional()
   time_job?: number;
 
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  picture_url?: string;
+
   @IsString()
   @IsOptional()
   @Length(1, 50)

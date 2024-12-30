@@ -24,6 +24,10 @@ export class PriceQuoteService {
     return this.priceQuoteClient.send({ cmd: 'update-price_quote' }, {id,data:updatePriceQuetoDto})
   }
 
+  async sendUpdateStatusPriceQueto(updatePriceQuetoDto: {price_quote_id:string,status:string}[]) {
+    return this.priceQuoteClient.send({ cmd: 'update-status_price_quote' }, updatePriceQuetoDto)
+  }
+
   async sendGetPriceQueto(filter?:PriceQuoteFilterDto) {
     return this.priceQuoteClient.send({ cmd: 'find-all_price_quotes' }, filter?? {})
   }

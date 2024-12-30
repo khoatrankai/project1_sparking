@@ -84,6 +84,11 @@ export class ActivityController {
     return this.activityService.sendGetAllYearActivities(year);
   }
 
+  @Get('work/all_year')
+  async sendGetAllYearWorks(@Query('year') year:string) {
+    return this.activityService.sendGetAllYearWorks(year);
+  }
+
   // Type Activities Methods
   @Post('type/create')
   async sendCreateTypeActivities(@Body() createTypeActivitiesDto: CreateTypeActivitiesDto) {
@@ -106,6 +111,11 @@ export class ActivityController {
   @Get('type/full/id/:id')
   async sendGetFullTypeActivitiesID(@Param('id') type_activity_id: string) {
     return this.activityService.sendGetFullTypeActivitiesID(type_activity_id);
+  }
+
+  @Get('type-work/full/id/:id')
+  async sendGetFullTypeWorksID(@Param('id') type_work_id: string) {
+    return this.activityService.sendGetFullTypeWorksID(type_work_id);
   }
 
   @Get('type/all')

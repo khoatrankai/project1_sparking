@@ -346,7 +346,6 @@ async getAllTypeMethods() {
 
 
 
-
 // Get a TypeContract by ID
 async getTypeContract(type_id: string) {
   const typeContract = await this.typeContractRepository.findOne({

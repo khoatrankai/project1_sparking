@@ -8,7 +8,7 @@ export class TypeSources {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
-  @OneToMany(() => Opportunities, opportunity => opportunity.opportunity_id)
+  @OneToMany(() => Opportunities, opportunity => opportunity.type_source)
   opportunities: Opportunities[];
 
 }

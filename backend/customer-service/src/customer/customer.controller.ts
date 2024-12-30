@@ -50,6 +50,16 @@ export class CustomerController {
     return this.customerService.getCustomerIDs(customer_ids)
   }
 
+  @MessagePattern({cmd:'get-customer_dashboard'})
+  getCustomerDashboard(){
+    return this.customerService.getCustomerDashboard()
+  }
+
+  @MessagePattern({cmd:'get-customer_filter'})
+  getCustomerFilter(@Payload('group') group?:string,@Payload('time_first') time_first?:number, @Payload('time_end') time_end?:number){
+    return this.customerService.getCustomerFilter(group,time_first?new Date(time_first):null,time_end?new Date(time_end):null)
+  }
+
   @MessagePattern({cmd:'create-group_customer'})
   createGroupCustomer(createGroupCustomer:CreateGroupCustomerDto){
     return this.customerService.createGroupCustomer(createGroupCustomer)
@@ -88,6 +98,7 @@ export class CustomerController {
 
   @MessagePattern({ cmd: 'update-customer_info' })
   updateCustomerInfo(updateCustomerInfo: UpdateCustomerInfoDto) {
+    console.log(updateCustomerInfo)
     return this.customerService.updateCustomerInfo(updateCustomerInfo);
   }
 

@@ -196,6 +196,14 @@ export class PriceQuoteService {
   
   }
 
+  async updateStatusPriceQuote(listPriceQuote:{price_quote_id:string,status:string}[]) {
+    console.log(listPriceQuote)
+    const data = Promise.all(listPriceQuote.map(async(dt)=>{
+     await this.priceQuoteRepository.update(dt.price_quote_id,{status:dt.status}) 
+    }))
+    return {statusCode: HttpStatus.OK,message:'Cập nhật trạng thái thành công'}
+ }
+
 
   async createListProducts(createListProductDto: CreateListProductDto[],part:ListParts) {
     const listProduct = createListProductDto.map((dt)=>{

@@ -16,6 +16,11 @@ export class UpdateCustomerInfoDto {
   @IsOptional()
   opportunity?: string;
 
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  picture_url?: string;
+
   @IsString()
   @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không

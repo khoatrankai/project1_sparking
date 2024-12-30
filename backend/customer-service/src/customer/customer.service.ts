@@ -4,7 +4,7 @@ import { CreateGroupCustomerDto } from 'src/dto/create_group.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid';
-import { In, Repository } from 'typeorm';
+import { Between, In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { UpdateGroupCustomerDto } from 'src/dto/update_group.dto';
 import { CreateRoleTypeCustomerDto } from 'src/dto/create_role_type_customer.dto';
 import { RoleTypeCustomer } from 'src/database/entities/role_type_customer.entity';
@@ -54,6 +54,65 @@ export class CustomerService {
     const data = await this.customerInfoRepository.find({where:{info_id:In(customer_ids)}});
     const sortedData = customer_ids.map(id => data.find(user => user.info_id === id))
     return sortedData
+  }
+
+  async getCustomerFilter(group?:string,time_first?:Date,time_end?:Date){
+
+
+    const whereCondition: any = {};
+    if (group) {
+      const group_customer = await this.groupCustomerRepository.find({where:{group_id:group}})
+      whereCondition.group_customer = group_customer;
+    }
+    // Lọc theo khoảng thời gian (date_start và date_expired)
+    if (time_first || time_end) {
+        if (time_first && time_end) {
+          whereCondition.created_at = Between(time_first, time_end);
+        } else {
+          if (time_first) {
+            whereCondition.created_at = MoreThanOrEqual(time_first);
+          }
+          if (time_end) {
+            whereCondition.created_at = LessThanOrEqual(time_end);
+          }
+        }
+      
+    }
+
+    console.log(time_end,time_first)
+
+    const data = await this.customerInfoRepository.find({where:whereCondition});
+    return {
+      statusCode:HttpStatus.OK,
+      data
+    }
+  }
+
+  async getCustomerDashboard(){
+    const data = await this.customerInfoRepository.find();
+    const dataProvince = data.reduce((preValue,currValue)=>{
+      if(!preValue[currValue.province]){
+        preValue[currValue.province] = 0
+      }
+      preValue[currValue.province] = preValue[currValue.province] + 1
+      return preValue
+    },{})
+    const dtProvince = Object.keys(dataProvince).map(dt => {
+      return {id:dt,count:dataProvince[dt]}
+    }).sort((a,b)=> b.count - a.count)
+    const dataGroup = await this.groupCustomerRepository.find({relations:['customers']})
+    // return dataGroup
+    const dtGroup = dataGroup.map((dt)=>{
+      return {...dt,customers:dt.customers.length}
+    })
+    
+    return {
+      statusCode:HttpStatus.OK,
+      data: {
+        dashboard_province: dtProvince,
+        dashboard_group: dtGroup
+      }
+    }
   }
 
   async createGroupCustomer(createGroupCustomer:CreateGroupCustomerDto){

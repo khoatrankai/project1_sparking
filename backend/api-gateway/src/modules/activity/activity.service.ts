@@ -125,6 +125,11 @@ export class ActivityService {
   async sendGetFullTypeActivitiesID(type_activity_id: string) {
     return await firstValueFrom(this.activityClient.send('get-id_full_type_activity', type_activity_id));
   }
+
+  
+  async sendGetFullTypeWorksID(type_work_id: string) {
+    return await firstValueFrom(this.activityClient.send('get-id_full_type_work', type_work_id));
+  }
   
   async sendGetAllTypeActivities() {
     return await firstValueFrom(this.activityClient.send('get-all_type_activities', {}));
@@ -244,6 +249,10 @@ export class ActivityService {
   
   async sendGetWork(work_id: string) {
     return await firstValueFrom(this.activityClient.send({ cmd: 'get-work' }, work_id));
+  }
+
+  async sendGetAllYearWorks(year:string) {
+    return await firstValueFrom(this.activityClient.send('get-all_year_works', year));
   }
   
   async sendGetAllWork() {

@@ -41,8 +41,10 @@ export class Projects {
   @ManyToOne(() => TypeProject)
   @JoinColumn({ name: 'type', })
   type: TypeProject;
-  
 
+  @Column({ type: 'varchar', nullable: true })
+  picture_url: string;
+  
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

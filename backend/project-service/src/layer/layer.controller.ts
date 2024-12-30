@@ -64,6 +64,11 @@ export class LayerController {
     return this.layerService.findAllTypeProject();
   }
 
+  @MessagePattern({ cmd: 'find-full_type_project' })
+  async findFullTypeProject() {
+    return this.layerService.findFullTypeProject();
+  }
+
   @MessagePattern({ cmd: 'find-one_type_project' })
   async findOneTypeProject(@Payload() id: string) {
     return this.layerService.findOneTypeProject(id);

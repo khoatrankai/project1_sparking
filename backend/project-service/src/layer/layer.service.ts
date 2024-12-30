@@ -109,6 +109,7 @@ export class LayerService {
   async findOneProject(id: string): Promise<any> {
     const project = await this.projectsRepository.findOne({
       where: { project_id: id },
+      relations:['type']
     });
     
     if (!project) {
@@ -124,7 +125,7 @@ export class LayerService {
     
     return {
       statusCode: HttpStatus.OK,
-      data: project,
+      data: {...project,type:project.type.type_id},
       message: 'Project retrieved successfully',
     };
   }
@@ -154,6 +155,7 @@ export class LayerService {
   
   // Update a project by ID
   async updateProject(id: string, updateProjectDto: UpdateProjectDto): Promise<any> {
+    console.log(updateProjectDto)
     const updateResult = await this.projectsRepository.update(id, updateProjectDto);
     
     if (updateResult.affected === 0) {
@@ -191,6 +193,16 @@ export class LayerService {
     return {
       statusCode: HttpStatus.OK,
       data: await this.typeProjectRepository.find()
+    
+    }
+    
+    
+  }
+
+  async findFullTypeProject() {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.typeProjectRepository.find({relations:['projects']})
     
     }
     

@@ -180,6 +180,11 @@ export class LayerController {
     return this.layerService.getWork(work_id);
   }
 
+  @MessagePattern('get-all_year_works')
+  async getAllYearWorks(year:string) {
+    return await this.layerService.getAllYearWorks(year);
+  }
+
   @MessagePattern({ cmd: 'get-all_work' })
   async getAllWork() {
     return this.layerService.getAllWork();
@@ -203,6 +208,11 @@ export class LayerController {
   @MessagePattern({ cmd: 'get-all_type_work' })
   async getAllTypeWork() {
     return this.layerService.getAllTypeWork();
+  }
+
+  @MessagePattern('get-id_full_type_work')
+  async getFullTypeWorksID(@Payload() type_work_id: string) {
+    return await this.layerService.getFullTypeWorksID(type_work_id);
   }
 
   @MessagePattern({ cmd: 'create-status_work' })

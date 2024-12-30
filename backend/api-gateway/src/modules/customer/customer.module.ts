@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { CustomerController } from './customer.controller';
 import { CustomerService } from './customer.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
+     CloudinaryModule,
     ClientsModule.register([
       {
         name: 'CUSTOMER',

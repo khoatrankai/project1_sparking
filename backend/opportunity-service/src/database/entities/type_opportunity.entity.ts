@@ -11,7 +11,7 @@ export class TypeOpportunities {
   @Column({ type: 'varchar', length: 50 })
   name_tag: string;
 
-  @OneToMany(() => Opportunities, opportunity => opportunity.opportunity_id)
+  @OneToMany(() => Opportunities, opportunity => opportunity.type_opportunity)
   opportunities: Opportunities[];
 
 }

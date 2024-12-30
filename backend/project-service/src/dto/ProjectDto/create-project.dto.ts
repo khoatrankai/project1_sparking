@@ -19,6 +19,11 @@ export class CreateProjectDto {
   @IsOptional()
   price?: number;
 
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  picture_url?: string;
+
   @IsInt()
   @IsOptional()
   time_job?: number;

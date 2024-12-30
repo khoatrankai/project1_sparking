@@ -1,4 +1,4 @@
-import {  Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {  Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { OpportunityService } from './opportunity.service';
 import { CreateOpportunitiesDto } from './dto/OpportunityDto/create-opportunity.dto';
 import { UpdateOpportunitiesDto } from './dto/OpportunityDto/update-opportunity.dto';
@@ -31,6 +31,8 @@ export class OpportunityController {
     return this.opportunitiesService.sendGetAllOpportunities();
   }
 
+  
+
   @Get('id/:id')
   async findOneOpportunity(@Param('id') id: string) {
     return this.opportunitiesService.sendGetOpportunity(id);
@@ -53,6 +55,11 @@ export class OpportunityController {
   @Get('type')
   async findAllTypeOpportunities() {
     return this.opportunitiesService.sendGetAllTypeOpportunities();
+  }
+
+  @Get('type-full')
+  async findFullTypeOpportunities() {
+    return this.opportunitiesService.sendGetFullTypeOpportunities();
   }
 
   @Get('type/:id')
@@ -78,6 +85,16 @@ export class OpportunityController {
   async findAllTypeSources() {
     return this.opportunitiesService.sendGetAllTypeSources();
   }
+
+  @Get('source-full')
+  async findFullTypeSources() {
+    return this.opportunitiesService.sendGetFullTypeSources();
+  }
+
+  @Get('get-opportunity-filter')
+    getCustomerFilter(@Query('time_first') time_first:number,@Query('time_end') time_end:number) {
+      return this.opportunitiesService.getOpportunityFilter(time_first,time_end);
+    }
 
   @Get('source/:id')
   async findOneTypeSource(@Param('id') id: string) {

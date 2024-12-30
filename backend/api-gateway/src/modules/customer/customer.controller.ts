@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateAccountCustomersDto } from './dto/create_account_customer.dto';
 import { CreateCustomerInfoDto } from './dto/create_customer_info.dto';
@@ -13,6 +13,7 @@ import { UpdateInfoContactDto } from './dto/update_info_contact.dto';
 import { UpdateRoleCustomerDto } from './dto/update_role_customer.dto';
 import { UpdateRoleTypeCustomerDto } from './dto/update_role_type_customer.dto';
 import { GetAllCustomerDto } from './dto/get_all_customer.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 
 @Controller('customer')
@@ -51,6 +52,16 @@ export class CustomerController {
     return this.customerService.getCustomerID(info_id);
   }
 
+  @Get('get-customer-dashboard')
+  getCustomerDashboard() {
+    return this.customerService.getCustomerDashboard();
+  }
+
+  @Get('get-customer-filter')
+  getCustomerFilter(@Query('group') group:string,@Query('time_first') time_first:number,@Query('time_end') time_end:number) {
+    return this.customerService.getCustomerFilter(group,time_first,time_end);
+  }
+
   @Put('update-group-customer/:id')
   updateGroupCustomer(@Param('id')id:string, @Body() updateGroupCustomerDto: UpdateGroupCustomerDto) {
     return this.customerService.updateGroupCustomer({...updateGroupCustomerDto,group_id:id});
@@ -77,13 +88,15 @@ export class CustomerController {
   }
 
   @Post('create-customer-info')
-  createCustomerInfo(@Body() createCustomerInfoDto: CreateCustomerInfoDto) {
-    return this.customerService.createCustomerInfo(createCustomerInfoDto);
+  @UseInterceptors(FilesInterceptor('picture_url',1))
+  createCustomerInfo(@Body() createCustomerInfoDto: CreateCustomerInfoDto,@UploadedFiles() picture_url:Express.Multer.File[]) {
+    return this.customerService.createCustomerInfo(createCustomerInfoDto,picture_url?.[0]);
   }
 
   @Put('update-customer-info')
-  updateCustomerInfo(@Body() updateCustomerInfoDto: UpdateCustomerInfoDto) {
-    return this.customerService.updateCustomerInfo(updateCustomerInfoDto);
+  @UseInterceptors(FilesInterceptor('picture_url',1))
+  updateCustomerInfo(@Body() updateCustomerInfoDto: UpdateCustomerInfoDto,@UploadedFiles() picture_url:Express.Multer.File[]) {
+    return this.customerService.updateCustomerInfo(updateCustomerInfoDto,picture_url?.[0]);
   }
 
   @Put('update-status-customer')

@@ -59,6 +59,9 @@ export class CustomerInfo {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
+  @Column({ type: 'varchar', nullable: true })
+  picture_url: string;
+
   @OneToMany(() => InfoContact, infoContact => infoContact.info_company)
   infoContacts: InfoContact[];
 }

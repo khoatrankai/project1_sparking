@@ -19,6 +19,11 @@ export class CreateCustomerInfoDto {
   @Length(1, 50)
   province: string;
 
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  picture_url?: string;
+
   @IsString()
   @Length(1, 12)
   phone_number: string;
