@@ -28,7 +28,7 @@ export class Contract {
   @Column({ type: 'int',nullable:true })
   times: number;
 
-  @ManyToOne(() => TypeContract)
+  @ManyToOne(() => TypeContract, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'type_contract' })
   type_contract: TypeContract;  
 

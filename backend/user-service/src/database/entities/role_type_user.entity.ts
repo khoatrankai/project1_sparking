@@ -12,7 +12,7 @@ export class RoleTypeUser {
   @Column({ type: 'varchar', length: 50 })
   name_tag: string;
 
-  @ManyToOne(() => CategoryRoleUser)
+  @ManyToOne(() => CategoryRoleUser,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'category_role' })
   category_role: CategoryRoleUser;
 }

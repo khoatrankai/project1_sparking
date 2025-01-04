@@ -7,11 +7,11 @@ export class InfoContact {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   info_contact_id: string;
 
-  @ManyToOne(() => AccountCustomers)
+  @ManyToOne(() => AccountCustomers,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'customer_id' })
   customer: AccountCustomers;
 
-  @ManyToOne(() => CustomerInfo)
+  @ManyToOne(() => CustomerInfo,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'info_id' })
   info_company: CustomerInfo;
   

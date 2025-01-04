@@ -25,11 +25,11 @@ export class HistoryCodeProduct {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-  @ManyToOne(() => CodeProduct, (codeProduct) => codeProduct.history)
+  @ManyToOne(() => CodeProduct, (codeProduct) => codeProduct.history,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'code_product' })
   code_product: CodeProduct;
 
-  @ManyToOne(() => ActivityContainer, (activityContainer) => activityContainer.list_code)
+  @ManyToOne(() => ActivityContainer, (activityContainer) => activityContainer.list_code,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'activity_container' })
   activity_container: ActivityContainer;
 }

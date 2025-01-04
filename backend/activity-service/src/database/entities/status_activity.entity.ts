@@ -15,7 +15,7 @@ export class StatusActivities {
   @Column({ type: 'int', nullable: true })
   position:number
 
-  @ManyToOne(() => TypeActivities,typeActivity => typeActivity.status)
+  @ManyToOne(() => TypeActivities,typeActivity => typeActivity.status, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'type_activity' })
   type_activity: TypeActivities;
 

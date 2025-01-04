@@ -8,15 +8,15 @@ export class RoleCustomer {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   role_id: string;
 
-  @ManyToOne(() => RoleTypeCustomer)
+  @ManyToOne(() => RoleTypeCustomer,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'role_type_id' })
   role_type: RoleTypeCustomer;
 
-  @ManyToOne(() => AccountCustomers)
+  @ManyToOne(() => AccountCustomers,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'customer_id' })
   customer: AccountCustomers;
 
-  @ManyToOne(() => CustomerInfo)
+  @ManyToOne(() => CustomerInfo,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'info_id' })
   info_company: CustomerInfo;
 

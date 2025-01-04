@@ -19,7 +19,7 @@ export class ListParts {
   @OneToMany(() => ListProduct, listProduct => listProduct.part)
   products: ListProduct[];
 
-  @ManyToOne(() => PriceQuote, priceQuote => priceQuote.parts)
+  @ManyToOne(() => PriceQuote, priceQuote => priceQuote.parts,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'price_quote' })
   price_quote: PriceQuote;
 

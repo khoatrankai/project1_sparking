@@ -7,7 +7,7 @@ export class Payment {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   payment_id: string;
 
-  @ManyToOne(() => Contract)
+  @ManyToOne(() => Contract, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'contract' })
   contract: Contract;  
 
@@ -41,7 +41,7 @@ export class Payment {
   @UpdateDateColumn()
   updated_at:Date
 
-  @ManyToOne(() => TypeMethod)
+  @ManyToOne(() => TypeMethod, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'type_method' })
   type_method: TypeMethod;  
 }

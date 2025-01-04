@@ -11,7 +11,7 @@ export class MoreDatas {
   @Column({ type: 'varchar', length: 50 })
   tag_more: string;
 
-  @ManyToOne(() => TypeMores)
+  @ManyToOne(() => TypeMores,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'type_more' })
   type_more: TypeMores;
 

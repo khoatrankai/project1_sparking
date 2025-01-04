@@ -17,15 +17,15 @@ export class Products {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
-  @ManyToOne(() => TypeProducts)
+  @ManyToOne(() => TypeProducts,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'type' })
   type: TypeProducts;
 
-  @ManyToOne(() => Brands)
+  @ManyToOne(() => Brands,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'brand' })
   brand: Brands;
 
-  @ManyToOne(() => Originals)
+  @ManyToOne(() => Originals,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'original' })
   original: Originals;
 
@@ -44,7 +44,7 @@ export class Products {
   @Column({ type: 'int' ,default:0})
   quantity: number;
 
-  @ManyToOne(() => UnitProduct)
+  @ManyToOne(() => UnitProduct,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'unit_product' })
   unit_product: UnitProduct;
 
@@ -57,7 +57,7 @@ export class Products {
   @OneToMany(() => CodeProduct, codeProduct => codeProduct.product)
   code_product: CodeProduct[];
 
-  @ManyToOne(() => SupplierProduct)
+  @ManyToOne(() => SupplierProduct,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'supplier_product' })
   supplier_product: SupplierProduct;
 }

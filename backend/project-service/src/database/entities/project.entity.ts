@@ -38,7 +38,7 @@ export class Projects {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @ManyToOne(() => TypeProject)
+  @ManyToOne(() => TypeProject,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'type', })
   type: TypeProject;
 

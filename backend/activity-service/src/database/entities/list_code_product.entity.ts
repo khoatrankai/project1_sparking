@@ -9,7 +9,7 @@ export class ListCodeProduct {
   @Column({ type: 'varchar', length: 50 })
   code_product: string;
 
-  @ManyToOne(() => Activities,activity => activity.list_code_product)
+  @ManyToOne(() => Activities,activity => activity.list_code_product, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'activity' })
   activity: Activities;
 

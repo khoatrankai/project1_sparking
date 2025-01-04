@@ -6,7 +6,7 @@ export class ListDetailProduct {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   detail_id: string;
 
-  @ManyToOne(() => ListProduct, product => product.list_detail)
+  @ManyToOne(() => ListProduct, product => product.list_detail,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'PQ_product' })
   PQ_product: ListProduct;
 

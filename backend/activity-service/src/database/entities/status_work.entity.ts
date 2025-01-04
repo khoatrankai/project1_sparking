@@ -15,7 +15,7 @@ export class StatusWork {
   @Column({ type: 'int', nullable: true })
   position:number
 
-  @ManyToOne(() => TypeWork,typework => typework.status)
+  @ManyToOne(() => TypeWork,typework => typework.status, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'type_work' })
   type_work: TypeWork;
 

@@ -15,7 +15,7 @@ export class TypeProducts {
   @Column({ type: 'varchar', length: 50,nullable:true,unique:true })
   name_tag: string;
 
-  @ManyToOne(() => ClassifyType)
+  @ManyToOne(() => ClassifyType,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'classify_type' })
   classify_type: ClassifyType;
 

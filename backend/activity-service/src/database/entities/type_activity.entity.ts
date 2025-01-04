@@ -12,10 +12,10 @@ export class TypeActivities {
   @Column({ type: 'varchar', length: 50 })
   name_tag: string;
 
-  @OneToMany(() => Activities, activity => activity.type)
+  @OneToMany(() => Activities, activity => activity.type, { cascade: false })
   activity: Activities[];
 
-  @OneToMany(() => StatusActivities,  statusActivity => statusActivity.type_activity)
+  @OneToMany(() => StatusActivities,  statusActivity => statusActivity.type_activity, { cascade: false })
   status: StatusActivities[];
 
   @CreateDateColumn({ type: 'timestamp' })

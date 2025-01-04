@@ -67,6 +67,7 @@ import { ParkingVehicleRegistrationAuditLogEntry } from 'src/database/entities/p
 import { ParkingVehicleType } from 'src/database/entities/parking_vehicletype.entity';
 import { ParkingVoucher } from 'src/database/entities/parking_voucher.entity';
 import { UnlockCard } from 'src/database/entities/unlockcard.entity';
+import { GetFrequencyDto } from 'src/dto/GetFrequency.dto';
 import { Repository } from 'typeorm';
 ;
 
@@ -179,41 +180,553 @@ export class SystemService {
   // }
     
   //   })
-  // const data = await this.parkingFeeSessionRepository
-  // .createQueryBuilder('parkingFeeSession')
-  // .leftJoinAndSelect('parkingFeeSession.parkingSession', 'parkingSession')
-  // .leftJoinAndSelect('parkingSession.parkingCard', 'parkingCard')
-  // .leftJoinAndSelect('parkingSession.checkInOperator', 'checkInOperator')
-  // .leftJoinAndSelect('parkingSession.checkOutOperator', 'checkOutOperator')
-  // .leftJoinAndSelect('parkingSession.checkOutException', 'checkOutException')
-  // .leftJoinAndSelect('parkingFeeSession.vehicleType', 'vehicleType')
-  // .where('parkingCard.card_type = :cardType', { cardType: 0 }) // Điều kiện lọc card_type = 0
-  // .select([
-  //   'parkingFeeSession.id',
-  //   'parkingFeeSession.payment_date',
-  //   'parkingFeeSession.vehicle_number',
-  //   'parkingSession.card_id',
-  //   'parkingSession.check_in_time',
-  //   'parkingSession.check_out_time',
-  //   'checkOutException.parking_fee',
-  //   'parkingCard.card_label',
-  //   'parkingCard.card_type',
-  //   'checkInOperator.username',
-  //   'checkOutOperator.username',
-  //   'vehicleType.name',
-  //   'vehicleType.code',
-  // ]).limit(100)
-  // .getMany();
-  const data = await this.parkingCustomerRepository.find({relations:['parkingVehicleRegistrations'],select:{
-    id:true,
-    customerName:true,
-    parkingVehicleRegistrations:{
-      vehicle_driver_name:true,
-      // id:true
-    }
+  const data = await this.parkingFeeSessionRepository
+  .createQueryBuilder('parkingFeeSession')
+  .leftJoinAndSelect('parkingFeeSession.parkingSession', 'parkingSession')
+  .leftJoinAndSelect('parkingSession.parkingCard', 'parkingCard')
+  .leftJoinAndSelect('parkingSession.checkInOperator', 'checkInOperator')
+  .leftJoinAndSelect('parkingSession.checkOutOperator', 'checkOutOperator')
+  .leftJoinAndSelect('parkingSession.checkOutException', 'checkOutException')
+  .leftJoinAndSelect('parkingFeeSession.vehicleType', 'vehicleType')
+  .where('parkingCard.card_type = :cardType', { cardType: 0 }) // Điều kiện lọc card_type = 0
+  .select([
+    'parkingFeeSession.id',
+    'parkingFeeSession.payment_date',
+    'parkingFeeSession.vehicle_number',
+    'parkingSession.card_id',
+    'parkingSession.check_in_time',
+    'parkingSession.check_out_time',
+    'checkOutException.parking_fee',
+    'parkingCard.card_label',
+    'parkingCard.card_type',
+    'checkInOperator.username',
+    'checkOutOperator.username',
+    'vehicleType.name',
+    'vehicleType.code',
+  ]).limit(100)
+  .getMany();
+  return data
+  }
 
-  }})
+  async getDashboardTotal(){
+    // const total0Revenue = (await this.parkingFeeSessionRepository.find({where:{session_type:"OUT",is_vehicle_registration:false,parking_fee: Not(0)},select:{
+    //   parking_fee:true
+    // }})).reduce((preValue,currValue)=>{
+    //  return preValue+currValue.parking_fee
+    // },0)
+    const data = await this.parkingFeeSessionRepository
+    .createQueryBuilder('session')
+    // .where('session.is_vehicle_registration = :vehicleType AND session.session_type = :sessionType', { vehicleType: false,sessionType:"OUT" })
+    .select(['session.is_vehicle_registration','session.session_type'])
+    .addSelect('SUM(session.parking_fee)', 'total_parking_fee')
+    .addSelect('COUNT(*)', 'count')
+    .groupBy('session.is_vehicle_registration')
+    .addGroupBy('session.session_type')
+    .getRawMany();
+
+
     return data
   }
+
+  async customerCategory(){
+    const data = await this.parkingCustomerRepository.find({relations:['parkingVehicleRegistrations'],select:{
+      id:true,
+      customerName:true,
+      parkingVehicleRegistrations:{
+        vehicle_driver_name:true,
+        // id:true
+      }
+  
+    }})
+      return data
+  }
+
  
+  async getFrequency(data:GetFrequencyDto){
+
+     const getStartAndEndOfWeek = (date: Date)=> {
+    const currentDay = date.getDay(); // 0: Chủ Nhật, 1: Thứ Hai, ..., 6: Thứ Bảy
+    const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay; // Khoảng cách đến thứ Hai
+    const distanceToSunday = currentDay === 0 ? 0 : 7 - currentDay; // Khoảng cách đến Chủ Nhật
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() + distanceToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(date);
+    endOfWeek.setDate(date.getDate() + distanceToSunday);
+    endOfWeek.setHours(23, 59, 59, 999); 
+    return { startOfWeek, endOfWeek };
+  }
+
+  //   const data = await this.parkingFeeSessionRepository
+  // .createQueryBuilder('parkingFeeSession')
+  // .leftJoinAndSelect('parkingFeeSession.vehicleType', 'vehicleType')
+  // .where('parkingFeeSession.session_type = :sessionType', { sessionType: "OUT" }).limit(100)
+  // .select('vehicleType.name','name')
+  // .addSelect('vehicleType.id','id')
+  // .addSelect('COUNT(*)','count')
+  // .groupBy('vehicleType.id')
+  // .getRawMany();
+
+  if(data.type==="day"){
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+    const dataToday = await this.parkingFeeSessionRepository
+    .createQueryBuilder('feesession')
+    .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+    .select([
+      'HOUR(feesession.timestamp) AS hour',
+      'vehicleType.name AS vehicleTypeName',
+      'COUNT(feesession.id) AS count', // Đếm số lượng bản ghi theo loại xe
+    ])
+    .where('feesession.session_type = :sessionType AND feesession.timestamp BETWEEN :startOfDay AND :endOfDay', {
+      startOfDay,
+      endOfDay,
+      sessionType: data.status
+    })
+    .groupBy('HOUR(feesession.timestamp), vehicleType.id') 
+    .orderBy('hour', 'ASC')
+    .getRawMany();
+    const groupedData = dataToday.reduce((acc, row) => {
+      const hourGroup = acc.find(group => group.hour === row.hour);
+      if (hourGroup) {
+        hourGroup.data.push({
+          name: row.vehicleTypeName,
+          count: parseInt(row.count, 10), 
+        });
+      } else {
+        acc.push({
+          hour: row.hour,
+          data: [{
+            name: row.vehicleTypeName,
+            count: parseInt(row.count, 10),
+          }],
+        });
+      }
+      
+      return acc;
+    }, []);
+    return groupedData
+  }
+  
+  if(data.type === "week"){
+    const {startOfWeek,endOfWeek } = getStartAndEndOfWeek((new Date()))
+    const dataByWeekday = await this.parkingFeeSessionRepository
+    .createQueryBuilder('feesession')
+    .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+    .select([
+      'DAYOFWEEK(feesession.timestamp) AS weekday', // Lấy số ngày trong tuần
+      'DAYNAME(feesession.timestamp) AS dayName',   // Lấy tên ngày
+      'vehicleType.name AS vehicleTypeName',        // Lấy tên loại xe
+      'COUNT(feesession.id) AS count',              // Đếm số lượng
+    ])
+    .where('feesession.session_type = :sessionType AND feesession.timestamp BETWEEN :startOfWeek AND :endOfWeek', {
+      startOfWeek,
+      endOfWeek,
+      sessionType: data.status
+    })
+    .groupBy('DAYOFWEEK(feesession.timestamp), vehicleType.name')
+    .getRawMany();
+  
+      const groupedByWeekday = dataByWeekday.reduce((acc, row) => {
+        const weekdayGroup = acc.find(group => group.weekday === row.weekday);
+  
+        if (weekdayGroup) {
+          weekdayGroup.data.push({
+            name: row.vehicleTypeName,
+            count: parseInt(row.count, 10),
+          });
+        } else {
+          acc.push({
+            weekday: row.weekday,
+            dayName: row.dayName,
+            data: [{
+              name: row.vehicleTypeName,
+              count: parseInt(row.count, 10),
+            }],
+          });
+        }
+  
+        return acc;
+      }, []);
+      return groupedByWeekday
+  }
+  
+  if(data.type === "month"){
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const dataByDay = await this.parkingFeeSessionRepository
+  .createQueryBuilder('feesession')
+  .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+  .select([
+    "DATE_FORMAT(feesession.timestamp, '%d-%m-%Y') AS date", 
+    'vehicleType.name AS vehicleTypeName',       // Lấy tên loại xe
+    'COUNT(feesession.id) AS count',             // Đếm số lượng
+  ])
+  .where('feesession.session_type = :sessionType AND feesession.timestamp BETWEEN :startOfMonth AND :endOfMonth', {
+    startOfMonth,   // Truyền đúng biến
+    endOfMonth,     // Truyền đúng biến
+    sessionType: data.status
+  })
+  .groupBy("DATE_FORMAT(feesession.timestamp, '%d-%m-%Y'), vehicleType.name")
+  .getRawMany();
+    const groupedByDay = dataByDay.reduce((acc, row) => {
+      const weekdayGroup = acc.find(group => group.date === row.date);
+
+      if (weekdayGroup) {
+        weekdayGroup.data.push({
+          name: row.vehicleTypeName,
+          count: parseInt(row.count, 10),
+        });
+      } else {
+        acc.push({
+          date: row.date,
+          data: [{
+            name: row.vehicleTypeName,
+            count: parseInt(row.count, 10),
+          }],
+        });
+      }
+
+      return acc;
+    }, []);
+    return groupedByDay
+  }
+
+  if(data.type === "year"){
+    const today = new Date()
+    const currentYear = today.getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1, 0, 0, 0);
+    const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59);
+    const dataByMonth = await this.parkingFeeSessionRepository
+  .createQueryBuilder('feesession')
+  .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+  .select([
+    "MONTH(feesession.timestamp) AS month", 
+    'vehicleType.name AS vehicleTypeName',       
+    'COUNT(feesession.id) AS count',             
+  ])
+  .where('feesession.session_type = :sessionType AND feesession.timestamp BETWEEN :startOfYear AND :endOfYear', {
+    startOfYear,  
+    endOfYear,    
+    sessionType: data.status
+  })
+  .groupBy("MONTH(feesession.timestamp), vehicleType.name")
+  .getRawMany();
+    const groupedByMonth = dataByMonth.reduce((acc, row) => {
+      const weekdayGroup = acc.find(group => group.month === row.month);
+
+      if (weekdayGroup) {
+        weekdayGroup.data.push({
+          name: row.vehicleTypeName,
+          count: parseInt(row.count, 10),
+        });
+      } else {
+        acc.push({
+          month: row.month,
+          data: [{
+            name: row.vehicleTypeName,
+            count: parseInt(row.count, 10),
+          }],
+        });
+      }
+
+      return acc;
+    }, []);
+    return groupedByMonth
+  }
+
+  if(data.type === "all"){
+    const dataByMonth = await this.parkingFeeSessionRepository
+    .createQueryBuilder('feesession')
+    .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+    .select([
+      "DATE_FORMAT(feesession.timestamp, '%m-%Y') AS date",
+      'vehicleType.name AS vehicleTypeName',       
+      'COUNT(feesession.id) AS count',             
+    ])
+    .where('feesession.session_type = :sessionType', {
+      sessionType: data.status
+    })
+    .groupBy("DATE_FORMAT(feesession.timestamp, '%m-%Y'), vehicleType.name")
+    .getRawMany();
+      const groupedByMonth = dataByMonth.reduce((acc, row) => {
+        const weekdayGroup = acc.find(group => group.date === row.date);
+  
+        if (weekdayGroup) {
+          weekdayGroup.data.push({
+            name: row.vehicleTypeName,
+            count: parseInt(row.count, 10),
+          });
+        } else {
+          acc.push({
+            date: row.date,
+            data: [{
+              name: row.vehicleTypeName,
+              count: parseInt(row.count, 10),
+            }],
+          });
+        }
+  
+        return acc;
+      }, []);
+      return groupedByMonth
+  
+  }
+   
+  }
+
+  async getRevenue(data:GetFrequencyDto){
+
+    const getStartAndEndOfWeek = (date: Date)=> {
+    const currentDay = date.getDay(); // 0: Chủ Nhật, 1: Thứ Hai, ..., 6: Thứ Bảy
+    const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay; // Khoảng cách đến thứ Hai
+    const distanceToSunday = currentDay === 0 ? 0 : 7 - currentDay; // Khoảng cách đến Chủ Nhật
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() + distanceToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(date);
+    endOfWeek.setDate(date.getDate() + distanceToSunday);
+    endOfWeek.setHours(23, 59, 59, 999); 
+    return { startOfWeek, endOfWeek };
+  }
+
+
+
+  if(data.type==="day"){
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+    const dataToday = await this.parkingFeeSessionRepository
+    .createQueryBuilder('feesession')
+    .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+    .select([
+      'HOUR(feesession.timestamp) AS hour',
+      'vehicleType.name AS vehicleTypeName',
+      'SUM(feesession.parking_fee) AS total', // Đếm số lượng bản ghi theo loại xe
+    ])
+    .where('feesession.session_type = :sessionType AND feesession.timestamp BETWEEN :startOfDay AND :endOfDay', {
+      startOfDay,
+      endOfDay,
+      sessionType: data.status
+    })
+    .groupBy('HOUR(feesession.timestamp), vehicleType.id') 
+    .orderBy('hour', 'ASC')
+    .getRawMany();
+    const groupedData = dataToday.reduce((acc, row) => {
+      const hourGroup = acc.find(group => group.hour === row.hour);
+      if (hourGroup) {
+        hourGroup.data.push({
+          name: row.vehicleTypeName,
+          total: parseInt(row.total, 10), 
+        });
+      } else {
+        acc.push({
+          hour: row.hour,
+          data: [{
+            name: row.vehicleTypeName,
+            total: parseInt(row.total, 10),
+          }],
+        });
+      }
+      
+      return acc;
+    }, []);
+    return groupedData
+  }
+  
+  if(data.type === "week"){
+    const {startOfWeek,endOfWeek } = getStartAndEndOfWeek((new Date()))
+    const dataByWeekday = await this.parkingFeeSessionRepository
+    .createQueryBuilder('feesession')
+    .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+    .select([
+      'DAYOFWEEK(feesession.timestamp) AS weekday', // Lấy số ngày trong tuần
+      'DAYNAME(feesession.timestamp) AS dayName',   // Lấy tên ngày
+      'vehicleType.name AS vehicleTypeName',        // Lấy tên loại xe
+      'SUM(feesession.parking_fee) AS total',              // Đếm số lượng
+    ])
+    .where('feesession.session_type = :sessionType AND feesession.timestamp BETWEEN :startOfWeek AND :endOfWeek', {
+      startOfWeek,
+      endOfWeek,
+      sessionType: data.status
+    })
+    .groupBy('DAYOFWEEK(feesession.timestamp), vehicleType.name')
+    .getRawMany();
+  
+      const groupedByWeekday = dataByWeekday.reduce((acc, row) => {
+        const weekdayGroup = acc.find(group => group.weekday === row.weekday);
+  
+        if (weekdayGroup) {
+          weekdayGroup.data.push({
+            name: row.vehicleTypeName,
+            total: parseInt(row.total, 10),
+          });
+        } else {
+          acc.push({
+            weekday: row.weekday,
+            dayName: row.dayName,
+            data: [{
+              name: row.vehicleTypeName,
+              total: parseInt(row.total, 10),
+            }],
+          });
+        }
+  
+        return acc;
+      }, []);
+      return groupedByWeekday
+  }
+  
+  if(data.type === "month"){
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const dataByDay = await this.parkingFeeSessionRepository
+  .createQueryBuilder('feesession')
+  .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+  .select([
+    "DATE_FORMAT(feesession.timestamp, '%d-%m-%Y') AS date", 
+    'vehicleType.name AS vehicleTypeName',       // Lấy tên loại xe
+    'SUM(feesession.parking_fee) AS total',             // Đếm số lượng
+  ])
+  .where('feesession.session_type = :sessionType AND feesession.timestamp BETWEEN :startOfMonth AND :endOfMonth', {
+    startOfMonth,   // Truyền đúng biến
+    endOfMonth,     // Truyền đúng biến
+    sessionType: data.status
+  })
+  .groupBy("DATE_FORMAT(feesession.timestamp, '%d-%m-%Y'), vehicleType.name")
+  .getRawMany();
+    const groupedByDay = dataByDay.reduce((acc, row) => {
+      const weekdayGroup = acc.find(group => group.date === row.date);
+
+      if (weekdayGroup) {
+        weekdayGroup.data.push({
+          name: row.vehicleTypeName,
+          total: parseInt(row.total, 10),
+        });
+      } else {
+        acc.push({
+          date: row.date,
+          data: [{
+            name: row.vehicleTypeName,
+            total: parseInt(row.total, 10),
+          }],
+        });
+      }
+
+      return acc;
+    }, []);
+    return groupedByDay
+  }
+
+  if(data.type === "year"){
+    const today = new Date()
+    const currentYear = today.getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1, 0, 0, 0);
+    const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59);
+    const dataByMonth = await this.parkingFeeSessionRepository
+  .createQueryBuilder('feesession')
+  .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+  .select([
+    "MONTH(feesession.timestamp) AS month", 
+    'vehicleType.name AS vehicleTypeName',       
+    'SUM(feesession.parking_fee) AS total',             
+  ])
+  .where('feesession.session_type = :sessionType AND feesession.timestamp BETWEEN :startOfYear AND :endOfYear', {
+    startOfYear,  
+    endOfYear,    
+    sessionType: data.status
+  })
+  .groupBy("MONTH(feesession.timestamp), vehicleType.name")
+  .getRawMany();
+    const groupedByMonth = dataByMonth.reduce((acc, row) => {
+      const weekdayGroup = acc.find(group => group.month === row.month);
+
+      if (weekdayGroup) {
+        weekdayGroup.data.push({
+          name: row.vehicleTypeName,
+          total: parseInt(row.total, 10),
+        });
+      } else {
+        acc.push({
+          month: row.month,
+          data: [{
+            name: row.vehicleTypeName,
+            total: parseInt(row.total, 10),
+          }],
+        });
+      }
+
+      return acc;
+    }, []);
+    return groupedByMonth
+  }
+
+  if(data.type === "all"){
+    const dataByMonth = await this.parkingFeeSessionRepository
+    .createQueryBuilder('feesession')
+    .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+    .select([
+      "DATE_FORMAT(feesession.timestamp, '%m-%Y') AS date",
+      'vehicleType.name AS vehicleTypeName',       
+      'SUM(feesession.parking_fee) AS total',             
+    ])
+    .where('feesession.session_type = :sessionType', {
+      sessionType: data.status
+    })
+    .groupBy("DATE_FORMAT(feesession.timestamp, '%m-%Y'), vehicleType.name")
+    .getRawMany();
+      const groupedByMonth = dataByMonth.reduce((acc, row) => {
+        const weekdayGroup = acc.find(group => group.date === row.date);
+  
+        if (weekdayGroup) {
+          weekdayGroup.data.push({
+            name: row.vehicleTypeName,
+            total: parseInt(row.total, 10),
+          });
+        } else {
+          acc.push({
+            date: row.date,
+            data: [{
+              name: row.vehicleTypeName,
+              total: parseInt(row.total, 10),
+            }],
+          });
+        }
+  
+        return acc;
+      }, []);
+      return groupedByMonth
+  
+    }
+    
+  }
+
+  async getTypeReport(startDate:number,endDate:number){
+
+    const startOfDate = new Date(2024,8,2)
+    const endOfDate = new Date(2024,10,0)
+    const dataDate = await this.parkingFeeSessionRepository
+    .createQueryBuilder('feesession')
+    .leftJoinAndSelect('feesession.vehicleType', 'vehicleType')
+    .select([
+      'vehicleType.name AS vehicleTypeName',
+      'is_vehicle_registration AS typeRegistration',
+      "SUM(CASE WHEN feesession.session_type = 'IN' THEN 1 ELSE 0 END) AS inCount",
+      "SUM(CASE WHEN feesession.session_type = 'OUT' THEN 1 ELSE 0 END) AS outCount", 
+      'SUM(feesession.parking_fee) AS total', 
+    ])
+    .where('feesession.timestamp BETWEEN :startOfDate AND :endOfDate', {
+      startOfDate,
+      endOfDate,
+    })
+    .groupBy('vehicleType.id, feesession.is_vehicle_registration') 
+    .getRawMany();
+
+    return dataDate
+  }
 }
+
+

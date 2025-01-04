@@ -12,7 +12,7 @@ export class ListLabel {
   @Column({ type: 'varchar', length: 50 })
   customer: string;
 
-  @ManyToOne(() => Label)
+  @ManyToOne(() => Label,{onDelete:'SET NULL'})
   @JoinColumn({ name: 'type_label' })
   label: Label;
 }

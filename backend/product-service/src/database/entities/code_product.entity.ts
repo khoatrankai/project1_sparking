@@ -13,7 +13,7 @@ export class CodeProduct {
   @Column({type:'enum',enum: ['selled','borrowed','inventory','export'],default:'inventory'})
   status:string
   
-  @ManyToOne(() => Products)
+  @ManyToOne(() => Products,{onDelete:'RESTRICT'})
   @JoinColumn({ name: 'product' })
   product: Products;
 

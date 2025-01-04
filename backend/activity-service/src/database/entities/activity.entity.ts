@@ -19,11 +19,11 @@ import { Works } from './work.entity';
     @PrimaryColumn({ type: 'varchar', length: 50 })
     activity_id: string;
 
-    @ManyToOne(() => TypeActivities, (typeActivity) => typeActivity.activity)
+    @ManyToOne(() => TypeActivities, (typeActivity) => typeActivity.activity,{ onDelete: 'SET NULL' })
     @JoinColumn({ name: 'type' })
     type: TypeActivities;
 
-    @ManyToOne(() => StatusActivities, (statusActivity) => statusActivity.activity)
+    @ManyToOne(() => StatusActivities, (statusActivity) => statusActivity.activity,{ onDelete: 'SET NULL' })
     @JoinColumn({ name: 'status' })
     status: StatusActivities;
   
@@ -51,13 +51,13 @@ import { Works } from './work.entity';
     @UpdateDateColumn({ type: 'timestamp' })
     updated_at: Date;
 
-    @OneToMany(() => PictureActivity, pictureActivity => pictureActivity.activity)
+    @OneToMany(() => PictureActivity, pictureActivity => pictureActivity.activity, { cascade: false })
     picture_urls: PictureActivity[];
 
-    @OneToMany(() => ListCodeProduct, listCodeProduct => listCodeProduct.activity)
+    @OneToMany(() => ListCodeProduct, listCodeProduct => listCodeProduct.activity, { cascade: false })
     list_code_product: ListCodeProduct[];
 
-    @OneToMany(() => Works, work => work.activity)
+    @OneToMany(() => Works, work => work.activity, { cascade: true })
     works: Works[];
   }
   

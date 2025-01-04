@@ -9,7 +9,7 @@ export class PictureWork {
   @Column({ type: 'varchar'})
   url: string;
 
-  @ManyToOne(() => Works)
+  @ManyToOne(() => Works, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'work' })
   work: Works;
 

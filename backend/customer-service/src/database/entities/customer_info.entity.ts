@@ -10,7 +10,7 @@ export class CustomerInfo {
   @Column({ type: 'varchar', length: 50 })
   name_company: string;
 
-  @ManyToOne(() => GroupCustomer,{nullable:true})
+  @ManyToOne(() => GroupCustomer,{nullable:true,onDelete:'SET NULL'})
   @JoinColumn({ name: 'group_customer' })
   group_customer: GroupCustomer;
 

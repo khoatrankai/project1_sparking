@@ -1,7 +1,8 @@
-import { Controller, Get, UseFilters } from '@nestjs/common';
+import { Controller, Get, Query, UseFilters } from '@nestjs/common';
 
 import { ConflictExceptionFilter } from 'src/common/filters/conflict-exception.filter';
 import { SystemService } from './system.service';
+import { GetFrequencyDto } from 'src/dto/GetFrequency.dto';
 
 
 @Controller()
@@ -15,8 +16,8 @@ export class SystemController {
   }
 
   @Get('find-all_parking_feesession')
-  findAllParkingFeesession(){
-    return this.systemService.findParkingFeesession()
+  findAllParkingFeesession(@Query() data:GetFrequencyDto){
+    return this.systemService.getRevenue(data)
   }
  
   

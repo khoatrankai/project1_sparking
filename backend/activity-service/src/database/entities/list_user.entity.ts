@@ -9,7 +9,7 @@ export class ListUser {
   @Column({ type: 'varchar', length: 50 })
   user: string;
 
-  @ManyToOne(() => Works,work => work.list_user)
+  @ManyToOne(() => Works,work => work.list_user, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'work' })
   work: Works;
 

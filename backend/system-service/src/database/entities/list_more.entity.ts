@@ -5,7 +5,7 @@ export class ListMore {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   list_more_id: string;
 
-  @ManyToOne(() => MoreDatas)
+  @ManyToOne(() => MoreDatas,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'more_data' })
   more_data: MoreDatas;
 

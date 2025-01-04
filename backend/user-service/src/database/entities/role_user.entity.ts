@@ -7,11 +7,11 @@ export class RoleUser {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   role_id: string;
 
-  @ManyToOne(() => RoleTypeUser)
+  @ManyToOne(() => RoleTypeUser,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'role_type' })
   role_type: RoleTypeUser;
 
-  @ManyToOne(() => AccountUsers)
+  @ManyToOne(() => AccountUsers,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'user_info' })
   user_info: AccountUsers;
 

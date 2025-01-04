@@ -15,11 +15,11 @@ import { TypeOpportunities } from './type_opportunity.entity';
     @PrimaryColumn({ type: 'varchar', length: 50 })
     opportunity_id: string;
   
-    @ManyToOne(() => TypeOpportunities, (typeOpportunity) => typeOpportunity.opportunities)
+    @ManyToOne(() => TypeOpportunities, (typeOpportunity) => typeOpportunity.opportunities,{onDelete:'SET NULL'})
     @JoinColumn({ name: 'type_opportunity' })
     type_opportunity: TypeOpportunities;
   
-    @ManyToOne(() => TypeSources, (typeSource) => typeSource.opportunities)
+    @ManyToOne(() => TypeSources, (typeSource) => typeSource.opportunities,{onDelete:'SET NULL'})
     @JoinColumn({ name: 'type_source' })
     type_source: TypeSources;
   
