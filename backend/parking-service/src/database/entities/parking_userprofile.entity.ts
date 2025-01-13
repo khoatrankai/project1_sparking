@@ -1,29 +1,34 @@
-import { Entity, Unique, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, Unique, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import { ParkingTicketPayment } from "./parking_ticketpayment.entity";
 import { ParkingVehicleRegistration } from "./parking_vehicleregistration.entity";
 import { ParkingVehicleRegistrationAuditLogEntry } from "./parking_vehicleregistrationauditlogentry.entity";
 import { ParkingDepositPayment } from "./parking_depositpayment.entity";
+import { AuthUser } from "./auth_user.entity";
+import { ParkingCard } from "./parking_card.entity";
 
 @Entity('parking_userprofile')
-@Unique(['user_id'])
+@Unique(['user'])
+@Unique(['card'])
 export class ParkingUserProfile {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column('int')
-  user_id: number;
-
-  @Column('varchar', { length: 500 })
-  fullname: string;
-
-  @Column('varchar', { length: 10 })
-  staff_id: string;
-
-  @Column('date', { nullable: true })
-  birthday: Date;
-
-  @Column('int', { nullable: true })
-  card_id: number;
+    @PrimaryGeneratedColumn({ name: 'id' })
+    id: number;
+  
+    @OneToOne(() => AuthUser)
+    @JoinColumn({ name: 'user_id' })
+    user: AuthUser;
+  
+    @Column({ type: 'varchar', length: 500, name: 'fullname' })
+    fullname: string;
+  
+    @Column({ type: 'varchar', length: 10, name: 'staff_id' })
+    staffId: string;
+  
+    @Column({ type: 'date', name: 'birthday', nullable: true })
+    birthday: Date | null;
+  
+    @OneToOne(() => ParkingCard)
+    @JoinColumn({ name: 'card_id' })
+    card: ParkingCard | null;
 
   @OneToMany(() => ParkingTicketPayment, (payment) => payment.staff)
   ticketPayments: ParkingTicketPayment[];

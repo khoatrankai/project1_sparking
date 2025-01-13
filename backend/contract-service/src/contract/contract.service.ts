@@ -1,11 +1,23 @@
-import { HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Contract } from 'src/database/entities/contract.entity';
 import { CreateTypeContractDto } from 'src/dto/TypeContractDto/create_type_contract.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 
-
-import { In, MoreThanOrEqual, Repository } from 'typeorm';
+import {
+  Between,
+  In,
+  LessThan,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Not,
+  Repository,
+} from 'typeorm';
 import { TypeContract } from 'src/database/entities/type_contract.entity';
 import { UpdateTypeContractDto } from 'src/dto/TypeContractDto/update_type_contract.dto';
 import { UpdateContractDto } from 'src/dto/ContractDto/update_contract.dto';
@@ -18,376 +30,619 @@ import { UpdateTypeMethodDto } from 'src/dto/TypeMethodDto/update-type_method.dt
 import { CreateContractDto } from 'src/dto/ContractDto/create_contract.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-
+import { GetFilterPaymentDto } from 'src/dto/PaymentDto/get-filter.dto';
+import { GetFilterContractDto } from 'src/dto/ContractDto/get-filter.dto';
 
 @Injectable()
 export class ContractService {
-
-  constructor(@Inject('CUSTOMER') private readonly customersClient:ClientProxy,@Inject('PRODUCT') private readonly productsClient:ClientProxy,@Inject('PROJECT') private readonly projectsClient:ClientProxy,@InjectRepository(Contract) private readonly contractRepository:Repository<Contract>,@InjectRepository(TypeContract) private readonly typeContractRepository:Repository<TypeContract>,@InjectRepository(Payment)
-  private paymentRepository: Repository<Payment>,
- @InjectRepository(TypeMethod)
-  private typeMethodRepository: Repository<TypeMethod>){}
+  constructor(
+    @Inject('CUSTOMER') private readonly customersClient: ClientProxy,
+    @Inject('PRODUCT') private readonly productsClient: ClientProxy,
+    @Inject('PROJECT') private readonly projectsClient: ClientProxy,
+    @InjectRepository(Contract)
+    private readonly contractRepository: Repository<Contract>,
+    @InjectRepository(TypeContract)
+    private readonly typeContractRepository: Repository<TypeContract>,
+    @InjectRepository(Payment)
+    private paymentRepository: Repository<Payment>,
+    @InjectRepository(TypeMethod)
+    private typeMethodRepository: Repository<TypeMethod>,
+  ) {}
   getHello(): string {
     return 'Hello World!';
   }
   // Create a new TypeContract
-async createTypeContract(createTypeContract: CreateTypeContractDto) {
-  try {
-    const id = uuidv4();
-    const dataNew = this.typeContractRepository.create({
-      ...createTypeContract,
-      type_id: id,
-    });
-    await this.typeContractRepository.save(dataNew);
+  async createTypeContract(createTypeContract: CreateTypeContractDto) {
+    try {
+      const id = uuidv4();
+      const dataNew = this.typeContractRepository.create({
+        ...createTypeContract,
+        type_id: id,
+      });
+      await this.typeContractRepository.save(dataNew);
 
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'TypeContract created successfully',
-    };
-  } catch {
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to create TypeContract',
-    };
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'TypeContract created successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to create TypeContract',
+      };
+    }
   }
-}
 
-// Update an existing TypeContract
-async updateTypeContract(updateTypeContract: UpdateTypeContractDto) {
-  try {
-    await this.typeContractRepository.update(
-      updateTypeContract.type_id,
-      updateTypeContract,
+  async deleteTypeContracts(datas: string[]) {
+    try {
+      const rm = await this.typeContractRepository.delete({
+        type_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  // Update an existing TypeContract
+  async updateTypeContract(updateTypeContract: UpdateTypeContractDto) {
+    try {
+      await this.typeContractRepository.update(
+        updateTypeContract.type_id,
+        updateTypeContract,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'TypeContract updated successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to update TypeContract',
+      };
+    }
+  }
+
+  // Create a new Contract
+  async createContract(createContract: CreateContractDto) {
+    try {
+      const id = uuidv4();
+      const typeContract = await this.typeContractRepository.findOne({
+        where: { type_id: createContract.type_contract },
+      });
+      const dataNew = this.contractRepository.create({
+        ...createContract,
+        contract_id: id,
+        type_contract: typeContract,
+      });
+      await this.contractRepository.save(dataNew);
+
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Contract created successfully',
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to create Contract',
+      };
+    }
+  }
+
+  async deleteContract(datas: string[]) {
+    try {
+      const rm = await this.contractRepository.delete({
+        contract_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  // Update an existing Contract
+  async updateContract(updateContract: UpdateContractDto) {
+    try {
+      const typeContract = await this.typeContractRepository.findOne({
+        where: { type_id: updateContract.type_contract },
+      });
+      await this.contractRepository.update(updateContract.contract_id, {
+        ...updateContract,
+        type_contract: typeContract,
+      });
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Contract updated successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to update Contract',
+      };
+    }
+  }
+
+  // Get all Contracts
+  async getContracts() {
+    const result = await this.contractRepository.find({
+      relations: ['type_contract'],
+    });
+    const customerIds = result.map((dt) => dt.customer);
+    const customerInfos = await firstValueFrom(
+      this.customersClient.send({ cmd: 'get-customer_ids' }, customerIds),
     );
     return {
       statusCode: HttpStatus.OK,
-      message: 'TypeContract updated successfully',
-    };
-  } catch {
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to update TypeContract',
+      message: 'Contracts retrieved successfully',
+      data: result.map((dt, index) => {
+        return { ...dt, customer: customerInfos[index] };
+      }),
     };
   }
-}
 
-// Create a new Contract
-async createContract(createContract: CreateContractDto) {
-  try {
-    const id = uuidv4();
-    const typeContract = await this.typeContractRepository.findOne({
-      where: { type_id: createContract.type_contract },
+  async getContractAbout() {
+    const today = new Date();
+    const weekDate = new Date();
+    weekDate.setDate(today.getDate() + 7);
+    const contractTotal = await this.contractRepository.count({
+      where: { status: Not('delete') },
     });
-    const dataNew = this.contractRepository.create({
-      ...createContract,
-      contract_id: id,
-      type_contract: typeContract,
+    const contractActive = await this.contractRepository.count({
+      where: { status: In(['active']), date_expired: MoreThanOrEqual(today) },
     });
-    await this.contractRepository.save(dataNew);
-
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'Contract created successfully',
-    };
-  } catch(err) {
-    console.log(err)
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to create Contract',
-    };
-  }
-}
-
-// Update an existing Contract
-async updateContract(updateContract: UpdateContractDto) {
-  try {
-    const typeContract = await this.typeContractRepository.findOne({
-      where: { type_id: updateContract.type_contract },
+    const contractReadyExpired = await this.contractRepository.count({
+      where: { status: In(['active']), date_expired: Between(today, weekDate) },
     });
-    await this.contractRepository.update(updateContract.contract_id, {
-      ...updateContract,
-      type_contract: typeContract,
+    const contractExpired = await this.contractRepository.count({
+      where: { status: In(['active']), date_expired: LessThan(today) },
     });
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Contract updated successfully',
-    };
-  } catch {
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to update Contract',
-    };
-  }
-}
-
-// Get all Contracts
-async getContracts() {
-  const result = await this.contractRepository.find({relations:['type_contract']});
-  const customerIds = result.map((dt)=> dt.customer)
-  const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},customerIds))
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'Contracts retrieved successfully',
-    data: result.map((dt,index)=>{
-      return {...dt,customer:customerInfos[index]}
-    }),
-  };
-}
-
-async getYearContracts(year:number) {
-  if(year){
-    const result = await this.contractRepository.find({where:{date_expired:MoreThanOrEqual(new Date(`${year}-01-01`))},relations:['type_contract']});
-    const projectIds = result.map((dt)=> dt.project)
-    const projectInfos = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},projectIds))
     return {
       statusCode: HttpStatus.OK,
       message: 'Contracts retrieved successfully',
-      data: result.map((dt,index)=>{
-        return {...dt,project:projectInfos[index]}
-      }).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+      data: {
+        contractActive,
+        contractExpired,
+        contractReadyExpired,
+        contractTotal,
+      },
     };
-  }else{
-    const result = await this.contractRepository.find({relations:['type_contract']});
-    const projectIds = result.map((dt)=> dt.project)
-    const projectInfos = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},projectIds))
+  }
+
+  async getYearContracts(filter?: GetFilterContractDto) {
+    const year = filter.year ?? null;
+    const customer = filter.customer ?? null;
+
+    const whereCondition: any = {};
+    if (customer) {
+      whereCondition.customer = customer;
+    }
+
+    if (year) {
+      const result = await this.contractRepository.find({
+        where: {
+          ...whereCondition,
+          date_expired: MoreThanOrEqual(new Date(`${year}-01-01`)),
+        },
+        relations: ['type_contract'],
+      });
+      const projectIds = result.map((dt) => dt.project);
+      const projectInfos = await firstValueFrom(
+        this.projectsClient.send({ cmd: 'get-project_ids' }, projectIds),
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Contracts retrieved successfully',
+        data: result
+          .map((dt, index) => {
+            return { ...dt, project: projectInfos[index] };
+          })
+          .sort(
+            (a, b) =>
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime(),
+          ),
+      };
+    } else {
+      const result = await this.contractRepository.find({
+        where: whereCondition,
+        relations: ['type_contract'],
+      });
+      const projectIds = result.map((dt) => dt.project);
+      const projectInfos = await firstValueFrom(
+        this.projectsClient.send({ cmd: 'get-project_ids' }, projectIds),
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Contracts retrieved successfully',
+        data: result
+          .map((dt, index) => {
+            return { ...dt, project: projectInfos[index] };
+          })
+          .sort(
+            (a, b) =>
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime(),
+          ),
+      };
+    }
+  }
+
+  async getYearCurrentContracts() {
+    const result = await this.contractRepository
+      .createQueryBuilder('contract')
+      .where('YEAR(contract.created_at) = :year', { year: 2024 })
+      .orderBy('contract.price', 'DESC')
+      .getMany();
+    // const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_id'},result.customer))
     return {
       statusCode: HttpStatus.OK,
       message: 'Contracts retrieved successfully',
-      data: result.map((dt,index)=>{
-        return {...dt,project:projectInfos[index]}
-      }).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+      data: result,
     };
   }
-  
-}
 
-async getContractID(id:string) {
-  const result = await this.contractRepository.findOne({where:{contract_id:id},relations:['type_contract']});
-  // const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_id'},result.customer))
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'Contracts retrieved successfully',
-    data: {...result,type_contract:result.type_contract.type_id}
-    ,
-  };
-}
-async getContractIDs(contract_ids:string[]){
-  const data = await this.contractRepository.find({where:{contract_id:In(contract_ids)}});
-  const sortedData = contract_ids.map(id => data.find(contract => contract.contract_id === id))
-  return sortedData
-}
-
-// async getContracts() {
-//   const result = await this.contractRepository.find({relations:['type_contract']});
-//   const customerIds = result.map((dt)=> dt.customer)
-//   const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},customerIds))
-//   return {
-//     statusCode: HttpStatus.OK,
-//     message: 'Contracts retrieved successfully',
-//     data: result.map((dt,index)=>{
-//       return {...dt,customer:customerInfos[index]}
-//     }),
-//   };
-// }
-
-// Create a new Payment
-async createPayment(createPaymentDto: CreatePaymentDto) {
-  try {
-    const contract = await this.contractRepository.findOne({
-      where: { contract_id: createPaymentDto.contract },
+  async getContractID(id: string) {
+    const result = await this.contractRepository.findOne({
+      where: { contract_id: id },
+      relations: ['type_contract'],
     });
-    const type_method = await this.typeMethodRepository.findOne({
-      where: { type_method_id: createPaymentDto.type_method },
-    });
-    const payment = this.paymentRepository.create({
-      ...createPaymentDto,
-      payment_id: uuidv4(),
-      contract,
-      type_method,
-    });
-    await this.paymentRepository.save(payment);
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'Payment created successfully',
-    };
-  } catch {
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to create Payment',
-    };
-  }
-}
-
-// Update an existing Payment
-async updatePayment(payment_id: string, updatePaymentDto: UpdatePaymentDto) {
-  try {
-    const contract = await this.contractRepository.findOne({
-      where: { contract_id: updatePaymentDto.contract },
-    });
-    const type_method = await this.typeMethodRepository.findOne({
-      where: { type_method_id: updatePaymentDto.type_method },
-    });
-    await this.paymentRepository.update(payment_id, {
-      ...updatePaymentDto,
-      contract,
-      type_method,
-    });
+    // const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_id'},result.customer))
     return {
       statusCode: HttpStatus.OK,
-      message: 'Payment updated successfully',
-    };
-  } catch {
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to update Payment',
+      message: 'Contracts retrieved successfully',
+      data: { ...result, type_contract: result.type_contract.type_id },
     };
   }
-}
-
-// Get a Payment by ID
-async getPayment(payment_id: string) {
-  const payment = await this.paymentRepository.findOne({
-    where: { payment_id },
-    relations: ['contract'],
-  });
-  if (!payment) {
-    throw new NotFoundException({
-      statusCode: HttpStatus.NOT_FOUND,
-      message: `Payment with ID ${payment_id} not found`,
+  async getContractIDs(contract_ids: string[]) {
+    const data = await this.contractRepository.find({
+      where: { contract_id: In(contract_ids) },
     });
+    const sortedData = contract_ids.map((id) =>
+      data.find((contract) => contract.contract_id === id),
+    );
+    return sortedData;
   }
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'Payment retrieved successfully',
-    data: payment,
-  };
-}
 
-// Get all Payments
-async getAllPayments() {
-  const result = await this.paymentRepository.find({ relations: ['contract'] });
-  const dataSuppliers = await firstValueFrom(this.productsClient.send({cmd:'find-all_supplier_ids'},result.map(dt => dt.supplier)))
-  const dataTypeProducts = await firstValueFrom(this.productsClient.send({cmd:'find-all_type_ids'},result.map(dt => dt.type_product)))
-  const dataProjects = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},result.map(dt => dt.contract.project)))
-  const dataCustomerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},result.map(dt => dt.contract.customer)))
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'Payments retrieved successfully',
-    data: result.map((dt,index) => {
-      return {...dt,type_product:dataTypeProducts[index],supplier:dataSuppliers[index],contract:{...dt.contract,project:dataProjects[index],customer:dataCustomerInfos[index]}}
-    }),
-  };
-}
-
-// Create a new TypeMethod
-async createTypeMethod(createTypeMethodDto: CreateTypeMethodDto) {
-  try {
-    const typeMethod = this.typeMethodRepository.create({
-      ...createTypeMethodDto,
-      type_method_id: uuidv4(),
+  async getContractByProject(project: string) {
+    const data = await this.contractRepository.find({
+      where: { project: project },
+      select: { contract_id: true },
     });
-    await this.typeMethodRepository.save(typeMethod);
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'TypeMethod created successfully',
-    };
-  } catch {
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to create TypeMethod',
-    };
-  }
-}
 
-// Update an existing TypeMethod
-async updateTypeMethod(type_method_id: string, updateTypeMethodDto: UpdateTypeMethodDto) {
-  try {
-    await this.typeMethodRepository.update(type_method_id, updateTypeMethodDto);
+    return data.map((dt) => dt.contract_id);
+  }
+
+  async getPaymentByProject(project: string) {
+    const data = await this.paymentRepository
+      .createQueryBuilder('payment')
+      .leftJoinAndSelect('payment.contract', 'contract')
+      .where('contract.project = :project', { project })
+      .getMany();
+
     return {
       statusCode: HttpStatus.OK,
-      message: 'TypeMethod updated successfully',
+      data,
     };
-  } catch {
+  }
+
+  // async getContracts() {
+  //   const result = await this.contractRepository.find({relations:['type_contract']});
+  //   const customerIds = result.map((dt)=> dt.customer)
+  //   const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},customerIds))
+  //   return {
+  //     statusCode: HttpStatus.OK,
+  //     message: 'Contracts retrieved successfully',
+  //     data: result.map((dt,index)=>{
+  //       return {...dt,customer:customerInfos[index]}
+  //     }),
+  //   };
+  // }
+
+  // Create a new Payment
+  async createPayment(createPaymentDto: CreatePaymentDto) {
+    try {
+      const contract = await this.contractRepository.findOne({
+        where: { contract_id: createPaymentDto.contract },
+      });
+      const type_method = await this.typeMethodRepository.findOne({
+        where: { type_method_id: createPaymentDto.type_method },
+      });
+      const payment = this.paymentRepository.create({
+        ...createPaymentDto,
+        payment_id: uuidv4(),
+        contract,
+        type_method,
+      });
+      await this.paymentRepository.save(payment);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Payment created successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to create Payment',
+      };
+    }
+  }
+
+  async deletePayment(datas: string[]) {
+    try {
+      const rm = await this.paymentRepository.delete({ payment_id: In(datas) });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  // Update an existing Payment
+  async updatePayment(payment_id: string, updatePaymentDto: UpdatePaymentDto) {
+    try {
+      const contract = await this.contractRepository.findOne({
+        where: { contract_id: updatePaymentDto.contract },
+      });
+      const type_method = await this.typeMethodRepository.findOne({
+        where: { type_method_id: updatePaymentDto.type_method },
+      });
+      await this.paymentRepository.update(payment_id, {
+        ...updatePaymentDto,
+        contract,
+        type_method,
+      });
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Payment updated successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to update Payment',
+      };
+    }
+  }
+
+  // Get a Payment by ID
+  async getPayment(payment_id: string) {
+    const payment = await this.paymentRepository.findOne({
+      where: { payment_id },
+      relations: ['contract'],
+    });
+    if (!payment) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Payment with ID ${payment_id} not found`,
+      });
+    }
     return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to update TypeMethod',
+      statusCode: HttpStatus.OK,
+      message: 'Payment retrieved successfully',
+      data: payment,
     };
   }
-}
 
-// Get a TypeMethod by ID
-async getTypeMethod(type_method_id: string) {
-  const typeMethod = await this.typeMethodRepository.findOne({
-    where: { type_method_id },
-  });
-  if (!typeMethod) {
-    throw new NotFoundException({
-      statusCode: HttpStatus.NOT_FOUND,
-      message: `TypeMethod with ID ${type_method_id} not found`,
+  // Get all Payments
+  async getAllPayments(filter?: GetFilterPaymentDto) {
+    const type = filter.type ?? null;
+    const customer = filter.customer ?? null;
+    const supplier = filter.supplier ?? null;
+    const contract = customer
+      ? (
+          await this.contractRepository.find({
+            where: { customer: customer },
+          })
+        ).map((dt) => dt.contract_id)
+      : filter.contract
+        ? filter.contract
+        : null;
+    const date_start = filter.date_start ? new Date(filter.date_start) : null;
+    const date_end = filter.date_end ? new Date(filter.date_end) : null;
+    const status = filter.status ?? null;
+
+    const whereCondition: any = {};
+    if (contract) {
+      whereCondition.contract = !customer
+        ? In([contract])
+        : In(contract as string[]);
+    }
+    if (type) {
+      whereCondition.type = type;
+    }
+
+    if (supplier) {
+      whereCondition.supplier = supplier;
+    }
+
+    if (['expired', 'ready'].includes(status)) {
+      if (status === 'expired') {
+        const today = new Date();
+        whereCondition.date_expired = LessThanOrEqual(today);
+      } else {
+        const today = new Date();
+        const weekDate = new Date();
+        weekDate.setDate(today.getDate() + 7);
+        whereCondition.date_expired = Between(today, weekDate);
+      }
+    } else {
+      whereCondition.status = status;
+      if (date_start || date_end) {
+        if (date_start && date_end) {
+          whereCondition.date_expired = Between(date_start, date_end);
+        } else {
+          if (date_start) {
+            whereCondition.date_expired = MoreThanOrEqual(date_start);
+          }
+          if (date_end) {
+            whereCondition.date_expired = LessThanOrEqual(date_end);
+          }
+        }
+      }
+    }
+    const result = await this.paymentRepository.find({
+      where: whereCondition,
+      relations: ['contract'],
     });
+    const dataSuppliers = await firstValueFrom(
+      this.productsClient.send(
+        { cmd: 'find-all_supplier_ids' },
+        result.map((dt) => dt.supplier),
+      ),
+    );
+    const dataTypeProducts = await firstValueFrom(
+      this.productsClient.send(
+        { cmd: 'find-all_type_ids' },
+        result.map((dt) => dt.type_product),
+      ),
+    );
+    const dataProjects = await firstValueFrom(
+      this.projectsClient.send(
+        { cmd: 'get-project_ids' },
+        result.map((dt) => dt.contract.project),
+      ),
+    );
+    const dataCustomerInfos = await firstValueFrom(
+      this.customersClient.send(
+        { cmd: 'get-customer_ids' },
+        result.map((dt) => dt.contract.customer),
+      ),
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Payments retrieved successfully',
+      data: result.map((dt, index) => {
+        return {
+          ...dt,
+          type_product: dataTypeProducts[index],
+          supplier: dataSuppliers[index],
+          contract: {
+            ...dt.contract,
+            project: dataProjects[index],
+            customer: dataCustomerInfos[index],
+          },
+        };
+      }),
+    };
   }
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'TypeMethod retrieved successfully',
-    data: typeMethod,
-  };
-}
 
-// Get all TypeMethods
-async getAllTypeMethods() {
-  const result = await this.typeMethodRepository.find();
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'TypeMethods retrieved successfully',
-    data: result,
-  };
-}
+  // Create a new TypeMethod
+  async createTypeMethod(createTypeMethodDto: CreateTypeMethodDto) {
+    try {
+      const typeMethod = this.typeMethodRepository.create({
+        ...createTypeMethodDto,
+        type_method_id: uuidv4(),
+      });
+      await this.typeMethodRepository.save(typeMethod);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'TypeMethod created successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to create TypeMethod',
+      };
+    }
+  }
 
+  async deleteTypeMethod(datas: string[]) {
+    try {
+      const rm = await this.typeMethodRepository.delete({
+        type_method_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
 
+  // Update an existing TypeMethod
+  async updateTypeMethod(
+    type_method_id: string,
+    updateTypeMethodDto: UpdateTypeMethodDto,
+  ) {
+    try {
+      await this.typeMethodRepository.update(
+        type_method_id,
+        updateTypeMethodDto,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'TypeMethod updated successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to update TypeMethod',
+      };
+    }
+  }
 
-
-// Get a TypeContract by ID
-async getTypeContract(type_id: string) {
-  const typeContract = await this.typeContractRepository.findOne({
-    where: { type_id },
-  });
-  if (!typeContract) {
-    throw new NotFoundException({
-      statusCode: HttpStatus.NOT_FOUND,
-      message: `TypeContract with ID ${type_id} not found`,
+  // Get a TypeMethod by ID
+  async getTypeMethod(type_method_id: string) {
+    const typeMethod = await this.typeMethodRepository.findOne({
+      where: { type_method_id },
     });
+    if (!typeMethod) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `TypeMethod with ID ${type_method_id} not found`,
+      });
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'TypeMethod retrieved successfully',
+      data: typeMethod,
+    };
   }
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'TypeContract retrieved successfully',
-    data: typeContract,
-  };
-}
 
-// Get all TypeContracts
-async getAllTypeContracts() {
-  const result = await this.typeContractRepository.find();
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'TypeContracts retrieved successfully',
-    data: result,
-  };
-}
+  // Get all TypeMethods
+  async getAllTypeMethods() {
+    const result = await this.typeMethodRepository.find();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'TypeMethods retrieved successfully',
+      data: result,
+    };
+  }
 
-async getFullTypeContracts() {
-  const result = await this.typeContractRepository.find({relations:['contracts']});
-  return {
-    statusCode: HttpStatus.OK,
-    message: 'TypeContracts retrieved successfully',
-    data: result,
-  };
-}
-
-// Delete a TypeContract by ID
-async deleteTypeContract(type_id: string) {
-  try {
-    const result = await this.typeContractRepository.delete(type_id);
-    if (result.affected === 0) {
+  // Get a TypeContract by ID
+  async getTypeContract(type_id: string) {
+    const typeContract = await this.typeContractRepository.findOne({
+      where: { type_id },
+    });
+    if (!typeContract) {
       throw new NotFoundException({
         statusCode: HttpStatus.NOT_FOUND,
         message: `TypeContract with ID ${type_id} not found`,
@@ -395,13 +650,245 @@ async deleteTypeContract(type_id: string) {
     }
     return {
       statusCode: HttpStatus.OK,
-      message: 'TypeContract deleted successfully',
-    };
-  } catch (error) {
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Failed to delete TypeContract',
+      message: 'TypeContract retrieved successfully',
+      data: typeContract,
     };
   }
-}
+
+  // Get all TypeContracts
+  async getAllTypeContracts() {
+    const result = await this.typeContractRepository.find();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'TypeContracts retrieved successfully',
+      data: result,
+    };
+  }
+
+  async getFullContractDashboard() {
+    const currentYear = 2024;
+    const result = await this.typeContractRepository
+      .createQueryBuilder('typeContract')
+      .leftJoin('typeContract.contracts', 'contracts')
+      .where('YEAR(contracts.created_at) = :currentYear', { currentYear })
+      .select('typeContract.name_type', 'name_type')
+      .addSelect('typeContract.type_id', 'type_id')
+      .addSelect('SUM(contracts.price)', 'total')
+      .groupBy('name_type')
+      .getRawMany();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'TypeContracts retrieved successfully',
+      data: result,
+    };
+  }
+
+  async getFullContractByIDType(id: string) {
+    const currentYear = 2024;
+    const result = await this.typeContractRepository
+      .createQueryBuilder('typeContract')
+      .leftJoin('typeContract.contracts', 'contracts')
+      .where(
+        'YEAR(contracts.created_at) = :currentYear AND typeContract.type_id = :typeID',
+        { currentYear, typeID: id },
+      )
+      .select('contracts.name_contract', 'name_contract')
+      .addSelect('contracts.contract_id', 'contract_id')
+      .addSelect('contracts.price', 'total')
+      .getRawMany();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'TypeContracts retrieved successfully',
+      data: result,
+    };
+  }
+
+  async getFullTypeContracts() {
+    const result = await this.typeContractRepository.find({
+      relations: ['contracts'],
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'TypeContracts retrieved successfully',
+      data: result,
+    };
+  }
+
+  async getDebtSupplier() {
+    const result = await this.paymentRepository
+      .createQueryBuilder('payment')
+      .where('payment.type = "import" AND payment.status = "pending"')
+      .select('payment.supplier', 'supplier')
+      .addSelect('SUM(payment.price)', 'total')
+      .groupBy('supplier')
+      .orderBy('total', 'DESC')
+      .getRawMany();
+    const idsSupplier = result.map((dt) => dt.supplier);
+
+    const supplier = await firstValueFrom(
+      this.productsClient.send({ cmd: 'find-all_supplier_ids' }, idsSupplier),
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'TypeContracts retrieved successfully',
+      data: result.map((dt, index) => {
+        return {
+          supplier: supplier[index].name,
+          total: Number(dt.total),
+        };
+      }),
+    };
+  }
+
+  async getExpiredCustomer() {
+    const result = await this.paymentRepository
+      .createQueryBuilder('payment')
+      .leftJoin('payment.contract', 'contract')
+      .where(
+        'payment.type = "export" AND payment.status = "pending" AND payment.date_expired < CURRENT_DATE',
+      )
+      .select('contract.name_contract', 'name_contract')
+      .addSelect('contract.contract_id', 'contract_id')
+      .addSelect('SUM(payment.price)', 'total')
+      .groupBy('contract_id')
+      .orderBy('total', 'DESC')
+      .getRawMany();
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Payment retrieved successfully',
+      data: result.map((dt) => {
+        return { ...dt, total: Number(dt.total) };
+      }),
+    };
+  }
+
+  async getPaymentReadyCustomer() {
+    const today = new Date();
+    const weekDate = new Date();
+    weekDate.setDate(today.getDate() + 30);
+    const result = await this.paymentRepository
+      .createQueryBuilder('payment')
+      .leftJoin('payment.contract', 'contract')
+      .where(
+        'payment.type = "export" AND payment.status = "pending" AND payment.date_expired BETWEEN :now AND :later',
+        { now: today.toISOString(), later: weekDate.toISOString() },
+      )
+      .select('contract.name_contract', 'name_contract')
+      .addSelect('contract.contract_id', 'contract_id')
+      .addSelect('payment.date_expired', 'date_expired')
+      .addSelect('SUM(payment.price)', 'price')
+      .groupBy('contract_id')
+      .addGroupBy('date_expired')
+      .orderBy('date_expired', 'ASC')
+      .getRawMany();
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Payment ready',
+      data: result.map((dt) => {
+        return {
+          date_expired: dt.date_expired,
+          contract: {
+            name_contract: dt.name_contract,
+            contract_id: dt.contract_id,
+          },
+          price: Number(dt.price),
+        };
+      }),
+    };
+  }
+
+  async getPaymentReadySupplier() {
+    const today = new Date();
+    const weekDate = new Date();
+    weekDate.setDate(today.getDate() + 30);
+    const result = await this.paymentRepository
+      .createQueryBuilder('payment')
+      .where(
+        'payment.type = "import" AND payment.status = "pending" AND payment.date_expired BETWEEN :now AND :later',
+        { now: today.toISOString(), later: weekDate.toISOString() },
+      )
+      .select('payment.supplier', 'supplier')
+      .addSelect('payment.date_expired', 'date_expired')
+      .addSelect('SUM(payment.price)', 'price')
+      .groupBy('supplier')
+      .addGroupBy('date_expired')
+      .orderBy('date_expired', 'ASC')
+      .getRawMany();
+
+    const idsSupplier = result.map((dt) => dt.supplier);
+
+    const supplier = await firstValueFrom(
+      this.productsClient.send({ cmd: 'find-all_supplier_ids' }, idsSupplier),
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Payment ready',
+      data: result.map((dt, index) => {
+        return { ...dt, price: Number(dt.price), supplier: supplier[index] };
+      }),
+    };
+  }
+
+  async getInfoPaymentDashboard() {
+    const result = await this.paymentRepository
+      .createQueryBuilder('payment')
+      .leftJoin('payment.contract', 'contract')
+      .where('payment.type = :type AND payment.status IN (:...statuses)', {
+        type: 'export',
+        statuses: ['pending', 'success'],
+      })
+      .andWhere('payment.date_expired >= CURRENT_DATE')
+      .select('payment.status', 'status')
+      .addSelect('contract.name_contract', 'name_contract')
+      .addSelect('contract.contract_id', 'contract_id')
+      .addSelect('SUM(payment.price)', 'total')
+      .groupBy('payment.status')
+      .addGroupBy('contract.contract_id')
+      .getRawMany();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Payment retrieved successfully',
+      data: result.map((dt) => {
+        return { ...dt, total: Number(dt.total) };
+      }),
+    };
+  }
+
+  async getRevenueTotalContract() {
+    // const year = new Date().getFullYear()
+    const data = await this.contractRepository
+      .createQueryBuilder('contract')
+      .where('YEAR(contract.date_start) = :year', { year: 2024 })
+      .select('SUM(contract.price)', 'total')
+      .getRawOne();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Total revenue successfully',
+      data: Number(data.total ?? 0),
+    };
+  }
+
+  // Delete a TypeContract by ID
+  async deleteTypeContract(type_id: string) {
+    try {
+      const result = await this.typeContractRepository.delete(type_id);
+      if (result.affected === 0) {
+        throw new NotFoundException({
+          statusCode: HttpStatus.NOT_FOUND,
+          message: `TypeContract with ID ${type_id} not found`,
+        });
+      }
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'TypeContract deleted successfully',
+      };
+    } catch (error) {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Failed to delete TypeContract',
+      };
+    }
+  }
 }

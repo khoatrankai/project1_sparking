@@ -14,7 +14,8 @@ export class RoleGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const checkfull = this.reflector.get<string[]>('checkfull', context.getHandler());
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    if(!checkfull){
+    const type = this.reflector.get<string[]>('type', context.getHandler());
+    if(checkfull){
         return true
     }
     const request = context.switchToHttp().getRequest();
@@ -26,42 +27,43 @@ export class RoleGuard implements CanActivate {
       return true;
     }
     const role = user['role']
-    if(roles.length > 2){
-        if(role === 'admin'){
-            const check = await firstValueFrom(this.usersClient.send({cmd:'check-role'},{user_id:user['sub'],role:roles[0]}))
-            if(check.statusCode === 200){
-                return true
-            }
-        }else{
-            //customer
-            // const check = await firstValueFrom(this.usersClient.send({cmd:'check-role'},{user_id:user['sub'],role:roles[0]}))
-            // if(check.statusCode === 200){
-            //     return true
-            // }
-        }
-    }else{
-        if(roles.length === 2){
-          if(roles[1] === "admin"){
-            if(role === "admin"){
-                const check = await firstValueFrom(this.usersClient.send({cmd:'check-role_user'},{user_id:user['sub'],role_name_tag:roles[0]}))
-            console.log(roles,user,check)
+    if(type.length> 1){
 
+    }else{
+      if(role === "admin"){
+                
+                const check = await firstValueFrom(this.usersClient.send({cmd:'check-role_user'},{user_id:user['sub'],role_name_tag:roles}))
+                console.log(check,"test",user)
                 if(check.statusCode === 200){
                     return true
                 }
+                return false
+      }else{
+        if(type[0] === "admin"){
+          if(role === "admin"){
+            const check = await firstValueFrom(this.usersClient.send({cmd:'check-role_user'},{user_id:user['sub'],role_name_tag:roles}))
+            if(check.statusCode === 200){
+                return true
             }
-          }else{
-            //customer
-            if(role === "customer"){
-                // const check = await firstValueFrom(this.usersClient.send({cmd:'check-role'},{user_id:user['sub'],role:roles[0]}))
-                // if(check.statusCode === 200){
-                //     return true
-                // }
-            }
-          
+            return false
           }
+          return false
+
+        }else{
+          // if(role === "customer"){
+          //   const check = await firstValueFrom(this.usersClient.send({cmd:'check-role_user'},{user_id:user['sub'],role_name_tag:roles}))
+          //   if(check.statusCode === 200){
+          //       return true
+          //   }
+          //   return false
+          // }
+          // return false
         }
+      }
     }
+      
+        
+    
     
     return false
     // Kiểm tra xem user có quyền phù hợp hay không

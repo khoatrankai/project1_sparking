@@ -14,6 +14,10 @@ export class PriceQuoteFilterDto {
   status?: string;
 
   @IsOptional()
+  @IsString()
+  customer?: string;
+
+  @IsOptional()
   @IsDateString()
   date_start?: string;
 

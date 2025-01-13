@@ -48,6 +48,12 @@ export class LayerController {
     return this.layerService.createProduct(createProductDto);
   }
 
+  @MessagePattern({ cmd: 'delete-product' })
+  async deleteProduct(@Payload() datas: string[]) {
+    return this.layerService.deleteProduct(datas);
+  }
+
+
   @MessagePattern({ cmd: 'find-all_product' })
   async findAllProduct() {
     return this.layerService.findAllProduct();
@@ -73,6 +79,11 @@ export class LayerController {
   @MessagePattern({ cmd: 'create-code_product' })
   async createCodeProduct(@Payload() createCodeProductDto: CreateCodeProductDto) {
     return this.layerService.createCodeProduct(createCodeProductDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-code_product' })
+  async deleteCodeProduct(@Payload() datas: string[]) {
+    return this.layerService.deleteCodeProduct(datas);
   }
 
   @MessagePattern({ cmd: 'find-all_code_product' })
@@ -137,6 +148,11 @@ export class LayerController {
     return this.layerService.createTypeProduct(createTypeProductDto);
   }
 
+  @MessagePattern({ cmd: 'delete-type_product' })
+  async deleteTypeProduct(@Payload() datas: string[]) {
+    return this.layerService.deleteTypeProduct(datas);
+  }
+
   @MessagePattern({ cmd: 'find-all_type_product' })
   async findAllTypeProduct() {
     return this.layerService.findAllTypeProduct();
@@ -161,6 +177,11 @@ export class LayerController {
   @MessagePattern({ cmd: 'create-classify_type' })
   async createClassifyType(@Payload() createClassifyTypeDto: CreateClassifyTypeDto) {
     return this.layerService.createClassifyType(createClassifyTypeDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-classify_type' })
+  async deleteClassifyType(@Payload() datas: string[]) {
+    return this.layerService.deleteClassifyType(datas);
   }
 
   @MessagePattern({ cmd: 'find-all_classify_type' })
@@ -189,6 +210,11 @@ export class LayerController {
     return this.layerService.createBrand(createBrandDto);
   }
 
+  @MessagePattern({ cmd: 'delete-brand' })
+  async deleteBrand(@Payload() datas: string[]) {
+    return this.layerService.deleteBrand(datas);
+  }
+
   @MessagePattern({ cmd: 'find-all_brand' })
   async findAllBrand() {
     return this.layerService.findAllBrand();
@@ -208,6 +234,11 @@ export class LayerController {
   @MessagePattern({ cmd: 'create-original' })
   async createOriginal(@Payload() createOriginalDto: CreateOriginalDto) {
     return this.layerService.createOriginal(createOriginalDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-original' })
+  async deleteOriginal(@Payload() datas: string[]) {
+    return this.layerService.deleteOriginal(datas);
   }
 
   @MessagePattern({ cmd: 'find-all_original' })
@@ -231,6 +262,11 @@ export class LayerController {
     return this.layerService.createUnitProduct(createUnitProductDto);
   }
 
+  @MessagePattern({ cmd: 'delete-unit_product' })
+  async deleteUnitProduct(@Payload() datas: string[]) {
+    return this.layerService.deleteUnitProduct(datas);
+  }
+
   @MessagePattern({ cmd: 'find-all_unit_product' })
   async findAllUnitProduct() {
     return this.layerService.findAllUnitProduct();
@@ -250,6 +286,11 @@ export class LayerController {
   @MessagePattern({ cmd: 'create-supplier_product' })
   async createSupplierProduct(@Payload() createSupplierProductDto: CreateSupplierProductDto) {
     return this.layerService.createSupplierProduct(createSupplierProductDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-supplier_product' })
+  async deleteSupplierProduct(@Payload() datas: string[]) {
+    return this.layerService.deleteSupplier(datas);
   }
 
   @MessagePattern({ cmd: 'find-all_supplier_product' })
@@ -283,6 +324,11 @@ export class LayerController {
       return await this.layerService.createActivityImportContainer(createActivityContainerDto);
     }
     return await this.layerService.createActivityExportContainer(createActivityContainerDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-activity_containers' })
+  async deleteActivityContainers(@Payload() datas: string[]) {
+    return this.layerService.deleteActivityContainers(datas);
   }
 
 

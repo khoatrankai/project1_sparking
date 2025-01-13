@@ -30,6 +30,10 @@ export class UpdatePaymentDto {
   @IsOptional()
   supplier: string;
 
+  @IsString()
+  @IsOptional()
+  vat: string;
+
   @IsEnum(['import','export'])
   @IsOptional()
   type: string;

@@ -19,11 +19,11 @@ import { ListUser } from './list_user.entity';
     @PrimaryColumn({ type: 'varchar', length: 50 })
     work_id: string;
 
-    @ManyToOne(() => TypeWork, (typeWork) => typeWork.work)
+    @ManyToOne(() => TypeWork, (typeWork) => typeWork.work, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'type' })
     type: TypeWork;
 
-    @ManyToOne(() => StatusWork, (statusWork) => statusWork.work)
+    @ManyToOne(() => StatusWork, (statusWork) => statusWork.work, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'status' })
     status: StatusWork;
   
@@ -36,7 +36,7 @@ import { ListUser } from './list_user.entity';
     @Column({ type: 'int', nullable: true })
     position:number
 
-    @ManyToOne(() => Activities, (activity) =>   activity.works)
+    @ManyToOne(() => Activities, (activity) =>   activity.works, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'activity' })
     activity: Activities;
 

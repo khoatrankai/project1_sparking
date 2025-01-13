@@ -1,4 +1,5 @@
-import { IsString, Length } from 'class-validator';
+import { IsOptional, IsString, Length } from 'class-validator';
+import { GetCategoryRoleUserDto } from './get_category.dto';
 
 export class RoleTypeUserDto {
   @IsString()
@@ -12,4 +13,7 @@ export class RoleTypeUserDto {
   @IsString()
   @Length(1, 50)
   name_tag: string;
+
+  @IsOptional()
+  category_role:GetCategoryRoleUserDto;
 }

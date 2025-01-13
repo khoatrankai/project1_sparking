@@ -16,6 +16,7 @@ import { CreateRoleCustomerDto } from 'src/dto/create_role_customer.dto';
 import { UpdateRoleCustomerDto } from 'src/dto/update_role_customer.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { GetAllCustomerDto } from 'src/dto/get_all_customer.dto';
+import { GetFilterAccountCustomersDto } from 'src/dto/get-filter-account.dto';
 
 @Controller()
 @UseFilters(ConflictExceptionFilter)
@@ -27,43 +28,52 @@ export class CustomerController {
     return this.customerService.getHello();
   }
 
-  @MessagePattern({cmd:'get-group_customer'})
-  getGroupCustomer(){
-    return this.customerService.getGroupCustomer()
-   
+  @MessagePattern({ cmd: 'get-group_customer' })
+  getGroupCustomer() {
+    return this.customerService.getGroupCustomer();
   }
 
-  @MessagePattern({cmd:'get-customer_id'})
-  getCustomerID(@Payload() data:{info_id:string}){
-    return this.customerService.getCustomerID(data.info_id)
-   
+  @MessagePattern({ cmd: 'get-customer_id' })
+  getCustomerID(@Payload() data: { info_id: string }) {
+    return this.customerService.getCustomerID(data.info_id);
   }
 
-  @MessagePattern({cmd:'get-full_info_customer_id'})
-  getFullCustomerID(@Payload() info_id:string){
-    return this.customerService.getFullCustomerID(info_id)
-   
+  @MessagePattern({ cmd: 'get-full_info_customer_id' })
+  getFullCustomerID(@Payload() info_id: string) {
+    return this.customerService.getFullCustomerID(info_id);
   }
 
-  @MessagePattern({cmd:'get-customer_ids'})
-  getCustomerIDs(@Payload() customer_ids:string[]){
-    return this.customerService.getCustomerIDs(customer_ids)
+  @MessagePattern({ cmd: 'get-customer_ids' })
+  getCustomerIDs(@Payload() customer_ids: string[]) {
+    return this.customerService.getCustomerIDs(customer_ids);
   }
 
-  @MessagePattern({cmd:'get-customer_dashboard'})
-  getCustomerDashboard(){
-    return this.customerService.getCustomerDashboard()
+  @MessagePattern({ cmd: 'get-customer_dashboard' })
+  getCustomerDashboard() {
+    return this.customerService.getCustomerDashboard();
   }
 
-  @MessagePattern({cmd:'get-customer_filter'})
-  getCustomerFilter(@Payload('group') group?:string,@Payload('time_first') time_first?:number, @Payload('time_end') time_end?:number){
-    return this.customerService.getCustomerFilter(group,time_first?new Date(time_first):null,time_end?new Date(time_end):null)
+  @MessagePattern({ cmd: 'get-customer_filter' })
+  getCustomerFilter(
+    @Payload('group') group?: string,
+    @Payload('time_first') time_first?: number,
+    @Payload('time_end') time_end?: number,
+  ) {
+    return this.customerService.getCustomerFilter(
+      group,
+      time_first ? new Date(time_first) : null,
+      time_end ? new Date(time_end) : null,
+    );
   }
 
-  @MessagePattern({cmd:'create-group_customer'})
-  createGroupCustomer(createGroupCustomer:CreateGroupCustomerDto){
-    return this.customerService.createGroupCustomer(createGroupCustomer)
-   
+  @MessagePattern({ cmd: 'create-group_customer' })
+  createGroupCustomer(createGroupCustomer: CreateGroupCustomerDto) {
+    return this.customerService.createGroupCustomer(createGroupCustomer);
+  }
+
+  @MessagePattern({ cmd: 'delete-group_customer' })
+  async deleteGroupCustomer(@Payload() datas: string[]) {
+    return this.customerService.deleteGroupCustomer(datas);
   }
 
   @MessagePattern({ cmd: 'update-group_customer' })
@@ -76,6 +86,11 @@ export class CustomerController {
     return this.customerService.createRoleTypeCustomer(createRoleTypeCustomer);
   }
 
+  @MessagePattern({ cmd: 'delete-role_type_customer' })
+  async deleteRoleTypeCustomer(@Payload() datas: string[]) {
+    return this.customerService.deleteRoleTypeCustomer(datas);
+  }
+
   @MessagePattern({ cmd: 'update-role_type_customer' })
   updateRoleTypeCustomer(updateRoleTypeCustomer: UpdateRoleTypeCustomerDto) {
     return this.customerService.updateRoleTypeCustomer(updateRoleTypeCustomer);
@@ -84,6 +99,21 @@ export class CustomerController {
   @MessagePattern({ cmd: 'create-account_customer' })
   createAccountCustomer(createAccountCustomer: CreateAccountCustomersDto) {
     return this.customerService.createAccountCustomer(createAccountCustomer);
+  }
+
+  @MessagePattern({ cmd: 'get-all_account_customer' })
+  getAllAccountCustomer(filter?: GetFilterAccountCustomersDto) {
+    return this.customerService.getAllAccountCustomer(filter);
+  }
+
+  @MessagePattern({ cmd: 'get-id_account_customer' })
+  getIDAccountCustomer(id: string) {
+    return this.customerService.getIDAccountCustomer(id);
+  }
+
+  @MessagePattern({ cmd: 'delete-account_customer' })
+  async deleteAccountCustomer(@Payload() datas: string[]) {
+    return this.customerService.deleteAccountCustomer(datas);
   }
 
   @MessagePattern({ cmd: 'update-account_customer' })
@@ -96,9 +126,14 @@ export class CustomerController {
     return this.customerService.createCustomerInfo(createCustomerInfo);
   }
 
+  @MessagePattern({ cmd: 'delete-customer_info' })
+  async deleteCustomerInfo(@Payload() datas: string[]) {
+    return this.customerService.deleteCustomerInfo(datas);
+  }
+
   @MessagePattern({ cmd: 'update-customer_info' })
   updateCustomerInfo(updateCustomerInfo: UpdateCustomerInfoDto) {
-    console.log(updateCustomerInfo)
+    console.log(updateCustomerInfo);
     return this.customerService.updateCustomerInfo(updateCustomerInfo);
   }
 
@@ -112,6 +147,11 @@ export class CustomerController {
     return this.customerService.createInfoContact(createInfoContact);
   }
 
+  @MessagePattern({ cmd: 'delete-info_contact' })
+  async deleteInfoContact(@Payload() datas: string[]) {
+    return this.customerService.deleteInfoContact(datas);
+  }
+
   @MessagePattern({ cmd: 'update-info_contact' })
   updateInfoContact(updateInfoContact: UpdateInfoContactDto) {
     return this.customerService.updateInfoContact(updateInfoContact);
@@ -120,6 +160,11 @@ export class CustomerController {
   @MessagePattern({ cmd: 'create-role_customer' })
   createRoleCustomer(createRoleCustomer: CreateRoleCustomerDto) {
     return this.customerService.createRoleCustomer(createRoleCustomer);
+  }
+
+  @MessagePattern({ cmd: 'delete-role_customer' })
+  async deleteRoleCustomer(@Payload() datas: string[]) {
+    return this.customerService.deleteRoleCustomer(datas);
   }
 
   @MessagePattern({ cmd: 'update-role_customer' })
@@ -133,8 +178,7 @@ export class CustomerController {
   }
 
   @MessagePattern({ cmd: 'get-all_customer' })
-  getAllCustomer(data:GetAllCustomerDto) {
-    return this.customerService.getAllCustomer(data.page,data.limit);
+  getAllCustomer(data: GetAllCustomerDto) {
+    return this.customerService.getAllCustomer(data.page, data.limit);
   }
-  
 }

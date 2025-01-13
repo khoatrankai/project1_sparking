@@ -8,4 +8,8 @@ export class UpdateListPartDto {
   @IsOptional()
   title?: string;
 
+  @IsString()
+  @IsOptional()
+  type_package?: string;
+
 }

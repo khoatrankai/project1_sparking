@@ -1,4 +1,11 @@
-import { IsString, IsEmail, IsEnum, IsOptional, Length, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  Length,
+  IsDateString,
+} from 'class-validator';
 
 export class UpdateAccountCustomersDto {
   @IsString()
@@ -15,6 +22,7 @@ export class UpdateAccountCustomersDto {
   @IsOptional() // Có thể cập nhật hoặc không
   email?: string;
 
+  @IsOptional()
   @IsString()
   @Length(1, 100)
   password?: string;

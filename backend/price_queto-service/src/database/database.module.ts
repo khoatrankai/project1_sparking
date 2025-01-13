@@ -4,6 +4,7 @@ import { PriceQuote } from './entities/price_quote.entity';
 import { ListProduct } from './entities/list_product.entity';
 import { ListParts } from './entities/list_part.entity';
 import { ListDetailProduct } from './entities/list_detail_product.entity';
+import { TypePackage } from './entities/type_package.entity';
 
 
 @Module({
@@ -15,7 +16,7 @@ import { ListDetailProduct } from './entities/list_detail_product.entity';
       username: 'root',
       password: '123456789',
       database: 'db_sparking_price_quote',
-      entities: [PriceQuote,ListProduct,ListParts,ListDetailProduct],
+      entities: [PriceQuote,ListProduct,ListParts,ListDetailProduct,TypePackage],
       // synchronize: true,
       // dropSchema: true,
     }),

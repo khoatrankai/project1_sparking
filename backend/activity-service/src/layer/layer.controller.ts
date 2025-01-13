@@ -22,10 +22,8 @@ import { UpdateTypeWorkDto } from 'src/dto/TypeWorkDto/update-type_work.dto';
 import { CreateWorkDto } from 'src/dto/WorkDto/create-work.dto';
 import { UpdateWorkDto } from 'src/dto/WorkDto/update-work.dto';
 import { GetActivityDto } from 'src/dto/ActivityDto/get-activity.dto';
-
-
-
-
+import { GetFilterActivityDto } from 'src/dto/ActivityDto/get-filter.dto';
+import { GetFilterWorkDto } from 'src/dto/WorkDto/get-filter.dto';
 
 @Controller('/activity')
 @UseFilters(ConflictExceptionFilter)
@@ -42,15 +40,33 @@ export class LayerController {
     return await this.layerService.createActivity(createActivityDto);
   }
 
+  @MessagePattern('delete-activity')
+  async deleteActivity(@Payload() datas: string[]) {
+    return await this.layerService.deleteActivity(datas);
+  }
+
   @MessagePattern('update-activity')
-  async updateActivity(@Payload() payload: { activity_id: string, updateActivityDto: UpdateActivityDto }) {
-    console.log(payload.updateActivityDto)
-    return await this.layerService.updateActivity(payload.activity_id, payload.updateActivityDto);
+  async updateActivity(
+    @Payload()
+    payload: {
+      activity_id: string;
+      updateActivityDto: UpdateActivityDto;
+    },
+  ) {
+    console.log(payload.updateActivityDto);
+    return await this.layerService.updateActivity(
+      payload.activity_id,
+      payload.updateActivityDto,
+    );
   }
 
   @MessagePattern('update-list_status_activity')
-  async updateStatusPositionActivitiesID(@Payload() updateActivityDto: GetActivityDto[] ) {
-    return await this.layerService.updateStatusPositionActivitiesID(updateActivityDto);
+  async updateStatusPositionActivitiesID(
+    @Payload() updateActivityDto: GetActivityDto[],
+  ) {
+    return await this.layerService.updateStatusPositionActivitiesID(
+      updateActivityDto,
+    );
   }
 
   @MessagePattern('get-activity')
@@ -60,28 +76,61 @@ export class LayerController {
 
   @MessagePattern('get-activity_by_contract')
   async getActivityByContract(@Payload() contract_id: string) {
-    console.log(contract_id)
+    console.log(contract_id);
     return await this.layerService.getActivityByContract(contract_id);
   }
 
+  @MessagePattern('get-work_by_project')
+  async getAllWorkByProject(project: string) {
+    return await this.layerService.getAllWorkByProject(project);
+  }
+
   @MessagePattern('get-all_activities')
-  async getAllActivities() {
-    return await this.layerService.getAllActivities();
+  async getAllActivities(filter?: GetFilterActivityDto) {
+    return await this.layerService.getAllActivities(filter);
+  }
+
+  @MessagePattern('get-all_activities_ready')
+  async getAllActivitiesReady(id: string) {
+    return await this.layerService.getAllActivitiesReady(id);
+  }
+
+  @MessagePattern('get-all_works_ready')
+  async getAllWorksReady(@Payload('user_id') user_id: string) {
+    return await this.layerService.getAllWorkReady(user_id);
   }
 
   @MessagePattern('get-all_year_activities')
-  async getAllYearActivities(year:string) {
+  async getAllYearActivities(year: string) {
     return await this.layerService.getAllYearActivities(year);
   }
 
   @MessagePattern('create-type_activity')
-  async createTypeActivities(@Payload() createTypeActivitiesDto: CreateTypeActivitiesDto) {
-    return await this.layerService.createTypeActivities(createTypeActivitiesDto);
+  async createTypeActivities(
+    @Payload() createTypeActivitiesDto: CreateTypeActivitiesDto,
+  ) {
+    return await this.layerService.createTypeActivities(
+      createTypeActivitiesDto,
+    );
+  }
+
+  @MessagePattern('delete-type_activity')
+  async deleteTypeActivity(@Payload() datas: string[]) {
+    return await this.layerService.deleteTypeActivity(datas);
   }
 
   @MessagePattern('update-type_activity')
-  async updateTypeActivities(@Payload() payload: { type_activity_id: string, updateTypeActivitiesDto: UpdateTypeActivitiesDto }) {
-    return await this.layerService.updateTypeActivities(payload.type_activity_id, payload.updateTypeActivitiesDto);
+  async updateTypeActivities(
+    @Payload()
+    payload: {
+      type_activity_id: string;
+      updateTypeActivitiesDto: UpdateTypeActivitiesDto;
+    },
+  ) {
+    return await this.layerService.updateTypeActivities(
+      payload.type_activity_id,
+      payload.updateTypeActivitiesDto,
+    );
   }
 
   @MessagePattern('get-type_activity')
@@ -105,13 +154,31 @@ export class LayerController {
   }
 
   @MessagePattern('create-status_activity')
-  async createStatusActivities(@Payload() createStatusActivitiesDto: CreateStatusActivitiesDto) {
-    return await this.layerService.createStatusActivities(createStatusActivitiesDto);
+  async createStatusActivities(
+    @Payload() createStatusActivitiesDto: CreateStatusActivitiesDto,
+  ) {
+    return await this.layerService.createStatusActivities(
+      createStatusActivitiesDto,
+    );
+  }
+
+  @MessagePattern('delete-status_activity')
+  async deleteStatusActivity(@Payload() datas: string[]) {
+    return await this.layerService.deleteStatusActivity(datas);
   }
 
   @MessagePattern('update-status_activity')
-  async updateStatusActivities(@Payload() payload: { status_activity_id: string, updateStatusActivitiesDto: UpdateStatusActivitiesDto }) {
-    return await this.layerService.updateStatusActivities(payload.status_activity_id, payload.updateStatusActivitiesDto);
+  async updateStatusActivities(
+    @Payload()
+    payload: {
+      status_activity_id: string;
+      updateStatusActivitiesDto: UpdateStatusActivitiesDto;
+    },
+  ) {
+    return await this.layerService.updateStatusActivities(
+      payload.status_activity_id,
+      payload.updateStatusActivitiesDto,
+    );
   }
 
   @MessagePattern('get-status_activity')
@@ -125,20 +192,27 @@ export class LayerController {
   }
 
   @MessagePattern('create-picture_activity')
-  async createPictureActivity(@Payload() createPictureActivityDto: CreatePictureActivityDto[]) {
-    return await this.layerService.createPictureActivity(createPictureActivityDto);
+  async createPictureActivity(
+    @Payload() createPictureActivityDto: CreatePictureActivityDto[],
+  ) {
+    return await this.layerService.createPictureActivity(
+      createPictureActivityDto,
+    );
   }
 
   @MessagePattern('create-one-picture_activity')
-  async createOnePictureActivity(@Payload() createPictureActivityDto: CreatePictureActivityDto) {
-    return await this.layerService.createOnePictureActivity(createPictureActivityDto);
+  async createOnePictureActivity(
+    @Payload() createPictureActivityDto: CreatePictureActivityDto,
+  ) {
+    return await this.layerService.createOnePictureActivity(
+      createPictureActivityDto,
+    );
   }
 
   @MessagePattern('delete-picture_activity')
   async deletePictureActivity(@Payload() picture_id: string) {
     return await this.layerService.deletePictureActivity(picture_id);
   }
-  
 
   @MessagePattern('get-all_picture_activity')
   async getAllPictureActivity(@Payload() activity_id: string) {
@@ -146,13 +220,31 @@ export class LayerController {
   }
 
   @MessagePattern('create-list_code_product')
-  async createListCodeProduct(@Payload() createListCodeProductDto: CreateListCodeProductDto[]) {
-    return await this.layerService.createListCodeProduct(createListCodeProductDto);
+  async createListCodeProduct(
+    @Payload() createListCodeProductDto: CreateListCodeProductDto[],
+  ) {
+    return await this.layerService.createListCodeProduct(
+      createListCodeProductDto,
+    );
+  }
+
+  @MessagePattern('delete-list_code_product')
+  async deleteListCodeProduct(@Payload() datas: string[]) {
+    return await this.layerService.deleteListCodeProduct(datas);
   }
 
   @MessagePattern('update-list_code_product')
-  async updateListCodeProduct(@Payload() payload: { list_id: string, updateListCodeProductDto: UpdateListCodeProductDto }) {
-    return await this.layerService.updateListCodeProduct(payload.list_id, payload.updateListCodeProductDto);
+  async updateListCodeProduct(
+    @Payload()
+    payload: {
+      list_id: string;
+      updateListCodeProductDto: UpdateListCodeProductDto;
+    },
+  ) {
+    return await this.layerService.updateListCodeProduct(
+      payload.list_id,
+      payload.updateListCodeProductDto,
+    );
   }
 
   @MessagePattern('get-list_code_product')
@@ -170,8 +262,13 @@ export class LayerController {
     return this.layerService.createWork(createWorkDto);
   }
 
+  @MessagePattern('delete-work')
+  async deleteWork(@Payload() datas: string[]) {
+    return await this.layerService.deleteWork(datas);
+  }
+
   @MessagePattern({ cmd: 'update-work' })
-  async updateWork(@Payload() payload: {id:string,data:UpdateWorkDto}) {
+  async updateWork(@Payload() payload: { id: string; data: UpdateWorkDto }) {
     return this.layerService.updateWork(payload.id, payload.data);
   }
 
@@ -181,13 +278,13 @@ export class LayerController {
   }
 
   @MessagePattern('get-all_year_works')
-  async getAllYearWorks(year:string) {
+  async getAllYearWorks(year: string) {
     return await this.layerService.getAllYearWorks(year);
   }
 
   @MessagePattern({ cmd: 'get-all_work' })
-  async getAllWork() {
-    return this.layerService.getAllWork();
+  async getAllWork(filter?: GetFilterWorkDto) {
+    return this.layerService.getAllWork(filter);
   }
 
   @MessagePattern({ cmd: 'create-type_work' })
@@ -195,8 +292,15 @@ export class LayerController {
     return this.layerService.createTypeWork(createTypeWorkDto);
   }
 
+  @MessagePattern('delete-type_work')
+  async deleteTypeWork(@Payload() datas: string[]) {
+    return await this.layerService.deleteTypeWork(datas);
+  }
+
   @MessagePattern({ cmd: 'update-type_work' })
-  async updateTypeWork(@Payload() payload: {id:string,data:UpdateTypeWorkDto}) {
+  async updateTypeWork(
+    @Payload() payload: { id: string; data: UpdateTypeWorkDto },
+  ) {
     return this.layerService.updateTypeWork(payload.id, payload.data);
   }
 
@@ -220,8 +324,15 @@ export class LayerController {
     return this.layerService.createStatusWork(createStatusWorkDto);
   }
 
+  @MessagePattern('delete-status_work')
+  async deleteStatusWork(@Payload() datas: string[]) {
+    return await this.layerService.deleteStatusWork(datas);
+  }
+
   @MessagePattern({ cmd: 'update-status_work' })
-  async updateStatusWork(@Payload() payload: {id:string,data:UpdateStatusWorkDto}) {
+  async updateStatusWork(
+    @Payload() payload: { id: string; data: UpdateStatusWorkDto },
+  ) {
     return this.layerService.updateStatusWork(payload.id, payload.data);
   }
 
@@ -236,7 +347,9 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'create-picture_work' })
-  async createPictureWork(@Payload() createPictureWorkDto: CreatePictureWorkDto[]) {
+  async createPictureWork(
+    @Payload() createPictureWorkDto: CreatePictureWorkDto[],
+  ) {
     return this.layerService.createPictureWork(createPictureWorkDto);
   }
 
@@ -251,7 +364,9 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-list_user' })
-  async updateListUser(@Payload() payload: {id:string,data:UpdateListUserDto}) {
+  async updateListUser(
+    @Payload() payload: { id: string; data: UpdateListUserDto },
+  ) {
     return this.layerService.updateListUser(payload.id, payload.data);
   }
 
@@ -264,5 +379,4 @@ export class LayerController {
   async getAllListUser(@Payload() work_id: string) {
     return this.layerService.getAllListUser(work_id);
   }
-  
 }

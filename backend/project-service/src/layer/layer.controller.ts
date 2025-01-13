@@ -7,8 +7,7 @@ import { CreateProjectDto } from 'src/dto/ProjectDto/create-project.dto';
 import { UpdateProjectDto } from 'src/dto/ProjectDto/update-project.dto';
 import { CreateTypeProjectDto } from 'src/dto/TypeProjectDto/create-type_project.dto';
 import { UpdateTypeProjectDto } from 'src/dto/TypeProjectDto/update-type_project.dto';
-
-
+import { GetFilterProjectDto } from 'src/dto/ProjectDto/get-filter.dto';
 
 @Controller('/project')
 @UseFilters(ConflictExceptionFilter)
@@ -25,10 +24,15 @@ export class LayerController {
     return await this.layerService.createProject(createProjectDto);
   }
 
+  @MessagePattern({ cmd: 'delete-project' })
+  async deleteProject(@Payload() datas: string[]) {
+    return this.layerService.deleteProjects(datas);
+  }
+
   // Handle retrieval of all projects
   @MessagePattern({ cmd: 'find-all_projects' })
-  async findAllProjects() {
-    return await this.layerService.findAllProjects();
+  async findAllProjects(filter?: GetFilterProjectDto) {
+    return await this.layerService.findAllProjects(filter);
   }
 
   // Handle retrieval of a single project by ID
@@ -44,19 +48,33 @@ export class LayerController {
 
   // Handle updating a project by ID
   @MessagePattern({ cmd: 'update-project' })
-  async updateProject(@Payload() payload: { id: string; updateProjectDto: UpdateProjectDto }) {
+  async updateProject(
+    @Payload() payload: { id: string; updateProjectDto: UpdateProjectDto },
+  ) {
     const { id, updateProjectDto } = payload;
     return await this.layerService.updateProject(id, updateProjectDto);
   }
 
-  @MessagePattern({cmd:'get-project_ids'})
-  getUserIDs(@Payload() project_ids:string[]){
-    return this.layerService.getProjectIDs(project_ids)
+  @MessagePattern({ cmd: 'get-project_ids' })
+  getUserIDs(@Payload() project_ids: string[]) {
+    return this.layerService.getProjectIDs(project_ids);
   }
- 
+
+  @MessagePattern({ cmd: 'get-project_about' })
+  getAboutProject() {
+    return this.layerService.getProjectAbout();
+  }
+
   @MessagePattern({ cmd: 'create-type_project' })
-  async createTypeProject(@Payload() createTypeProjectDto: CreateTypeProjectDto) {
+  async createTypeProject(
+    @Payload() createTypeProjectDto: CreateTypeProjectDto,
+  ) {
     return this.layerService.createTypeProject(createTypeProjectDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-type_project' })
+  async deleteTypeProject(@Payload() datas: string[]) {
+    return this.layerService.deleteTypeProject(datas);
   }
 
   @MessagePattern({ cmd: 'find-all_type_project' })
@@ -75,11 +93,10 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-type_project' })
-  async updateTypeProject(@Payload() data: { id: string; updateTypeProjectDto: UpdateTypeProjectDto }) {
+  async updateTypeProject(
+    @Payload() data: { id: string; updateTypeProjectDto: UpdateTypeProjectDto },
+  ) {
     const { id, updateTypeProjectDto } = data;
     return this.layerService.updateTypeProject(id, updateTypeProjectDto);
   }
-
- 
-  
 }

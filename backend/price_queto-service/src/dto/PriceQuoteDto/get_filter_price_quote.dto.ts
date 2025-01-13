@@ -11,6 +11,10 @@ export class PriceQuoteFilterDto {
 
   @IsOptional()
   @IsString()
+  customer?: string;
+
+  @IsOptional()
+  @IsString()
   status?: string;
 
   @IsOptional()

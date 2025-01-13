@@ -1,4 +1,12 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { InfoContact } from './info_contact.entity';
 // import { GroupCustomer } from './group_customer.entity';
 
 @Entity('Account_customers')
@@ -18,7 +26,7 @@ export class AccountCustomers {
   @Column({ type: 'varchar', length: 50 })
   position: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   picture_url: string;
 
   @Column({ type: 'enum', enum: ['male', 'female', 'other'], default: 'male' })
@@ -26,7 +34,6 @@ export class AccountCustomers {
 
   @Column({ type: 'varchar', length: 50 })
   phone_number: string;
-
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_of_birth: Date;
@@ -37,7 +44,11 @@ export class AccountCustomers {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_active: Date;
 
-  @Column({ type: 'enum', enum: ['active', 'delete', 'hide'], default: 'active' })
+  @Column({
+    type: 'enum',
+    enum: ['active', 'delete', 'hide'],
+    default: 'active',
+  })
   status: string;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -45,4 +56,7 @@ export class AccountCustomers {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @OneToMany(() => InfoContact, (infoContact) => infoContact.customer)
+  info_contact: InfoContact[];
 }

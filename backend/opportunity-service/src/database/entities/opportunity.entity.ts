@@ -32,7 +32,7 @@ import { TypeOpportunities } from './type_opportunity.entity';
     @Column({ type: 'varchar', length: 50, nullable: true })
     name_contact: string;
   
-    @Column({ type: 'enum', enum: ['active', 'delete', 'hide'], default: 'active' })
+    @Column({ type: 'enum', enum: [ 'delete', 'hide','success','pending','cancel'], default: 'pending' })
     status: string;
 
     @Column({ type: 'varchar', length: 50, nullable: true })

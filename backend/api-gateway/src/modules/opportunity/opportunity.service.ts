@@ -7,64 +7,128 @@ import { UpdateTypeOpportunitiesDto } from './dto/TypeOpportunityDto/update-type
 import { CreateTypeSourcesDto } from './dto/TypeSourceDto/create-type_source.dto';
 import { UpdateTypeSourcesDto } from './dto/TypeSourceDto/update-type_source.dto';
 import { firstValueFrom } from 'rxjs';
-
-
+import { GetFilterOpportunitiesDto } from './dto/OpportunityDto/get-filter.dto';
 
 @Injectable()
 export class OpportunityService {
-
-  constructor(@Inject('OPPORTUNITY') private readonly opportunityClient:ClientProxy){}
-  getHello(): string {
-    return 'Hello World!';
+  constructor(
+    @Inject('OPPORTUNITY') private readonly opportunityClient: ClientProxy,
+  ) {}
+  async getHello() {
+    return await firstValueFrom(
+      this.opportunityClient.send({ cmd: 'get-opportunity_dashboard' }, {}),
+    );
   }
 
- 
   async sendCreateOpportunity(createOpportunityDto: CreateOpportunitiesDto) {
-    return this.opportunityClient.send({ cmd: 'create-opportunity' }, createOpportunityDto);
+    return this.opportunityClient.send(
+      { cmd: 'create-opportunity' },
+      createOpportunityDto,
+    );
   }
-  
-  async sendGetAllOpportunities() {
-    return this.opportunityClient.send({ cmd: 'get-all_opportunities' }, {});
+
+  async sendDeleteOpportunity(datas: string[]) {
+    return await firstValueFrom(
+      this.opportunityClient.send('delete-opportunity', datas),
+    );
   }
-  
+
+  async sendGetOpportunityDashboard() {
+    return await firstValueFrom(
+      this.opportunityClient.send({ cmd: 'get-opportunity_dashboard' }, {}),
+    );
+  }
+
+  async sendGetAllOpportunities(filter?: GetFilterOpportunitiesDto) {
+    return this.opportunityClient.send(
+      { cmd: 'get-all_opportunities' },
+      filter,
+    );
+  }
+
   async sendGetOpportunity(id: string) {
     return this.opportunityClient.send({ cmd: 'get-opportunity' }, id);
   }
-  
-  async sendUpdateOpportunity(id: string, updateOpportunityDto: UpdateOpportunitiesDto) {
-    console.log(updateOpportunityDto)
-    return this.opportunityClient.send({ cmd: 'update-opportunity' }, { id, data: updateOpportunityDto });
-  }
-  
-  async sendCreateTypeOpportunity(createTypeOpportunityDto: CreateTypeOpportunitiesDto) {
-    console.log(createTypeOpportunityDto)
-    return await firstValueFrom(this.opportunityClient.send({ cmd: 'create-type_opportunity' }, createTypeOpportunityDto));
-  }
-  
-  async sendGetAllTypeOpportunities() {
-    return this.opportunityClient.send({ cmd: 'get-all_type_opportunities' }, {});
+
+  async sendUpdateOpportunity(
+    id: string,
+    updateOpportunityDto: UpdateOpportunitiesDto,
+  ) {
+    console.log(updateOpportunityDto);
+    return this.opportunityClient.send(
+      { cmd: 'update-opportunity' },
+      { id, data: updateOpportunityDto },
+    );
   }
 
-  async getOpportunityFilter(time_first?:number,time_end?:number) {
-    return await firstValueFrom(this.opportunityClient.send({ cmd: 'get-opportunity_filter' }, {time_first,time_end}));
+  async sendCreateTypeOpportunity(
+    createTypeOpportunityDto: CreateTypeOpportunitiesDto,
+  ) {
+    console.log(createTypeOpportunityDto);
+    return await firstValueFrom(
+      this.opportunityClient.send(
+        { cmd: 'create-type_opportunity' },
+        createTypeOpportunityDto,
+      ),
+    );
+  }
+
+  async sendDeleteTypeOpportunity(datas: string[]) {
+    return await firstValueFrom(
+      this.opportunityClient.send('delete-type_opportunity', datas),
+    );
+  }
+
+  async sendGetAllTypeOpportunities() {
+    return this.opportunityClient.send(
+      { cmd: 'get-all_type_opportunities' },
+      {},
+    );
+  }
+
+  async getOpportunityFilter(time_first?: number, time_end?: number) {
+    return await firstValueFrom(
+      this.opportunityClient.send(
+        { cmd: 'get-opportunity_filter' },
+        { time_first, time_end },
+      ),
+    );
   }
 
   async sendGetFullTypeOpportunities() {
-    return this.opportunityClient.send({ cmd: 'get-full_type_opportunities' }, {});
+    return this.opportunityClient.send(
+      { cmd: 'get-full_type_opportunities' },
+      {},
+    );
   }
-  
+
   async sendGetTypeOpportunity(id: string) {
     return this.opportunityClient.send({ cmd: 'get-type_opportunity' }, id);
   }
-  
-  async sendUpdateTypeOpportunity(id: string, updateTypeOpportunityDto: UpdateTypeOpportunitiesDto) {
-    return this.opportunityClient.send({ cmd: 'update-type_opportunity' }, { id, data: updateTypeOpportunityDto });
+
+  async sendUpdateTypeOpportunity(
+    id: string,
+    updateTypeOpportunityDto: UpdateTypeOpportunitiesDto,
+  ) {
+    return this.opportunityClient.send(
+      { cmd: 'update-type_opportunity' },
+      { id, data: updateTypeOpportunityDto },
+    );
   }
-  
+
   async sendCreateTypeSource(createTypeSourceDto: CreateTypeSourcesDto) {
-    return this.opportunityClient.send({ cmd: 'create-type_source' }, createTypeSourceDto);
+    return this.opportunityClient.send(
+      { cmd: 'create-type_source' },
+      createTypeSourceDto,
+    );
   }
-  
+
+  async sendDeleteTypeSource(datas: string[]) {
+    return await firstValueFrom(
+      this.opportunityClient.send('delete-type_source', datas),
+    );
+  }
+
   async sendGetAllTypeSources() {
     return this.opportunityClient.send({ cmd: 'get-all_type_sources' }, {});
   }
@@ -72,13 +136,18 @@ export class OpportunityService {
   async sendGetFullTypeSources() {
     return this.opportunityClient.send({ cmd: 'get-full_type_sources' }, {});
   }
-  
+
   async sendGetTypeSource(id: string) {
     return this.opportunityClient.send({ cmd: 'get-type_source' }, id);
   }
-  
-  async sendUpdateTypeSource(id: string, updateTypeSourceDto: UpdateTypeSourcesDto) {
-    return this.opportunityClient.send({ cmd: 'update-type_source' }, { id, data: updateTypeSourceDto });
+
+  async sendUpdateTypeSource(
+    id: string,
+    updateTypeSourceDto: UpdateTypeSourcesDto,
+  ) {
+    return this.opportunityClient.send(
+      { cmd: 'update-type_source' },
+      { id, data: updateTypeSourceDto },
+    );
   }
-  
 }

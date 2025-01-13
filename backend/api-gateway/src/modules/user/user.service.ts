@@ -10,6 +10,8 @@ import { CreateUserDto } from './dto/create_user.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Request } from 'express';
 import { UpdateUserDto } from './dto/update_user.dto';
+import { CreateCategoryRoleUserDto } from './dto/create_category.dto';
+import { UpdateCategoryRoleUserDto } from './dto/update_category.dto';
 @Injectable()
 export class UserService {
 
@@ -33,6 +35,18 @@ export class UserService {
     return this.usersClient.send({ cmd: 'create-role_type' }, createRoleTypeUserDto);
   }
 
+  async sendDeleteRoleUser(datas:string[]) {
+    
+    return await firstValueFrom(this.usersClient.send('delete-role_type', datas));
+
+}
+
+async sendDeleteUsers(datas:string[]) {
+    
+  return await firstValueFrom(this.usersClient.send('delete-user', datas));
+
+}
+
   async updateRoleType(updateRoleTypeUserDto: UpdateRoleTypeUserDto) {
     return this.usersClient.send({ cmd: 'update-role_type' }, updateRoleTypeUserDto);
   }
@@ -55,8 +69,8 @@ export class UserService {
   }
 
   async updateUser(user_id:string,updateUserDto: UpdateUserDto,picture_url:Express.Multer.File) {
-    const data = await this.cloudinaryService.uploadFile(picture_url)
-    return this.usersClient.send({cmd:'update-user'}, {user_id,updateUserDto:{...updateUserDto,picture_url:data.secure_url}});
+    const data = picture_url ? await this.cloudinaryService.uploadFile(picture_url) : null
+    return this.usersClient.send({cmd:'update-user'}, {user_id,updateUserDto:{...updateUserDto,picture_url:data ? data.secure_url : undefined}});
   }
 
   async getUsers(){
@@ -75,8 +89,6 @@ export class UserService {
   async getUserIDProfile(req:Request){
     const user = req['user']
     if(user){
-      // console.log(user)
-      console.log(user)
       return await firstValueFrom(this.usersClient.send({ cmd: 'get-user_id_admin' }, {user_id:user.sub}))
 
     }
@@ -85,5 +97,49 @@ export class UserService {
       message: "Lấy thông tin thất bại"
     }
     
+  }
+
+  async createCategoryRole(createCategoryRole:CreateCategoryRoleUserDto){
+    return await firstValueFrom(this.usersClient.send({cmd:'create-category_role'},createCategoryRole))
+  }
+
+  async updateCategoryRole(id:string,updateCategoryRole:UpdateCategoryRoleUserDto){
+    return await firstValueFrom(this.usersClient.send({cmd:'update-category_role'},{id,updateCategoryRole}))
+  }
+
+  async deleteCategoryRole(ids:string[]){
+    return await firstValueFrom(this.usersClient.send({cmd:'delete-category_role'},ids))
+  }
+
+  async getFullCategoryRole(){
+    return await firstValueFrom(this.usersClient.send({cmd:'get-full_category_role'},{}))
+  }
+
+  async getFullRoleUserByID(id:string){
+    return await firstValueFrom(this.usersClient.send({cmd:'get-full_role_user_id'},id))
+  }
+
+  async getFullRoleUserByAccess(req:Request){
+    const user = req['user']
+    if(user){
+      return await firstValueFrom(this.usersClient.send({ cmd: 'get-full_role_user_id' }, user.sub))
+
+    }
+    return {
+      statusCode:HttpStatus.BAD_REQUEST,
+      message: "Lấy role thất bại"
+    }
+  }
+
+  async updateFullRoleUserByID(data:{id:string,role_type:string[]}){
+    return await firstValueFrom(this.usersClient.send({cmd:'update-full_role_user_id'},data))
+  }
+
+  async resetAdmin(){
+    return await firstValueFrom(this.usersClient.send({cmd:'reset-admin'},{}))
+  }
+
+  async createFullCategoryRole(datas:{name_category:string,role_type:CreateRoleTypeUserDto[]}[]){
+    return await firstValueFrom(this.usersClient.send({cmd:'create-full_category_role'},datas))
   }
 }

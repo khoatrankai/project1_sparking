@@ -44,6 +44,11 @@ export class SystemController {
     return this.systemService.createProvinces(createProvincesDto);
   }
 
+  @MessagePattern({ cmd: 'delete-provinces' })
+  deleteProvinces(@Payload() datas: string[]) {
+    return this.systemService.deleteProvinces(datas);
+  }
+
   @MessagePattern({ cmd: 'create-links_system' })
   createLinksSystem(@Payload() createLinksSystemDto: CreateLinkSystemDto[]) {
     return this.systemService.createLinkSystems(createLinksSystemDto);
@@ -70,6 +75,11 @@ export class SystemController {
     return this.systemService.createVats(createVats);
   }
 
+  @MessagePattern({ cmd: 'delete-vats' })
+  deleteVats(@Payload() datas: string[]) {
+    return this.systemService.deleteVats(datas);
+  }
+
   @MessagePattern({ cmd: 'get-vats' })
   getVats() {
     return this.systemService.getAllVats();
@@ -78,6 +88,11 @@ export class SystemController {
   @MessagePattern({ cmd: 'create-profits' })
   createProfits(@Payload() createProfits: CreateProfitDto[]) {
     return this.systemService.createProfits(createProfits);
+  }
+
+  @MessagePattern({ cmd: 'delete-profits' })
+  deleteProfits(@Payload() datas: string[]) {
+    return this.systemService.deleteProfits(datas);
   }
 
   @MessagePattern({ cmd: 'get-profits' })

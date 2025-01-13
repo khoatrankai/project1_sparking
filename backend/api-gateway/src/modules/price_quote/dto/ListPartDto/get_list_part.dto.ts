@@ -7,5 +7,6 @@ export class GetListPartDto {
     created_at: Date;
     updated_at: Date;
     products:GetListProductDto
+    type_package?: string;
   }
   

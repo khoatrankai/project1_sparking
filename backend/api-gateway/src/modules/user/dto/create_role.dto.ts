@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateRoleTypeUserDto {
 
@@ -9,4 +9,7 @@ export class CreateRoleTypeUserDto {
   @IsString()
   @Length(1, 50)
   name_tag: string;
+
+  @IsOptional()
+  category_role?:string
 }

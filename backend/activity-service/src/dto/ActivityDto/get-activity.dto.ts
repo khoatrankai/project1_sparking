@@ -1,4 +1,4 @@
-import { IsString,  IsArray, IsInt, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsArray, IsInt, IsOptional, IsDate } from 'class-validator';
 
 export class GetActivityDto {
   @IsString()
@@ -13,7 +13,7 @@ export class GetActivityDto {
   @IsOptional()
   name: string;
 
-  @IsString() 
+  @IsString()
   @IsOptional()
   status: string;
 

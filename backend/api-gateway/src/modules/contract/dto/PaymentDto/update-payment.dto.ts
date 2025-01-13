@@ -34,6 +34,10 @@ export class UpdatePaymentDto {
   @IsOptional()
   type: string;
 
+  @IsString()
+  @IsOptional()
+  vat: string;
+
   @IsDate()
   @IsOptional()
   @Type(() => Date)

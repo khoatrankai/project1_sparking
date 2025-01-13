@@ -32,6 +32,14 @@ import { memoryStorage } from 'multer';
           host:'localhost',
           port:3004
         }
+      },
+      {
+        name: 'USER',
+        transport:Transport.TCP,
+        options:{
+          host:'localhost',
+          port:3005
+        }
       }
     ])
   ],

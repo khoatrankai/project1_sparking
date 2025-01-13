@@ -14,6 +14,10 @@ export class CreateListPartDto {
   @IsOptional()
   title: string;
 
+  @IsString()
+  @IsOptional()
+  type_package: string;
+
   @IsOptional()
   @IsArray()
   products?: CreateListProductDto[];

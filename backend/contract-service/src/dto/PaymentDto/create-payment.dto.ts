@@ -16,7 +16,6 @@ export class CreatePaymentDto {
   @IsInt()
   price: number;
 
-  
   @IsString()
   @IsOptional()
   description: string;
@@ -29,9 +28,13 @@ export class CreatePaymentDto {
   @IsOptional()
   supplier: string;
 
-  @IsEnum(['import','export'])
+  @IsEnum(['import', 'export'])
   @IsOptional()
   type: string;
+
+  @IsString()
+  @IsOptional()
+  vat: string;
 
   @IsDate()
   @Type(() => Date)

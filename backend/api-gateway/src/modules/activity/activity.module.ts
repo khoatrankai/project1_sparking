@@ -15,6 +15,14 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
           host:'localhost',
           port:3014
         }
+      },
+      {
+        name: 'USER',
+        transport:Transport.TCP,
+        options:{
+          host:'localhost',
+          port:3005
+        }
       }
     ])
   ],

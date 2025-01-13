@@ -63,6 +63,12 @@ export class ProductService {
     }
   }
 
+  async sendDeleteProduct(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-product', datas));
+
+}
+
   async getAboutProduct() {
     return {
       statusCode:HttpStatus.OK,
@@ -130,6 +136,12 @@ export class ProductService {
       throw new HttpException('Failed to create code product', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async sendDeleteCodeProduct(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-code_product', datas));
+
+}
 
   async findAllCodeProduct() {
     try {
@@ -251,6 +263,12 @@ export class ProductService {
     }
   }
 
+  async sendDeleteTypeProduct(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-type_product', datas));
+
+}
+
   async findAllTypeProduct() {
     try {
       const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_type_product' }, {}));
@@ -288,6 +306,12 @@ export class ProductService {
       throw new HttpException('Failed to create classify_type', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async sendDeleteClassifyType(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-classify_type', datas));
+
+}
 
   async findAllClassifyType() {
     try {
@@ -340,6 +364,12 @@ export class ProductService {
     }
   }
 
+  async sendDeleteBrand(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-brand', datas));
+
+}
+
   async findAllBrand() {
     try {
       const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_brand' }, {}));
@@ -378,6 +408,12 @@ export class ProductService {
       throw new HttpException('Failed to create type product', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async sendDeleteOriginal(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-original', datas));
+
+}
 
   async findAllOriginal() {
     try {
@@ -419,6 +455,12 @@ export class ProductService {
     }
   }
 
+  async sendDeleteUnitProduct(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-unit_product', datas));
+
+}
+
   async findAllUnitProduct() {
     try {
       const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_unit_product' }, {}));
@@ -458,6 +500,12 @@ export class ProductService {
       throw new HttpException('Failed to create supplier product', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async sendDeleteSupplierProduct(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-supplier_product', datas));
+
+}
 
   async findAllSupplierProduct() {
     try {
@@ -506,6 +554,12 @@ export class ProductService {
       );
     }
   }
+
+  async sendDeleteActivityContainer(datas:string[]) {
+    
+    return await firstValueFrom(this.productClient.send('delete-activity_container', datas));
+
+}
 
   async findAllActivityContainers(type:string) {
     try {

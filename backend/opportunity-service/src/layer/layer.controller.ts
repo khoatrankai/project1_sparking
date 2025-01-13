@@ -9,9 +9,7 @@ import { CreateTypeOpportunitiesDto } from 'src/dto/TypeOpportunityDto/create-ty
 import { UpdateTypeOpportunitiesDto } from 'src/dto/TypeOpportunityDto/update-type_opportunity.dto';
 import { UpdateTypeSourcesDto } from 'src/dto/TypeSourceDto/update-type_source.dto';
 import { CreateTypeSourcesDto } from 'src/dto/TypeSourceDto/create-type_source.dto';
-
-
-
+import { GetFilterOpportunitiesDto } from 'src/dto/OpportunityDto/get-filter.dto';
 
 @Controller('/opportunity')
 @UseFilters(ConflictExceptionFilter)
@@ -28,9 +26,19 @@ export class LayerController {
     return this.layerService.createOpportunity(data);
   }
 
+  @MessagePattern({ cmd: 'delete-opportunity' })
+  async deleteOpportunity(@Payload() datas: string[]) {
+    return this.layerService.deleteOpportunity(datas);
+  }
+
   @MessagePattern({ cmd: 'get-all_opportunities' })
-  async findAllOpportunity() {
-    return this.layerService.findAllOpportunity();
+  async findAllOpportunity(filter?: GetFilterOpportunitiesDto) {
+    return this.layerService.findAllOpportunity(filter);
+  }
+
+  @MessagePattern({ cmd: 'get-opportunity_dashboard' })
+  async getOpportunityDashboard() {
+    return this.layerService.getOpportunityDashboard();
   }
 
   @MessagePattern({ cmd: 'get-opportunity' })
@@ -39,13 +47,24 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-opportunity' })
-  async updateOpportunity({ id, data }: { id: string; data: UpdateOpportunitiesDto }) {
+  async updateOpportunity({
+    id,
+    data,
+  }: {
+    id: string;
+    data: UpdateOpportunitiesDto;
+  }) {
     return this.layerService.updateOpportunity(id, data);
   }
 
   @MessagePattern({ cmd: 'create-type_opportunity' })
   async createTypeOpportunity(data: CreateTypeOpportunitiesDto) {
     return this.layerService.createTypeOpportunity(data);
+  }
+
+  @MessagePattern({ cmd: 'delete-type_opportunity' })
+  async deleteTypeOpportunity(@Payload() datas: string[]) {
+    return this.layerService.deleteTypeOpportunity(datas);
   }
 
   @MessagePattern({ cmd: 'get-all_type_opportunities' })
@@ -64,14 +83,24 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-type_opportunity' })
-  async updateTypeOpportunity({ id, data }: { id: string; data: UpdateTypeOpportunitiesDto }) {
+  async updateTypeOpportunity({
+    id,
+    data,
+  }: {
+    id: string;
+    data: UpdateTypeOpportunitiesDto;
+  }) {
     return this.layerService.updateTypeOpportunity(id, data);
   }
-
 
   @MessagePattern({ cmd: 'create-type_source' })
   async createTypeSource(data: CreateTypeSourcesDto) {
     return this.layerService.createTypeSource(data);
+  }
+
+  @MessagePattern({ cmd: 'delete-type_source' })
+  async deleteTypeSource(@Payload() datas: string[]) {
+    return this.layerService.deleteTypeSource(datas);
   }
 
   @MessagePattern({ cmd: 'get-all_type_sources' })
@@ -79,9 +108,15 @@ export class LayerController {
     return this.layerService.findAllTypeSource();
   }
 
-  @MessagePattern({cmd:'get-opportunity_filter'})
-  getOpportunityFilter(@Payload('time_first') time_first?:number, @Payload('time_end') time_end?:number){
-    return this.layerService.getOpportunityFilter(time_first?new Date(time_first):null,time_end?new Date(time_end):null)
+  @MessagePattern({ cmd: 'get-opportunity_filter' })
+  getOpportunityFilter(
+    @Payload('time_first') time_first?: number,
+    @Payload('time_end') time_end?: number,
+  ) {
+    return this.layerService.getOpportunityFilter(
+      time_first ? new Date(time_first) : null,
+      time_end ? new Date(time_end) : null,
+    );
   }
 
   @MessagePattern({ cmd: 'get-full_type_sources' })
@@ -95,10 +130,13 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-type_source' })
-  async updateTypeSource({ id, data }: { id: string; data: UpdateTypeSourcesDto }) {
+  async updateTypeSource({
+    id,
+    data,
+  }: {
+    id: string;
+    data: UpdateTypeSourcesDto;
+  }) {
     return this.layerService.updateTypeSource(id, data);
   }
-
- 
-  
 }

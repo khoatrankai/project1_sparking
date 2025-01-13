@@ -11,6 +11,8 @@ import { CreatePaymentDto } from 'src/dto/PaymentDto/create-payment.dto';
 import { UpdatePaymentDto } from 'src/dto/PaymentDto/update-payment.dto';
 import { CreateTypeMethodDto } from 'src/dto/TypeMethodDto/create-type_method.dto';
 import { UpdateTypeMethodDto } from 'src/dto/TypeMethodDto/update-type_method.dto';
+import { GetFilterPaymentDto } from 'src/dto/PaymentDto/get-filter.dto';
+import { GetFilterContractDto } from 'src/dto/ContractDto/get-filter.dto';
 
 @Controller()
 @UseFilters(ConflictExceptionFilter)
@@ -23,13 +25,30 @@ export class ContractController {
   }
   // Type Contract patterns
   @MessagePattern({ cmd: 'create-type_contract' })
-  async createTypeContract(createTypeContract: CreateTypeContractDto) {
+  async createTypeContract(
+    @Payload() createTypeContract: CreateTypeContractDto,
+  ) {
     return this.contractService.createTypeContract(createTypeContract);
+  }
+
+  @MessagePattern({ cmd: 'delete-type_contract' })
+  async deleteTypeContract(@Payload() datas: string[]) {
+    return this.contractService.deleteTypeContracts(datas);
   }
 
   @MessagePattern({ cmd: 'get-type_contracts' })
   async getTypeContract() {
     return this.contractService.getAllTypeContracts();
+  }
+
+  @MessagePattern({ cmd: 'get-full_contract_dashboard' })
+  async getFullContractDashboard() {
+    return this.contractService.getFullContractDashboard();
+  }
+
+  @MessagePattern({ cmd: 'get-full_contract_by_type_id' })
+  async getFullContractByIDType(id: string) {
+    return this.contractService.getFullContractByIDType(id);
   }
 
   @MessagePattern({ cmd: 'get-type-full_contracts' })
@@ -38,18 +57,25 @@ export class ContractController {
   }
 
   @MessagePattern({ cmd: 'update-type_contract' })
-  async updateTypeContract(updateTypeContract: UpdateTypeContractDto) {
+  async updateTypeContract(
+    @Payload() updateTypeContract: UpdateTypeContractDto,
+  ) {
     return this.contractService.updateTypeContract(updateTypeContract);
   }
 
   // Contract patterns
   @MessagePattern({ cmd: 'create-contract' })
-  async createContract(createContract: CreateContractDto) {
+  async createContract(@Payload() createContract: CreateContractDto) {
     return this.contractService.createContract(createContract);
   }
 
+  @MessagePattern({ cmd: 'delete-contract' })
+  async deleteContract(@Payload() datas: string[]) {
+    return this.contractService.deleteContract(datas);
+  }
+
   @MessagePattern({ cmd: 'update-contract' })
-  async updateContract(updateContract: UpdateContractDto) {
+  async updateContract(@Payload() updateContract: UpdateContractDto) {
     return this.contractService.updateContract(updateContract);
   }
 
@@ -58,54 +84,128 @@ export class ContractController {
     return this.contractService.getContracts();
   }
 
+  @MessagePattern({ cmd: 'get-contract_about' })
+  async getContractAbout() {
+    return this.contractService.getContractAbout();
+  }
+
   @MessagePattern({ cmd: 'get-year_contracts' })
-  async getYearContracts(@Payload('year') year:number) {
-    return this.contractService.getYearContracts(year);
+  async getYearContracts(filter?: GetFilterContractDto) {
+    return this.contractService.getYearContracts(filter);
   }
 
   @MessagePattern({ cmd: 'get-contract' })
-  async getContract(@Payload() id:string) {
+  async getContract(@Payload() id: string) {
     return this.contractService.getContractID(id);
   }
+
   @MessagePattern({ cmd: 'get-contract_ids' })
-  async getContractIds(@Payload() data:string[]) {
+  async getContractIds(@Payload() data: string[]) {
     return this.contractService.getContractIDs(data);
+  }
+
+  @MessagePattern({ cmd: 'get-contract_by_project_id' })
+  async getContractByProject(project: string) {
+    return this.contractService.getContractByProject(project);
   }
 
   // Payment patterns
   @MessagePattern({ cmd: 'create-payment' })
-  async createPayment(createPaymentDto: CreatePaymentDto) {
+  async createPayment(@Payload() createPaymentDto: CreatePaymentDto) {
     return this.contractService.createPayment(createPaymentDto);
   }
 
+  @MessagePattern({ cmd: 'delete-payment' })
+  async deletePayment(@Payload() datas: string[]) {
+    return this.contractService.deletePayment(datas);
+  }
+
   @MessagePattern({ cmd: 'update-payment' })
-  async updatePayment(data: { payment_id: string; updatePaymentDto: UpdatePaymentDto }) {
-    return this.contractService.updatePayment(data.payment_id, data.updatePaymentDto);
+  async updatePayment(
+    @Payload() data: { payment_id: string; updatePaymentDto: UpdatePaymentDto },
+  ) {
+    return this.contractService.updatePayment(
+      data.payment_id,
+      data.updatePaymentDto,
+    );
   }
 
   @MessagePattern({ cmd: 'get-payment' })
-  async getPayment(payment_id: string) {
+  async getPayment(@Payload() payment_id: string) {
     return this.contractService.getPayment(payment_id);
   }
 
-  @MessagePattern({ cmd: 'get-all-payments' })
-  async getAllPayments() {
-    return this.contractService.getAllPayments();
+  @MessagePattern({ cmd: 'get-debt_supplier' })
+  async getDebtSupplier() {
+    return this.contractService.getDebtSupplier();
   }
 
-  
+  @MessagePattern({ cmd: 'get-payment_dashboard' })
+  async getInfoPaymentDashboard() {
+    return this.contractService.getInfoPaymentDashboard();
+  }
+
+  @MessagePattern({ cmd: 'get-revenue_total_contract' })
+  async getRevenueTotalContract() {
+    return this.contractService.getRevenueTotalContract();
+  }
+
+  @MessagePattern({ cmd: 'get-contract_current_year' })
+  async getYearCurrentContracts() {
+    return this.contractService.getYearCurrentContracts();
+  }
+
+  @MessagePattern({ cmd: 'get-payment_expired_customer' })
+  async getExpiredCustomer() {
+    return this.contractService.getExpiredCustomer();
+  }
+
+  @MessagePattern({ cmd: 'get-payment_ready_customer' })
+  async getPaymentReadyCustomer() {
+    return this.contractService.getPaymentReadyCustomer();
+  }
+
+  @MessagePattern({ cmd: 'get-payment_ready_supplier' })
+  async getPaymentReadySupplier() {
+    return this.contractService.getPaymentReadySupplier();
+  }
+
+  @MessagePattern({ cmd: 'get-all-payments' })
+  async getAllPayments(@Payload() filter?: GetFilterPaymentDto) {
+    return this.contractService.getAllPayments(filter);
+  }
+
+  @MessagePattern({ cmd: 'get-payments_by_project' })
+  async getPaymentByProject(project: string) {
+    return this.contractService.getPaymentByProject(project);
+  }
+
   @MessagePattern({ cmd: 'create-type_method' })
-  async createTypeMethod(createTypeMethodDto: CreateTypeMethodDto) {
+  async createTypeMethod(@Payload() createTypeMethodDto: CreateTypeMethodDto) {
     return this.contractService.createTypeMethod(createTypeMethodDto);
   }
 
+  @MessagePattern({ cmd: 'delete-type_method' })
+  async deleteTypeMethod(@Payload() datas: string[]) {
+    return this.contractService.deleteTypeMethod(datas);
+  }
+
   @MessagePattern({ cmd: 'update-type_method' })
-  async updateTypeMethod(data: { type_method_id: string; updateTypeMethodDto: UpdateTypeMethodDto }) {
-    return this.contractService.updateTypeMethod(data.type_method_id, data.updateTypeMethodDto);
+  async updateTypeMethod(
+    @Payload()
+    data: {
+      type_method_id: string;
+      updateTypeMethodDto: UpdateTypeMethodDto;
+    },
+  ) {
+    return this.contractService.updateTypeMethod(
+      data.type_method_id,
+      data.updateTypeMethodDto,
+    );
   }
 
   @MessagePattern({ cmd: 'get-type_method' })
-  async getTypeMethod(type_method_id: string) {
+  async getTypeMethod(@Payload() type_method_id: string) {
     return this.contractService.getTypeMethod(type_method_id);
   }
 
@@ -113,5 +213,4 @@ export class ContractController {
   async getAllTypeMethods() {
     return this.contractService.getAllTypeMethods();
   }
-  
 }

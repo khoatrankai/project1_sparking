@@ -7,6 +7,7 @@ import { ListProduct } from 'src/database/entities/list_product.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ListParts } from 'src/database/entities/list_part.entity';
 import { ListDetailProduct } from 'src/database/entities/list_detail_product.entity';
+import { TypePackage } from 'src/database/entities/type_package.entity';
 
 
 @Module({
@@ -44,7 +45,7 @@ import { ListDetailProduct } from 'src/database/entities/list_detail_product.ent
       }
     }
   ]),
-    TypeOrmModule.forFeature([PriceQuote,ListProduct,ListParts,ListDetailProduct])
+    TypeOrmModule.forFeature([PriceQuote,ListProduct,ListParts,ListDetailProduct,TypePackage])
   ],
   controllers: [PriceQuoteController],
   providers: [PriceQuoteService],

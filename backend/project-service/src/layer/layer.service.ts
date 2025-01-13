@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import {  In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Projects } from 'src/database/entities/project.entity';
 import { CreateProjectDto } from 'src/dto/ProjectDto/create-project.dto';
 import { UpdateProjectDto } from 'src/dto/ProjectDto/update-project.dto';
@@ -10,16 +10,15 @@ import { firstValueFrom } from 'rxjs';
 import { CreateTypeProjectDto } from 'src/dto/TypeProjectDto/create-type_project.dto';
 import { TypeProject } from 'src/database/entities/type_project.entity';
 import { UpdateTypeProjectDto } from 'src/dto/TypeProjectDto/update-type_project.dto';
-
-
-
+import { GetFilterProjectDto } from 'src/dto/ProjectDto/get-filter.dto';
 
 @Injectable()
 export class LayerService {
-
-  constructor(@Inject('CUSTOMER') private readonly customersClient:ClientProxy,
+  constructor(
+    @Inject('CUSTOMER') private readonly customersClient: ClientProxy,
     @InjectRepository(Projects)
-    private readonly projectsRepository: Repository<Projects>, @InjectRepository(TypeProject)
+    private readonly projectsRepository: Repository<Projects>,
+    @InjectRepository(TypeProject)
     private readonly typeProjectRepository: Repository<TypeProject>,
   ) {}
 
@@ -30,37 +29,86 @@ export class LayerService {
       project_id: uuidv4(),
     });
     const savedProject = await this.projectsRepository.save(project);
-    
+
     return {
       statusCode: HttpStatus.CREATED,
       data: savedProject,
       message: 'Project created successfully',
     };
   }
-  
-  async getProjectIDs(project_ids:string[]){
-    const data = await this.projectsRepository.find({select:['project_id','name','type'],where:{project_id:In(project_ids)},relations:['type']});
-    const sortedData = project_ids.map(id => data.find(project => project.project_id === id))
-    return sortedData
+
+  async deleteProjects(datas: string[]) {
+    try {
+      const rm = await this.projectsRepository.delete({
+        project_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async getProjectIDs(project_ids: string[]) {
+    const data = await this.projectsRepository.find({
+      select: ['project_id', 'name', 'type'],
+      where: { project_id: In(project_ids) },
+      relations: ['type'],
+    });
+    const sortedData = project_ids.map((id) =>
+      data.find((project) => project.project_id === id),
+    );
+    return sortedData;
+  }
+
+  async getProjectAbout() {
+    const data = await this.projectsRepository
+      .createQueryBuilder('project')
+      .select('project.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('status')
+      .getRawMany();
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: data.map((dt) => {
+        return { ...dt, count: Number(dt.count) };
+      }),
+      message: 'About project',
+    };
   }
   // Find all projects
-  async findAllProjects(): Promise<any> {
-    const projects = await this.projectsRepository.find();
-    
+  async findAllProjects(filter?: GetFilterProjectDto): Promise<any> {
+    const customer = filter?.customer;
+    const whereCondition: any = {};
+    if (customer) {
+      whereCondition.customer = customer;
+    }
+    const projects = await this.projectsRepository.find({
+      where: whereCondition,
+    });
 
     if (!projects || projects.length === 0) {
-     
       return {
         statusCode: HttpStatus.NO_CONTENT,
         data: [],
         message: 'No projects found',
       };
     }
-    const customerIds = projects.map((dt)=> dt.customer)
-    const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_ids'},customerIds))
-    const dataRes = projects.map((dt,index)=>{
-      return {...dt,customer:customerInfos[index]}
-    })
+    const customerIds = projects.map((dt) => dt.customer);
+    const customerInfos = await firstValueFrom(
+      this.customersClient.send({ cmd: 'get-customer_ids' }, customerIds),
+    );
+    const dataRes = projects.map((dt, index) => {
+      return { ...dt, customer: customerInfos[index] };
+    });
     return {
       statusCode: HttpStatus.OK,
       data: dataRes,
@@ -68,50 +116,48 @@ export class LayerService {
     };
   }
 
-  async getAboutProject(): Promise<any> {
-    const projects = await this.projectsRepository.find();
-    
+  // async getAboutProject(): Promise<any> {
+  //   const projects = await this.projectsRepository.find();
 
-    if (!projects || projects.length === 0) {
-     
-      return {
-        statusCode: HttpStatus.NO_CONTENT,
-        data: [],
-        message: 'No projects found',
-      };
-    }
-    let projWaiting = 0
-    let projStart = 0
-    let projPause = 0
-    let projCancel = 0
-    let projCompleted = 0
-    projects.forEach(dt =>{
-      if(dt.status === 'waiting') projWaiting++
-      if(dt.status === 'start') projStart++
-      if(dt.status === 'pause') projPause++
-      if(dt.status === 'cancel') projCancel++
-      if(dt.status === 'completed') projCompleted++
-    })
-    return {
-      statusCode: HttpStatus.OK,
-      data: {
-        totalWaiting:projWaiting,
-        totalStart:projStart,
-        totalPause:projPause,
-        totalCancel:projCancel,
-        totalCompleted:projCompleted,
-      },
-      message: 'Projects retrieved successfully',
-    };
-  }
-  
+  //   if (!projects || projects.length === 0) {
+  //     return {
+  //       statusCode: HttpStatus.NO_CONTENT,
+  //       data: [],
+  //       message: 'No projects found',
+  //     };
+  //   }
+  //   let projWaiting = 0;
+  //   let projStart = 0;
+  //   let projPause = 0;
+  //   let projCancel = 0;
+  //   let projCompleted = 0;
+  //   projects.forEach((dt) => {
+  //     if (dt.status === 'waiting') projWaiting++;
+  //     if (dt.status === 'start') projStart++;
+  //     if (dt.status === 'pause') projPause++;
+  //     if (dt.status === 'cancel') projCancel++;
+  //     if (dt.status === 'completed') projCompleted++;
+  //   });
+  //   return {
+  //     statusCode: HttpStatus.OK,
+  //     data: {
+  //       totalWaiting: projWaiting,
+  //       totalStart: projStart,
+  //       totalPause: projPause,
+  //       totalCancel: projCancel,
+  //       totalCompleted: projCompleted,
+  //     },
+  //     message: 'Projects retrieved successfully',
+  //   };
+  // }
+
   // Find one project by ID
   async findOneProject(id: string): Promise<any> {
     const project = await this.projectsRepository.findOne({
       where: { project_id: id },
-      relations:['type']
+      relations: ['type'],
     });
-    
+
     if (!project) {
       throw new HttpException(
         {
@@ -122,10 +168,10 @@ export class LayerService {
         HttpStatus.NOT_FOUND,
       );
     }
-    
+
     return {
       statusCode: HttpStatus.OK,
-      data: {...project,type:project.type.type_id},
+      data: { ...project, type: project.type.type_id },
       message: 'Project retrieved successfully',
     };
   }
@@ -134,7 +180,7 @@ export class LayerService {
     const project = await this.projectsRepository.findOne({
       where: { project_id: id },
     });
-    
+
     if (!project) {
       throw new HttpException(
         {
@@ -145,19 +191,30 @@ export class LayerService {
         HttpStatus.NOT_FOUND,
       );
     }
-    const infoCustomer = await firstValueFrom(this.customersClient.send({cmd:"get-full_info_customer_id"},project.customer))
+    const infoCustomer = await firstValueFrom(
+      this.customersClient.send(
+        { cmd: 'get-full_info_customer_id' },
+        project.customer,
+      ),
+    );
     return {
       statusCode: HttpStatus.OK,
-      data: {...project,customer:infoCustomer.data},
+      data: { ...project, customer: infoCustomer.data },
       message: 'Project retrieved successfully',
     };
   }
-  
+
   // Update a project by ID
-  async updateProject(id: string, updateProjectDto: UpdateProjectDto): Promise<any> {
-    console.log(updateProjectDto)
-    const updateResult = await this.projectsRepository.update(id, updateProjectDto);
-    
+  async updateProject(
+    id: string,
+    updateProjectDto: UpdateProjectDto,
+  ): Promise<any> {
+    console.log(updateProjectDto);
+    const updateResult = await this.projectsRepository.update(
+      id,
+      updateProjectDto,
+    );
+
     if (updateResult.affected === 0) {
       throw new HttpException(
         {
@@ -168,11 +225,11 @@ export class LayerService {
         HttpStatus.NOT_FOUND,
       );
     }
-    
+
     const updatedProject = await this.projectsRepository.findOne({
       where: { project_id: id },
     });
-    
+
     return {
       statusCode: HttpStatus.OK,
       data: updatedProject,
@@ -181,57 +238,74 @@ export class LayerService {
   }
 
   async createTypeProject(createTypeProjectDto: CreateTypeProjectDto) {
-    const typeProject = this.typeProjectRepository.create({...createTypeProjectDto,type_id:uuidv4()});
+    const typeProject = this.typeProjectRepository.create({
+      ...createTypeProjectDto,
+      type_id: uuidv4(),
+    });
     await this.typeProjectRepository.save(typeProject);
     return {
       statusCode: HttpStatus.CREATED,
-      message:"Loại dự án tạo thành công"
+      message: 'Loại dự án tạo thành công',
+    };
+  }
+
+  async deleteTypeProject(datas: string[]) {
+    try {
+      const rm = await this.typeProjectRepository.delete({
+        type_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
     }
   }
 
   async findAllTypeProject() {
     return {
       statusCode: HttpStatus.OK,
-      data: await this.typeProjectRepository.find()
-    
-    }
-    
-    
+      data: await this.typeProjectRepository.find(),
+    };
   }
 
   async findFullTypeProject() {
     return {
       statusCode: HttpStatus.OK,
-      data: await this.typeProjectRepository.find({relations:['projects']})
-    
-    }
-    
-    
+      data: await this.typeProjectRepository.find({ relations: ['projects'] }),
+    };
   }
 
   async findOneTypeProject(id: string) {
-
     return {
       statusCode: HttpStatus.OK,
-      data: await this.typeProjectRepository.findOne({ where: { type_id: id } })
-    
-    }
+      data: await this.typeProjectRepository.findOne({
+        where: { type_id: id },
+      }),
+    };
   }
 
-  async updateTypeProject(id: string, updateTypeProjectDto: UpdateTypeProjectDto) {
+  async updateTypeProject(
+    id: string,
+    updateTypeProjectDto: UpdateTypeProjectDto,
+  ) {
     await this.typeProjectRepository.update(id, updateTypeProjectDto);
     return {
       statusCode: HttpStatus.OK,
-      data:  await this.typeProjectRepository.findOne({where:{type_id:id}}),
-      message:"Cập nhật thành công"
-    
-    }
-    
+      data: await this.typeProjectRepository.findOne({
+        where: { type_id: id },
+      }),
+      message: 'Cập nhật thành công',
+    };
   }
- 
+
   getHello(): string {
     return 'Hello World!';
   }
-
-  
 }

@@ -39,6 +39,11 @@ export class UserController {
     return this.userService.createUser(createUserDto)
   }
 
+  @MessagePattern({ cmd: 'delete-user' })
+  async deleteTypeRole(datas: string[]) {
+    return this.userService.deleteUser(datas);
+  }
+
   @MessagePattern({cmd:'update-user'})
   updateUser( data:{user_id:string,updateUserDto:UpdateUserDto}): Promise<ResultResponse>{
     return this.userService.updateUser(data.user_id,data.updateUserDto)

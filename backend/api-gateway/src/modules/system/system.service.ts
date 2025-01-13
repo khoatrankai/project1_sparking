@@ -65,6 +65,12 @@ export class SystemService {
     return this.systemClient.send({ cmd: 'create-province' }, createProvinceDto);
   }
 
+  async sendDeleteProvince(datas:string[]) {
+    
+    return await firstValueFrom(this.systemClient.send('delete-provinces', datas));
+
+}
+
   async createProvinces(createProvincesDto: CreateProvinceDto[]) {
     console.log(createProvincesDto)
     return this.systemClient.send({ cmd: 'create-provinces' }, createProvincesDto);
@@ -85,6 +91,12 @@ export class SystemService {
   async createVat(createVatDto: CreateVatDto) {
     return this.systemClient.send({ cmd: 'create-vat' }, createVatDto);
   }
+
+  async sendDeleteVats(datas:string[]) {
+    
+    return await firstValueFrom(this.systemClient.send('delete-vats', datas));
+
+}
   async createUnitProduct(createUnitDto: CreateUnitProductDto) {
     return this.systemClient.send({ cmd: 'create-unit_product' }, createUnitDto);
   }
@@ -100,6 +112,12 @@ export class SystemService {
   async createProfits(createProfitsDto: CreateProfitDto[]) {
     return this.systemClient.send({ cmd: 'create-profits' }, createProfitsDto);
   }
+
+  async sendDeleteProfits(datas:string[]) {
+    
+    return await firstValueFrom(this.systemClient.send('delete-profits', datas));
+
+}
   
   async updateProvince(updateProvinceDto: UpdateProvinceDto) {
     return this.systemClient.send({ cmd: 'update-province' }, updateProvinceDto);

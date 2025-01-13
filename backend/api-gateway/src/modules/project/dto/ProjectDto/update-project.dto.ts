@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsEnum, IsInt, IsDate, Length } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  IsDate,
+  Length,
+} from 'class-validator';
 
 export class UpdateProjectDto {
   @IsString()
@@ -11,6 +18,7 @@ export class UpdateProjectDto {
   @IsOptional()
   status?: string;
 
+  @Type(() => Number)
   @IsInt()
   @IsOptional()
   price?: number;

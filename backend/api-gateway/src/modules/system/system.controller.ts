@@ -1,4 +1,4 @@
-import {  Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {  Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { SystemService } from './system.service';
 import { CreateProductDto } from './dto/create_product.dto';
 import { CreateListUseProductDto } from './dto/create_list_user_product.dto';
@@ -33,10 +33,16 @@ export class SystemController {
   createListUseProduct(@Body() dataListUseProduct:CreateListUseProductDto){
     return this.systemService.createListUseProduct(dataListUseProduct)
   }
+
   @Post('create-provinces')
   createProvinces(@Body() dataProvinces:CreateProvinceDto[]){
     return this.systemService.createProvinces(dataProvinces)
   }
+
+  @Delete('province')
+            async sendDeleteProvinces(@Body() datas:string[]) {
+              return this.systemService.sendDeleteProvince(datas);
+            }
   @Get('provinces')
   getProvinces(){
     return this.systemService.getAllProvinces()
@@ -55,6 +61,12 @@ export class SystemController {
   createVats(@Body() dataVats:CreateVatDto[]){
     return this.systemService.createVats(dataVats)
   }
+
+  @Delete('vats')
+            async sendDeleteVats(@Body() datas:string[]) {
+              return this.systemService.sendDeleteVats(datas);
+            }
+
   @Get('vats')
   getVats(){
     return this.systemService.getAllVats()
@@ -64,6 +76,12 @@ export class SystemController {
   createProfits(@Body() dataProfits:CreateProfitDto[]){
     return this.systemService.createProfits(dataProfits)
   }
+
+  @Delete('profits')
+            async sendDeleteProfits(@Body() datas:string[]) {
+              return this.systemService.sendDeleteProfits(datas);
+            }
+
   @Get('profits')
   getProfits(){
     return this.systemService.getAllProfits()

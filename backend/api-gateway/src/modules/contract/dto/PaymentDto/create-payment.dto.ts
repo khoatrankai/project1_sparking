@@ -26,6 +26,10 @@ export class CreatePaymentDto {
 
   @IsString()
   @IsOptional()
+  vat: string;
+
+  @IsString()
+  @IsOptional()
   supplier: string;
 
   @IsEnum(['import','export'])
