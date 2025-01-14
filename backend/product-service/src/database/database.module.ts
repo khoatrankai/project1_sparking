@@ -11,20 +11,48 @@ import { HistoryCodeProduct } from './entities/history_code_product.entity';
 import { Brands } from './entities/brand.entity';
 import { Originals } from './entities/original.entity';
 import { ClassifyType } from './entities/classify_type.entity';
-
+import { createConnection } from 'mysql2/promise';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '123456789',
-      database: 'db_sparking_product',
-      entities: [Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals,ClassifyType],
-      // synchronize: true,
-      // dropSchema: true,
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => {
+        const connection = await createConnection({
+          host: 'localhost',
+          user: 'root',
+          password: '123456789',
+        });
+
+        // Tạo database nếu không tồn tại
+        await connection.query(
+          `CREATE DATABASE IF NOT EXISTS db_sparking_product`,
+        );
+        await connection.end();
+
+        return {
+          type: 'mysql',
+          host: 'localhost',
+          port: 3306,
+          username: 'root',
+          password: '123456789',
+          database: 'db_sparking_product',
+          entities: [
+            Products,
+            TypeProducts,
+            UnitProduct,
+            CodeProduct,
+            PictureProduct,
+            SupplierProduct,
+            ActivityContainer,
+            HistoryCodeProduct,
+            Brands,
+            Originals,
+            ClassifyType,
+          ],
+          // synchronize: true,
+          // dropSchema: true,
+        };
+      },
     }),
   ],
 })

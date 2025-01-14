@@ -733,7 +733,7 @@ export class ContractService {
       message: 'TypeContracts retrieved successfully',
       data: result.map((dt, index) => {
         return {
-          supplier: supplier[index].name,
+          supplier: supplier?.[index]?.name,
           total: Number(dt.total),
         };
       }),

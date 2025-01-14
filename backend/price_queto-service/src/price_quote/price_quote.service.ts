@@ -475,9 +475,11 @@ export class PriceQuoteService {
     const listPart = await Promise.all(
       createListPartDto.map(async (dt) => {
         const id = uuidv4();
-        const typePackage = await this.typePackageRepository.findOne({
-          where: { package_id: dt.type_package },
-        });
+        const typePackage = dt.type_package
+          ? await this.typePackageRepository.findOne({
+              where: { package_id: dt.type_package },
+            })
+          : null;
         return this.listPartRepository.create({
           title: dt.title,
           part_id: id,
@@ -528,9 +530,12 @@ export class PriceQuoteService {
   }
 
   async updateListPart(id: string, updateListPartDto: UpdateListPartDto) {
-    const typePackage = await this.typePackageRepository.findOne({
-      where: { package_id: updateListPartDto.type_package },
-    });
+    const typePackage = updateListPartDto.type_package
+      ? await this.typePackageRepository.findOne({
+          where: { package_id: updateListPartDto.type_package },
+        })
+      : null;
+    // console.log(typePackage, updateListPartDto);
     return await this.listPartRepository.update(id, {
       ...updateListPartDto,
       type_package: typePackage,

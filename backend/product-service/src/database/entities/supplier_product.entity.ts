@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToMany} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { Products } from './product.entity';
 
 @Entity('Supplier_product')
@@ -6,22 +6,21 @@ export class SupplierProduct {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   supplier_id: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'text' })
   name: string;
 
-  @Column({ type: 'varchar', length: 50,nullable:true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   phone_number: string;
 
-  @Column({ type: 'varchar', length: 50,nullable:true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   email: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   address: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
-  @OneToMany(() => Products, products => products.supplier_product)
+  @OneToMany(() => Products, (products) => products.supplier_product)
   products: Products[];
-
 }

@@ -1,7 +1,7 @@
-import {  HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import {v4 as uuidv4} from 'uuid'
+import { v4 as uuidv4 } from 'uuid';
 import { CreateProductDto } from './dto/ProductDto/create-product.dto';
 import { UpdateProductDto } from './dto/ProductDto/update-product.dto';
 import { CreateCodeProductDto } from './dto/CodeProductDto/create-code_product.dto';
@@ -26,69 +26,109 @@ import { UpdateOriginalDto } from './dto/OriginalDto/update-original.dto';
 import { CreateClassifyTypeDto } from './dto/ClassifyTypeDto/create-classify_type.dto';
 import { UpdateClassifyTypeDto } from './dto/ClassifyTypeDto/update-classify_type.dto';
 
-
-
 @Injectable()
 export class ProductService {
   private cloudinaryMiddleware: CloudinaryMiddleware;
-  constructor(@Inject('PRODUCT') private readonly productClient:ClientProxy,@Inject('SYSTEM') private readonly systemClient:ClientProxy,private readonly configService: ConfigService,private readonly cloudinaryService:CloudinaryService){
-    this.cloudinaryMiddleware = new CloudinaryMiddleware(this.configService)
+  constructor(
+    @Inject('PRODUCT') private readonly productClient: ClientProxy,
+    @Inject('SYSTEM') private readonly systemClient: ClientProxy,
+    private readonly configService: ConfigService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {
+    this.cloudinaryMiddleware = new CloudinaryMiddleware(this.configService);
   }
   getHello(): string {
     return 'Hello World!';
   }
 
   // Product methods
-  async createProduct(createProductDto: CreateProductDto,images:Express.Multer.File[]) {
+  async createProduct(
+    createProductDto: CreateProductDto,
+    images: Express.Multer.File[],
+  ) {
     const id = uuidv4();
     try {
-      
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-product' }, { ...createProductDto, product_id: id }));
-      if(result){
-      
-        if(images.length > 0){
-          const datas = await this.cloudinaryService.uploadFiles(images) 
-          const resultImg = await firstValueFrom(this.productClient.send({ cmd: 'create-pictures_product' }, {url:datas,product:id } as CreatePictureProductDto));
-          if(resultImg){
-            return { statusCode: HttpStatus.CREATED, message: 'Product and Picture created successfully' };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-product' },
+          { ...createProductDto, product_id: id },
+        ),
+      );
+      if (result) {
+        if (images.length > 0) {
+          const datas = await this.cloudinaryService.uploadFiles(images);
+          const resultImg = await firstValueFrom(
+            this.productClient.send({ cmd: 'create-pictures_product' }, {
+              url: datas,
+              product: id,
+            } as CreatePictureProductDto),
+          );
+          if (resultImg) {
+            return {
+              statusCode: HttpStatus.CREATED,
+              message: 'Product and Picture created successfully',
+            };
           }
         }
-        return { statusCode: HttpStatus.CREATED, message: 'Product created successfully' };
-
-       
+        return {
+          statusCode: HttpStatus.CREATED,
+          message: 'Product created successfully',
+        };
       }
-      
     } catch (error) {
-      throw new HttpException('Failed to create product', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  async sendDeleteProduct(datas:string[]) {
-    
-    return await firstValueFrom(this.productClient.send('delete-product', datas));
-
-}
+  async sendDeleteProduct(datas: string[]) {
+    return await firstValueFrom(
+      this.productClient.send('delete-product', datas),
+    );
+  }
 
   async getAboutProduct() {
     return {
-      statusCode:HttpStatus.OK,
-      data: await firstValueFrom(this.productClient.send({ cmd: 'get-about_product' },{}))
-    }
-    
+      statusCode: HttpStatus.OK,
+      data: await firstValueFrom(
+        this.productClient.send({ cmd: 'get-about_product' }, {}),
+      ),
+    };
   }
 
-  async updateProduct(id: string, updateProductDto: UpdateProductDto,images:Express.Multer.File[]) {
+  async updateProduct(
+    id: string,
+    updateProductDto: UpdateProductDto,
+    images: Express.Multer.File[],
+  ) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-product' }, { id, updateProductDto }));
-      if (!result) throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
-      if(images.length > 0){
-        const datas = await this.cloudinaryService.uploadFiles(images)
-        await firstValueFrom(this.productClient.send({ cmd: 'create-pictures_product' }, {url:datas,product:id } as CreatePictureProductDto));
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-product' },
+          { id, updateProductDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
+      if (images.length > 0) {
+        const datas = await this.cloudinaryService.uploadFiles(images);
+        await firstValueFrom(
+          this.productClient.send({ cmd: 'create-pictures_product' }, {
+            url: datas,
+            product: id,
+          } as CreatePictureProductDto),
+        );
         // if(resultImg){
         //   return { statusCode: HttpStatus.CREATED, message: 'Product created successfully' };
         // }
       }
-      return { statusCode: HttpStatus.OK, message: 'Product updated successfully', data: result };
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Product updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
@@ -96,75 +136,116 @@ export class ProductService {
 
   async updateStatusProduct(id: string, updateProductDto: UpdateProductDto) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-status_product' }, { id, updateProductDto }));
-      if (!result) throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
-     
-      return { statusCode: HttpStatus.OK, message: 'Product updated successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-status_product' },
+          { id, updateProductDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Product updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
   }
   async findAllProduct() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_product' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_product' }, {}),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOneProduct(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_product' }, id));
-      if (!result) throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_product' }, id),
+      );
+      if (!result)
+        throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
     }
   }
 
- 
-
   // CodeProduct methods
   async createCodeProduct(createCodeProductDto: CreateCodeProductDto) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-code_product' }, { ...createCodeProductDto })) as CreateCodeProductDto;
-      return { statusCode: HttpStatus.CREATED, message: 'CodeProduct created successfully', data: {
-        code:result.code
-      } };
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-code_product' },
+          { ...createCodeProductDto },
+        ),
+      )) as CreateCodeProductDto;
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'CodeProduct created successfully',
+        data: {
+          code: result.code,
+        },
+      };
     } catch (error) {
-      throw new HttpException('Failed to create code product', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  async sendDeleteCodeProduct(datas:string[]) {
-    
-    return await firstValueFrom(this.productClient.send('delete-code_product', datas));
-
-}
+  async sendDeleteCodeProduct(datas: string[]) {
+    return await firstValueFrom(
+      this.productClient.send('delete-code_product', datas),
+    );
+  }
 
   async findAllCodeProduct() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_code_product' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_code_product' }, {}),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch code products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch code products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  async findAllCodeProductID(id:string) {
+  async findAllCodeProductID(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_code_product_id' }, id));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_code_product_id' }, id),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch code products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch code products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOneCodeProduct(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_code_product' }, id));
-      if (!result) throw new HttpException('Code product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_code_product' }, id),
+      );
+      if (!result)
+        throw new HttpException('Code product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
@@ -173,30 +254,59 @@ export class ProductService {
 
   async findOneUrlCodeProduct(url: string) {
     try {
-      const name_tag = url.split('@')?.[1]
-      if(name_tag){
-        const linkCode = await firstValueFrom(this.systemClient.send({ cmd: 'get-link_system' }, name_tag))
-        if(linkCode && url.includes(linkCode.link)){
-          const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_code_product' }, url.replace(linkCode.link,'')));
-          if (!result) throw new HttpException('Code product not found', HttpStatus.NOT_FOUND);
-          if (result.length === 0) throw new HttpException('Sản phẩm đã xuất kho', HttpStatus.NOT_FOUND);
+      const name_tag = url.split('@')?.[1];
+      if (name_tag) {
+        const linkCode = await firstValueFrom(
+          this.systemClient.send({ cmd: 'get-link_system' }, name_tag),
+        );
+        if (linkCode && url.includes(linkCode.link)) {
+          const result = await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'find-one_code_product' },
+              url.replace(linkCode.link, ''),
+            ),
+          );
+          if (!result)
+            throw new HttpException(
+              'Code product not found',
+              HttpStatus.NOT_FOUND,
+            );
+          if (result.length === 0)
+            throw new HttpException(
+              'Sản phẩm đã xuất kho',
+              HttpStatus.NOT_FOUND,
+            );
           return { statusCode: HttpStatus.OK, data: result };
         }
-       
       }
-      return { statusCode: HttpStatus.NOT_FOUND, data: {},message:"Sản phẩm không tìm thấy" };
-     
-      
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        data: {},
+        message: 'Sản phẩm không tìm thấy',
+      };
     } catch (error) {
       throw error;
     }
   }
 
-  async updateCodeProduct(id: string, updateCodeProductDto: UpdateCodeProductDto) {
+  async updateCodeProduct(
+    id: string,
+    updateCodeProductDto: UpdateCodeProductDto,
+  ) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-code_product' }, { id, updateCodeProductDto }));
-      if (!result) throw new HttpException('Code product not found', HttpStatus.NOT_FOUND);
-      return { statusCode: HttpStatus.OK, message: 'CodeProduct updated successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-code_product' },
+          { id, updateCodeProductDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException('Code product not found', HttpStatus.NOT_FOUND);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'CodeProduct updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
@@ -206,37 +316,76 @@ export class ProductService {
   async createPictureProduct(createPictureProductDto: CreatePictureProductDto) {
     const id = uuidv4();
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-picture_product' }, { ...createPictureProductDto, picture_id: id }));
-      return { statusCode: HttpStatus.CREATED, message: 'PictureProduct created successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-picture_product' },
+          { ...createPictureProductDto, picture_id: id },
+        ),
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'PictureProduct created successfully',
+        data: result,
+      };
     } catch (error) {
-      throw new HttpException('Failed to create picture product', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create picture product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
   async findAllPictureProduct() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_picture_product' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_picture_product' }, {}),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch picture products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch picture products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOnePictureProduct(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_picture_product' }, id));
-      if (!result) throw new HttpException('Picture product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_picture_product' }, id),
+      );
+      if (!result)
+        throw new HttpException(
+          'Picture product not found',
+          HttpStatus.NOT_FOUND,
+        );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
     }
   }
 
-  async updatePictureProduct(id: string, updatePictureProductDto: UpdatePictureProductDto) {
+  async updatePictureProduct(
+    id: string,
+    updatePictureProductDto: UpdatePictureProductDto,
+  ) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-picture_product' }, { id, updatePictureProductDto }));
-      if (!result) throw new HttpException('Picture product not found', HttpStatus.NOT_FOUND);
-      return { statusCode: HttpStatus.OK, message: 'PictureProduct updated successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-picture_product' },
+          { id, updatePictureProductDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException(
+          'Picture product not found',
+          HttpStatus.NOT_FOUND,
+        );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'PictureProduct updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
@@ -244,9 +393,19 @@ export class ProductService {
 
   async deletePictureProduct(id: string[]) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'delete-picture_product' }, id));
-      if (!result) throw new HttpException('Picture product not found', HttpStatus.NOT_FOUND);
-      return { statusCode: HttpStatus.OK, message: 'PictureProduct delete successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'delete-picture_product' }, id),
+      );
+      if (!result)
+        throw new HttpException(
+          'Picture product not found',
+          HttpStatus.NOT_FOUND,
+        );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'PictureProduct delete successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
@@ -256,43 +415,76 @@ export class ProductService {
   async createTypeProduct(createTypeProductDto: CreateTypeProductDto) {
     const id = uuidv4();
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-type_product' }, { ...createTypeProductDto, type_product_id: id }));
-      return { statusCode: HttpStatus.CREATED, message: 'TypeProduct created successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-type_product' },
+          { ...createTypeProductDto, type_product_id: id },
+        ),
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'TypeProduct created successfully',
+        data: result,
+      };
     } catch (error) {
-      throw new HttpException('Failed to create type product', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create type product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  async sendDeleteTypeProduct(datas:string[]) {
-    
-    return await firstValueFrom(this.productClient.send('delete-type_product', datas));
-
-}
+  async sendDeleteTypeProduct(datas: string[]) {
+    return await firstValueFrom(
+      this.productClient.send('delete-type_product', datas),
+    );
+  }
 
   async findAllTypeProduct() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_type_product' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_type_product' }, {}),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch type products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOneTypeProduct(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_type_product' }, id));
-      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_type_product' }, id),
+      );
+      if (!result)
+        throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
     }
   }
 
-  async updateTypeProduct(id: string, updateTypeProductDto: UpdateTypeProductDto) {
+  async updateTypeProduct(
+    id: string,
+    updateTypeProductDto: UpdateTypeProductDto,
+  ) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-type_product' }, { id, updateTypeProductDto }));
-      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
-      return { statusCode: HttpStatus.OK, message: 'TypeProduct updated successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-type_product' },
+          { id, updateTypeProductDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'TypeProduct updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
@@ -300,32 +492,52 @@ export class ProductService {
 
   async createClassifyType(createClassifyTypeDto: CreateClassifyTypeDto) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-classify_type' }, { ...createClassifyTypeDto }));
-      return { statusCode: HttpStatus.CREATED, message: 'classify_type created successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-classify_type' },
+          { ...createClassifyTypeDto },
+        ),
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'classify_type created successfully',
+        data: result,
+      };
     } catch (error) {
-      throw new HttpException('Failed to create classify_type', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create classify_type',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  async sendDeleteClassifyType(datas:string[]) {
-    
-    return await firstValueFrom(this.productClient.send('delete-classify_type', datas));
-
-}
+  async sendDeleteClassifyType(datas: string[]) {
+    return await firstValueFrom(
+      this.productClient.send('delete-classify_type', datas),
+    );
+  }
 
   async findAllClassifyType() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_classify_type' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_classify_type' }, {}),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch type products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOneClassifyType(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_classify_type' }, id));
-      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_classify_type' }, id),
+      );
+      if (!result)
+        throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
@@ -334,55 +546,94 @@ export class ProductService {
 
   async findOneClassifyTypeName(name: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one-name_classify_type' }, name));
-      if (!result) throw new HttpException('classify product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one-name_classify_type' }, name),
+      );
+      if (!result)
+        throw new HttpException(
+          'classify product not found',
+          HttpStatus.NOT_FOUND,
+        );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
     }
   }
 
-  async updateClassifyType(id: string, updateClassifyTypeDto: UpdateClassifyTypeDto) {
+  async updateClassifyType(
+    id: string,
+    updateClassifyTypeDto: UpdateClassifyTypeDto,
+  ) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-classify_type' }, { id, updateClassifyTypeDto }));
-      if (!result) throw new HttpException('classify_type not found', HttpStatus.NOT_FOUND);
-      return { statusCode: HttpStatus.OK, message: 'classify_type updated successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-classify_type' },
+          { id, updateClassifyTypeDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException(
+          'classify_type not found',
+          HttpStatus.NOT_FOUND,
+        );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'classify_type updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
   }
-
 
   async createBrand(createBrandDto: CreateBrandDto) {
     const id = uuidv4();
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-brand' }, { ...createBrandDto, brand_id: id }));
-      return { statusCode: HttpStatus.CREATED, message: 'Brand created successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-brand' },
+          { ...createBrandDto, brand_id: id },
+        ),
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Brand created successfully',
+        data: result,
+      };
     } catch (error) {
-      console.log(error)
-      throw new HttpException('Failed to create brand product', HttpStatus.BAD_REQUEST);
+      console.log(error);
+      throw new HttpException(
+        'Failed to create brand product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  async sendDeleteBrand(datas:string[]) {
-    
+  async sendDeleteBrand(datas: string[]) {
     return await firstValueFrom(this.productClient.send('delete-brand', datas));
-
-}
+  }
 
   async findAllBrand() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_brand' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_brand' }, {}),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch type products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOneBrand(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_brand' }, id));
-      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_brand' }, id),
+      );
+      if (!result)
+        throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
@@ -391,9 +642,19 @@ export class ProductService {
 
   async updateBrand(id: string, updateBrandDto: UpdateBrandDto) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-brand' }, { id, updateBrandDto }));
-      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
-      return { statusCode: HttpStatus.OK, message: 'TypeProduct updated successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-brand' },
+          { id, updateBrandDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'TypeProduct updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
@@ -402,32 +663,52 @@ export class ProductService {
   async createOriginal(createOriginalDto: CreateOriginalDto) {
     const id = uuidv4();
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-original' }, { ...createOriginalDto, original_id: id }));
-      return { statusCode: HttpStatus.CREATED, message: 'Brand created successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-original' },
+          { ...createOriginalDto, original_id: id },
+        ),
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Brand created successfully',
+        data: result,
+      };
     } catch (error) {
-      throw new HttpException('Failed to create type product', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create type product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  async sendDeleteOriginal(datas:string[]) {
-    
-    return await firstValueFrom(this.productClient.send('delete-original', datas));
-
-}
+  async sendDeleteOriginal(datas: string[]) {
+    return await firstValueFrom(
+      this.productClient.send('delete-original', datas),
+    );
+  }
 
   async findAllOriginal() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_original' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_original' }, {}),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch type products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch type products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOneOriginal(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_original' }, id));
-      if (!result) throw new HttpException('original not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_original' }, id),
+      );
+      if (!result)
+        throw new HttpException('original not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
@@ -436,9 +717,19 @@ export class ProductService {
 
   async updateOriginal(id: string, updateOriginalDto: UpdateOriginalDto) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-original' }, { id, updateOriginalDto }));
-      if (!result) throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
-      return { statusCode: HttpStatus.OK, message: 'Original updated successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-original' },
+          { id, updateOriginalDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Original updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
@@ -448,97 +739,180 @@ export class ProductService {
   async createUnitProduct(createUnitProductDto: CreateUnitProductDto) {
     const id = uuidv4();
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'create-unit_product' }, { ...createUnitProductDto, unit_id: id }));
-      return { statusCode: HttpStatus.CREATED, message: 'UnitProduct created successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-unit_product' },
+          { ...createUnitProductDto, unit_id: id },
+        ),
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'UnitProduct created successfully',
+        data: result,
+      };
     } catch (error) {
-      throw new HttpException('Failed to create unit product', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create unit product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  async sendDeleteUnitProduct(datas:string[]) {
-    
-    return await firstValueFrom(this.productClient.send('delete-unit_product', datas));
-
-}
+  async sendDeleteUnitProduct(datas: string[]) {
+    return await firstValueFrom(
+      this.productClient.send('delete-unit_product', datas),
+    );
+  }
 
   async findAllUnitProduct() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_unit_product' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_unit_product' }, {}),
+      );
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
-      throw new HttpException('Failed to fetch unit products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch unit products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOneUnitProduct(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_unit_product' }, id));
-      if (!result) throw new HttpException('Unit product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_unit_product' }, id),
+      );
+      if (!result)
+        throw new HttpException('Unit product not found', HttpStatus.NOT_FOUND);
       return { statusCode: HttpStatus.OK, data: result };
     } catch (error) {
       throw error;
     }
   }
 
-  async updateUnitProduct(id: string, updateUnitProductDto: UpdateUnitProductDto) {
+  async updateUnitProduct(
+    id: string,
+    updateUnitProductDto: UpdateUnitProductDto,
+  ) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'update-unit_product' }, { id, updateUnitProductDto }));
-      if (!result) throw new HttpException('Unit product not found', HttpStatus.NOT_FOUND);
-      return { statusCode: HttpStatus.OK, message: 'UnitProduct updated successfully', data: result };
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-unit_product' },
+          { id, updateUnitProductDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException('Unit product not found', HttpStatus.NOT_FOUND);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'UnitProduct updated successfully',
+        data: result,
+      };
     } catch (error) {
       throw error;
     }
   }
 
-  async createSupplierProduct(createSupplierProductDto: CreateSupplierProductDto) {
+  async createSupplierProduct(
+    createSupplierProductDto: CreateSupplierProductDto,
+  ) {
     try {
       const result = await firstValueFrom(
-        this.productClient.send({ cmd: 'create-supplier_product' }, createSupplierProductDto),
+        this.productClient.send(
+          { cmd: 'create-supplier_product' },
+          createSupplierProductDto,
+        ),
       );
       return result;
     } catch (error) {
-      throw new HttpException('Failed to create supplier product', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create supplier product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
-  async sendDeleteSupplierProduct(datas:string[]) {
-    
-    return await firstValueFrom(this.productClient.send('delete-supplier_product', datas));
+  async createSuppliersProduct(
+    createSupplierProductDto: CreateSupplierProductDto[],
+  ) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-suppliers_product' },
+          createSupplierProductDto,
+        ),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create supplier product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 
-}
+  async sendDeleteSupplierProduct(datas: string[]) {
+    return await firstValueFrom(
+      this.productClient.send('delete-supplier_product', datas),
+    );
+  }
 
   async findAllSupplierProduct() {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-all_supplier_product' }, {}));
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_supplier_product' }, {}),
+      );
       return result;
     } catch (error) {
-      throw new HttpException('Failed to fetch supplier products', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch supplier products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async findOneSupplierProduct(id: string) {
     try {
-      const result = await firstValueFrom(this.productClient.send({ cmd: 'find-one_supplier_product' }, id));
-      if (!result) throw new HttpException('Supplier product not found', HttpStatus.NOT_FOUND);
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_supplier_product' }, id),
+      );
+      if (!result)
+        throw new HttpException(
+          'Supplier product not found',
+          HttpStatus.NOT_FOUND,
+        );
       return result;
     } catch (error) {
       throw error;
     }
   }
 
-  async updateSupplierProduct(id: string, updateSupplierProductDto: UpdateSupplierProductDto) {
+  async updateSupplierProduct(
+    id: string,
+    updateSupplierProductDto: UpdateSupplierProductDto,
+  ) {
     try {
       const result = await firstValueFrom(
-        this.productClient.send({ cmd: 'update-supplier_product' }, { id, updateSupplierProductDto }),
+        this.productClient.send(
+          { cmd: 'update-supplier_product' },
+          { id, updateSupplierProductDto },
+        ),
       );
-      if (!result) throw new HttpException('Supplier product not found', HttpStatus.NOT_FOUND);
+      if (!result)
+        throw new HttpException(
+          'Supplier product not found',
+          HttpStatus.NOT_FOUND,
+        );
       return result;
     } catch (error) {
       throw error;
     }
   }
 
-  async createActivityContainer(createActivityContainerDto: CreateActivityContainerDto) {
+  async createActivityContainer(
+    createActivityContainerDto: CreateActivityContainerDto,
+  ) {
     try {
       const result = await firstValueFrom(
         this.productClient.send(
@@ -555,16 +929,19 @@ export class ProductService {
     }
   }
 
-  async sendDeleteActivityContainer(datas:string[]) {
-    
-    return await firstValueFrom(this.productClient.send('delete-activity_container', datas));
+  async sendDeleteActivityContainer(datas: string[]) {
+    return await firstValueFrom(
+      this.productClient.send('delete-activity_container', datas),
+    );
+  }
 
-}
-
-  async findAllActivityContainers(type:string) {
+  async findAllActivityContainers(type: string) {
     try {
       const result = await firstValueFrom(
-        this.productClient.send({ cmd: 'find-all_activity_containers' }, {type}),
+        this.productClient.send(
+          { cmd: 'find-all_activity_containers' },
+          { type },
+        ),
       );
       return result;
     } catch (error) {
@@ -614,7 +991,4 @@ export class ProductService {
       throw error;
     }
   }
-
-  
- 
 }

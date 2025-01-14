@@ -29,7 +29,7 @@ export class OpportunityService {
 
   async sendDeleteOpportunity(datas: string[]) {
     return await firstValueFrom(
-      this.opportunityClient.send('delete-opportunity', datas),
+      this.opportunityClient.send({ cmd: 'delete-opportunity' }, datas),
     );
   }
 

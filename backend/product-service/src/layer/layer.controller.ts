@@ -24,8 +24,6 @@ import { UpdateOriginalDto } from 'src/dto/OriginalDto/update-original.dto';
 import { CreateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/create-classify_type.dto';
 import { UpdateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/update-classify_type.dto';
 
-
-
 @Controller('/product')
 @UseFilters(ConflictExceptionFilter)
 export class LayerController {
@@ -35,8 +33,6 @@ export class LayerController {
   getHello(): string {
     return this.layerService.getHello();
   }
-
-
 
   @MessagePattern({ cmd: 'get-about_product' })
   getAboutProduct() {
@@ -53,7 +49,6 @@ export class LayerController {
     return this.layerService.deleteProduct(datas);
   }
 
-
   @MessagePattern({ cmd: 'find-all_product' })
   async findAllProduct() {
     return this.layerService.findAllProduct();
@@ -65,19 +60,25 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-product' })
-  async updateProduct(@Payload() data: { id: string; updateProductDto: UpdateProductDto }) {
+  async updateProduct(
+    @Payload() data: { id: string; updateProductDto: UpdateProductDto },
+  ) {
     const { id, updateProductDto } = data;
     return this.layerService.updateProduct(id, updateProductDto);
   }
 
   @MessagePattern({ cmd: 'update-status_product' })
-  async updateStatusProduct(@Payload() data: { id: string; updateProductDto: UpdateProductDto }) {
+  async updateStatusProduct(
+    @Payload() data: { id: string; updateProductDto: UpdateProductDto },
+  ) {
     const { id, updateProductDto } = data;
     return this.layerService.updateProduct(id, updateProductDto);
   }
 
   @MessagePattern({ cmd: 'create-code_product' })
-  async createCodeProduct(@Payload() createCodeProductDto: CreateCodeProductDto) {
+  async createCodeProduct(
+    @Payload() createCodeProductDto: CreateCodeProductDto,
+  ) {
     return this.layerService.createCodeProduct(createCodeProductDto);
   }
 
@@ -102,7 +103,9 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-code_product' })
-  async updateCodeProduct(@Payload() data: { id: string; updateCodeProductDto: UpdateCodeProductDto }) {
+  async updateCodeProduct(
+    @Payload() data: { id: string; updateCodeProductDto: UpdateCodeProductDto },
+  ) {
     const { id, updateCodeProductDto } = data;
     return this.layerService.updateCodeProduct(id, updateCodeProductDto);
   }
@@ -112,13 +115,15 @@ export class LayerController {
   //   return this.layerService.createPictureProduct(createPictureProductDto);
   // }
 
-  @MessagePattern({cmd:'get-product_ids'})
-  getUserIDs(@Payload() product_ids:string[]){
-    return this.layerService.getProductIDs(product_ids)
+  @MessagePattern({ cmd: 'get-product_ids' })
+  getUserIDs(@Payload() product_ids: string[]) {
+    return this.layerService.getProductIDs(product_ids);
   }
 
   @MessagePattern({ cmd: 'create-pictures_product' })
-  async createPicturesProduct(@Payload() createPictureProductDto: CreatePictureProductDto) {
+  async createPicturesProduct(
+    @Payload() createPictureProductDto: CreatePictureProductDto,
+  ) {
     return this.layerService.createPicturesProduct(createPictureProductDto);
   }
 
@@ -133,7 +138,13 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-picture_product' })
-  async updatePictureProduct(@Payload() data: { id: string; updatePictureProductDto: UpdatePictureProductDto }) {
+  async updatePictureProduct(
+    @Payload()
+    data: {
+      id: string;
+      updatePictureProductDto: UpdatePictureProductDto;
+    },
+  ) {
     const { id, updatePictureProductDto } = data;
     return this.layerService.updatePictureProduct(id, updatePictureProductDto);
   }
@@ -144,7 +155,9 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'create-type_product' })
-  async createTypeProduct(@Payload() createTypeProductDto: CreateTypeProductDto) {
+  async createTypeProduct(
+    @Payload() createTypeProductDto: CreateTypeProductDto,
+  ) {
     return this.layerService.createTypeProduct(createTypeProductDto);
   }
 
@@ -169,13 +182,17 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-type_product' })
-  async updateTypeProduct(@Payload() data: { id: string; updateTypeProductDto: UpdateTypeProductDto }) {
+  async updateTypeProduct(
+    @Payload() data: { id: string; updateTypeProductDto: UpdateTypeProductDto },
+  ) {
     const { id, updateTypeProductDto } = data;
     return this.layerService.updateTypeProduct(id, updateTypeProductDto);
   }
 
   @MessagePattern({ cmd: 'create-classify_type' })
-  async createClassifyType(@Payload() createClassifyTypeDto: CreateClassifyTypeDto) {
+  async createClassifyType(
+    @Payload() createClassifyTypeDto: CreateClassifyTypeDto,
+  ) {
     return this.layerService.createClassifyType(createClassifyTypeDto);
   }
 
@@ -200,7 +217,13 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-classify_type' })
-  async updateClassifyType(@Payload() data: { id: string; updateClassifyTypeDto: UpdateClassifyTypeDto }) {
+  async updateClassifyType(
+    @Payload()
+    data: {
+      id: string;
+      updateClassifyTypeDto: UpdateClassifyTypeDto;
+    },
+  ) {
     const { id, updateClassifyTypeDto } = data;
     return this.layerService.updateClassifyType(id, updateClassifyTypeDto);
   }
@@ -226,7 +249,9 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-brand' })
-  async updateBrand(@Payload() data: { id: string; updateBrandDto: UpdateBrandDto }) {
+  async updateBrand(
+    @Payload() data: { id: string; updateBrandDto: UpdateBrandDto },
+  ) {
     const { id, updateBrandDto } = data;
     return this.layerService.updateBrand(id, updateBrandDto);
   }
@@ -252,13 +277,17 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-original' })
-  async updateOriginal(@Payload() data: { id: string; updateOriginalDto: UpdateOriginalDto }) {
+  async updateOriginal(
+    @Payload() data: { id: string; updateOriginalDto: UpdateOriginalDto },
+  ) {
     const { id, updateOriginalDto } = data;
     return this.layerService.updateOriginal(id, updateOriginalDto);
   }
 
   @MessagePattern({ cmd: 'create-unit_product' })
-  async createUnitProduct(@Payload() createUnitProductDto: CreateUnitProductDto) {
+  async createUnitProduct(
+    @Payload() createUnitProductDto: CreateUnitProductDto,
+  ) {
     return this.layerService.createUnitProduct(createUnitProductDto);
   }
 
@@ -278,14 +307,25 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'update-unit_product' })
-  async updateUnitProduct(@Payload() data: { id: string; updateUnitProductDto: UpdateUnitProductDto }) {
+  async updateUnitProduct(
+    @Payload() data: { id: string; updateUnitProductDto: UpdateUnitProductDto },
+  ) {
     const { id, updateUnitProductDto } = data;
     return this.layerService.updateUnitProduct(id, updateUnitProductDto);
   }
- 
+
   @MessagePattern({ cmd: 'create-supplier_product' })
-  async createSupplierProduct(@Payload() createSupplierProductDto: CreateSupplierProductDto) {
+  async createSupplierProduct(
+    @Payload() createSupplierProductDto: CreateSupplierProductDto,
+  ) {
     return this.layerService.createSupplierProduct(createSupplierProductDto);
+  }
+
+  @MessagePattern({ cmd: 'create-suppliers_product' })
+  async createSupplierSProduct(
+    @Payload() createSupplierProductDto: CreateSupplierProductDto[],
+  ) {
+    return this.layerService.createSuppliersProduct(createSupplierProductDto);
   }
 
   @MessagePattern({ cmd: 'delete-supplier_product' })
@@ -310,20 +350,31 @@ export class LayerController {
 
   @MessagePattern({ cmd: 'update-supplier_product' })
   async updateSupplierProduct(
-    @Payload() data: { id: string; updateSupplierProductDto: UpdateSupplierProductDto },
+    @Payload()
+    data: {
+      id: string;
+      updateSupplierProductDto: UpdateSupplierProductDto;
+    },
   ) {
     const { id, updateSupplierProductDto } = data;
-    return this.layerService.updateSupplierProduct(id, updateSupplierProductDto);
+    return this.layerService.updateSupplierProduct(
+      id,
+      updateSupplierProductDto,
+    );
   }
-  
+
   @MessagePattern({ cmd: 'create-activity_container' })
   async createActivityExportContainer(
     @Payload() createActivityContainerDto: CreateActivityContainerDto,
   ) {
-    if(createActivityContainerDto.type === 'import'){
-      return await this.layerService.createActivityImportContainer(createActivityContainerDto);
+    if (createActivityContainerDto.type === 'import') {
+      return await this.layerService.createActivityImportContainer(
+        createActivityContainerDto,
+      );
     }
-    return await this.layerService.createActivityExportContainer(createActivityContainerDto);
+    return await this.layerService.createActivityExportContainer(
+      createActivityContainerDto,
+    );
   }
 
   @MessagePattern({ cmd: 'delete-activity_containers' })
@@ -331,9 +382,8 @@ export class LayerController {
     return this.layerService.deleteActivityContainers(datas);
   }
 
-
   @MessagePattern({ cmd: 'find-all_activity_containers' })
-  async findAllActivityContainers(@Payload() data:{type:string}) {
+  async findAllActivityContainers(@Payload() data: { type: string }) {
     return await this.layerService.findAllActivityContainers(data.type);
   }
 
@@ -345,9 +395,15 @@ export class LayerController {
   @MessagePattern({ cmd: 'update-activity_container' })
   async updateActivityContainer(
     @Payload()
-    data: { id: string; updateActivityContainerDto: UpdateActivityContainerDto },
+    data: {
+      id: string;
+      updateActivityContainerDto: UpdateActivityContainerDto;
+    },
   ) {
     const { id, updateActivityContainerDto } = data;
-    return await this.layerService.updateActivityContainer(id, updateActivityContainerDto);
+    return await this.layerService.updateActivityContainer(
+      id,
+      updateActivityContainerDto,
+    );
   }
 }

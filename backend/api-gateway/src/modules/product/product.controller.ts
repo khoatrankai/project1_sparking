@@ -447,6 +447,13 @@ export class ProductController {
     return this.productService.createSupplierProduct(createSupplierProductDto);
   }
 
+  @Post('suppliers')
+  async createSuppliersProduct(
+    @Body() createSupplierProductDto: CreateSupplierProductDto[],
+  ) {
+    return this.productService.createSuppliersProduct(createSupplierProductDto);
+  }
+
   @Delete('supplier')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['product', 'admin-top'])

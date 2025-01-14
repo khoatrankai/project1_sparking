@@ -415,7 +415,6 @@ export class LayerService {
     const classifyType = await this.classifyTypeRepository.findOne({
       where: { classify_id: updateTypeProductDto.classify_type },
     });
-    console.log(classifyType);
     await this.typeProductRepository.update(id, {
       ...updateTypeProductDto,
       classify_type: classifyType,
@@ -613,6 +612,24 @@ export class LayerService {
       message: 'Supplier product created successfully',
       data: savedProduct,
     };
+  }
+
+  async createSuppliersProduct(
+    createSupplierProductDto: CreateSupplierProductDto[],
+  ) {
+    const datas = createSupplierProductDto.map((dt) => {
+      return this.supplierProductRepository.create({
+        ...dt,
+        supplier_id: uuidv4(),
+      });
+    });
+    await this.supplierProductRepository.save(datas);
+    if (datas.length > 0) {
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Tạo thành công',
+      };
+    }
   }
 
   async deleteSupplier(datas: string[]) {
