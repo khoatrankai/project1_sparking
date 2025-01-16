@@ -1,12 +1,20 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Activities } from './activity.entity';
 
-@Entity('Picture_activity')
+@Entity('picture_activity')
 export class PictureActivity {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   picture_id: string;
 
-  @Column({ type: 'varchar'})
+  @Column({ type: 'varchar' })
   url: string;
 
   @ManyToOne(() => Activities, { onDelete: 'CASCADE' })

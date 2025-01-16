@@ -1,17 +1,29 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ParkingTicketPayment } from "./parking_ticketpayment.entity";
-import { ParkingVehicleRegistration } from "./parking_vehicleregistration.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ParkingTicketPayment } from './parking_ticketpayment.entity';
+import { ParkingVehicleRegistration } from './parking_vehicleregistration.entity';
 
 @Entity('parking_ticketpaymentdetail')
 export class ParkingTicketPaymentDetail {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @ManyToOne(() => ParkingTicketPayment, (ticketPayment) => ticketPayment.paymentDetails)
+  @ManyToOne(
+    () => ParkingTicketPayment,
+    (ticketPayment) => ticketPayment.paymentDetails,
+  )
   @JoinColumn({ name: 'ticket_payment_id' })
   ticketPayment: ParkingTicketPayment;
 
-  @ManyToOne(() => ParkingVehicleRegistration, (vehicleRegistration) => vehicleRegistration.paymentDetails)
+  @ManyToOne(
+    () => ParkingVehicleRegistration,
+    (vehicleRegistration) => vehicleRegistration.paymentDetails,
+  )
   @JoinColumn({ name: 'vehicle_registration_id' })
   vehicleRegistration: ParkingVehicleRegistration;
 

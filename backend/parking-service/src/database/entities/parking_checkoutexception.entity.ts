@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index } from "typeorm";
-import { ParkingSession } from "./parking_parkingsession.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
+import { ParkingSession } from './parking_parkingsession.entity';
 
 @Entity('parking_checkoutexception')
 export class ParkingCheckoutException {
@@ -23,10 +30,14 @@ export class ParkingCheckoutException {
   timestamp: Date;
 
   // Foreign key to ParkingSession
-  @ManyToOne(() => ParkingSession, (parkingSession) => parkingSession.checkoutExceptions, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(
+    () => ParkingSession,
+    (parkingSession) => parkingSession.checkoutExceptions,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  )
   @JoinColumn({ name: 'parking_session_id' })
   parkingSession: ParkingSession;
 }

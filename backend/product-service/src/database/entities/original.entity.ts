@@ -1,6 +1,6 @@
-import { Entity, PrimaryColumn, Column, OneToMany} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { Products } from './product.entity';
-@Entity('Originals')
+@Entity('originals')
 export class Originals {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   original_id: string;
@@ -8,7 +8,6 @@ export class Originals {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
-  @OneToMany(() => Products, product => product.original)
+  @OneToMany(() => Products, (product) => product.original)
   products: Products[];
-
 }

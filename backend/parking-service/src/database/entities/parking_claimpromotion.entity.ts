@@ -1,8 +1,14 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, OneToMany } from "typeorm";
-import { ParkingClaimPromotionBill } from "./parking_claimpromotionbill.entity";
-import { ParkingClaimPromotionBillV2 } from "./parking_claimpromotionbillv2.entity";
-import { ParkingClaimPromotionCoupon } from "./parking_claimpromotioncoupon.entity";
-import { ParkingClaimPromotionCouponV2 } from "./parking_claimpromotioncouponv2.entity";
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { ParkingClaimPromotionBill } from './parking_claimpromotionbill.entity';
+import { ParkingClaimPromotionBillV2 } from './parking_claimpromotionbillv2.entity';
+import { ParkingClaimPromotionCoupon } from './parking_claimpromotioncoupon.entity';
+import { ParkingClaimPromotionCouponV2 } from './parking_claimpromotioncouponv2.entity';
 
 @Entity('parking_claimpromotion')
 export class ParkingClaimPromotion {
@@ -43,14 +49,14 @@ export class ParkingClaimPromotion {
   notes: string;
 
   @OneToMany(() => ParkingClaimPromotionBill, (post) => post.claimPromotion)
-  claimPromotionBills: ParkingClaimPromotionBill[]
+  claimPromotionBills: ParkingClaimPromotionBill[];
 
   @OneToMany(() => ParkingClaimPromotionBillV2, (post) => post.claimPromotion)
-  claimPromotionBillsV2: ParkingClaimPromotionBillV2[]
+  claimPromotionBillsV2: ParkingClaimPromotionBillV2[];
 
   @OneToMany(() => ParkingClaimPromotionCoupon, (post) => post.claimPromotion)
-  claimPromotionCoupon: ParkingClaimPromotionCoupon[]
+  claimPromotionCoupon: ParkingClaimPromotionCoupon[];
 
   @OneToMany(() => ParkingClaimPromotionCouponV2, (post) => post.claimPromotion)
-  claimPromotionCouponV2: ParkingClaimPromotionCouponV2[]
+  claimPromotionCouponV2: ParkingClaimPromotionCouponV2[];
 }

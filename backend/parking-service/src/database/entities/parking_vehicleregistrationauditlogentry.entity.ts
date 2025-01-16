@@ -1,37 +1,61 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from "typeorm";
-import { ParkingCard } from "./parking_card.entity";
-import { ParkingCustomer } from "./parking_customer.entity";
-import { ParkingLevelFee } from "./parking_levelfee.entity";
-import { ParkingVehicleType } from "./parking_vehicletype.entity";
-import { ParkingUserProfile } from "./parking_userprofile.entity";
-import { AuthUser } from "./auth_user.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Column,
+} from 'typeorm';
+import { ParkingCard } from './parking_card.entity';
+import { ParkingCustomer } from './parking_customer.entity';
+import { ParkingLevelFee } from './parking_levelfee.entity';
+import { ParkingVehicleType } from './parking_vehicletype.entity';
+import { ParkingUserProfile } from './parking_userprofile.entity';
+import { AuthUser } from './auth_user.entity';
 
 @Entity('parking_vehicleregistrationauditlogentry')
 export class ParkingVehicleRegistrationAuditLogEntry {
   @PrimaryGeneratedColumn('increment')
   actionId: number;
 
-  @ManyToOne(() => ParkingCard, card => card.parkingVehicleRegistrationAuditLogEntries)
+  @ManyToOne(
+    () => ParkingCard,
+    (card) => card.parkingVehicleRegistrationAuditLogEntries,
+  )
   @JoinColumn({ name: 'card_id' })
   card: ParkingCard;
 
-  @ManyToOne(() => ParkingCustomer, customer => customer.parkingVehicleRegistrationAuditLogEntries)
+  @ManyToOne(
+    () => ParkingCustomer,
+    (customer) => customer.parkingVehicleRegistrationAuditLogEntries,
+  )
   @JoinColumn({ name: 'customer_id' })
   customer: ParkingCustomer;
 
-  @ManyToOne(() => ParkingLevelFee, levelFee => levelFee.parkingVehicleRegistrationAuditLogEntries)
+  @ManyToOne(
+    () => ParkingLevelFee,
+    (levelFee) => levelFee.parkingVehicleRegistrationAuditLogEntries,
+  )
   @JoinColumn({ name: 'level_fee_id' })
   levelFee: ParkingLevelFee;
 
-  @ManyToOne(() => ParkingVehicleType, vehicleType => vehicleType.parkingVehicleRegistrationAuditLogEntries)
+  @ManyToOne(
+    () => ParkingVehicleType,
+    (vehicleType) => vehicleType.parkingVehicleRegistrationAuditLogEntries,
+  )
   @JoinColumn({ name: 'vehicle_type_id' })
   vehicleType: ParkingVehicleType;
 
-  @ManyToOne(() => ParkingUserProfile, userProfile => userProfile.parkingVehicleRegistrationAuditLogEntries)
+  @ManyToOne(
+    () => ParkingUserProfile,
+    (userProfile) => userProfile.parkingVehicleRegistrationAuditLogEntries,
+  )
   @JoinColumn({ name: 'staff_id' })
   staff: ParkingUserProfile;
 
-  @ManyToOne(() => AuthUser, user => user.parkingVehicleRegistrationAuditLogEntries)
+  @ManyToOne(
+    () => AuthUser,
+    (user) => user.parkingVehicleRegistrationAuditLogEntries,
+  )
   @JoinColumn({ name: 'action_user_id' })
   actionUser: AuthUser;
 

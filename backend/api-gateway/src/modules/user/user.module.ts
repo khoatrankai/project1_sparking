@@ -10,17 +10,17 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
     ClientsModule.register([
       {
         name: 'USER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3005
-        }
-      }
-    ])
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
+    ]),
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports: [UserService]
+  exports: [UserService],
   // exports:[TypeOrmModule]
 })
 export class UserModule {}

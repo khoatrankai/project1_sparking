@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, JoinColumn, ManyToOne } from "typeorm";
-import { ParkingClaimPromotion } from "./parking_claimpromotion.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
+import { ParkingClaimPromotion } from './parking_claimpromotion.entity';
 
 @Entity('parking_claimpromotionbill')
 export class ParkingClaimPromotionBill {
@@ -24,10 +31,14 @@ export class ParkingClaimPromotionBill {
   @CreateDateColumn()
   date: Date;
 
-  @ManyToOne(() => ParkingClaimPromotion, (claimPromotion) => claimPromotion.claimPromotionBills, {
-    onDelete: 'NO ACTION',
-    onUpdate: 'NO ACTION',
-  })
+  @ManyToOne(
+    () => ParkingClaimPromotion,
+    (claimPromotion) => claimPromotion.claimPromotionBills,
+    {
+      onDelete: 'NO ACTION',
+      onUpdate: 'NO ACTION',
+    },
+  )
   @JoinColumn({ name: 'claim_promotion_id' })
   claimPromotion: ParkingClaimPromotion;
 }

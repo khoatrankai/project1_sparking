@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { ParkingVehicleBlacklist } from "./parking_vehiclebalcklist.entity";
-import { ParkingVehicleRegistration } from "./parking_vehicleregistration.entity";
-import { ParkingVehicleRegistrationAuditLogEntry } from "./parking_vehicleregistrationauditlogentry.entity";
-import { ParkingDepositActionFee } from "./parking_depositactionfee.entity";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ParkingVehicleBlacklist } from './parking_vehiclebalcklist.entity';
+import { ParkingVehicleRegistration } from './parking_vehicleregistration.entity';
+import { ParkingVehicleRegistrationAuditLogEntry } from './parking_vehicleregistrationauditlogentry.entity';
+import { ParkingDepositActionFee } from './parking_depositactionfee.entity';
 
 @Entity('parking_vehicletype')
 export class ParkingVehicleType {
@@ -30,9 +30,12 @@ export class ParkingVehicleType {
   @OneToMany(() => ParkingVehicleRegistration, (post) => post.vehicleType)
   parkingVehicleRegistrations: ParkingVehicleRegistration[];
 
-@OneToMany(() => ParkingVehicleRegistrationAuditLogEntry, (post) => post.vehicleType)
-parkingVehicleRegistrationAuditLogEntries: ParkingVehicleRegistrationAuditLogEntry[];
+  @OneToMany(
+    () => ParkingVehicleRegistrationAuditLogEntry,
+    (post) => post.vehicleType,
+  )
+  parkingVehicleRegistrationAuditLogEntries: ParkingVehicleRegistrationAuditLogEntry[];
 
-    @OneToMany(() => ParkingDepositActionFee, (post) => post.vehicle_type_id)
-    depositactionFees: ParkingDepositActionFee[];
+  @OneToMany(() => ParkingDepositActionFee, (post) => post.vehicle_type_id)
+  depositactionFees: ParkingDepositActionFee[];
 }

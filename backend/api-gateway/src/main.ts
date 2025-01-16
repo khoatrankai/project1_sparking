@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { BadRequestException, HttpStatus, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
-
 
 async function bootstrap() {
   const customValidationPipe = new ValidationPipe({
@@ -24,7 +27,7 @@ async function bootstrap() {
           };
         }
       });
-  
+
       return new BadRequestException({
         statusCode: HttpStatus.BAD_GATEWAY,
         message: 'Invalid data',
@@ -34,10 +37,10 @@ async function bootstrap() {
   });
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
-  app.useGlobalPipes(customValidationPipe)
+  app.useGlobalPipes(customValidationPipe);
   app.enableCors({
-    origin: 'http://localhost:3000',  // Next.js đang chạy tại cổng này
-    credentials: true,  // Nếu cần gửi cookies
+    origin: true, // Next.js đang chạy tại cổng này
+    credentials: true, // Nếu cần gửi cookies
   });
   await app.listen(3001);
 }

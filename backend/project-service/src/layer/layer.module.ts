@@ -6,19 +6,20 @@ import { Projects } from 'src/database/entities/project.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeProject } from 'src/database/entities/type_project.entity';
 
-
-
 @Module({
-  imports: [ClientsModule.register([
-    {
-      name: 'CUSTOMER',
-      transport:Transport.TCP,
-      options:{
-        host:'localhost',
-        port:3006
-      }
-    }
-  ]),TypeOrmModule.forFeature([Projects,TypeProject])],
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'CUSTOMER',
+        transport: Transport.TCP,
+        options: {
+          host: 'customer-service',
+          port: 3006,
+        },
+      },
+    ]),
+    TypeOrmModule.forFeature([Projects, TypeProject]),
+  ],
   controllers: [LayerController],
   providers: [LayerService],
   // exports:[TypeOrmModule]

@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { ParkingCustomer } from "./parking_customer.entity";
-import { ParkingCustomerAuditLogEntry } from "./parking_customerauditlogentry.entity";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ParkingCustomer } from './parking_customer.entity';
+import { ParkingCustomerAuditLogEntry } from './parking_customerauditlogentry.entity';
 
 @Entity('parking_company')
 export class ParkingCompany {
@@ -26,8 +26,8 @@ export class ParkingCompany {
   representative_phone: string;
 
   @OneToMany(() => ParkingCustomer, (post) => post.company)
-  customers: ParkingCustomer[]
+  customers: ParkingCustomer[];
 
   @OneToMany(() => ParkingCustomerAuditLogEntry, (post) => post.company)
-  customerAuditLogEntry: ParkingCustomerAuditLogEntry[]
+  customerAuditLogEntry: ParkingCustomerAuditLogEntry[];
 }

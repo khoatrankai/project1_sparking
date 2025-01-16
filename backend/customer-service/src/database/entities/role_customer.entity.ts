@@ -1,22 +1,30 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { RoleTypeCustomer } from './role_type_customer.entity';
 import { AccountCustomers } from './account_customers.entity';
 import { CustomerInfo } from './customer_info.entity';
 
-@Entity('Role_customer')
+@Entity('role_customer')
 export class RoleCustomer {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   role_id: string;
 
-  @ManyToOne(() => RoleTypeCustomer,{onDelete:'CASCADE'})
+  @ManyToOne(() => RoleTypeCustomer, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'role_type_id' })
   role_type: RoleTypeCustomer;
 
-  @ManyToOne(() => AccountCustomers,{onDelete:'CASCADE'})
+  @ManyToOne(() => AccountCustomers, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'customer_id' })
   customer: AccountCustomers;
 
-  @ManyToOne(() => CustomerInfo,{onDelete:'CASCADE'})
+  @ManyToOne(() => CustomerInfo, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'info_id' })
   info_company: CustomerInfo;
 

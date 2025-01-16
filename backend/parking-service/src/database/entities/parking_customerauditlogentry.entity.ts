@@ -1,28 +1,48 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
-import { ParkingApartment } from "./parking_apartment.entity";
-import { ParkingBuilding } from "./parking_building.entity";
-import { ParkingCompany } from "./parking_company.entity";
-import { ParkingCustomerType } from "./parking_customertype.entity";
-import { AuthUser } from "./auth_user.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { ParkingApartment } from './parking_apartment.entity';
+import { ParkingBuilding } from './parking_building.entity';
+import { ParkingCompany } from './parking_company.entity';
+import { ParkingCustomerType } from './parking_customertype.entity';
+import { AuthUser } from './auth_user.entity';
 
 @Entity('parking_customerauditlogentry')
 export class ParkingCustomerAuditLogEntry {
   @PrimaryGeneratedColumn({ name: 'action_id' })
   actionId: number;
 
-  @ManyToOne(() => ParkingApartment, (apartment) => apartment.customerAuditLogEntry, { nullable: true })
+  @ManyToOne(
+    () => ParkingApartment,
+    (apartment) => apartment.customerAuditLogEntry,
+    { nullable: true },
+  )
   @JoinColumn({ name: 'apartment_id' })
   apartment: ParkingApartment;
 
-  @ManyToOne(() => ParkingBuilding, (building) => building.customerAuditLogEntry, { nullable: true })
+  @ManyToOne(
+    () => ParkingBuilding,
+    (building) => building.customerAuditLogEntry,
+    { nullable: true },
+  )
   @JoinColumn({ name: 'building_id' })
   building: ParkingBuilding;
 
-  @ManyToOne(() => ParkingCompany, (company) => company.customerAuditLogEntry, { nullable: true })
+  @ManyToOne(() => ParkingCompany, (company) => company.customerAuditLogEntry, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'company_id' })
   company: ParkingCompany;
 
-  @ManyToOne(() => ParkingCustomerType, (customerType) => customerType.customerAuditLogEntry, { nullable: true })
+  @ManyToOne(
+    () => ParkingCustomerType,
+    (customerType) => customerType.customerAuditLogEntry,
+    { nullable: true },
+  )
   @JoinColumn({ name: 'customer_type_id' })
   customerType: ParkingCustomerType;
 
@@ -83,7 +103,9 @@ export class ParkingCustomerAuditLogEntry {
   @Column({ type: 'varchar', length: 255, name: 'messaging_address' })
   messagingAddress: string;
 
-  @ManyToOne(() => AuthUser, (user) => user.customerAuditLogEntry, { nullable: true })
+  @ManyToOne(() => AuthUser, (user) => user.customerAuditLogEntry, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'action_user_id' })
   actionUser: AuthUser;
 

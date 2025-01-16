@@ -7,7 +7,7 @@ COPY package-lock.json ./
 
 
 
-RUN npm install
+RUN npm ci
 EXPOSE 3002
 COPY . .
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]

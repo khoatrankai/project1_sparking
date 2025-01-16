@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity('Target_revenue')
+@Entity('target_revenue')
 export class TargetRevenue {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   target_id: string;

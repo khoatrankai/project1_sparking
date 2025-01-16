@@ -1,8 +1,17 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { Products } from './product.entity';
 import { HistoryCodeProduct } from './history_code_product.entity';
 
-@Entity('Code_product')
+@Entity('code_product')
 export class CodeProduct {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   code_product_id: string;
@@ -10,10 +19,14 @@ export class CodeProduct {
   @Column({ type: 'varchar', length: 50 })
   code: string;
 
-  @Column({type:'enum',enum: ['selled','borrowed','inventory','export'],default:'inventory'})
-  status:string
-  
-  @ManyToOne(() => Products,{onDelete:'RESTRICT'})
+  @Column({
+    type: 'enum',
+    enum: ['selled', 'borrowed', 'inventory', 'export'],
+    default: 'inventory',
+  })
+  status: string;
+
+  @ManyToOne(() => Products, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'product' })
   product: Products;
 
@@ -23,7 +36,6 @@ export class CodeProduct {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-  @OneToMany(() => HistoryCodeProduct, history => history.code_product)
+  @OneToMany(() => HistoryCodeProduct, (history) => history.code_product)
   history: HistoryCodeProduct[];
-
 }

@@ -9,43 +9,49 @@ import { ListParts } from 'src/database/entities/list_part.entity';
 import { ListDetailProduct } from 'src/database/entities/list_detail_product.entity';
 import { TypePackage } from 'src/database/entities/type_package.entity';
 
-
 @Module({
-  imports: [ ClientsModule.register([
-    {
-      name: 'USER',
-      transport:Transport.TCP,
-      options:{
-        host:'localhost',
-        port:3005
-      }
-    },
-    {
-      name: 'PROJECT',
-      transport:Transport.TCP,
-      options:{
-        host:'localhost',
-        port:3013
-      }
-    },
-    {
-      name: 'PRODUCT',
-      transport:Transport.TCP,
-      options:{
-        host:'localhost',
-        port:3012
-      }
-    },
-    {
-      name: 'SYSTEM',
-      transport:Transport.TCP,
-      options:{
-        host:'localhost',
-        port:3004
-      }
-    }
-  ]),
-    TypeOrmModule.forFeature([PriceQuote,ListProduct,ListParts,ListDetailProduct,TypePackage])
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'USER',
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
+      {
+        name: 'PROJECT',
+        transport: Transport.TCP,
+        options: {
+          host: 'project-service',
+          port: 3013,
+        },
+      },
+      {
+        name: 'PRODUCT',
+        transport: Transport.TCP,
+        options: {
+          host: 'product-service',
+          port: 3012,
+        },
+      },
+      {
+        name: 'SYSTEM',
+        transport: Transport.TCP,
+        options: {
+          host: 'system-service',
+          port: 3004,
+        },
+      },
+    ]),
+    TypeOrmModule.forFeature([
+      PriceQuote,
+      ListProduct,
+      ListParts,
+      ListDetailProduct,
+      TypePackage,
+    ]),
   ],
   controllers: [PriceQuoteController],
   providers: [PriceQuoteService],

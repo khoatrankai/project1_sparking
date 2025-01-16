@@ -5,8 +5,8 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY package-lock.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]

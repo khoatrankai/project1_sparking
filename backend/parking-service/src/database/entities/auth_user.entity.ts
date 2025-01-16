@@ -1,15 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { ParkingUserShift } from "./parking_usershift.entity";
-import { ParkingVehicleRegistrationAuditLogEntry } from "./parking_vehicleregistrationauditlogentry.entity";
-import { ParkingCardAuditLogEntry } from "./parking_cardauditlogentry.entity";
-import { ParkingClaimPromotionV2 } from "./parking_claimpromotionv2.entity";
-import { ParkingCurrentBlacklistState } from "./parking_currentbalckliststate.entity";
-import { ParkingCustomerAuditLogEntry } from "./parking_customerauditlogentry.entity";
-import { ParkingUserCard } from "./parking_usercard.entity";
-import { AuthUserGroup } from "./auth_user_groups.entity";
-import { AuthUserUserPermission } from "./auth_user_user_permissions.entity";
-import { DjangoAdminLog } from "./django_admin_log.entity";
-import { ParkingSession } from "./parking_parkingsession.entity";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ParkingUserShift } from './parking_usershift.entity';
+import { ParkingVehicleRegistrationAuditLogEntry } from './parking_vehicleregistrationauditlogentry.entity';
+import { ParkingCardAuditLogEntry } from './parking_cardauditlogentry.entity';
+import { ParkingClaimPromotionV2 } from './parking_claimpromotionv2.entity';
+import { ParkingCurrentBlacklistState } from './parking_currentbalckliststate.entity';
+import { ParkingCustomerAuditLogEntry } from './parking_customerauditlogentry.entity';
+import { ParkingUserCard } from './parking_usercard.entity';
+import { AuthUserGroup } from './auth_user_groups.entity';
+import { AuthUserUserPermission } from './auth_user_user_permissions.entity';
+import { DjangoAdminLog } from './django_admin_log.entity';
+import { ParkingSession } from './parking_parkingsession.entity';
 
 @Entity('auth_user')
 export class AuthUser {
@@ -58,14 +58,16 @@ export class AuthUser {
   @OneToMany(() => ParkingSession, (post) => post.checkOutOperator)
   parkingSessionOuts: ParkingSession[];
 
-
   @OneToMany(() => DjangoAdminLog, (post) => post.user)
   djangoAdminLogs: DjangoAdminLog[];
 
   @OneToMany(() => AuthUserUserPermission, (post) => post.user)
   authUserUserPermissions: AuthUserUserPermission[];
 
-  @OneToMany(() => ParkingVehicleRegistrationAuditLogEntry, (post) => post.actionUser)
+  @OneToMany(
+    () => ParkingVehicleRegistrationAuditLogEntry,
+    (post) => post.actionUser,
+  )
   parkingVehicleRegistrationAuditLogEntries: ParkingVehicleRegistrationAuditLogEntry[];
 
   @OneToMany(() => ParkingCardAuditLogEntry, (post) => post.actionUser)
@@ -77,10 +79,12 @@ export class AuthUser {
   @OneToMany(() => ParkingCurrentBlacklistState, (terminal) => terminal.user)
   currentBlacklistStates: ParkingCurrentBlacklistState[];
 
-  @OneToMany(() => ParkingCustomerAuditLogEntry, (terminal) => terminal.actionUser)
+  @OneToMany(
+    () => ParkingCustomerAuditLogEntry,
+    (terminal) => terminal.actionUser,
+  )
   customerAuditLogEntry: ParkingCustomerAuditLogEntry[];
 
   @OneToMany(() => ParkingUserCard, (post) => post.user)
-  userCards: ParkingUserCard[]
-
+  userCards: ParkingUserCard[];
 }

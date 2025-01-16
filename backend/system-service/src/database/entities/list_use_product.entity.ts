@@ -2,7 +2,7 @@ import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Product } from './product.entity';
 import { UnitProduct } from './unit_product.entity';
 
-@Entity('List_use_product')
+@Entity('list_use_product')
 export class ListUseProduct {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   use_id: string;
@@ -33,6 +33,6 @@ export class ListUseProduct {
   @Column({ type: 'int', default: 1 })
   quantity_product: number;
 
-  @Column({type: 'text'})
-  description:string
+  @Column({ type: 'text' })
+  description: string;
 }

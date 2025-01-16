@@ -1,6 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ParkingCard } from "./parking_card.entity";
-import { AuthUser } from "./auth_user.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ParkingCard } from './parking_card.entity';
+import { AuthUser } from './auth_user.entity';
 
 @Entity('parking_usercard')
 export class ParkingUserCard {
@@ -15,6 +21,6 @@ export class ParkingUserCard {
   @JoinColumn({ name: 'card_id' })
   card: ParkingCard;
 
-  @Column({ type: 'varchar',  name: 'card_id', unique: true })
+  @Column({ type: 'varchar', name: 'card_id', unique: true })
   card_id: string;
 }

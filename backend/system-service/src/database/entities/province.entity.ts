@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 // import { v4 as uuidv4 } from 'uuid';
 
-@Entity('Provinces')
+@Entity('provinces')
 export class Province {
   @PrimaryGeneratedColumn('uuid')
   province_id: string;

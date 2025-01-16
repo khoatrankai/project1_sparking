@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { ParkingTerminal } from "./parking_terminal.entity";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ParkingTerminal } from './parking_terminal.entity';
 
 @Entity('parking_terminalgroup')
 export class ParkingTerminalGroup {

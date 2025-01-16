@@ -10,25 +10,25 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
     ClientsModule.register([
       {
         name: 'ACTIVITY',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3014
-        }
+        transport: Transport.TCP,
+        options: {
+          host: 'activity-service',
+          port: 3014,
+        },
       },
       {
         name: 'USER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3005
-        }
-      }
-    ])
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
+    ]),
   ],
   controllers: [ActivityController],
   providers: [ActivityService],
-  exports: [ActivityService]
+  exports: [ActivityService],
   // exports:[TypeOrmModule]
 })
 export class ActivityModule {}

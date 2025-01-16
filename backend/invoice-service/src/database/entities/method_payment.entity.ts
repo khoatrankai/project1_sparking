@@ -1,13 +1,19 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity('Method_payment')
+@Entity('method_payment')
 export class MethodPayment {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   method_id: string;
 
   @Column({ type: 'varchar', length: 50 })
   name: string;
-  
+
   @Column({ type: 'varchar', length: 50 })
   name_tag: string;
 
@@ -15,8 +21,8 @@ export class MethodPayment {
   description: string;
 
   @CreateDateColumn()
-  created_at:Date
+  created_at: Date;
 
   @UpdateDateColumn()
-  updated_at:Date
+  updated_at: Date;
 }

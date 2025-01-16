@@ -11,7 +11,7 @@ import {
 import { GroupCustomer } from './group_customer.entity';
 import { InfoContact } from './info_contact.entity';
 
-@Entity('Customer_info')
+@Entity('customer_info')
 export class CustomerInfo {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   info_id: string;

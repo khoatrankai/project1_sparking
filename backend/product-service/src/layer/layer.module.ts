@@ -15,21 +15,33 @@ import { Originals } from 'src/database/entities/original.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ClassifyType } from 'src/database/entities/classify_type.entity';
 
-
 @Module({
   imports: [
     ClientsModule.register([
       {
         name: 'SYSTEM',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3004
-        }
-      }
+        transport: Transport.TCP,
+        options: {
+          host: 'system-service',
+          port: 3004,
+        },
+      },
     ]),
 
-    TypeOrmModule.forFeature([Products,TypeProducts,UnitProduct,CodeProduct,PictureProduct,SupplierProduct,ActivityContainer,HistoryCodeProduct,Brands,Originals,ClassifyType])],
+    TypeOrmModule.forFeature([
+      Products,
+      TypeProducts,
+      UnitProduct,
+      CodeProduct,
+      PictureProduct,
+      SupplierProduct,
+      ActivityContainer,
+      HistoryCodeProduct,
+      Brands,
+      Originals,
+      ClassifyType,
+    ]),
+  ],
   controllers: [LayerController],
   providers: [LayerService],
   // exports:[TypeOrmModule]

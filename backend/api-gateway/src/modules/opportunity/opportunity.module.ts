@@ -8,25 +8,25 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ClientsModule.register([
       {
         name: 'OPPORTUNITY',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3011
-        }
+        transport: Transport.TCP,
+        options: {
+          host: 'opportunity-service',
+          port: 3011,
+        },
       },
       {
         name: 'USER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3005
-        }
-      }
-    ])
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
+    ]),
   ],
   controllers: [OpportunityController],
   providers: [OpportunityService],
-  exports: [OpportunityService]
+  exports: [OpportunityService],
   // exports:[TypeOrmModule]
 })
 export class OpportunityModule {}

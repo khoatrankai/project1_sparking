@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Unique } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  Unique,
+} from 'typeorm';
 
 @Entity('parking_claimpromotionvoucher')
 @Unique(['short_value'])

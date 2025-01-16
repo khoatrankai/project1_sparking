@@ -1,17 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from "typeorm";
-import { ParkingLane } from "./parking_lane.entity";
-import { AuthUser } from "./auth_user.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Column,
+} from 'typeorm';
+import { ParkingLane } from './parking_lane.entity';
+import { AuthUser } from './auth_user.entity';
 
 @Entity('parking_usershift')
 export class ParkingUserShift {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => AuthUser, user => user.parkingUserShifts)
+  @ManyToOne(() => AuthUser, (user) => user.parkingUserShifts)
   @JoinColumn({ name: 'user_id' })
   user_id: AuthUser;
 
-  @ManyToOne(() => ParkingLane, lane => lane.parkingUserShifts)
+  @ManyToOne(() => ParkingLane, (lane) => lane.parkingUserShifts)
   @JoinColumn({ name: 'lane_id' })
   lane_id: ParkingLane;
 

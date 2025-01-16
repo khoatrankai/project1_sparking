@@ -1,5 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ParkingFee } from "./parking_parkingfee.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ParkingFee } from './parking_parkingfee.entity';
 
 @Entity('parking_turnfee')
 export class ParkingTurnFee {

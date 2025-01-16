@@ -1,6 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne } from "typeorm";
-import { ParkingUserShift } from "./parking_usershift.entity";
-import { ParkingTerminal } from "./parking_terminal.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
+import { ParkingUserShift } from './parking_usershift.entity';
+import { ParkingTerminal } from './parking_terminal.entity';
 
 @Entity('parking_lane')
 export class ParkingLane {
@@ -19,8 +26,7 @@ export class ParkingLane {
   @Column()
   vehicle_type: number;
 
-
-  @ManyToOne(() => ParkingTerminal, user => user.lanes)
+  @ManyToOne(() => ParkingTerminal, (user) => user.lanes)
   @JoinColumn({ name: 'terminal_id' })
   terminal_id: ParkingTerminal;
 

@@ -1,5 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from "typeorm";
-import { ParkingClaimPromotion } from "./parking_claimpromotion.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
+import { ParkingClaimPromotion } from './parking_claimpromotion.entity';
 
 @Entity('parking_claimpromotioncoupon')
 export class ParkingClaimPromotionCoupon {
@@ -21,10 +27,14 @@ export class ParkingClaimPromotionCoupon {
   @Column('longtext', { nullable: true })
   notes: string;
 
-  @ManyToOne(() => ParkingClaimPromotion, (claimPromotion) => claimPromotion.claimPromotionCoupon, {
-        onDelete: 'NO ACTION',
-        onUpdate: 'NO ACTION',
-      })
-      @JoinColumn({ name: 'claim_promotion_id' })
-      claimPromotion: ParkingClaimPromotion;
+  @ManyToOne(
+    () => ParkingClaimPromotion,
+    (claimPromotion) => claimPromotion.claimPromotionCoupon,
+    {
+      onDelete: 'NO ACTION',
+      onUpdate: 'NO ACTION',
+    },
+  )
+  @JoinColumn({ name: 'claim_promotion_id' })
+  claimPromotion: ParkingClaimPromotion;
 }

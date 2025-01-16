@@ -9,7 +9,7 @@ import {
 import { InfoContact } from './info_contact.entity';
 // import { GroupCustomer } from './group_customer.entity';
 
-@Entity('Account_customers')
+@Entity('account_customers')
 export class AccountCustomers {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   customer_id: string;

@@ -1,5 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from "typeorm";
-import { ParkingVehicleRegistration } from "./parking_vehicleregistration.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Column,
+} from 'typeorm';
+import { ParkingVehicleRegistration } from './parking_vehicleregistration.entity';
 
 @Entity('parking_pauseresumehistory')
 export class PauseResumeHistory {

@@ -1,7 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from "typeorm";
-import { ParkingDepositActionFee } from "./parking_depositactionfee.entity";
-import { ParkingDepositPayment } from "./parking_depositpayment.entity";
-import { ParkingVehicleRegistration } from "./parking_vehicleregistration.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Column,
+} from 'typeorm';
+import { ParkingDepositActionFee } from './parking_depositactionfee.entity';
+import { ParkingDepositPayment } from './parking_depositpayment.entity';
+import { ParkingVehicleRegistration } from './parking_vehicleregistration.entity';
 
 @Entity('parking_depositpaymentdetail')
 export class ParkingDepositPaymentDetail {
@@ -18,7 +24,11 @@ export class ParkingDepositPaymentDetail {
   @Column({ length: 255 })
   vehicle_number: string;
 
-  @ManyToOne(() => ParkingVehicleRegistration, (vehicleRegistration) => vehicleRegistration.depositPaymentDetail, { nullable: true })
+  @ManyToOne(
+    () => ParkingVehicleRegistration,
+    (vehicleRegistration) => vehicleRegistration.depositPaymentDetail,
+    { nullable: true },
+  )
   @JoinColumn({ name: 'vehicle_registration_id' })
   vehicleRegistration: ParkingVehicleRegistration;
 

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import {PriceQuoteController } from './price_quote.controller';
+import { PriceQuoteController } from './price_quote.controller';
 import { PriceQuoteService } from './price_quote.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
@@ -8,25 +8,25 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ClientsModule.register([
       {
         name: 'PRICEQUOTE',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3008
-        }
+        transport: Transport.TCP,
+        options: {
+          host: 'price_quote-service',
+          port: 3008,
+        },
       },
       {
         name: 'USER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3005
-        }
-      }
-    ])
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
+    ]),
   ],
   controllers: [PriceQuoteController],
   providers: [PriceQuoteService],
-  exports: [PriceQuoteService]
+  exports: [PriceQuoteService],
   // exports:[TypeOrmModule]
 })
 export class PriceQuoteModule {}

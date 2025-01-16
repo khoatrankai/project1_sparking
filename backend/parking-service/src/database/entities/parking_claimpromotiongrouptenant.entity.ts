@@ -1,5 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm";
-import { ParkingClaimPromotionTenant } from "./parking_claimpromotiontenant.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { ParkingClaimPromotionTenant } from './parking_claimpromotiontenant.entity';
 
 @Entity('parking_claimpromotiongrouptenant')
 export class ParkingClaimPromotionGroupTenant {
@@ -12,7 +18,6 @@ export class ParkingClaimPromotionGroupTenant {
   @CreateDateColumn()
   updated: Date;
 
-
   @OneToMany(() => ParkingClaimPromotionTenant, (post) => post.group_tenant)
-  claimPromotionTenants: ParkingClaimPromotionTenant[]
+  claimPromotionTenants: ParkingClaimPromotionTenant[];
 }

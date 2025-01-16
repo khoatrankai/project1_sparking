@@ -1,6 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index, ManyToOne, JoinColumn } from "typeorm";
-import { ParkingTerminal } from "./parking_terminal.entity";
-import { ParkingSession } from "./parking_parkingsession.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { ParkingTerminal } from './parking_terminal.entity';
+import { ParkingSession } from './parking_parkingsession.entity';
 
 @Entity('parking_checkinimage')
 export class ParkingCheckinImage {
@@ -16,18 +23,26 @@ export class ParkingCheckinImage {
   terminal_id: number;
 
   // Foreign key to ParkingSession
-  @ManyToOne(() => ParkingSession, (parkingSession) => parkingSession.checkinImages, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(
+    () => ParkingSession,
+    (parkingSession) => parkingSession.checkinImages,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  )
   @JoinColumn({ name: 'parking_session_id' })
   parkingSession: ParkingSession;
 
   // Foreign key to ParkingTerminal
-  @ManyToOne(() => ParkingTerminal, (parkingTerminal) => parkingTerminal.checkinImages, {
-    onDelete: 'NO ACTION',
-    onUpdate: 'NO ACTION',
-  })
+  @ManyToOne(
+    () => ParkingTerminal,
+    (parkingTerminal) => parkingTerminal.checkinImages,
+    {
+      onDelete: 'NO ACTION',
+      onUpdate: 'NO ACTION',
+    },
+  )
   @JoinColumn({ name: 'terminal_id' })
   terminal: ParkingTerminal;
 }

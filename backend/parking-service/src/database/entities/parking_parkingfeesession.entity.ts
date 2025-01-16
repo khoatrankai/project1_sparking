@@ -1,6 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from "typeorm";
-import { ParkingSession } from "./parking_parkingsession.entity";
-import { ParkingVehicleType } from "./parking_vehicletype.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Column,
+} from 'typeorm';
+import { ParkingSession } from './parking_parkingsession.entity';
+import { ParkingVehicleType } from './parking_vehicletype.entity';
 
 @Entity('parking_parkingfeesession')
 export class ParkingFeeSession {

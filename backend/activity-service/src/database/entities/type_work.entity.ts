@@ -1,7 +1,14 @@
-import { Entity, PrimaryColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn} from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Works } from './work.entity';
 import { StatusWork } from './status_work.entity';
-@Entity('Type_work')
+@Entity('type_work')
 export class TypeWork {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   type_work_id: string;
@@ -12,10 +19,10 @@ export class TypeWork {
   @Column({ type: 'varchar', length: 50 })
   name_tag: string;
 
-  @OneToMany(() => Works, work => work.type)
+  @OneToMany(() => Works, (work) => work.type)
   work: Works[];
 
-  @OneToMany(() => StatusWork,  statuswork => statuswork.type_work)
+  @OneToMany(() => StatusWork, (statuswork) => statuswork.type_work)
   status: StatusWork[];
 
   @CreateDateColumn({ type: 'timestamp' })

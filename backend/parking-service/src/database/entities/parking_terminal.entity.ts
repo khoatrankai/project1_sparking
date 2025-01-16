@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn,  OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { ParkingTerminalGroup } from './parking_terminalgroup.entity';
 import { ParkingCheckinImage } from './parking_checkinimage.entity';
 import { ParkingCurrentBlacklistState } from './parking_currentbalckliststate.entity';
@@ -30,13 +37,14 @@ export class ParkingTerminal {
   @Column('datetime')
   last_check_health: Date;
 
-  @ManyToOne(() => ParkingTerminalGroup, (group) => group.terminals, { nullable: true })
+  @ManyToOne(() => ParkingTerminalGroup, (group) => group.terminals, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'terminal_group_id' })
   terminal_group: ParkingTerminalGroup;
 
-
   @OneToMany(() => ParkingCheckinImage, (post) => post.terminal)
-  checkinImages: ParkingCheckinImage[]
+  checkinImages: ParkingCheckinImage[];
 
   @OneToMany(() => ParkingCurrentBlacklistState, (terminal) => terminal.gate)
   currentBlacklistStates: ParkingCurrentBlacklistState[];

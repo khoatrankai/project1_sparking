@@ -1,6 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column, Unique, OneToMany } from "typeorm";
-import { ParkingVehicleType } from "./parking_vehicletype.entity";
-import { ParkingTurnFee } from "./parking_turnfee.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Column,
+  Unique,
+  OneToMany,
+} from 'typeorm';
+import { ParkingVehicleType } from './parking_vehicletype.entity';
+import { ParkingTurnFee } from './parking_turnfee.entity';
 
 @Entity('parking_parkingfee')
 @Unique(['vehicleType'])

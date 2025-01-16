@@ -1,23 +1,38 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from "typeorm";
-import { ParkingTerminal } from "./parking_terminal.entity";
-import { AuthUser } from "./auth_user.entity";
-import { ParkingVehicleBlacklist } from "./parking_vehiclebalcklist.entity";
-import { GateNotified } from "./gatenotified.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { ParkingTerminal } from './parking_terminal.entity';
+import { AuthUser } from './auth_user.entity';
+import { ParkingVehicleBlacklist } from './parking_vehiclebalcklist.entity';
+import { GateNotified } from './gatenotified.entity';
 
 @Entity('parking_currentbalckliststate')
 export class ParkingCurrentBlacklistState {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @ManyToOne(() => ParkingVehicleBlacklist, (blacklist) => blacklist.currentBlacklistStates, { nullable: true })
+  @ManyToOne(
+    () => ParkingVehicleBlacklist,
+    (blacklist) => blacklist.currentBlacklistStates,
+    { nullable: true },
+  )
   @JoinColumn({ name: 'blacklist' })
   blacklist: ParkingVehicleBlacklist;
 
-  @ManyToOne(() => ParkingTerminal, (gate) => gate.currentBlacklistStates, { nullable: true })
+  @ManyToOne(() => ParkingTerminal, (gate) => gate.currentBlacklistStates, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'gate' })
   gate: ParkingTerminal;
 
-  @ManyToOne(() => AuthUser, (user) => user.currentBlacklistStates, { nullable: true })
+  @ManyToOne(() => AuthUser, (user) => user.currentBlacklistStates, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'user' })
   user: AuthUser;
 
@@ -40,6 +55,5 @@ export class ParkingCurrentBlacklistState {
   image_path: string;
 
   @OneToMany(() => GateNotified, (post) => post.blacklistStateEntity)
-  gateNotifieds: GateNotified[]
-  
+  gateNotifieds: GateNotified[];
 }

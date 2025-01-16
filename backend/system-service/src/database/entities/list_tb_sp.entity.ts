@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Product } from './product.entity';
 
-@Entity('List_tb_sp')
+@Entity('list_tb_sp')
 export class ListTBSP {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   tb_sp_id: string;

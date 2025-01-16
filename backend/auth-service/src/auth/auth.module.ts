@@ -10,23 +10,23 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ClientsModule.register([
       {
         name: 'USER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3005
-        }
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
       },
       {
         name: 'MAIL',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3003
-        }
-      }
+        transport: Transport.TCP,
+        options: {
+          host: 'email-service',
+          port: 3003,
+        },
+      },
     ]),
     JwtModule.registerAsync({
-      imports: [ConfigModule], 
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),

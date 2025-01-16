@@ -8,25 +8,25 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ClientsModule.register([
       {
         name: 'SYSTEM',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3004
-        }
+        transport: Transport.TCP,
+        options: {
+          host: 'system-service',
+          port: 3004,
+        },
       },
       {
         name: 'USER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3005
-        }
-      }
-    ])
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
+    ]),
   ],
   controllers: [SystemController],
   providers: [SystemService],
-  exports: [SystemService]
+  exports: [SystemService],
   // exports:[TypeOrmModule]
 })
 export class SystemModule {}

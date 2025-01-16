@@ -3,30 +3,31 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Projects } from './entities/project.entity';
 import { createConnection } from 'mysql2/promise';
 import { TypeProject } from './entities/type_project.entity';
-
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useFactory: async () => {
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
         const connection = await createConnection({
-          host: 'localhost',
-          user: 'root',
-          password: '123456789',
+          host: configService.get<string>('DB_HOST'),
+          user: configService.get<string>('DB_USER'),
+          password: configService.get<string>('DB_PASSWORD'),
         });
-
-        // Tạo database nếu không tồn tại
-        await connection.query(`CREATE DATABASE IF NOT EXISTS db_sparking_project`);
+        await connection.query(
+          `CREATE DATABASE IF NOT EXISTS ${configService.get<string>('DB_NAME')}`,
+        );
         await connection.end();
 
         return {
           type: 'mysql',
-          host: 'localhost',
-          port: 3306,
-          username: 'root',
-          password: '123456789',
-          database: 'db_sparking_project',
-          entities: [Projects,TypeProject],
+          host: configService.get<string>('DB_HOST'),
+          port: configService.get<number>('DB_PORT'),
+          username: configService.get<string>('DB_USER'),
+          password: configService.get<string>('DB_PASSWORD'),
+          database: configService.get<string>('DB_NAME'),
+          entities: [Projects, TypeProject],
           // synchronize: true,
           // dropSchema: true,
         };

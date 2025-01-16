@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index, ManyToOne, JoinColumn } from "typeorm";
-import { AuthUser } from "./auth_user.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { AuthUser } from './auth_user.entity';
 
 @Entity('parking_cardauditlogentry')
 export class ParkingCardAuditLogEntry {

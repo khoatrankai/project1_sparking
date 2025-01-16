@@ -1,8 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from "typeorm";
-import { ParkingCustomerType } from "./parking_customertype.entity";
-import { ParkingVehicleType } from "./parking_vehicletype.entity";
-import { ParkingVehicleRegistration } from "./parking_vehicleregistration.entity";
-import { ParkingVehicleRegistrationAuditLogEntry } from "./parking_vehicleregistrationauditlogentry.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { ParkingCustomerType } from './parking_customertype.entity';
+import { ParkingVehicleType } from './parking_vehicletype.entity';
+import { ParkingVehicleRegistration } from './parking_vehicleregistration.entity';
+import { ParkingVehicleRegistrationAuditLogEntry } from './parking_vehicleregistrationauditlogentry.entity';
 
 @Entity('parking_levelfee')
 export class ParkingLevelFee {
@@ -26,6 +33,9 @@ export class ParkingLevelFee {
   @OneToMany(() => ParkingVehicleRegistration, (post) => post.levelFee)
   parkingVehicleRegistrations: ParkingVehicleRegistration[];
 
-  @OneToMany(() => ParkingVehicleRegistrationAuditLogEntry, (post) => post.levelFee)
+  @OneToMany(
+    () => ParkingVehicleRegistrationAuditLogEntry,
+    (post) => post.levelFee,
+  )
   parkingVehicleRegistrationAuditLogEntries: ParkingVehicleRegistrationAuditLogEntry[];
 }

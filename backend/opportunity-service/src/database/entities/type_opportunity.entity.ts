@@ -1,6 +1,6 @@
-import { Entity, PrimaryColumn, Column, OneToMany} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { Opportunities } from './opportunity.entity';
-@Entity('Type_opportunities')
+@Entity('type_opportunities')
 export class TypeOpportunities {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   type_opportunity_id: string;
@@ -11,7 +11,6 @@ export class TypeOpportunities {
   @Column({ type: 'varchar', length: 50 })
   name_tag: string;
 
-  @OneToMany(() => Opportunities, opportunity => opportunity.type_opportunity)
+  @OneToMany(() => Opportunities, (opportunity) => opportunity.type_opportunity)
   opportunities: Opportunities[];
-
 }

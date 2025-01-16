@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { Products } from './product.entity';
 
-@Entity('Supplier_product')
+@Entity('supplier_product')
 export class SupplierProduct {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   supplier_id: string;

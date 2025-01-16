@@ -14,29 +14,39 @@ import { Works } from 'src/database/entities/work.entity';
 import { ListUser } from 'src/database/entities/list_user.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
-
 @Module({
-  imports: [TypeOrmModule.forFeature([Activities,TypeActivities,PictureActivity,StatusActivities,ListCodeProduct,TypeWork,PictureWork,StatusWork,Works,ListUser])
-,
-ClientsModule.register([
-  {
-    name: 'USER',
-    transport:Transport.TCP,
-    options:{
-      host:'localhost',
-      port:3005
-    }
-  },
-  {
-    name: 'CONTRACT',
-    transport:Transport.TCP,
-    options:{
-      host:'localhost',
-      port:3010
-    }
-  }
-])
-],
+  imports: [
+    TypeOrmModule.forFeature([
+      Activities,
+      TypeActivities,
+      PictureActivity,
+      StatusActivities,
+      ListCodeProduct,
+      TypeWork,
+      PictureWork,
+      StatusWork,
+      Works,
+      ListUser,
+    ]),
+    ClientsModule.register([
+      {
+        name: 'USER',
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
+      {
+        name: 'CONTRACT',
+        transport: Transport.TCP,
+        options: {
+          host: 'contract-service',
+          port: 3010,
+        },
+      },
+    ]),
+  ],
   controllers: [LayerController],
   providers: [LayerService],
   // exports:[TypeOrmModule]

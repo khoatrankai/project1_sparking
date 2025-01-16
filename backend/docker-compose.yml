@@ -1,0 +1,65 @@
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./api-gateway/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3001
+  user-service:
+    build: ./user-service
+    volumes:
+      - ./user-service/src:/usr/src/app/src
+    command: npm run start:dev
+  auth-service:
+    build: ./auth-service
+    volumes:
+      - ./auth-service/src:/usr/src/app/src
+    command: npm run start:dev
+  email-service:
+    build: ./email-service
+    volumes:
+      - ./email-service/src:/usr/src/app/src
+    command: npm run start:dev
+  activity-service:
+    build: ./activity-service
+    volumes:
+      - ./activity-service/src:/usr/src/app/src
+    command: npm run start:dev
+  contract-service:
+    build: ./contract-service
+    volumes:
+      - ./contract-service/src:/usr/src/app/src
+    command: npm run start:dev
+  customer-service:
+    build: ./customer-service
+    volumes:
+      - ./customer-service/src:/usr/src/app/src
+    command: npm run start:dev
+  opportunity-service:
+    build: ./opportunity-service
+    volumes:
+      - ./opportunity-service/src:/usr/src/app/src
+    command: npm run start:dev
+  price_quote-service:
+    build: ./price_quote-service
+    volumes:
+      - ./price_quote-service/src:/usr/src/app/src
+    command: npm run start:dev
+  product-service:
+    build: ./product-service
+    volumes:
+      - ./product-service/src:/usr/src/app/src
+    command: npm run start:dev
+  project-service:
+    build: ./project-service
+    volumes:
+      - ./project-service/src:/usr/src/app/src
+    command: npm run start:dev
+  system-service:
+    build: ./system-service
+    volumes:
+      - ./system-service/src:/usr/src/app/src
+    command: npm run start:dev

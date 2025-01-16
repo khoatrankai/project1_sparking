@@ -1,9 +1,16 @@
-import { Entity, PrimaryColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { PictureProduct } from './picture_product.entity';
 import { UnitProduct } from './unit_product.entity';
 // import { TypeProduct } from './type_product.entity';
 
-@Entity('Products')
+@Entity('products')
 export class Product {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   product_id: string;
@@ -27,11 +34,13 @@ export class Product {
   @JoinColumn({ name: 'unit_product' })
   unit_product: UnitProduct;
 
-  @Column({ type: 'enum', enum: ['active', 'delete', 'hide'], default: 'active' })
+  @Column({
+    type: 'enum',
+    enum: ['active', 'delete', 'hide'],
+    default: 'active',
+  })
   status: string;
 
-  @OneToMany(() => PictureProduct, pictureProducts => pictureProducts.product)
+  @OneToMany(() => PictureProduct, (pictureProducts) => pictureProducts.product)
   picture_urls: PictureProduct[];
-
-
 }

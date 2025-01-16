@@ -6,29 +6,29 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
-     CloudinaryModule,
+    CloudinaryModule,
     ClientsModule.register([
       {
         name: 'CUSTOMER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3006
-        }
+        transport: Transport.TCP,
+        options: {
+          host: 'customer-service',
+          port: 3006,
+        },
       },
       {
         name: 'USER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3005
-        }
-      }
-    ])
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
+    ]),
   ],
   controllers: [CustomerController],
   providers: [CustomerService],
-  exports: [CustomerService]
+  exports: [CustomerService],
   // exports:[TypeOrmModule]
 })
 export class CustomerModule {}

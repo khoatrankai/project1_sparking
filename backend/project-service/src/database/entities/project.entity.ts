@@ -1,7 +1,15 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { TypeProject } from './type_project.entity';
 
-@Entity('Projects')
+@Entity('projects')
 export class Projects {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   project_id: string;
@@ -9,13 +17,12 @@ export class Projects {
   @Column({ type: 'varchar', length: 100, nullable: true })
   name: string;
 
-  @Column({ 
-    type: 'enum', 
-    enum: ['waiting', 'start', 'pause', 'cancel', 'completed'], 
-    default: 'waiting' 
+  @Column({
+    type: 'enum',
+    enum: ['waiting', 'start', 'pause', 'cancel', 'completed'],
+    default: 'waiting',
   })
   status: string;
-
 
   @Column({ type: 'int', nullable: true })
   price: number;
@@ -38,13 +45,13 @@ export class Projects {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @ManyToOne(() => TypeProject,{onDelete:'SET NULL'})
-  @JoinColumn({ name: 'type', })
+  @ManyToOne(() => TypeProject, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'type' })
   type: TypeProject;
 
   @Column({ type: 'varchar', nullable: true })
   picture_url: string;
-  
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

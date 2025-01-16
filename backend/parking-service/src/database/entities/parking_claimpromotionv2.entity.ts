@@ -1,6 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from "typeorm";
-import { AuthUser } from "./auth_user.entity";
-import { ParkingSession } from "./parking_parkingsession.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
+import { AuthUser } from './auth_user.entity';
+import { ParkingSession } from './parking_parkingsession.entity';
 
 @Entity('parking_claimpromotionv2')
 @Unique(['oldId']) // Đảm bảo tính duy nhất cho cột old_id
@@ -11,11 +18,15 @@ export class ParkingClaimPromotionV2 {
   @Column({ type: 'varchar', length: 250, name: 'old_id', nullable: true })
   oldId: string;
 
-  @ManyToOne(() => ParkingSession, (parkingSession) => parkingSession.claimPromotionsV2, {
-    nullable: true,
-    onDelete: 'NO ACTION',
-    onUpdate: 'NO ACTION',
-  })
+  @ManyToOne(
+    () => ParkingSession,
+    (parkingSession) => parkingSession.claimPromotionsV2,
+    {
+      nullable: true,
+      onDelete: 'NO ACTION',
+      onUpdate: 'NO ACTION',
+    },
+  )
   @JoinColumn({ name: 'parking_session_id' })
   parkingSession: ParkingSession;
 

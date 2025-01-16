@@ -7,22 +7,19 @@ import { TypeSources } from 'src/database/entities/type_source.entity';
 import { Opportunities } from 'src/database/entities/opportunity.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
-
 @Module({
   imports: [
     ClientsModule.register([
       {
         name: 'USER',
-        transport:Transport.TCP,
-        options:{
-          host:'localhost',
-          port:3005
-        }
-      }
+        transport: Transport.TCP,
+        options: {
+          host: 'user-service',
+          port: 3005,
+        },
+      },
     ]),
-    TypeOrmModule.forFeature(
-      [TypeOpportunities,TypeSources,Opportunities]
-    )
+    TypeOrmModule.forFeature([TypeOpportunities, TypeSources, Opportunities]),
   ],
   controllers: [LayerController],
   providers: [LayerService],

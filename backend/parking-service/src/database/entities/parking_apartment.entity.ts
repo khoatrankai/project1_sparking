@@ -1,6 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm";
-import { ParkingCustomer } from "./parking_customer.entity";
-import { ParkingCustomerAuditLogEntry } from "./parking_customerauditlogentry.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { ParkingCustomer } from './parking_customer.entity';
+import { ParkingCustomerAuditLogEntry } from './parking_customerauditlogentry.entity';
 
 @Entity('parking_apartment')
 export class ParkingApartment {
@@ -29,8 +35,8 @@ export class ParkingApartment {
   timestamp: Date;
 
   @OneToMany(() => ParkingCustomer, (post) => post.apartment)
-  customers: ParkingCustomer[]
+  customers: ParkingCustomer[];
 
   @OneToMany(() => ParkingCustomerAuditLogEntry, (post) => post.apartment)
-  customerAuditLogEntry: ParkingCustomerAuditLogEntry[]
+  customerAuditLogEntry: ParkingCustomerAuditLogEntry[];
 }

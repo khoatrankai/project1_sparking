@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity('Labels')
+@Entity('labels')
 export class Label {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   label_id: string;

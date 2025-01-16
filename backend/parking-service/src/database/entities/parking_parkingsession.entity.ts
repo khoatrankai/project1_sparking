@@ -1,14 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from "typeorm";
-import { AuthUser } from "./auth_user.entity";
-import { ParkingLane } from "./parking_lane.entity";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { AuthUser } from './auth_user.entity';
+import { ParkingLane } from './parking_lane.entity';
 // import { ParkingVehicleType } from "./parking_vehicletype.entity";
-import { ParkingCheckoutExceptionInfo } from "./parking_checkoutexceptioninfo.entity";
-import { ParkingVoucher } from "./parking_voucher.entity";
-import { ParkingCardStatus } from "./parking_cardstatus.entity";
-import { ParkingCheckinImage } from "./parking_checkinimage.entity";
-import { ParkingCheckoutException } from "./parking_checkoutexception.entity";
-import { ParkingClaimPromotionV2 } from "./parking_claimpromotionv2.entity";
-import { ParkingCard } from "./parking_card.entity";
+import { ParkingCheckoutExceptionInfo } from './parking_checkoutexceptioninfo.entity';
+import { ParkingVoucher } from './parking_voucher.entity';
+import { ParkingCardStatus } from './parking_cardstatus.entity';
+import { ParkingCheckinImage } from './parking_checkinimage.entity';
+import { ParkingCheckoutException } from './parking_checkoutexception.entity';
+import { ParkingClaimPromotionV2 } from './parking_claimpromotionv2.entity';
+import { ParkingCard } from './parking_card.entity';
 
 @Entity('parking_parkingsession')
 export class ParkingSession {
@@ -22,12 +29,12 @@ export class ParkingSession {
   @JoinColumn({ name: 'card_id' })
   parkingCard: ParkingCard;
 
-//   @ManyToOne(() => ParkingVehicleType)
-//   @JoinColumn({ name: 'vehicle_type' })
-//   vehicleType: ParkingVehicleType;
+  //   @ManyToOne(() => ParkingVehicleType)
+  //   @JoinColumn({ name: 'vehicle_type' })
+  //   vehicleType: ParkingVehicleType;
 
-  @Column({type:'int'})
-  vehicle_type:number
+  @Column({ type: 'int' })
+  vehicle_type: number;
 
   @Column({ length: 20 })
   vehicle_number: string;
@@ -36,9 +43,12 @@ export class ParkingSession {
   check_in_alpr_vehicle_number: string;
 
   @Column()
-  check_in_operator_id:number
+  check_in_operator_id: number;
 
-  @ManyToOne(() => AuthUser,(statusActivity) => statusActivity.parkingSessionIns)
+  @ManyToOne(
+    () => AuthUser,
+    (statusActivity) => statusActivity.parkingSessionIns,
+  )
   @JoinColumn({ name: 'check_in_operator_id' })
   checkInOperator: AuthUser;
 
@@ -55,7 +65,11 @@ export class ParkingSession {
   @Column({ length: 20, nullable: true })
   check_out_alpr_vehicle_number: string;
 
-  @ManyToOne(() => AuthUser,(statusActivity) => statusActivity.parkingSessionOuts, { nullable: true })
+  @ManyToOne(
+    () => AuthUser,
+    (statusActivity) => statusActivity.parkingSessionOuts,
+    { nullable: true },
+  )
   @JoinColumn({ name: 'check_out_operator_id' })
   checkOutOperator: AuthUser;
 
@@ -81,21 +95,19 @@ export class ParkingSession {
 
   @Column({ type: 'timestamp', nullable: true })
   timestamp: Date;
-  
+
   @OneToMany(() => ParkingVoucher, (post) => post.parkingSession)
   parkingVouchers: ParkingVoucher[];
 
   @OneToMany(() => ParkingCardStatus, (post) => post.parkingSession)
-  cardStatuses: ParkingCardStatus[]
+  cardStatuses: ParkingCardStatus[];
 
   @OneToMany(() => ParkingCheckinImage, (post) => post.parkingSession)
-  checkinImages: ParkingCheckinImage[]
+  checkinImages: ParkingCheckinImage[];
 
   @OneToMany(() => ParkingCheckoutException, (post) => post.parkingSession)
-  checkoutExceptions: ParkingCheckoutException[]
+  checkoutExceptions: ParkingCheckoutException[];
 
   @OneToMany(() => ParkingClaimPromotionV2, (post) => post.parkingSession)
   claimPromotionsV2: ParkingClaimPromotionV2[];
-
-  
 }

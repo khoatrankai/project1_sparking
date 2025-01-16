@@ -1,62 +1,66 @@
 import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany,
-  } from 'typeorm';
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { TypeWork } from './type_work.entity';
 import { StatusWork } from './status_work.entity';
 import { PictureWork } from './picture_work.entity';
 import { Activities } from './activity.entity';
 import { ListUser } from './list_user.entity';
 
-  @Entity('Works')
-  export class Works {
-    @PrimaryColumn({ type: 'varchar', length: 50 })
-    work_id: string;
+@Entity('works')
+export class Works {
+  @PrimaryColumn({ type: 'varchar', length: 50 })
+  work_id: string;
 
-    @ManyToOne(() => TypeWork, (typeWork) => typeWork.work, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'type' })
-    type: TypeWork;
+  @ManyToOne(() => TypeWork, (typeWork) => typeWork.work, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'type' })
+  type: TypeWork;
 
-    @ManyToOne(() => StatusWork, (statusWork) => statusWork.work, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'status' })
-    status: StatusWork;
-  
-    @Column({ type: 'varchar', length: 50 })
-    name: string;
+  @ManyToOne(() => StatusWork, (statusWork) => statusWork.work, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'status' })
+  status: StatusWork;
 
-    @Column({ type: 'text', nullable: true })
-    description: string;
+  @Column({ type: 'varchar', length: 50 })
+  name: string;
 
-    @Column({ type: 'int', nullable: true })
-    position:number
+  @Column({ type: 'text', nullable: true })
+  description: string;
 
-    @ManyToOne(() => Activities, (activity) =>   activity.works, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'activity' })
-    activity: Activities;
+  @Column({ type: 'int', nullable: true })
+  position: number;
 
-    @Column({ type: 'timestamp' })
-    time_start: Date;
+  @ManyToOne(() => Activities, (activity) => activity.works, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'activity' })
+  activity: Activities;
 
-    @Column({ type: 'timestamp' })
-    time_end: Date;
-  
-    @CreateDateColumn({ type: 'timestamp' })
-    created_at: Date;
-  
-    @UpdateDateColumn({ type: 'timestamp' })
-    updated_at: Date;
+  @Column({ type: 'timestamp' })
+  time_start: Date;
 
-    @OneToMany(() => PictureWork, pictureWork => pictureWork.work)
-    picture_urls: PictureWork[];
+  @Column({ type: 'timestamp' })
+  time_end: Date;
 
-    @OneToMany(() => ListUser, listUser => listUser.work)
-    list_user: ListUser[];
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
 
-  }
-  
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
+
+  @OneToMany(() => PictureWork, (pictureWork) => pictureWork.work)
+  picture_urls: PictureWork[];
+
+  @OneToMany(() => ListUser, (listUser) => listUser.work)
+  list_user: ListUser[];
+}
