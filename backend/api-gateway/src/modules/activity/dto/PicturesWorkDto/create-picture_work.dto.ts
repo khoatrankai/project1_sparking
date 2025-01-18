@@ -1,3 +1,4 @@
+import { File } from 'buffer';
 import { IsString, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class GetPictureWorkDto {
@@ -7,7 +8,7 @@ export class GetPictureWorkDto {
 
   @IsString()
   @IsNotEmpty()
-  url: string;
+  url: File;
 
   @IsString()
   @IsNotEmpty()

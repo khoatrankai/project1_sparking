@@ -13,6 +13,7 @@ import { CreateTypeMethodDto } from 'src/dto/TypeMethodDto/create-type_method.dt
 import { UpdateTypeMethodDto } from 'src/dto/TypeMethodDto/update-type_method.dto';
 import { GetFilterPaymentDto } from 'src/dto/PaymentDto/get-filter.dto';
 import { GetFilterContractDto } from 'src/dto/ContractDto/get-filter.dto';
+import { CreateDocumentContractDto } from 'src/dto/DocumentContractDto/create-document_contract.dto';
 
 @Controller()
 @UseFilters(ConflictExceptionFilter)
@@ -212,5 +213,33 @@ export class ContractController {
   @MessagePattern({ cmd: 'get-all-type_methods' })
   async getAllTypeMethods() {
     return this.contractService.getAllTypeMethods();
+  }
+
+  @MessagePattern('create-document_contract')
+  async createDocumentContract(
+    @Payload() createDocumentContractDto: CreateDocumentContractDto[],
+  ) {
+    return await this.contractService.createDocumentContract(
+      createDocumentContractDto,
+    );
+  }
+
+  @MessagePattern('create-one-document_contract')
+  async createOnePictureActivity(
+    @Payload() createDocumentContractDto: CreateDocumentContractDto,
+  ) {
+    return await this.contractService.createOneDocumentContract(
+      createDocumentContractDto,
+    );
+  }
+
+  @MessagePattern('delete-document_contract')
+  async deleteDocumentContract(@Payload() document_id: string) {
+    return await this.contractService.deleteDocumentContract(document_id);
+  }
+
+  @MessagePattern('get-all_document_contract')
+  async getAllDocumentContract(@Payload() contract_id: string) {
+    return await this.contractService.getAllDocumentContract(contract_id);
   }
 }

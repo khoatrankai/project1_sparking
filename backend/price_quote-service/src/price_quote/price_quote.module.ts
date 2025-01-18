@@ -16,7 +16,7 @@ import { TypePackage } from 'src/database/entities/type_package.entity';
         name: 'USER',
         transport: Transport.TCP,
         options: {
-          host: 'user-service',
+          host: 'user_service',
           port: 3005,
         },
       },
@@ -24,7 +24,7 @@ import { TypePackage } from 'src/database/entities/type_package.entity';
         name: 'PROJECT',
         transport: Transport.TCP,
         options: {
-          host: 'project-service',
+          host: 'project_service',
           port: 3013,
         },
       },
@@ -32,7 +32,7 @@ import { TypePackage } from 'src/database/entities/type_package.entity';
         name: 'PRODUCT',
         transport: Transport.TCP,
         options: {
-          host: 'product-service',
+          host: 'product_service',
           port: 3012,
         },
       },
@@ -40,7 +40,7 @@ import { TypePackage } from 'src/database/entities/type_package.entity';
         name: 'SYSTEM',
         transport: Transport.TCP,
         options: {
-          host: 'system-service',
+          host: 'system_service',
           port: 3004,
         },
       },

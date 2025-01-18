@@ -13,12 +13,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from 'src/dto/create_user.dto';
 import { ResultResponse } from 'src/common/interfaces/result.interface';
 import { UpdateUserDto } from 'src/dto/update_user.dto';
+import { GroupUser } from 'src/database/entities/group_user.entity';
+import { CreateGroupUserDto } from 'src/dto/GroupUser/create_group.dto';
+import { UpdateGroupUserDto } from 'src/dto/GroupUser/update_group.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(AccountUsers)
     private readonly accountUserRepository: Repository<AccountUsers>,
+    @InjectRepository(GroupUser)
+    private readonly groupUserRepository: Repository<GroupUser>,
     private configService: ConfigService,
   ) {}
   getHello(): string {
@@ -49,11 +54,17 @@ export class UserService {
   async createUser(registerDto: CreateUserDto): Promise<ResultResponse> {
     try {
       const id = uuidv4();
+      const group_user = registerDto.group_user
+        ? await this.groupUserRepository.findOne({
+            where: { group_id: registerDto.group_user },
+          })
+        : undefined;
       const pass = await this.hashPassword(registerDto.password);
       const user = this.accountUserRepository.create({
         ...registerDto,
         user_id: id,
         password: pass,
+        group_user,
       });
       await this.accountUserRepository.save(user);
       return {
@@ -177,5 +188,73 @@ export class UserService {
       data.find((user) => user.user_id === id),
     );
     return sortedData;
+  }
+
+  async getGroupUser() {
+    try {
+      const data = await this.groupUserRepository.find();
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: data,
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
+  async createGroupUser(createGroupUser: CreateGroupUserDto) {
+    try {
+      const id = uuidv4();
+      const dataMew = this.groupUserRepository.create({
+        ...createGroupUser,
+        group_id: id,
+      });
+      await this.groupUserRepository.save(dataMew);
+      return {
+        statusCode: HttpStatus.CREATED,
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
+  async deleteGroupUser(datas: string[]) {
+    try {
+      const rm = await this.groupUserRepository.delete({
+        group_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateGroupUser(updateGroupUser: UpdateGroupUserDto) {
+    try {
+      await this.groupUserRepository.update(
+        updateGroupUser.group_id,
+        updateGroupUser,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
   }
 }

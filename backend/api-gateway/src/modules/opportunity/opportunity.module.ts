@@ -10,7 +10,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'OPPORTUNITY',
         transport: Transport.TCP,
         options: {
-          host: 'opportunity-service',
+          host: 'opportunity_service',
           port: 3011,
         },
       },
@@ -18,7 +18,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'USER',
         transport: Transport.TCP,
         options: {
-          host: 'user-service',
+          host: 'user_service',
           port: 3005,
         },
       },

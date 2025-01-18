@@ -342,6 +342,22 @@ export class ActivityService {
     return dataDelete;
   }
 
+  async sendDeletePictureWork(picture_id: string) {
+    const dataDelete = await firstValueFrom(
+      this.activityClient.send('delete-picture_work', picture_id),
+    );
+    if (dataDelete.data) {
+      const data = await this.cloudinaryService.deleteFile(dataDelete.data);
+      if (data) {
+        return {
+          statusCode: dataDelete.statusCode,
+          message: dataDelete.message,
+        };
+      }
+    }
+    return dataDelete;
+  }
+
   async sendGetAllPictureActivity(activity_id: string) {
     return await firstValueFrom(
       this.activityClient.send('get-all_picture_activity', activity_id),
@@ -528,13 +544,37 @@ export class ActivityService {
   }
 
   // Picture Work methods
-  async sendCreatePictureWork(createPictureWorkDto: CreatePictureWorkDto[]) {
-    return await firstValueFrom(
-      this.activityClient.send(
-        { cmd: 'create-picture_work' },
-        createPictureWorkDto,
-      ),
-    );
+  async sendCreatePictureWork(
+    createPictureWorkDto: CreatePictureWorkDto[],
+    picture_urls: Express.Multer.File[],
+  ) {
+    try {
+      // console.log(picture_urls)
+      if (picture_urls && picture_urls.length > 0) {
+        const datas = await this.cloudinaryService.uploadFiles(picture_urls);
+        if (datas.length > 0) {
+          const resultImg = await firstValueFrom(
+            this.activityClient.send('create-one-picture_work', {
+              ...createPictureWorkDto,
+              url: datas[0],
+            }),
+          );
+          if (resultImg) {
+            return {
+              statusCode: HttpStatus.CREATED,
+              message: 'Work and Picture created successfully',
+            };
+          }
+        }
+      } else {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Picture dont successfully',
+        };
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async sendGetAllPictureWork(work_id: string) {

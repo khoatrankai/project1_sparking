@@ -1,5 +1,13 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { CategoryRoleUser } from './category_role_user.entity';
+import { ListGroupRole } from './list_group_role.entity';
 
 @Entity('role_type_user')
 export class RoleTypeUser {
@@ -15,4 +23,7 @@ export class RoleTypeUser {
   @ManyToOne(() => CategoryRoleUser, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'category_role' })
   category_role: CategoryRoleUser;
+
+  @OneToMany(() => ListGroupRole, (groupRole) => groupRole.role_type)
+  group_role: ListGroupRole[];
 }

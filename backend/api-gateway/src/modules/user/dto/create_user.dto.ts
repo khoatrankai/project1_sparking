@@ -43,4 +43,8 @@ export class CreateUserDto {
 
   @IsEnum(['active', 'delete', 'hide'])
   status: string = 'active';
+
+  @IsOptional()
+  @IsString()
+  group_user?: string;
 }

@@ -69,7 +69,6 @@ export class ActivityController {
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'admin-top'])
   @SetMetadata('type', ['admin'])
-  @UseInterceptors(FilesInterceptor('picture_urls'))
   async getAllActivitiesReady(@Param('id') id: string) {
     return this.activityService.sendGetAllActivitiesReady(id);
   }
@@ -78,7 +77,6 @@ export class ActivityController {
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'admin-top'])
   @SetMetadata('type', ['admin'])
-  @UseInterceptors(FilesInterceptor('picture_urls'))
   async getAllWorksReady(@Req() req: Request) {
     return this.activityService.sendGetAllWorksReady(req?.['user']?.sub);
   }
@@ -327,6 +325,14 @@ export class ActivityController {
     return this.activityService.sendDeletePictureActivity(picture_id);
   }
 
+  @Delete('pictures-work/delete')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendDeletePictureWork(@Query('id') picture_id: string) {
+    return this.activityService.sendDeletePictureWork(picture_id);
+  }
+
   @Get('picture/all/:activity_id')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
@@ -527,14 +533,19 @@ export class ActivityController {
   }
 
   // Picture Work Methods
-  @Post('picture-work/create')
+  @Post('pictures-work/create')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
+  @UseInterceptors(FilesInterceptor('url'))
   async sendCreatePictureWork(
     @Body() createPictureWorkDto: CreatePictureWorkDto[],
+    @UploadedFiles() url: Express.Multer.File[],
   ) {
-    return this.activityService.sendCreatePictureWork(createPictureWorkDto);
+    return this.activityService.sendCreatePictureWork(
+      createPictureWorkDto,
+      url,
+    );
   }
 
   @Get('picture-work/all/:work_id')

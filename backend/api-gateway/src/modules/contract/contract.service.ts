@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 import { firstValueFrom } from 'rxjs';
@@ -12,11 +12,14 @@ import { CreateTypeMethodDto } from './dto/TypeMethodDto/create-type_method.dto'
 import { UpdateTypeMethodDto } from './dto/TypeMethodDto/update-type_method.dto';
 import { GetFilterPaymentDto } from './dto/PaymentDto/get-filter.dto';
 import { GetFilterContractDto } from './dto/ContractDto/get-filter.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CreateDocumentContractDto } from './dto/DocumentContractDto/create-document_contract.dto';
 
 @Injectable()
 export class ContractService {
   constructor(
     @Inject('CONTRACT') private readonly contractClient: ClientProxy,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
   getHello() {
     return firstValueFrom(
@@ -231,6 +234,63 @@ export class ContractService {
   async getAllTypeMethods() {
     return firstValueFrom(
       this.contractClient.send({ cmd: 'get-all-type_methods' }, {}),
+    );
+  }
+
+  async sendDeleteDocumentContract(document_id: string) {
+    const dataDelete = await firstValueFrom(
+      this.contractClient.send('delete-document_contract', document_id),
+    );
+    if (dataDelete.data) {
+      const data = await this.cloudinaryService.deleteFile(dataDelete.data);
+      if (data) {
+        return {
+          statusCode: dataDelete.statusCode,
+          message: dataDelete.message,
+        };
+      }
+    }
+    return dataDelete;
+  }
+
+  async sendCreateDocumentContract(
+    createDocumentContractDto: CreateDocumentContractDto,
+    picture_urls: Express.Multer.File[],
+  ) {
+    try {
+      // console.log(picture_urls)
+      if (picture_urls && picture_urls.length > 0) {
+        const type = picture_urls?.[0]?.originalname.split('.').pop();
+        const datas = await this.cloudinaryService.uploadFiles(picture_urls);
+        if (datas.length > 0) {
+          const resultImg = await firstValueFrom(
+            this.contractClient.send('create-one-document_contract', {
+              ...createDocumentContractDto,
+              url: datas[0],
+              type,
+            }),
+          );
+          if (resultImg) {
+            return {
+              statusCode: HttpStatus.CREATED,
+              message: 'Contract and Document created successfully',
+            };
+          }
+        }
+      } else {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Document dont successfully',
+        };
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async sendGetAllDocumentContract(contract_id: string) {
+    return await firstValueFrom(
+      this.contractClient.send('get-all_document_contract', contract_id),
     );
   }
 }

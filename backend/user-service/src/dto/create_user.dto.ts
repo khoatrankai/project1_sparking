@@ -1,4 +1,11 @@
-import { IsEnum, IsOptional, IsString, IsUrl, Length, IsEmail } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Length,
+  IsEmail,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -49,4 +56,8 @@ export class CreateUserDto {
 
   @IsEnum(['active', 'delete', 'hide'])
   status: string = 'active';
+
+  @IsOptional()
+  @IsString()
+  group_user?: string;
 }

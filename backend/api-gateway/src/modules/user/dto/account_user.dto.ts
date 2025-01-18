@@ -1,4 +1,5 @@
 import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import { GetGroupUserDto } from './GroupUser/get_group.dto';
 
 export class AccountUsersDto {
   @IsString()
@@ -53,4 +54,7 @@ export class AccountUsersDto {
 
   @IsEnum(['active', 'delete', 'hide'])
   status: string;
+
+  @IsOptional()
+  group_user?: GetGroupUserDto;
 }

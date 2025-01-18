@@ -1,11 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 // import { v4 as uuidv4 } from 'uuid';
 
-@Entity('Vats')
+@Entity('vats')
 export class Vats {
   @PrimaryGeneratedColumn('uuid')
   vat_id: string;
 
-  @Column({ type: 'int'})
+  @Column({ type: 'int' })
   type_vat: number;
 }

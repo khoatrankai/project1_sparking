@@ -249,6 +249,7 @@ export class LayerService {
       const activities = await this.activitiesRepository.find({
         where: { contract: In(contracts) },
         relations: ['type', 'status', 'picture_urls', 'list_code_product'],
+        order: { created_at: 'DESC' },
       });
       if (activities) {
         const ids = activities.map((dt) => dt.contract);
@@ -301,6 +302,7 @@ export class LayerService {
       const activities = await this.activitiesRepository.find({
         where: whereCondition,
         relations: ['type', 'status', 'picture_urls', 'list_code_product'],
+        order: { created_at: 'DESC' },
       });
       if (activities) {
         const ids = activities.map((dt) => dt.contract);
@@ -532,6 +534,7 @@ export class LayerService {
   async getAllTypeActivities() {
     const typeActivities = await this.typeActivitiesRepository.find({
       relations: ['status'],
+      order: { created_at: 'DESC' },
     });
     const dataRes = typeActivities.map((dt) => {
       if (dt && dt.status) {
@@ -549,6 +552,7 @@ export class LayerService {
   async getFullTypeActivities() {
     const typeActivities = await this.typeActivitiesRepository.find({
       relations: ['status', 'status.activity'],
+      order: { created_at: 'DESC' },
     });
     const dataRes = typeActivities.map((dt) => {
       if (dt && dt.status) {
@@ -648,6 +652,7 @@ export class LayerService {
   async getAllStatusActivities() {
     const statusActivities = await this.statusActivitiesRepository.find({
       relations: ['activity', 'type_activity'],
+      order: { created_at: 'DESC' },
     });
     return { statusCode: HttpStatus.OK, data: statusActivities };
   }
@@ -713,6 +718,23 @@ export class LayerService {
     };
   }
 
+  async createOnePictureWork(createPictureWorkDto: CreatePictureWorkDto) {
+    const work = await this.worksRepository.findOne({
+      where: { work_id: createPictureWorkDto.work },
+    });
+    const newPictureWork = this.pictureWorkRepository.create({
+      ...createPictureWorkDto,
+      work,
+      picture_id: uuidv4(),
+    });
+    const result = await this.pictureWorkRepository.save(newPictureWork);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Picture Work created successfully',
+      data: result,
+    };
+  }
+
   async deletePictureActivity(picture_id: string) {
     function extractPublicId(url: string): string {
       const parts = url.split('/');
@@ -732,6 +754,25 @@ export class LayerService {
     };
   }
 
+  async deletePictureWork(picture_id: string) {
+    function extractPublicId(url: string): string {
+      const parts = url.split('/');
+      const fileName = parts[parts.length - 1]; // Lấy phần cuối cùng của URL
+      const publicId = fileName.split('.')[0]; // Loại bỏ phần mở rộng (.jpg, .png, ...)
+      return publicId;
+    }
+    const dataDelete = await this.pictureWorkRepository.findOne({
+      where: { picture_id },
+    });
+    await this.pictureWorkRepository.delete({ picture_id });
+    const publicId = extractPublicId(dataDelete.url);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Picture Work deleted successfully',
+      data: publicId,
+    };
+  }
+
   async getAllPictureActivity(activity_id: string) {
     const activity = await this.activitiesRepository.findOne({
       where: { activity_id },
@@ -739,6 +780,7 @@ export class LayerService {
     const pictureActivity = await this.pictureActivityRepository.find({
       where: { activity },
       relations: ['activity'],
+      order: { created_at: 'DESC' },
     });
     if (!pictureActivity)
       throw new NotFoundException(`PictureActivity not found`);
@@ -815,6 +857,7 @@ export class LayerService {
     });
     const listCodeProduct = await this.listCodeProductRepository.find({
       where: { activity },
+      order: { created_at: 'DESC' },
     });
     return { statusCode: HttpStatus.OK, data: listCodeProduct };
   }
@@ -909,6 +952,7 @@ export class LayerService {
   }
 
   async updateWork(work_id: string, updateWorkDto: UpdateWorkDto) {
+    const { picture_urls, ...reqUpdateWork } = updateWorkDto;
     const activity = await this.activitiesRepository.findOne({
       where: { activity_id: updateWorkDto.activity },
     });
@@ -918,12 +962,16 @@ export class LayerService {
     const status = await this.statusWorkRepository.findOne({
       where: { status_work_id: updateWorkDto.status },
     });
+
     const updatedWork = await this.worksRepository.update(work_id, {
-      ...updateWorkDto,
+      ...reqUpdateWork,
       type,
       status,
       activity,
     });
+    if (updatedWork.affected !== 0 && picture_urls) {
+      await this.createPictureWork(picture_urls);
+    }
     return { statusCode: HttpStatus.OK, data: updatedWork };
   }
 
@@ -985,11 +1033,13 @@ export class LayerService {
       const works = await this.worksRepository.find({
         where: { activity: In(activity.map((dt) => dt.activity_id)) },
         relations: ['type', 'status', 'picture_urls', 'list_user', 'activity'],
+        order: { created_at: 'DESC' },
       });
       return { statusCode: HttpStatus.OK, data: works };
     } else {
       const works = await this.worksRepository.find({
         relations: ['type', 'status', 'picture_urls', 'list_user', 'activity'],
+        order: { created_at: 'DESC' },
       });
       return { statusCode: HttpStatus.OK, data: works };
     }
@@ -1076,6 +1126,7 @@ export class LayerService {
   async getAllTypeWork() {
     const typeWork = await this.typeWorkRepository.find({
       relations: ['work', 'status'],
+      order: { created_at: 'DESC' },
     });
     if (!typeWork) {
       throw new NotFoundException(`TypeActivity not found`);
@@ -1150,6 +1201,7 @@ export class LayerService {
   async getAllStatusWork() {
     const statusWork = await this.statusWorkRepository.find({
       relations: ['work', 'type_work'],
+      order: { created_at: 'DESC' },
     });
     if (!statusWork) {
       throw new NotFoundException(`Status Activity not found`);
@@ -1171,30 +1223,31 @@ export class LayerService {
     return { statusCode: HttpStatus.CREATED, data: savedPictureWork };
   }
 
-  async deletePictureWork(datas: string[]) {
-    try {
-      const rm = await this.pictureWorkRepository.delete({
-        picture_id: In(datas),
-      });
-      if (rm) {
-        return {
-          statusCode: HttpStatus.OK,
-          message: 'Đã xóa thành công',
-        };
-      }
-    } catch {
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Xóa thất bại',
-      };
-    }
-  }
+  // async deletePictureWork(datas: string[]) {
+  //   try {
+  //     const rm = await this.pictureWorkRepository.delete({
+  //       picture_id: In(datas),
+  //     });
+  //     if (rm) {
+  //       return {
+  //         statusCode: HttpStatus.OK,
+  //         message: 'Đã xóa thành công',
+  //       };
+  //     }
+  //   } catch {
+  //     return {
+  //       statusCode: HttpStatus.BAD_REQUEST,
+  //       message: 'Xóa thất bại',
+  //     };
+  //   }
+  // }
 
   async getAllPictureWork(work_id: string) {
     const work = await this.worksRepository.findOne({ where: { work_id } });
     const pictureWork = await this.pictureWorkRepository.find({
       where: { work },
       relations: ['work'],
+      order: { created_at: 'DESC' },
     });
     if (!pictureWork) {
       throw new NotFoundException(`PictureWork not found`);
@@ -1255,7 +1308,10 @@ export class LayerService {
 
   async getAllListUser(work_id: string) {
     const work = await this.worksRepository.findOne({ where: { work_id } });
-    const listUser = await this.listUserRepository.find({ where: { work } });
+    const listUser = await this.listUserRepository.find({
+      where: { work },
+      order: { created_at: 'DESC' },
+    });
     if (!listUser) {
       throw new NotFoundException(`ListUser not found`);
     }

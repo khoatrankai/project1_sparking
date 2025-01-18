@@ -309,6 +309,7 @@ export class PriceQuoteService {
     const result = await this.priceQuoteRepository.find({
       where: whereCondition,
       relations: ['parts', 'parts.products'],
+      order: { created_at: 'DESC' },
     });
 
     const userIds = result.map((dt) => dt.user_support);

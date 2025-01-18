@@ -22,7 +22,7 @@ import { ClassifyType } from 'src/database/entities/classify_type.entity';
         name: 'SYSTEM',
         transport: Transport.TCP,
         options: {
-          host: 'system-service',
+          host: 'system_service',
           port: 3004,
         },
       },

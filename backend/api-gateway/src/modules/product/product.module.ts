@@ -20,7 +20,7 @@ import { memoryStorage } from 'multer';
         name: 'PRODUCT',
         transport: Transport.TCP,
         options: {
-          host: 'product-service',
+          host: 'product_service',
           port: 3012,
         },
       },
@@ -28,7 +28,7 @@ import { memoryStorage } from 'multer';
         name: 'SYSTEM',
         transport: Transport.TCP,
         options: {
-          host: 'system-service',
+          host: 'system_service',
           port: 3004,
         },
       },
@@ -36,7 +36,7 @@ import { memoryStorage } from 'multer';
         name: 'USER',
         transport: Transport.TCP,
         options: {
-          host: 'user-service',
+          host: 'user_service',
           port: 3005,
         },
       },

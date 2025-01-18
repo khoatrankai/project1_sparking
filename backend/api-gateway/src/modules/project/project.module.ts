@@ -12,7 +12,7 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
         name: 'PROJECT',
         transport: Transport.TCP,
         options: {
-          host: 'project-service',
+          host: 'project_service',
           port: 3013,
         },
       },
@@ -20,7 +20,7 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
         name: 'USER',
         transport: Transport.TCP,
         options: {
-          host: 'user-service',
+          host: 'user_service',
           port: 3005,
         },
       },

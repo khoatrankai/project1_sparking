@@ -33,7 +33,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'USER',
         transport: Transport.TCP,
         options: {
-          host: 'user-service',
+          host: 'user_service',
           port: 3005,
         },
       },
@@ -41,7 +41,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'CONTRACT',
         transport: Transport.TCP,
         options: {
-          host: 'contract-service',
+          host: 'contract_service',
           port: 3010,
         },
       },

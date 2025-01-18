@@ -209,9 +209,21 @@ export class LayerController {
     );
   }
 
+  @MessagePattern('create-one-picture_work')
+  async createOnePictureWork(
+    @Payload() createPictureWorkDto: CreatePictureWorkDto,
+  ) {
+    return await this.layerService.createOnePictureWork(createPictureWorkDto);
+  }
+
   @MessagePattern('delete-picture_activity')
   async deletePictureActivity(@Payload() picture_id: string) {
     return await this.layerService.deletePictureActivity(picture_id);
+  }
+
+  @MessagePattern('delete-picture_work')
+  async deletePictureWork(@Payload() picture_id: string) {
+    return await this.layerService.deletePictureWork(picture_id);
   }
 
   @MessagePattern('get-all_picture_activity')

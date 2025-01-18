@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsDate, IsInt } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsDate,
+  IsInt,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateWorkDto {
   @IsString()
@@ -16,7 +23,7 @@ export class CreateWorkDto {
   @IsOptional()
   @IsString()
   description?: string;
-  
+
   @IsInt()
   @IsOptional()
   position: number;
@@ -30,4 +37,12 @@ export class CreateWorkDto {
 
   @IsDate()
   time_end: Date;
+
+  @IsArray()
+  @IsOptional()
+  picture_urls?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  urgent?: boolean;
 }

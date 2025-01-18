@@ -7,6 +7,7 @@ import { TypeContract } from 'src/database/entities/type_contract.entity';
 import { Payment } from 'src/database/entities/payment.entity';
 import { TypeMethod } from 'src/database/entities/type_method.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { DocumentContract } from 'src/database/entities/document_contract.entity';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'CUSTOMER',
         transport: Transport.TCP,
         options: {
-          host: 'customer-service',
+          host: 'customer_service',
           port: 3006,
         },
       },
@@ -23,7 +24,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'PROJECT',
         transport: Transport.TCP,
         options: {
-          host: 'project-service',
+          host: 'project_service',
           port: 3013,
         },
       },
@@ -31,12 +32,18 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'PRODUCT',
         transport: Transport.TCP,
         options: {
-          host: 'product-service',
+          host: 'product_service',
           port: 3012,
         },
       },
     ]),
-    TypeOrmModule.forFeature([TypeContract, Contract, Payment, TypeMethod]),
+    TypeOrmModule.forFeature([
+      TypeContract,
+      Contract,
+      Payment,
+      TypeMethod,
+      DocumentContract,
+    ]),
   ],
   controllers: [ContractController],
   providers: [ContractService],

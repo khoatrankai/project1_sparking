@@ -6,6 +6,7 @@ import { Payment } from './entities/payment.entity';
 import { TypeMethod } from './entities/type_method.entity';
 import { createConnection } from 'mysql2/promise';
 import { ConfigService } from '@nestjs/config';
+import { DocumentContract } from './entities/document_contract.entity';
 
 @Module({
   imports: [
@@ -29,7 +30,13 @@ import { ConfigService } from '@nestjs/config';
           username: configService.get<string>('DB_USER'),
           password: configService.get<string>('DB_PASSWORD'),
           database: configService.get<string>('DB_NAME'),
-          entities: [TypeContract, Contract, Payment, TypeMethod],
+          entities: [
+            TypeContract,
+            Contract,
+            Payment,
+            TypeMethod,
+            DocumentContract,
+          ],
           // synchronize: true,
           // dropSchema: true,
         };

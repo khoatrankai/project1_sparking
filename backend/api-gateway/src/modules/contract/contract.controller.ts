@@ -8,7 +8,9 @@ import {
   Put,
   Query,
   SetMetadata,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ContractService } from './contract.service';
 import { CreateContractDto } from './dto/ContractDto/create_contract.dto';
@@ -22,6 +24,8 @@ import { UpdateTypeMethodDto } from './dto/TypeMethodDto/update-type_method.dto'
 import { RoleGuard } from 'src/guards/role.guard';
 import { GetFilterPaymentDto } from './dto/PaymentDto/get-filter.dto';
 import { GetFilterContractDto } from './dto/ContractDto/get-filter.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { CreateDocumentContractDto } from './dto/DocumentContractDto/create-document_contract.dto';
 
 @Controller('contract')
 export class ContractController {
@@ -318,5 +322,37 @@ export class ContractController {
   @SetMetadata('type', ['admin'])
   async getAllTypeMethods() {
     return this.contractService.getAllTypeMethods();
+  }
+
+  @Post('document/create')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['contract', 'contract-create', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  @UseInterceptors(FilesInterceptor('url'))
+  async createDocumentContract(
+    @Body() createDocumentContractDto: CreateDocumentContractDto,
+    @UploadedFiles() url: Express.Multer.File[],
+  ) {
+    console.log(url);
+    return this.contractService.sendCreateDocumentContract(
+      createDocumentContractDto,
+      url,
+    );
+  }
+
+  @Delete('document/delete')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['contract', 'contract-create', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async deleteDocumentContract(@Query('id') document_id: string) {
+    return this.contractService.sendDeleteDocumentContract(document_id);
+  }
+
+  @Get('document/all/:contract_id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['contract', 'contract-create', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async getAllDocumentContract(@Param('contract_id') contract_id: string) {
+    return this.contractService.sendGetAllDocumentContract(contract_id);
   }
 }

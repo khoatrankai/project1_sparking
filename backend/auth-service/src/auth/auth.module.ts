@@ -12,7 +12,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         name: 'USER',
         transport: Transport.TCP,
         options: {
-          host: 'user-service',
+          host: 'user_service',
           port: 3005,
         },
       },
@@ -20,7 +20,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         name: 'MAIL',
         transport: Transport.TCP,
         options: {
-          host: 'email-service',
+          host: 'email_service',
           port: 3003,
         },
       },

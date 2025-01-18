@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsOptional, IsDate, IsBoolean } from 'class-validator';
 
 export class CreateWorkDto {
   @IsString()
@@ -26,4 +26,8 @@ export class CreateWorkDto {
 
   @IsDate()
   time_end: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  urgent?: boolean;
 }

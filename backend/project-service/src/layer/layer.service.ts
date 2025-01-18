@@ -93,6 +93,7 @@ export class LayerService {
     }
     const projects = await this.projectsRepository.find({
       where: whereCondition,
+      order: { created_at: 'DESC' },
     });
 
     if (!projects || projects.length === 0) {

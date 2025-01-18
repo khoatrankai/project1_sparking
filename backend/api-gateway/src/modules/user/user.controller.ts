@@ -26,6 +26,8 @@ import { UpdateUserDto } from './dto/update_user.dto';
 import { RoleGuard } from 'src/guards/role.guard';
 import { CreateCategoryRoleUserDto } from './dto/create_category.dto';
 import { UpdateCategoryRoleUserDto } from './dto/update_category.dto';
+import { CreateGroupUserDto } from './dto/GroupUser/create_group.dto';
+import { UpdateGroupUserDto } from './dto/GroupUser/update_group.dto';
 // import { RoleGuard } from 'src/guards/role.guard';
 
 @Controller('user')
@@ -123,19 +125,19 @@ export class UserController {
   }
 
   // @SetMetadata('checkfull',['all'])
-  @UseGuards(RoleGuard)
-  @SetMetadata('roles', [
-    'user',
-    'customer',
-    'user-all',
-    'opportunity',
-    'price_quote',
-    'product',
-    'project',
-    'admin-top',
-    'activity',
-  ])
-  @SetMetadata('type', ['admin'])
+  // @UseGuards(RoleGuard)
+  // @SetMetadata('roles', [
+  //   'user',
+  //   'customer',
+  //   'user-all',
+  //   'opportunity',
+  //   'price_quote',
+  //   'product',
+  //   'project',
+  //   'admin-top',
+  //   'activity',
+  // ])
+  // @SetMetadata('type', ['admin'])
   @Get('all')
   async getUsers() {
     return await this.userService.getUsers();
@@ -229,5 +231,40 @@ export class UserController {
     datas: { name_category: string; role_type: CreateRoleTypeUserDto[] }[],
   ) {
     return await this.userService.createFullCategoryRole(datas);
+  }
+
+  @Get('get-group-user')
+  getGroupUser() {
+    return this.userService.getGroupUser();
+  }
+
+  @Post('create-group-user')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-create', 'user-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  createGroupUser(@Body() createGroupUserDto: CreateGroupUserDto) {
+    return this.userService.createGroupUser(createGroupUserDto);
+  }
+
+  @Delete('/group-user')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteGroupUser(@Body() datas: string[]) {
+    return this.userService.sendDeleteGroupUser(datas);
+  }
+
+  @Put('update-group-user/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  updateGroupUser(
+    @Param('id') id: string,
+    @Body() updateGroupUserDto: UpdateGroupUserDto,
+  ) {
+    return this.userService.updateGroupUser({
+      ...updateGroupUserDto,
+      group_id: id,
+    });
   }
 }

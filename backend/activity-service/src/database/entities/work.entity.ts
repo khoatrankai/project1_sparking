@@ -52,6 +52,9 @@ export class Works {
   @Column({ type: 'timestamp' })
   time_end: Date;
 
+  @Column({ type: 'boolean', default: false })
+  urgent: boolean;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

@@ -6,6 +6,8 @@ import { RoleUser } from './entities/role_user.entity';
 import { CategoryRoleUser } from './entities/category_role_user.entity';
 import { createConnection } from 'mysql2/promise';
 import { ConfigService } from '@nestjs/config';
+import { GroupUser } from './entities/group_user.entity';
+import { ListGroupRole } from './entities/list_group_role.entity';
 
 @Module({
   imports: [
@@ -29,7 +31,14 @@ import { ConfigService } from '@nestjs/config';
           username: configService.get<string>('DB_USER'),
           password: configService.get<string>('DB_PASSWORD'),
           database: configService.get<string>('DB_NAME'),
-          entities: [AccountUsers, RoleTypeUser, RoleUser, CategoryRoleUser],
+          entities: [
+            AccountUsers,
+            RoleTypeUser,
+            RoleUser,
+            CategoryRoleUser,
+            GroupUser,
+            ListGroupRole,
+          ],
           // synchronize: true,
           // dropSchema: true,
         };

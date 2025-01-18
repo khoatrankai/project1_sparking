@@ -10,7 +10,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'PRICEQUOTE',
         transport: Transport.TCP,
         options: {
-          host: 'price_quote-service',
+          host: 'price_quote_service',
           port: 3008,
         },
       },
@@ -18,7 +18,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'USER',
         transport: Transport.TCP,
         options: {
-          host: 'user-service',
+          host: 'user_service',
           port: 3005,
         },
       },

@@ -105,6 +105,7 @@ export class CustomerService {
     const data = await this.customerInfoRepository.find({
       where: whereCondition,
       relations: ['group_customer'],
+      order: { created_at: 'DESC' },
     });
     return {
       statusCode: HttpStatus.OK,
@@ -341,6 +342,7 @@ export class CustomerService {
             status: true,
             updated_at: true,
           },
+          order: { created_at: 'DESC' },
         });
         return {
           statusCode: HttpStatus.OK,

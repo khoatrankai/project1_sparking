@@ -13,7 +13,7 @@ import { TypeProject } from 'src/database/entities/type_project.entity';
         name: 'CUSTOMER',
         transport: Transport.TCP,
         options: {
-          host: 'customer-service',
+          host: 'customer_service',
           port: 3006,
         },
       },

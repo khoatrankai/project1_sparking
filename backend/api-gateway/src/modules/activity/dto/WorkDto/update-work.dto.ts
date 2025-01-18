@@ -1,7 +1,6 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsOptional, IsDate, IsBoolean } from 'class-validator';
 
 export class UpdateWorkDto {
-
   @IsString()
   @IsOptional()
   type?: string;
@@ -29,4 +28,8 @@ export class UpdateWorkDto {
   @IsDate()
   @IsOptional()
   time_end?: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  urgent?: boolean;
 }

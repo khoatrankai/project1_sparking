@@ -32,6 +32,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { GetFilterPaymentDto } from 'src/dto/PaymentDto/get-filter.dto';
 import { GetFilterContractDto } from 'src/dto/ContractDto/get-filter.dto';
+import { CreateDocumentContractDto } from 'src/dto/DocumentContractDto/create-document_contract.dto';
+import { DocumentContract } from 'src/database/entities/document_contract.entity';
 
 @Injectable()
 export class ContractService {
@@ -41,6 +43,8 @@ export class ContractService {
     @Inject('PROJECT') private readonly projectsClient: ClientProxy,
     @InjectRepository(Contract)
     private readonly contractRepository: Repository<Contract>,
+    @InjectRepository(DocumentContract)
+    private readonly documentContractRepository: Repository<DocumentContract>,
     @InjectRepository(TypeContract)
     private readonly typeContractRepository: Repository<TypeContract>,
     @InjectRepository(Payment)
@@ -183,6 +187,7 @@ export class ContractService {
   async getContracts() {
     const result = await this.contractRepository.find({
       relations: ['type_contract'],
+      order: { created_at: 'DESC' },
     });
     const customerIds = result.map((dt) => dt.customer);
     const customerInfos = await firstValueFrom(
@@ -324,6 +329,7 @@ export class ContractService {
     const data = await this.contractRepository.find({
       where: { project: project },
       select: { contract_id: true },
+      order: { created_at: 'DESC' },
     });
 
     return data.map((dt) => dt.contract_id);
@@ -890,5 +896,71 @@ export class ContractService {
         message: 'Failed to delete TypeContract',
       };
     }
+  }
+
+  async createOneDocumentContract(
+    createDocumentContractDto: CreateDocumentContractDto,
+  ) {
+    const contract = await this.contractRepository.findOne({
+      where: { contract_id: createDocumentContractDto.contract },
+    });
+    const newDocument = this.documentContractRepository.create({
+      ...createDocumentContractDto,
+      contract,
+      document_id: uuidv4(),
+    });
+    const result = await this.documentContractRepository.save(newDocument);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Document created successfully',
+      data: result,
+    };
+  }
+
+  async deleteDocumentContract(document_id: string) {
+    function extractPublicId(url: string): string {
+      const parts = url.split('/');
+      const fileName = parts[parts.length - 1]; // Lấy phần cuối cùng của URL
+      const publicId = fileName.split('.')[0]; // Loại bỏ phần mở rộng (.jpg, .png, ...)
+      return publicId;
+    }
+    const dataDelete = await this.documentContractRepository.findOne({
+      where: { document_id },
+    });
+    await this.documentContractRepository.delete({ document_id });
+    const publicId = extractPublicId(dataDelete.url);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Picture Work deleted successfully',
+      data: publicId,
+    };
+  }
+
+  async getAllDocumentContract(contract_id: string) {
+    const documentContract = await this.documentContractRepository.find({
+      where: { contract: In([contract_id]) },
+      order: { created_at: 'DESC' },
+    });
+    console.log(documentContract);
+    if (!documentContract) {
+      throw new NotFoundException(`DocumentContract not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: documentContract };
+  }
+
+  async createDocumentContract(
+    createDocumentContract: CreateDocumentContractDto[],
+  ) {
+    const contract = await this.contractRepository.findOne({
+      where: { contract_id: createDocumentContract[0].contract },
+    });
+    const newDocumentContract = this.documentContractRepository.create(
+      createDocumentContract.map((dt) => {
+        return { ...dt, contract, picture_id: uuidv4() };
+      }),
+    );
+    const savedDocumentContract =
+      await this.documentContractRepository.save(newDocumentContract);
+    return { statusCode: HttpStatus.CREATED, data: savedDocumentContract };
   }
 }

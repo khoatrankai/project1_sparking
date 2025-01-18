@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsDate, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsDate,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
 import { CreatePictureActivityDto } from '../PictureActivityDto/create-picture_activity.dto';
 
 export class CreateWorkDto {
@@ -24,11 +30,11 @@ export class CreateWorkDto {
   @IsString()
   activity?: string;
 
-  @Type(()=> Date)
+  @Type(() => Date)
   @IsDate()
   time_start: Date;
 
-  @Type(()=> Date)
+  @Type(() => Date)
   @IsDate()
   time_end: Date;
 
@@ -43,4 +49,8 @@ export class CreateWorkDto {
   @IsArray()
   @IsOptional()
   list_users?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  urgent?: boolean;
 }

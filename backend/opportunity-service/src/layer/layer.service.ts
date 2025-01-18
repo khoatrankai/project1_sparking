@@ -141,6 +141,7 @@ export class LayerService {
     const opportunities = await this.opportunitiesRepository.find({
       where: whereCondition,
       relations: ['type_source', 'type_opportunity'],
+      order: { created_at: 'DESC' },
     });
     const userIds = opportunities.map((dt) => dt.user_support);
     const dataUsers = await firstValueFrom(
@@ -263,6 +264,7 @@ export class LayerService {
     const data = await this.opportunitiesRepository.find({
       where: whereCondition,
       relations: ['type_source', 'type_opportunity'],
+      order: { created_at: 'DESC' },
     });
     return {
       statusCode: HttpStatus.OK,

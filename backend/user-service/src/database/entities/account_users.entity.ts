@@ -1,5 +1,13 @@
-import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  OneToMany,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 import { RoleUser } from './role_user.entity';
+import { GroupUser } from './group_user.entity';
 
 @Entity('account_users')
 export class AccountUsers {
@@ -45,4 +53,8 @@ export class AccountUsers {
 
   @OneToMany(() => RoleUser, (roleUser) => roleUser.user_info)
   role_user: RoleUser[];
+
+  @ManyToOne(() => GroupUser, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'group_user' })
+  group_user: GroupUser;
 }

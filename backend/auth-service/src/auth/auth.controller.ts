@@ -14,29 +14,29 @@ export class AuthController {
     return this.authService.getHello();
   }
 
-  @MessagePattern({cmd:'register'})
-  registerUser(otpUserDto:CreateUserDto){
-    return this.authService.register(otpUserDto)
+  @MessagePattern({ cmd: 'register' })
+  registerUser(otpUserDto: CreateUserDto) {
+    return this.authService.register(otpUserDto);
   }
 
-  @MessagePattern({cmd:'verify'})
-  verifyUser(verifyUserDto:VerifyUserDto){
-    return this.authService.verify(verifyUserDto)
+  @MessagePattern({ cmd: 'verify' })
+  verifyUser(verifyUserDto: VerifyUserDto) {
+    return this.authService.verify(verifyUserDto);
   }
 
-  @MessagePattern({cmd:'login'})
-  loginUser(userLoginDto:UserLoginDto){
-    return this.authService.login(userLoginDto)
+  @MessagePattern({ cmd: 'login' })
+  loginUser(userLoginDto: UserLoginDto) {
+    console.log('vao roi');
+    return this.authService.login(userLoginDto);
   }
 
-  @MessagePattern({cmd:'refresh-token'})
-  refreshToken(data:string){
-    return this.authService.refreshTokens(data)
+  @MessagePattern({ cmd: 'refresh-token' })
+  refreshToken(data: string) {
+    return this.authService.refreshTokens(data);
   }
 
-  @MessagePattern({cmd:'comfirm-access-token'})
-  comfirmAccessToken(data:string){
-    return this.authService.comfirmAccessToken(data)
+  @MessagePattern({ cmd: 'comfirm-access-token' })
+  comfirmAccessToken(data: string) {
+    return this.authService.comfirmAccessToken(data);
   }
-  
 }

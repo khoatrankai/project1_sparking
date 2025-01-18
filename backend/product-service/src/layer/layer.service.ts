@@ -266,7 +266,10 @@ export class LayerService {
     const product = await this.productRepository.findOne({
       where: { product_id: id },
     });
-    return await this.codeProductRepository.find({ where: { product } });
+    return await this.codeProductRepository.find({
+      where: { product },
+      order: { created_at: 'DESC' },
+    });
   }
 
   async findOneCodeProduct(id: string): Promise<CodeProduct | undefined> {
@@ -841,6 +844,7 @@ export class LayerService {
       data: await this.activityContainerRepository.find({
         where: { type },
         relations: ['list_code'],
+        order: { created_at: 'DESC' },
       }),
     };
   }
@@ -920,6 +924,7 @@ export class LayerService {
   async findAllHistoryCodeProducts() {
     return await this.historyCodeProductRepository.find({
       relations: ['code_product', 'activity_container'],
+      order: { created_at: 'DESC' },
     });
   }
 

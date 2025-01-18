@@ -1,3 +1,4 @@
+import { File } from 'buffer';
 import { IsString, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class GetPictureActivityDto {

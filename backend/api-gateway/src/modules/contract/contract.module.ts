@@ -2,15 +2,17 @@ import { Module } from '@nestjs/common';
 import { ContractController } from './contract.controller';
 import { ContractService } from './contract.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
+    CloudinaryModule,
     ClientsModule.register([
       {
         name: 'CONTRACT',
         transport: Transport.TCP,
         options: {
-          host: 'contract-service',
+          host: 'contract_service',
           port: 3010,
         },
       },
@@ -18,7 +20,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'USER',
         transport: Transport.TCP,
         options: {
-          host: 'user-service',
+          host: 'user_service',
           port: 3005,
         },
       },

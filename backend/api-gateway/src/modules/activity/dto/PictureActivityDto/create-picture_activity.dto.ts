@@ -1,3 +1,4 @@
+import { File } from 'buffer';
 import { IsString, IsEnum, IsOptional } from 'class-validator';
 
 export class CreatePictureActivityDto {
@@ -5,7 +6,6 @@ export class CreatePictureActivityDto {
   @IsOptional()
   picture_id: string;
 
-  @IsString()
   @IsOptional()
   url: File;
 
