@@ -24,7 +24,11 @@ export class CloudinaryService {
         {
           resource_type: resourceType,
           public_id:
-            resourceType === 'raw' ? uuidv4() + '.' + typeOK : undefined,
+            resourceType === 'raw'
+              ? uuidv4() + '.' + typeOK === 'pdf'
+                ? 'docx'
+                : typeOK
+              : undefined,
         },
         (error, result) => {
           if (error) return reject(error);
