@@ -41,6 +41,10 @@ export class UpdateUserDto {
   @IsString()
   sign_name?: string;
 
+  @IsOptional()
+  @IsString()
+  group_user?: string;
+
   @IsEnum(['active', 'delete', 'hide'])
   @IsOptional()
   status?: string;

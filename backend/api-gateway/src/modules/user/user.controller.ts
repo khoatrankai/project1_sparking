@@ -267,4 +267,13 @@ export class UserController {
       group_id: id,
     });
   }
+
+  @Get('get-user-filter')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  getUserFilter(@Query('group') group: string) {
+    console.log('vao');
+    return this.userService.getUserFilter(group);
+  }
 }

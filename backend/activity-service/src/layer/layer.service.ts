@@ -186,7 +186,7 @@ export class LayerService {
 
     return {
       statusCode: HttpStatus.OK,
-      message: 'Activity updated successfully',
+      message: 'Cập nhật thành công',
       data: result,
     };
   }
@@ -380,6 +380,88 @@ export class LayerService {
     };
   }
 
+  async getAllWorkUrgent() {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const data = await this.worksRepository
+        .createQueryBuilder('work')
+        .leftJoinAndSelect('work.status', 'status')
+        .leftJoinAndSelect('work.type', 'type')
+        .leftJoinAndSelect('work.activity', 'activity')
+        .where(
+          'status.name_tag != :completed AND DATE(work.time_end) >= :today AND work.urgent = :urgent',
+          {
+            today,
+            completed: 'completed',
+            urgent: true,
+          },
+        )
+        .orderBy('work.time_end', 'ASC')
+        .getMany();
+
+      const contractIds = data
+        .filter((dt) => dt.activity)
+        .map((dt) => dt.activity.contract);
+      const dataContract = await firstValueFrom(
+        this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        data: data.map((dt, index) => {
+          return {
+            ...dt,
+            activity: { ...dt.activity, contract: dataContract[index] },
+          };
+        }),
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        messager: 'Lỗi',
+      };
+    }
+  }
+
+  async getAllWorkExpiredUrgent() {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const data = await this.worksRepository
+        .createQueryBuilder('work')
+        .leftJoinAndSelect('work.status', 'status')
+        .leftJoinAndSelect('work.type', 'type')
+        .leftJoinAndSelect('work.activity', 'activity')
+        .where(
+          'status.name_tag != :completed AND DATE(work.time_end) < :today',
+          {
+            today,
+            completed: 'completed',
+          },
+        )
+        .orderBy('work.time_end', 'DESC')
+        .getMany();
+      const contractIds = data
+        .filter((dt) => dt.activity)
+        .map((dt) => dt.activity.contract);
+      const dataContract = await firstValueFrom(
+        this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        data: data.map((dt, index) => {
+          return {
+            ...dt,
+            activity: { ...dt.activity, contract: dataContract[index] },
+          };
+        }),
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        messager: 'Lỗi',
+      };
+    }
+  }
+
   async getAllWorkByProject(project: string) {
     const listContract = await firstValueFrom(
       this.contractsClient.send({ cmd: 'get-contract_by_project_id' }, project),
@@ -465,7 +547,7 @@ export class LayerService {
     );
     return {
       statusCode: HttpStatus.OK,
-      message: 'Type Activity updated successfully',
+      message: 'Cập nhật thành công',
       data: result,
     };
   }
@@ -632,7 +714,7 @@ export class LayerService {
     );
     return {
       statusCode: HttpStatus.OK,
-      message: 'Status Activity updated successfully',
+      message: 'Cập nhật thành công',
       data: result,
     };
   }
@@ -834,7 +916,7 @@ export class LayerService {
     );
     return {
       statusCode: HttpStatus.OK,
-      message: 'List Code Product updated successfully',
+      message: 'Cập nhật thành công',
       data: result,
     };
   }
@@ -972,7 +1054,11 @@ export class LayerService {
     if (updatedWork.affected !== 0 && picture_urls) {
       await this.createPictureWork(picture_urls);
     }
-    return { statusCode: HttpStatus.OK, data: updatedWork };
+    return {
+      statusCode: HttpStatus.OK,
+      data: updatedWork,
+      message: 'Cập nhật thành công',
+    };
   }
 
   async getWork(work_id: string) {
@@ -1107,7 +1193,11 @@ export class LayerService {
       type_work_id,
       updateTypeWorkDto,
     );
-    return { statusCode: HttpStatus.OK, data: updatedTypeWork };
+    return {
+      statusCode: HttpStatus.OK,
+      data: updatedTypeWork,
+      message: 'Cập nhật thành công',
+    };
   }
 
   async getTypeWork(type_work_id: string) {
@@ -1182,7 +1272,11 @@ export class LayerService {
       status_work_id,
       { ...updateStatusWorkDto, type_work: type },
     );
-    return { statusCode: HttpStatus.OK, data: updatedStatusWork };
+    return {
+      statusCode: HttpStatus.OK,
+      data: updatedStatusWork,
+      message: 'Cập nhật thành công',
+    };
   }
 
   async getStatusWork(status_work_id: string) {
@@ -1292,7 +1386,11 @@ export class LayerService {
       list_id,
       updateListUserDto,
     );
-    return { statusCode: HttpStatus.OK, data: updatedListUser };
+    return {
+      statusCode: HttpStatus.OK,
+      data: updatedListUser,
+      message: 'Cập nhật thành công',
+    };
   }
 
   async getListUser(list_id: string) {

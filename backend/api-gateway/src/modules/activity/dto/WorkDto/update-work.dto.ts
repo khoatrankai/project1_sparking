@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsBoolean } from 'class-validator';
 
 export class UpdateWorkDto {
@@ -21,10 +22,12 @@ export class UpdateWorkDto {
   @IsString()
   activity?: string;
 
+  @Type(() => Date)
   @IsDate()
   @IsOptional()
   time_start?: Date;
 
+  @Type(() => Date)
   @IsDate()
   @IsOptional()
   time_end?: Date;

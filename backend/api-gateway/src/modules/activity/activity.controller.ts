@@ -450,6 +450,22 @@ export class ActivityController {
     return this.activityService.sendGetAllWork(filter);
   }
 
+  @Get('work-urgent/all')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async getAllWorkUrgent() {
+    return this.activityService.sendGetAllWorkUrgent();
+  }
+
+  @Get('work-expired-urgent/all')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async getAllWorkExpiredUrgent() {
+    return this.activityService.sendGetAllWorkExpiredUrgent();
+  }
+
   // Type Work Methods
   @Post('type-work/create')
   @UseGuards(RoleGuard)

@@ -299,6 +299,16 @@ export class LayerController {
     return this.layerService.getAllWork(filter);
   }
 
+  @MessagePattern({ cmd: 'get-all_work_urgent' })
+  async getAllWorkUrgent() {
+    return this.layerService.getAllWorkUrgent();
+  }
+
+  @MessagePattern({ cmd: 'get-all_work_expired_urgent' })
+  async getAllWorkExpiredUrgent() {
+    return this.layerService.getAllWorkExpiredUrgent();
+  }
+
   @MessagePattern({ cmd: 'create-type_work' })
   async createTypeWork(@Payload() createTypeWorkDto: CreateTypeWorkDto) {
     return this.layerService.createTypeWork(createTypeWorkDto);

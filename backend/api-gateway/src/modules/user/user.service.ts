@@ -125,10 +125,7 @@ export class UserService {
     const user = req['user'];
     if (user) {
       return await firstValueFrom(
-        this.usersClient.send(
-          { cmd: 'get-user_id_admin' },
-          { user_id: user.sub },
-        ),
+        this.usersClient.send({ cmd: 'get-user_id_admin' }, user.sub),
       );
     }
     return {
@@ -232,6 +229,12 @@ export class UserService {
     return this.usersClient.send(
       { cmd: 'update-group_user' },
       updateGroupUserDto,
+    );
+  }
+
+  async getUserFilter(group?: string) {
+    return await firstValueFrom(
+      this.usersClient.send({ cmd: 'get-user_filter' }, { group }),
     );
   }
 }

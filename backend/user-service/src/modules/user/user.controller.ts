@@ -26,8 +26,7 @@ export class UserController {
   }
 
   @MessagePattern({ cmd: 'get-user_id_admin' })
-  getUserIDAdmin(@Payload('user_id') user_id: string) {
-    console.log(' goi toi ne', user_id);
+  getUserIDAdmin(user_id: string) {
     return this.userService.getUserIDAdmin(user_id);
   }
 
@@ -82,5 +81,10 @@ export class UserController {
   @MessagePattern({ cmd: 'update-group_user' })
   updateGroupUser(updateGroupUser: UpdateGroupUserDto) {
     return this.userService.updateGroupUser(updateGroupUser);
+  }
+
+  @MessagePattern({ cmd: 'get-user_filter' })
+  getUserFilter(@Payload('group') group?: string) {
+    return this.userService.getUserFilter(group);
   }
 }

@@ -170,9 +170,10 @@ export class UserService {
 
   async getUserIDAdmin(user_id: string) {
     const data = await this.accountUserRepository.findOne({
-      where: { user_id },
+      where: { user_id: user_id },
+      relations: ['group_user'],
     });
-    delete data.password;
+    data && delete data.password;
     return {
       statusCode: HttpStatus.OK,
       data: data,
@@ -256,5 +257,25 @@ export class UserService {
         statusCode: HttpStatus.BAD_REQUEST,
       };
     }
+  }
+
+  async getUserFilter(group?: string) {
+    const whereCondition: any = {};
+    if (group) {
+      const group_user = await this.groupUserRepository.find({
+        where: { group_id: group },
+      });
+      whereCondition.group_user = group_user;
+    }
+    // Lọc theo khoảng thời gian (date_start và date_expired)
+
+    const data = await this.accountUserRepository.find({
+      where: whereCondition,
+      relations: ['group_user'],
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
   }
 }

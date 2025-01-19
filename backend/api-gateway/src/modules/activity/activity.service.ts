@@ -469,6 +469,18 @@ export class ActivityService {
     );
   }
 
+  async sendGetAllWorkUrgent() {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-all_work_urgent' }, {}),
+    );
+  }
+
+  async sendGetAllWorkExpiredUrgent() {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-all_work_expired_urgent' }, {}),
+    );
+  }
+
   // Type Work methods
   async sendCreateTypeWork(createTypeWorkDto: CreateTypeWorkDto) {
     return await firstValueFrom(
