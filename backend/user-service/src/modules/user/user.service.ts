@@ -162,6 +162,9 @@ export class UserService {
         'picture_url',
         'user_id',
         'phone_number',
+        'link_facebook',
+        'link_skype',
+        'link_in',
       ],
       where: { user_id },
     });

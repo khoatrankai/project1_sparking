@@ -58,6 +58,32 @@ export class AuthService {
     }
   }
 
+  async logOut(res: Response) {
+    try {
+      res.cookie('accessToken', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+
+      res.cookie('refreshToken', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+      return res.json({
+        statusCode: HttpStatus.OK,
+        message: 'Đăng xuất thành công',
+      });
+    } catch (err) {
+      console.log(err);
+      return res.json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Đăng xuất thất bại',
+      });
+    }
+  }
+
   async refreshToken(res: Response, req: Request) {
     try {
       const newAccessToken: string = await firstValueFrom(
