@@ -16,6 +16,7 @@ import { Profits } from './entities/profit.entity';
 import { LinkSystems } from './entities/link_system.entity';
 import { createConnection } from 'mysql2/promise';
 import { ConfigService } from '@nestjs/config';
+import { TargetRevenue } from './entities/target_revenue.entity';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { ConfigService } from '@nestjs/config';
             TypeMores,
             Profits,
             LinkSystems,
+            TargetRevenue,
           ],
           // synchronize: true,
           // dropSchema: true,

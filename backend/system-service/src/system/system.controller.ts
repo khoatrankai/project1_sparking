@@ -13,6 +13,7 @@ import { CreateProvinceDto } from 'src/dto/create_province.dto';
 import { CreateVatDto } from 'src/dto/create_vat.dto';
 import { CreateProfitDto } from 'src/dto/create_profit.dto';
 import { CreateLinkSystemDto } from 'src/dto/create_link_system.dto';
+import { UpdateVatDto } from 'src/dto/update_vat.dto';
 
 @Controller('/system')
 @UseFilters(ConflictExceptionFilter)
@@ -60,7 +61,7 @@ export class SystemController {
   }
 
   @MessagePattern({ cmd: 'get-link_system' })
-  getLinkSystemByNameTag(name_tag:string) {
+  getLinkSystemByNameTag(name_tag: string) {
     return this.systemService.getLinkSystemByNameTag(name_tag);
   }
 
@@ -69,9 +70,13 @@ export class SystemController {
     return this.systemService.updateUnitProduct(updateTypeProductDto);
   }
 
+  @MessagePattern({ cmd: 'create-vat' })
+  createVat(@Payload() createVat: CreateVatDto) {
+    return this.systemService.createVat(createVat);
+  }
+
   @MessagePattern({ cmd: 'create-vats' })
   createVats(@Payload() createVats: CreateVatDto[]) {
-    console.log("goi toi")
     return this.systemService.createVats(createVats);
   }
 
@@ -80,8 +85,23 @@ export class SystemController {
     return this.systemService.deleteVats(datas);
   }
 
+  @MessagePattern({ cmd: 'update-vat' })
+  updateVat(@Payload() datas: UpdateVatDto) {
+    return this.systemService.updateVat(datas);
+  }
+
   @MessagePattern({ cmd: 'get-vats' })
   getVats() {
+    return this.systemService.getAllVats();
+  }
+
+  @MessagePattern({ cmd: 'get-vat' })
+  getVat(id: string) {
+    return this.systemService.getVat(id);
+  }
+
+  @MessagePattern({ cmd: 'get-all_vat' })
+  getAllVat() {
     return this.systemService.getAllVats();
   }
 
@@ -101,15 +121,14 @@ export class SystemController {
   }
 
   @MessagePattern({ cmd: 'get-profit_ids' })
-  getProfitIds(profit_ids:string[]) {
+  getProfitIds(profit_ids: string[]) {
     return this.systemService.getProfitIDs(profit_ids);
   }
 
   @MessagePattern({ cmd: 'get-province_id' })
-  getProfitId(profit_id:string) {
+  getProfitId(profit_id: string) {
     return this.systemService.getProvinceById(profit_id);
   }
-
 
   @MessagePattern({ cmd: 'get-all_unit_products' })
   getAllTypeProducts() {
@@ -160,5 +179,4 @@ export class SystemController {
   getListProductTypeId(@Payload() data) {
     return this.systemService.getListProductType(data);
   }
-  
 }

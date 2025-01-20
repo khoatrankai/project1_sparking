@@ -30,6 +30,9 @@ import { UpdateProfitDto } from 'src/dto/update_profit.dto';
 import { CreateLinkSystemDto } from 'src/dto/create_link_system.dto';
 import { LinkSystems } from 'src/database/entities/link_system.entity';
 import { UpdateLinkSystemDto } from 'src/dto/update_link_system.dto';
+import { CreateTargetRevenueDto } from 'src/dto/TargetRevenue/create_target_revenue.dto';
+import { TargetRevenue } from 'src/database/entities/target_revenue.entity';
+import { UpdateTargetRevenueDto } from 'src/dto/TargetRevenue/update_target_revenue.dto';
 
 @Injectable()
 export class SystemService {
@@ -42,6 +45,8 @@ export class SystemService {
     private readonly unitProductRepository: Repository<UnitProduct>,
     @InjectRepository(Province)
     private readonly provinceRepository: Repository<Province>,
+    @InjectRepository(TargetRevenue)
+    private readonly targetRevenueRepository: Repository<TargetRevenue>,
     @InjectRepository(Vats) private readonly vatRepository: Repository<Vats>,
     @InjectRepository(Profits)
     private readonly profitRepository: Repository<Profits>,
@@ -143,7 +148,53 @@ export class SystemService {
 
   async createProvince(createProvinceDto: CreateProvinceDto) {
     const newProvince = this.provinceRepository.create(createProvinceDto);
-    return await this.provinceRepository.save(newProvince);
+    await this.provinceRepository.save(newProvince);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Tạo thành công',
+    };
+  }
+
+  async createTarget(createTargetRevenue: CreateTargetRevenueDto) {
+    const newTarget = this.targetRevenueRepository.create(createTargetRevenue);
+    await this.targetRevenueRepository.save(newTarget);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Tạo thành công',
+    };
+  }
+
+  async updateTarget(id: string, updateTargetRevenue: UpdateTargetRevenueDto) {
+    try {
+      await this.targetRevenueRepository.update(id, updateTargetRevenue);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Cập nhật thành công',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Cập nhật thất bại',
+      };
+    }
+  }
+
+  async getAllTarget() {
+    const data = await this.targetRevenueRepository.find();
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
+  }
+
+  async getTarget(id: string) {
+    const data = await this.targetRevenueRepository.findOneBy({
+      target_id: id,
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
   }
 
   async deleteProvinces(datas: string[]) {
@@ -187,7 +238,11 @@ export class SystemService {
 
   async createLinkSystem(createLinkSystemDto: CreateLinkSystemDto) {
     const newLinkSystem = this.linkSystemRepository.create(createLinkSystemDto);
-    return await this.linkSystemRepository.save(newLinkSystem);
+    await this.linkSystemRepository.save(newLinkSystem);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Tạo thành công',
+    };
   }
 
   async createLinkSystems(createLinkSystemsDto: CreateLinkSystemDto[]) {
@@ -198,7 +253,45 @@ export class SystemService {
 
   async createVat(createVat: CreateVatDto) {
     const newVat = this.vatRepository.create(createVat);
-    return await this.vatRepository.save(newVat);
+    await this.vatRepository.save(newVat);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Tạo thành công',
+    };
+  }
+
+  async updateVat(updateVat: UpdateVatDto) {
+    await this.vatRepository.update(updateVat.vat_id, {
+      type_vat: updateVat.type_vat,
+    });
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Tạo thành công',
+    };
+  }
+
+  async getAllVat() {
+    const data = await this.vatRepository.find();
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
+  }
+
+  async getVat(id: string) {
+    const data = await this.vatRepository.findOneBy({ vat_id: id });
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
+  }
+
+  async getAllLinkSystem() {
+    const data = await this.linkSystemRepository.find();
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
   }
 
   async createVats(createVatsDto: CreateVatDto[]) {
@@ -225,7 +318,29 @@ export class SystemService {
 
   async createProfit(createProfit: CreateProfitDto) {
     const newProfit = this.profitRepository.create(createProfit);
-    return await this.profitRepository.save(newProfit);
+    await this.profitRepository.save(newProfit);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Tạo thành công',
+    };
+  }
+
+  async updateProfit(updateProfit: UpdateProfitDto) {
+    await this.profitRepository.update(updateProfit.profit_id, {
+      type_profit: updateProfit.type_profit,
+    });
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Cập nhật thành công',
+    };
+  }
+
+  async getAllProfit() {
+    const data = await this.profitRepository.find();
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
   }
 
   async createProfits(createProfitsDto: CreateProfitDto[]) {
@@ -255,26 +370,10 @@ export class SystemService {
       updateProvinceDto.province_id,
       updateProvinceDto,
     );
-    return this.provinceRepository.findOne({
-      where: { province_id: updateProvinceDto.province_id },
-    });
-  }
-
-  async updateVat(updateVatDto: UpdateVatDto) {
-    await this.vatRepository.update(updateVatDto.vat_id, updateVatDto);
-    return this.vatRepository.findOne({
-      where: { vat_id: updateVatDto.vat_id },
-    });
-  }
-
-  async updateProfit(updateProfitDto: UpdateProfitDto) {
-    await this.profitRepository.update(
-      updateProfitDto.profit_id,
-      updateProfitDto,
-    );
-    return this.profitRepository.findOne({
-      where: { profit_id: updateProfitDto.profit_id },
-    });
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Cập nhật thành công',
+    };
   }
 
   async getAllProvinces() {
