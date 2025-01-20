@@ -398,6 +398,13 @@ export class SystemService {
     return await this.profitRepository.find();
   }
 
+  async getProfit(id: string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.profitRepository.findOneBy({ profit_id: id }),
+    };
+  }
+
   async getProfitIDs(profit_ids: string[]) {
     const data = await this.profitRepository.find({
       where: { profit_id: In(profit_ids) },

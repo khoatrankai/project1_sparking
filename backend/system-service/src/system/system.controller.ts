@@ -174,6 +174,11 @@ export class SystemController {
     return this.systemService.getAllProfits();
   }
 
+  @MessagePattern({ cmd: 'get-profit' })
+  getProfit(id: string) {
+    return this.systemService.getProfit(id);
+  }
+
   @MessagePattern({ cmd: 'get-profit_ids' })
   getProfitIds(profit_ids: string[]) {
     return this.systemService.getProfitIDs(profit_ids);
