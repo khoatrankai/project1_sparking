@@ -20,6 +20,9 @@ import { UpdateUnitProductDto } from './dto/update_unit_product.dto';
 import { CreateProfitDto } from './dto/create_profit.dto';
 import { UpdateProfitDto } from './dto/update_profit.dto';
 import { CreateLinkSystemDto } from './dto/create_link_system.dto';
+import { UpdateLinkSystemDto } from './dto/update_link_system.dto';
+import { CreateTargetRevenueDto } from './dto/TargetRevenue/create_target_revenue.dto';
+import { UpdateTargetRevenueDto } from './dto/TargetRevenue/update_target_revenue.dto';
 
 @Injectable()
 export class SystemService {
@@ -92,6 +95,13 @@ export class SystemService {
     );
   }
 
+  async updateLinkSystem(id: string, updateLinkSystemDto: UpdateLinkSystemDto) {
+    return this.systemClient.send(
+      { cmd: 'update-link_system' },
+      { id, data: updateLinkSystemDto },
+    );
+  }
+
   async createLinksSystem(createLinksSystemDto: CreateLinkSystemDto[]) {
     return this.systemClient.send(
       { cmd: 'create-links_system' },
@@ -101,6 +111,14 @@ export class SystemService {
 
   async getLinkSystemByNameTag(name_tag: string) {
     return this.systemClient.send({ cmd: 'get-link_system' }, name_tag);
+  }
+
+  async getLinkSystem(id: string) {
+    return this.systemClient.send({ cmd: 'get-one_link_system' }, id);
+  }
+
+  async getAllLinkSystem() {
+    return this.systemClient.send({ cmd: 'get-all_link_system' }, {});
   }
 
   async createVat(createVatDto: CreateVatDto) {
@@ -137,6 +155,10 @@ export class SystemService {
 
   async createProfits(createProfitsDto: CreateProfitDto[]) {
     return this.systemClient.send({ cmd: 'create-profits' }, createProfitsDto);
+  }
+
+  async createProfit(createProfitDto: CreateProfitDto) {
+    return this.systemClient.send({ cmd: 'create-profit' }, createProfitDto);
   }
 
   async sendDeleteProfits(datas: string[]) {
@@ -195,6 +217,15 @@ export class SystemService {
       statusCode: HttpStatus.OK,
       data: await firstValueFrom(
         this.systemClient.send({ cmd: 'get-profits' }, {}),
+      ),
+    };
+  }
+
+  async getProfit(id: string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await firstValueFrom(
+        this.systemClient.send({ cmd: 'get-profit' }, id),
       ),
     };
   }
@@ -288,5 +319,27 @@ export class SystemService {
 
   async getListProductType(type_id: string) {
     return this.systemClient.send({ cmd: 'get-list_product_type_id' }, type_id);
+  }
+
+  async createTarget(createTarget: CreateTargetRevenueDto) {
+    return this.systemClient.send(
+      { cmd: 'create-target_revenue' },
+      createTarget,
+    );
+  }
+
+  async updateTarget(id: string, updateTarget: UpdateTargetRevenueDto) {
+    return this.systemClient.send(
+      { cmd: 'update-target_revenue' },
+      { id, data: updateTarget },
+    );
+  }
+
+  async getTarget(id: string) {
+    return this.systemClient.send({ cmd: 'get-target_revenue' }, id);
+  }
+
+  async getAllTarget() {
+    return this.systemClient.send({ cmd: 'get-all_target_revenue' }, {});
   }
 }

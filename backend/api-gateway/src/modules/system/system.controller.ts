@@ -16,6 +16,10 @@ import { CreateVatDto } from './dto/create_vat.dto';
 import { CreateProfitDto } from './dto/create_profit.dto';
 import { CreateLinkSystemDto } from './dto/create_link_system.dto';
 import { UpdateVatDto } from './dto/update_vat.dto';
+import { UpdateProfitDto } from './dto/update_profit.dto';
+import { UpdateLinkSystemDto } from './dto/update_link_system.dto';
+import { CreateTargetRevenueDto } from './dto/TargetRevenue/create_target_revenue.dto';
+import { UpdateTargetRevenueDto } from './dto/TargetRevenue/update_target_revenue.dto';
 
 @Controller('system')
 export class SystemController {
@@ -104,6 +108,19 @@ export class SystemController {
     return this.systemService.createProfits(dataProfits);
   }
 
+  @Post('create-profit')
+  createProfit(@Body() dataProfit: CreateProfitDto) {
+    return this.systemService.createProfit(dataProfit);
+  }
+
+  @Put('profit/:id')
+  updateProfit(@Param('id') id: string, @Body() dataProfit: UpdateProfitDto) {
+    return this.systemService.updateProfit({
+      profit_id: id,
+      type_profit: dataProfit.type_profit,
+    });
+  }
+
   @Delete('profits')
   async sendDeleteProfits(@Body() datas: string[]) {
     return this.systemService.sendDeleteProfits(datas);
@@ -112,5 +129,45 @@ export class SystemController {
   @Get('profits')
   getProfits() {
     return this.systemService.getAllProfits();
+  }
+  @Get('profit/:id')
+  getProfit(@Param('id') id: string) {
+    return this.systemService.getProfit(id);
+  }
+
+  @Get('links_system')
+  getAllLinkSystem() {
+    return this.systemService.getAllLinkSystem();
+  }
+  @Get('link_system/:id')
+  getOneLinkSystem(@Param('id') id: string) {
+    return this.systemService.getLinkSystem(id);
+  }
+  @Post('link_system')
+  createLinkSystem(@Body() data: CreateLinkSystemDto) {
+    return this.systemService.createLinkSystem(data);
+  }
+
+  @Put('link_system/:id')
+  updateLinkSystem(@Param('id') id: string, @Body() data: UpdateLinkSystemDto) {
+    return this.systemService.updateLinkSystem(id, data);
+  }
+
+  @Get('targets_revenue')
+  getAllTarget() {
+    return this.systemService.getAllTarget();
+  }
+  @Get('target_revenue/:id')
+  getOneTarget(@Param('id') id: string) {
+    return this.systemService.getTarget(id);
+  }
+  @Post('target_revenue')
+  createTarget(@Body() data: CreateTargetRevenueDto) {
+    return this.systemService.createTarget(data);
+  }
+
+  @Put('target_revenue/:id')
+  updateTarget(@Param('id') id: string, @Body() data: UpdateTargetRevenueDto) {
+    return this.systemService.updateTarget(id, data);
   }
 }

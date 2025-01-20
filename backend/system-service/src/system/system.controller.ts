@@ -14,6 +14,10 @@ import { CreateVatDto } from 'src/dto/create_vat.dto';
 import { CreateProfitDto } from 'src/dto/create_profit.dto';
 import { CreateLinkSystemDto } from 'src/dto/create_link_system.dto';
 import { UpdateVatDto } from 'src/dto/update_vat.dto';
+import { UpdateProfitDto } from 'src/dto/update_profit.dto';
+import { UpdateLinkSystemDto } from 'src/dto/update_link_system.dto';
+import { UpdateTargetRevenueDto } from 'src/dto/TargetRevenue/update_target_revenue.dto';
+import { CreateTargetRevenueDto } from 'src/dto/TargetRevenue/create_target_revenue.dto';
 
 @Controller('/system')
 @UseFilters(ConflictExceptionFilter)
@@ -55,6 +59,11 @@ export class SystemController {
     return this.systemService.createLinkSystems(createLinksSystemDto);
   }
 
+  @MessagePattern({ cmd: 'create-link_system' })
+  createLinkSystem(@Payload() createLinkSystemDto: CreateLinkSystemDto) {
+    return this.systemService.createLinkSystem(createLinkSystemDto);
+  }
+
   @MessagePattern({ cmd: 'get-provinces' })
   getProvinces() {
     return this.systemService.getAllProvinces();
@@ -63,6 +72,41 @@ export class SystemController {
   @MessagePattern({ cmd: 'get-link_system' })
   getLinkSystemByNameTag(name_tag: string) {
     return this.systemService.getLinkSystemByNameTag(name_tag);
+  }
+
+  @MessagePattern({ cmd: 'get-one_link_system' })
+  getLinkSystem(id: string) {
+    return this.systemService.getLinkSystem(id);
+  }
+
+  @MessagePattern({ cmd: 'update-link_system' })
+  updateLinkSystem(payload: { id: string; data: UpdateLinkSystemDto }) {
+    return this.systemService.updateLinkSystem(payload.id, payload.data);
+  }
+
+  @MessagePattern({ cmd: 'get-all_target_revenue' })
+  getAllTarget() {
+    return this.systemService.getAllTarget();
+  }
+
+  @MessagePattern({ cmd: 'get-target_revenue' })
+  getTarget(id: string) {
+    return this.systemService.getTarget(id);
+  }
+
+  @MessagePattern({ cmd: 'create-target_revenue' })
+  createTarget(data: CreateTargetRevenueDto) {
+    return this.systemService.createTarget(data);
+  }
+
+  @MessagePattern({ cmd: 'update-target_revenue' })
+  updateTarget(payload: { id: string; data: UpdateTargetRevenueDto }) {
+    return this.systemService.updateTarget(payload.id, payload.data);
+  }
+
+  @MessagePattern({ cmd: 'get-all_link_system' })
+  getAllLinkSystem() {
+    return this.systemService.getAllLinkSystem();
   }
 
   @MessagePattern({ cmd: 'update-unit_product' })
@@ -108,6 +152,16 @@ export class SystemController {
   @MessagePattern({ cmd: 'create-profits' })
   createProfits(@Payload() createProfits: CreateProfitDto[]) {
     return this.systemService.createProfits(createProfits);
+  }
+
+  @MessagePattern({ cmd: 'create-profit' })
+  createProfit(@Payload() createProfit: CreateProfitDto) {
+    return this.systemService.createProfit(createProfit);
+  }
+
+  @MessagePattern({ cmd: 'update-profit' })
+  updateProfit(@Payload() updateProfit: UpdateProfitDto) {
+    return this.systemService.updateProfit(updateProfit);
   }
 
   @MessagePattern({ cmd: 'delete-profits' })

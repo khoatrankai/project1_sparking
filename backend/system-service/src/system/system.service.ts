@@ -294,6 +294,16 @@ export class SystemService {
     };
   }
 
+  async getLinkSystem(id: string) {
+    const data = await this.linkSystemRepository.findOneBy({
+      link_system_id: id,
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
+  }
+
   async createVats(createVatsDto: CreateVatDto[]) {
     const newVat = this.vatRepository.create(createVatsDto);
     return await this.vatRepository.save(newVat);
