@@ -1035,15 +1035,21 @@ export class LayerService {
 
   async updateWork(work_id: string, updateWorkDto: UpdateWorkDto) {
     const { picture_urls, ...reqUpdateWork } = updateWorkDto;
-    const activity = await this.activitiesRepository.findOne({
-      where: { activity_id: updateWorkDto.activity },
-    });
-    const type = await this.typeWorkRepository.findOne({
-      where: { type_work_id: updateWorkDto.type },
-    });
-    const status = await this.statusWorkRepository.findOne({
-      where: { status_work_id: updateWorkDto.status },
-    });
+    const activity = updateWorkDto.activity
+      ? await this.activitiesRepository.findOne({
+          where: { activity_id: In([updateWorkDto.activity]) },
+        })
+      : undefined;
+    const type = updateWorkDto.type
+      ? await this.typeWorkRepository.findOne({
+          where: { type_work_id: In([updateWorkDto.type]) },
+        })
+      : undefined;
+    const status = updateWorkDto.type
+      ? await this.statusWorkRepository.findOne({
+          where: { status_work_id: updateWorkDto.status },
+        })
+      : undefined;
 
     const updatedWork = await this.worksRepository.update(work_id, {
       ...reqUpdateWork,
