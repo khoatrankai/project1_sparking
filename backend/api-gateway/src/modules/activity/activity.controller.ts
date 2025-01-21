@@ -442,6 +442,27 @@ export class ActivityController {
     return this.activityService.sendGetWork(work_id);
   }
 
+  @Get('work-filter')
+  // @UseGuards(RoleGuard)
+  // @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
+  // @SetMetadata('type', ['admin'])
+  async sendGetFilterWork(
+    @Query()
+    filter?: {
+      date_start?: string;
+      date_end?: string;
+      contract?: string;
+      type?: 'week' | 'month' | 'year';
+      export?: boolean;
+    },
+  ) {
+    return this.activityService.sendGetFilterWork({
+      ...filter,
+      date_start: Number(filter.date_start),
+      date_end: Number(filter.date_end),
+    });
+  }
+
   @Get('work/all')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])

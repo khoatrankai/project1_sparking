@@ -289,6 +289,17 @@ export class LayerController {
     return this.layerService.getWork(work_id);
   }
 
+  @MessagePattern({ cmd: 'get-filter_work' })
+  async getFilterWork(filter?: {
+    date_start?: number;
+    date_end?: number;
+    contract?: string;
+    type?: 'week' | 'month' | 'year';
+    export?: boolean;
+  }) {
+    return this.layerService.getFilterWork(filter);
+  }
+
   @MessagePattern('get-all_year_works')
   async getAllYearWorks(year: string) {
     return await this.layerService.getAllYearWorks(year);

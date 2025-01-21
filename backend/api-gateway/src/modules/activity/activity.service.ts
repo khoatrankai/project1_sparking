@@ -457,6 +457,18 @@ export class ActivityService {
     );
   }
 
+  async sendGetFilterWork(filter?: {
+    date_start?: number;
+    date_end?: number;
+    contract?: string;
+    type?: 'week' | 'month' | 'year';
+    export?: boolean;
+  }) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-filter_work' }, filter),
+    );
+  }
+
   async sendGetAllYearWorks(year: string) {
     return await firstValueFrom(
       this.activityClient.send('get-all_year_works', year),

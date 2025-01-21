@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { getISOWeek, getYear, format, getMonth } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Between,
@@ -1078,16 +1079,212 @@ export class LayerService {
     const dataUsers = await firstValueFrom(
       this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
     );
-    // const dataListUser = await Promise.all(work.list_user.map(async dt=>{
-    //   const data = await firstValueFrom(this.usersClient.send({cmd:'get-user_id'},dt.user))
-    //   return data
-    // }))
 
     const dataRes = { ...work, list_user: dataUsers };
     if (!work) {
       throw new NotFoundException(`Activity not found`);
     }
     return { statusCode: HttpStatus.OK, data: dataRes };
+  }
+
+  async getFilterWork(filter?: {
+    date_start?: number;
+    date_end?: number;
+    contract?: string;
+    type?: 'week' | 'month' | 'year';
+    export?: boolean;
+  }) {
+    let allWorks = [];
+
+    if (filter.contract) {
+      if (filter.date_start) {
+        const start = new Date(filter.date_start).toISOString().split('T')[0];
+        const end = new Date(filter.date_end).toISOString().split('T')[0];
+        const data = await this.worksRepository
+          .createQueryBuilder('work')
+          .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.status', 'status-work')
+          .where(
+            'activity.contract = :contract AND DATE(work.time_end) >= :start AND DATE(work.time_end) <= :end',
+            { contract: filter.contract, start, end },
+          )
+          .orderBy('work.time_end', 'ASC')
+          .getMany();
+
+        const dataContract = await firstValueFrom(
+          this.contractsClient.send({ cmd: 'get-contract_ids' }, [
+            filter.contract,
+          ]),
+        );
+
+        allWorks = data.map((dt) => {
+          return {
+            ...dt,
+            activity: { ...dt.activity, contract: dataContract[0] },
+          };
+        });
+      } else {
+        const data = await this.worksRepository
+          .createQueryBuilder('work')
+          .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.status', 'status-work')
+          .where('activity.contract = :contract', { contract: filter.contract })
+          .orderBy('work.time_end', 'ASC')
+          .getMany();
+
+        const dataContract = await firstValueFrom(
+          this.contractsClient.send({ cmd: 'get-contract_ids' }, [
+            filter.contract,
+          ]),
+        );
+
+        allWorks = data.map((dt) => {
+          return {
+            ...dt,
+            activity: { ...dt.activity, contract: dataContract[0] },
+          };
+        });
+      }
+    } else {
+      if (filter.date_start) {
+        const start = new Date(filter.date_start).toISOString().split('T')[0];
+        const end = new Date(filter.date_end).toISOString().split('T')[0];
+        const data = await this.worksRepository
+          .createQueryBuilder('work')
+          .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.status', 'status-work')
+          .where(
+            ' DATE(work.time_end) >= :start AND DATE(work.time_end) <= :end',
+            { start, end },
+          )
+          .orderBy('work.time_end', 'ASC')
+          .getMany();
+        const contractIds = data.map((dt) => dt.activity.contract);
+        const dataContract = await firstValueFrom(
+          this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+        );
+        allWorks = data.map((dt, index) => {
+          return {
+            ...dt,
+            activity: { ...dt.activity, contract: dataContract[index] },
+          };
+        });
+      } else {
+        const data = await this.worksRepository
+          .createQueryBuilder('work')
+          .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.status', 'status-work')
+          .orderBy('work.time_end', 'ASC')
+          .getMany();
+        const contractIds = data.map((dt) => dt.activity.contract);
+        const dataContract = await firstValueFrom(
+          this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+        );
+        allWorks = data.map((dt, index) => {
+          return {
+            ...dt,
+            activity: { ...dt.activity, contract: dataContract[index] },
+          };
+        });
+      }
+    }
+
+    if (!filter.export) {
+      if (filter.type === 'week') {
+        return {
+          statusCode: HttpStatus.OK,
+          data: allWorks.map((dt) => {
+            const timeEnd = new Date(dt.time_end);
+            const week = getISOWeek(timeEnd); // Lấy tuần ISO
+            const year = getYear(timeEnd); // Lấy năm
+            return { ...dt, date: `${week}/${year}` };
+          }),
+        };
+      }
+      if (filter.type === 'month') {
+        return {
+          statusCode: HttpStatus.OK,
+          data: allWorks.map((dt) => {
+            const timeEnd = new Date(dt.time_end);
+            const month = getMonth(timeEnd) + 1; // Lấy tháng
+            const year = getYear(timeEnd); // Lấy năm
+            return { ...dt, date: `${month}/${year}` };
+          }),
+        };
+      }
+      return {
+        statusCode: HttpStatus.OK,
+        data: allWorks.map((dt) => {
+          const timeEnd = new Date(dt.time_end);
+          const year = getYear(timeEnd); // Lấy năm
+          return { ...dt, date: `${year}` };
+        }),
+      };
+    } else {
+      if (filter.type === 'week') {
+        const groupedWorks = allWorks.reduce((acc, work) => {
+          const timeEnd = new Date(work.time_end);
+          const week = getISOWeek(timeEnd); // Lấy tuần ISO
+          const year = getYear(timeEnd); // Lấy năm
+
+          const key = `${week}/${year}`;
+          if (!acc[key]) {
+            acc[key] = {
+              date: key,
+              works: [],
+            };
+          }
+
+          acc[key].works.push(work);
+          return acc;
+        }, {});
+        return {
+          statusCode: HttpStatus.OK,
+          data: groupedWorks,
+        };
+      }
+      if (filter.type === 'month') {
+        const groupedMonths = allWorks.reduce((acc, work) => {
+          const timeEnd = new Date(work.time_end);
+          const month = getMonth(timeEnd) + 1; // Lấy tháng
+          const year = getYear(timeEnd); // Lấy năm
+
+          const key = `${month}/${year}`;
+          if (!acc[key]) {
+            acc[key] = {
+              date: key,
+              works: [],
+            };
+          }
+
+          acc[key].works.push(work);
+          return acc;
+        }, {});
+        return {
+          statusCode: HttpStatus.OK,
+          data: groupedMonths,
+        };
+      }
+      const groupedYears = allWorks.reduce((acc, work) => {
+        const timeEnd = new Date(work.time_end);
+        const year = getYear(timeEnd);
+
+        const key = `${year}`;
+        if (!acc[key]) {
+          acc[key] = {
+            date: key,
+            works: [],
+          };
+        }
+
+        acc[key].works.push(work);
+        return acc;
+      }, {});
+      return {
+        statusCode: HttpStatus.OK,
+        data: groupedYears,
+      };
+    }
   }
 
   async getAllYearWorks(year: string) {

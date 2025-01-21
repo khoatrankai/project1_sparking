@@ -8,7 +8,7 @@ import { Contract } from 'src/database/entities/contract.entity';
 import { CreateTypeContractDto } from 'src/dto/TypeContractDto/create_type_contract.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-
+import { getYear, getMonth } from 'date-fns';
 import {
   Between,
   In,
@@ -465,8 +465,10 @@ export class ContractService {
       : filter.contract
         ? filter.contract
         : null;
-    const date_start = filter.date_start ? new Date(filter.date_start) : null;
-    const date_end = filter.date_end ? new Date(filter.date_end) : null;
+    const date_start = filter.date_start
+      ? new Date(Number(filter.date_start))
+      : null;
+    const date_end = filter.date_end ? new Date(Number(filter.date_end)) : null;
     const status = filter.status ?? null;
 
     const whereCondition: any = {};
@@ -495,22 +497,39 @@ export class ContractService {
       }
     } else {
       whereCondition.status = status;
-      if (date_start || date_end) {
-        if (date_start && date_end) {
-          whereCondition.date_expired = Between(date_start, date_end);
-        } else {
-          if (date_start) {
-            whereCondition.date_expired = MoreThanOrEqual(date_start);
+      if (filter.export) {
+        if (date_start || date_end) {
+          if (date_start && date_end) {
+            whereCondition.created_at = Between(date_start, date_end);
+          } else {
+            if (date_start) {
+              whereCondition.created_at = MoreThanOrEqual(date_start);
+            }
+            if (date_end) {
+              whereCondition.created_at = LessThanOrEqual(date_end);
+            }
           }
-          if (date_end) {
-            whereCondition.date_expired = LessThanOrEqual(date_end);
+        }
+      } else {
+        if (date_start || date_end) {
+          if (date_start && date_end) {
+            whereCondition.date_expired = Between(date_start, date_end);
+          } else {
+            if (date_start) {
+              whereCondition.date_expired = MoreThanOrEqual(date_start);
+            }
+            if (date_end) {
+              whereCondition.date_expired = LessThanOrEqual(date_end);
+            }
           }
         }
       }
     }
+
     const result = await this.paymentRepository.find({
       where: whereCondition,
       relations: ['contract'],
+      order: { created_at: 'ASC' },
     });
     const dataSuppliers = await firstValueFrom(
       this.productsClient.send(
@@ -536,10 +555,75 @@ export class ContractService {
         result.map((dt) => dt.contract.customer),
       ),
     );
+    if (!filter.export) {
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Payments retrieved successfully',
+        data: result.map((dt, index) => {
+          return {
+            ...dt,
+            type_product: dataTypeProducts[index],
+            supplier: dataSuppliers[index],
+            contract: {
+              ...dt.contract,
+              project: dataProjects[index],
+              customer: dataCustomerInfos[index],
+            },
+          };
+        }),
+      };
+    }
+    if (filter.typeDate === 'month') {
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Payments retrieved successfully',
+        data: result.map((dt, index) => {
+          const timeEnd = new Date(dt.created_at);
+          const month = getMonth(timeEnd) + 1; // Lấy tháng
+          const year = getYear(timeEnd); // Lấy năm
+          return {
+            ...dt,
+            type_product: dataTypeProducts[index],
+            supplier: dataSuppliers[index],
+            contract: {
+              ...dt.contract,
+              project: dataProjects[index],
+              customer: dataCustomerInfos[index],
+            },
+            date: `${month}/${year}`,
+          };
+        }),
+      };
+    }
+    if (filter.typeDate === 'quarter') {
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Payments retrieved successfully',
+        data: result.map((dt, index) => {
+          const timeEnd = new Date(dt.created_at);
+          const month = getMonth(timeEnd) + 1; // Lấy tháng
+          const quarter = Math.ceil(month / 3);
+          const year = getYear(timeEnd); // Lấy năm
+          return {
+            ...dt,
+            type_product: dataTypeProducts[index],
+            supplier: dataSuppliers[index],
+            contract: {
+              ...dt.contract,
+              project: dataProjects[index],
+              customer: dataCustomerInfos[index],
+            },
+            date: `${quarter}/${year}`,
+          };
+        }),
+      };
+    }
     return {
       statusCode: HttpStatus.OK,
       message: 'Payments retrieved successfully',
       data: result.map((dt, index) => {
+        const timeEnd = new Date(dt.created_at);
+        const year = getYear(timeEnd); // Lấy năm
         return {
           ...dt,
           type_product: dataTypeProducts[index],
@@ -549,6 +633,7 @@ export class ContractService {
             project: dataProjects[index],
             customer: dataCustomerInfos[index],
           },
+          date: `${year}`,
         };
       }),
     };

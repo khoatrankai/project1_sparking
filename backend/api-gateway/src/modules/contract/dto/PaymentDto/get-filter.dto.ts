@@ -1,4 +1,5 @@
-import { IsString, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsBoolean, IsEnum } from 'class-validator';
 
 export class GetFilterPaymentDto {
   @IsString()
@@ -32,4 +33,13 @@ export class GetFilterPaymentDto {
   @IsString()
   @IsOptional()
   customer?: string;
+
+  @Type(() => Boolean)
+  @IsBoolean()
+  @IsOptional()
+  export?: boolean;
+
+  @IsOptional()
+  @IsEnum(['month', 'quarter', 'year'])
+  typeDate?: 'month' | 'quarter' | 'year';
 }

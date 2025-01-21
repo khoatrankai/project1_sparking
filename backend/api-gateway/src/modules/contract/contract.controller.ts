@@ -271,9 +271,9 @@ export class ContractController {
 
   // Get all payments
   @Get('/payment')
-  @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'payment-read', 'admin-top'])
-  @SetMetadata('type', ['admin'])
+  // @UseGuards(RoleGuard)
+  // @SetMetadata('roles', ['contract', 'payment-read', 'admin-top'])
+  // @SetMetadata('type', ['admin'])
   async getAllPayments(@Query() filter?: GetFilterPaymentDto) {
     if (filter.project) {
       return this.contractService.getAllPaymentByProject(filter.project);

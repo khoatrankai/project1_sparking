@@ -222,12 +222,9 @@ export class SystemService {
   }
 
   async getProfit(id: string) {
-    return {
-      statusCode: HttpStatus.OK,
-      data: await firstValueFrom(
-        this.systemClient.send({ cmd: 'get-profit' }, id),
-      ),
-    };
+    return await firstValueFrom(
+      this.systemClient.send({ cmd: 'get-profit' }, id),
+    );
   }
 
   async getProvinceById(provinceId: string) {
