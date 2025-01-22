@@ -1103,6 +1103,7 @@ export class LayerService {
         const data = await this.worksRepository
           .createQueryBuilder('work')
           .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.list_user', 'list_user')
           .leftJoinAndSelect('work.status', 'status-work')
           .where(
             'activity.contract = :contract AND DATE(work.time_end) >= :start AND DATE(work.time_end) <= :end',
@@ -1117,16 +1118,26 @@ export class LayerService {
           ]),
         );
 
-        allWorks = data.map((dt) => {
-          return {
-            ...dt,
-            activity: { ...dt.activity, contract: dataContract[0] },
-          };
-        });
+        allWorks = await Promise.all(
+          data.map(async (dt) => {
+            const userIds = dt.list_user.map((dt) => {
+              return dt.user;
+            });
+            const dataUsers = await firstValueFrom(
+              this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
+            );
+            return {
+              ...dt,
+              activity: { ...dt.activity, contract: dataContract[0] },
+              list_user: dataUsers,
+            };
+          }),
+        );
       } else {
         const data = await this.worksRepository
           .createQueryBuilder('work')
           .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.list_user', 'list_user')
           .leftJoinAndSelect('work.status', 'status-work')
           .where('activity.contract = :contract', { contract: filter.contract })
           .orderBy('work.time_end', 'ASC')
@@ -1138,12 +1149,21 @@ export class LayerService {
           ]),
         );
 
-        allWorks = data.map((dt) => {
-          return {
-            ...dt,
-            activity: { ...dt.activity, contract: dataContract[0] },
-          };
-        });
+        allWorks = await Promise.all(
+          data.map(async (dt) => {
+            const userIds = dt.list_user.map((dt) => {
+              return dt.user;
+            });
+            const dataUsers = await firstValueFrom(
+              this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
+            );
+            return {
+              ...dt,
+              activity: { ...dt.activity, contract: dataContract[0] },
+              list_user: dataUsers,
+            };
+          }),
+        );
       }
     } else {
       if (filter.date_start) {
@@ -1152,6 +1172,7 @@ export class LayerService {
         const data = await this.worksRepository
           .createQueryBuilder('work')
           .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.list_user', 'list_user')
           .leftJoinAndSelect('work.status', 'status-work')
           .where(
             ' DATE(work.time_end) >= :start AND DATE(work.time_end) <= :end',
@@ -1163,16 +1184,26 @@ export class LayerService {
         const dataContract = await firstValueFrom(
           this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
         );
-        allWorks = data.map((dt, index) => {
-          return {
-            ...dt,
-            activity: { ...dt.activity, contract: dataContract[index] },
-          };
-        });
+        allWorks = await Promise.all(
+          data.map(async (dt, index) => {
+            const userIds = dt.list_user.map((dt) => {
+              return dt.user;
+            });
+            const dataUsers = await firstValueFrom(
+              this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
+            );
+            return {
+              ...dt,
+              activity: { ...dt.activity, contract: dataContract[index] },
+              list_user: dataUsers,
+            };
+          }),
+        );
       } else {
         const data = await this.worksRepository
           .createQueryBuilder('work')
           .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.list_user', 'list_user')
           .leftJoinAndSelect('work.status', 'status-work')
           .orderBy('work.time_end', 'ASC')
           .getMany();
@@ -1180,12 +1211,21 @@ export class LayerService {
         const dataContract = await firstValueFrom(
           this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
         );
-        allWorks = data.map((dt, index) => {
-          return {
-            ...dt,
-            activity: { ...dt.activity, contract: dataContract[index] },
-          };
-        });
+        allWorks = await Promise.all(
+          data.map(async (dt, index) => {
+            const userIds = dt.list_user.map((dt) => {
+              return dt.user;
+            });
+            const dataUsers = await firstValueFrom(
+              this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
+            );
+            return {
+              ...dt,
+              activity: { ...dt.activity, contract: dataContract[index] },
+              list_user: dataUsers,
+            };
+          }),
+        );
       }
     }
 
