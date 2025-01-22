@@ -1035,7 +1035,7 @@ export class LayerService {
   }
 
   async updateWork(work_id: string, updateWorkDto: UpdateWorkDto) {
-    const { picture_urls, ...reqUpdateWork } = updateWorkDto;
+    const { picture_urls, list_users, ...reqUpdateWork } = updateWorkDto;
     const activity = updateWorkDto.activity
       ? await this.activitiesRepository.findOne({
           where: { activity_id: In([updateWorkDto.activity]) },
@@ -1051,6 +1051,15 @@ export class LayerService {
           where: { status_work_id: updateWorkDto.status },
         })
       : undefined;
+
+    if (list_users) {
+      await this.listUserRepository.delete({ work: In([work_id]) });
+      await this.createListUser(
+        list_users.map((dt) => {
+          return { work: work_id, user: dt, list_id: '' };
+        }),
+      );
+    }
 
     const updatedWork = await this.worksRepository.update(work_id, {
       ...reqUpdateWork,

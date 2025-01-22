@@ -29,6 +29,10 @@ export class UpdateWorkDto {
   @IsOptional()
   position: number;
 
+  @IsArray()
+  @IsOptional()
+  list_users?: string[];
+
   @IsOptional()
   @IsString()
   activity?: string;

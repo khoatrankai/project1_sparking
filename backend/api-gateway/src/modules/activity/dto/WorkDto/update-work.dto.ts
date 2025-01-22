@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsDate, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsDate,
+  IsBoolean,
+  IsArray,
+} from 'class-validator';
 
 export class UpdateWorkDto {
   @IsString()
@@ -31,6 +37,10 @@ export class UpdateWorkDto {
   @IsDate()
   @IsOptional()
   time_end?: Date;
+
+  @IsArray()
+  @IsOptional()
+  list_users?: string[];
 
   @IsOptional()
   @IsBoolean()
