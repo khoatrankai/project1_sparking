@@ -529,7 +529,10 @@ export class ContractService {
     const result = await this.paymentRepository.find({
       where: whereCondition,
       relations: ['contract'],
-      order: { created_at: 'ASC' },
+      order:
+        filter.status === 'success'
+          ? { created_at: 'ASC' }
+          : { date_expired: 'ASC' },
     });
     const dataSuppliers = await firstValueFrom(
       this.productsClient.send(
