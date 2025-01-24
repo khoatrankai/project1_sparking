@@ -866,8 +866,9 @@ export class LayerService {
             where: { product_id: dt.product },
           });
           const dataCodes = Array.from({ length: dt.quantity }).map(() => {
-            const idCode = uuidv4();
-            const code = uuidv4() + '@' + 'code_product';
+            const idOK = uuidv4();
+            const idCode = idOK;
+            const code = idOK + '@' + 'code_product';
             return this.codeProductRepository.create({
               code_product_id: idCode,
               product,
