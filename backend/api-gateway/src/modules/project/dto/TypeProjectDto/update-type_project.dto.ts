@@ -1,6 +1,6 @@
-import { IsString } from "class-validator";
+import { IsString } from 'class-validator';
 
 export class UpdateTypeProjectDto {
-    @IsString()
-    name_type?: string;
-  }
+  @IsString()
+  name_type?: string;
+}

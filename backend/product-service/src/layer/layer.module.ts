@@ -14,6 +14,10 @@ import { Brands } from 'src/database/entities/brand.entity';
 import { Originals } from 'src/database/entities/original.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ClassifyType } from 'src/database/entities/classify_type.entity';
+import { CommentReportProduct } from 'src/database/entities/comment_report_product.entity';
+import { LikeReportProduct } from 'src/database/entities/like_report_product.entity';
+import { HistoryReportProduct } from 'src/database/entities/history_report_product.entity';
+import { ListDetail } from 'src/database/entities/list_detail.entity';
 
 @Module({
   imports: [
@@ -24,6 +28,22 @@ import { ClassifyType } from 'src/database/entities/classify_type.entity';
         options: {
           host: 'system_service',
           port: 3004,
+        },
+      },
+      {
+        name: 'USER',
+        transport: Transport.TCP,
+        options: {
+          host: 'user_service',
+          port: 3005,
+        },
+      },
+      {
+        name: 'CUSTOMER',
+        transport: Transport.TCP,
+        options: {
+          host: 'customer_service',
+          port: 3006,
         },
       },
     ]),
@@ -40,6 +60,10 @@ import { ClassifyType } from 'src/database/entities/classify_type.entity';
       Brands,
       Originals,
       ClassifyType,
+      CommentReportProduct,
+      LikeReportProduct,
+      HistoryReportProduct,
+      ListDetail,
     ]),
   ],
   controllers: [LayerController],

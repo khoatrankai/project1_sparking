@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsEnum, IsInt, IsDate, Length } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  IsDate,
+  Length,
+} from 'class-validator';
 
 export class UpdateProjectDto {
   @IsString()
@@ -32,6 +39,11 @@ export class UpdateProjectDto {
   @IsOptional()
   @Length(1, 50)
   customer?: string;
+
+  @IsString()
+  @IsOptional()
+  @Length(1, 50)
+  opportunity?: string;
 
   @IsDate()
   @IsOptional()

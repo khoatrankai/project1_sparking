@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsEnum, IsInt, IsDate, Length } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  IsDate,
+  Length,
+} from 'class-validator';
 import { GetTypeProjectDto } from '../TypeProjectDto/get-type_project.dto';
 
 export class GetProjectDto {
@@ -11,7 +18,7 @@ export class GetProjectDto {
   @Length(1, 100)
   name?: string;
 
-  type:GetTypeProjectDto
+  type: GetTypeProjectDto;
 
   @IsEnum(['waiting', 'start', 'pause', 'cancel', 'completed'])
   @IsOptional()
@@ -39,6 +46,11 @@ export class GetProjectDto {
   @IsOptional()
   @Length(1, 50)
   customer?: string;
+
+  @IsString()
+  @IsOptional()
+  @Length(1, 50)
+  opportunity?: string;
 
   @IsDate()
   @IsOptional()

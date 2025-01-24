@@ -1,5 +1,13 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsEnum, IsInt, IsDate, Length, IsNotEmpty } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  IsDate,
+  Length,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class CreateProjectDto {
   @IsString()
@@ -43,12 +51,15 @@ export class CreateProjectDto {
   @Length(1, 50)
   customer?: string;
 
+  @IsString()
+  @IsOptional()
+  @Length(1, 50)
+  opportunity?: string;
 
   @Type(() => Date)
   @IsDate()
   @IsOptional()
   start_date?: Date;
-
 
   @Type(() => Date)
   @IsDate()

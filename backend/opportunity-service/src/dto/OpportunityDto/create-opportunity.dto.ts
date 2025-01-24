@@ -1,4 +1,11 @@
-import { IsString, IsEnum, IsInt, IsDate, IsOptional, IsEmail } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsInt,
+  IsDate,
+  IsOptional,
+  IsEmail,
+} from 'class-validator';
 
 export class CreateOpportunitiesDto {
   @IsString()
@@ -24,7 +31,7 @@ export class CreateOpportunitiesDto {
   name_contact?: string;
 
   @IsOptional()
-  @IsEnum(['delete', 'hide','success','pending','cancel'])
+  @IsEnum(['delete', 'hide', 'success', 'pending', 'cancel'])
   status?: string;
 
   @IsOptional()

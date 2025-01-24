@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsEnum,
+  IsJSON,
+} from 'class-validator';
 
 export class CreateProductDto {
   @IsOptional() // The product_id is optional
@@ -56,6 +63,10 @@ export class CreateProductDto {
   status?: 'active' | 'delete' | 'hide';
 
   @IsString()
-    @IsOptional()
-    supplier_product: string;
+  @IsOptional()
+  supplier_product: string;
+
+  @IsJSON()
+  @IsOptional()
+  details?: JSON;
 }

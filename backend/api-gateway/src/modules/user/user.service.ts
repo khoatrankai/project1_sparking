@@ -107,6 +107,26 @@ export class UserService {
     );
   }
 
+  async updatePasswordUser(
+    req: Request,
+    updateUserDto: {
+      old_password: string;
+      new_password: string;
+      again_password: string;
+    },
+  ) {
+    const user = req['user'];
+    if (user) {
+      return this.usersClient.send(
+        { cmd: 'update-password_user' },
+        {
+          user_id: user.sub,
+          updateUserDto,
+        },
+      );
+    }
+  }
+
   async getUsers() {
     return {
       statusCode: HttpStatus.OK,

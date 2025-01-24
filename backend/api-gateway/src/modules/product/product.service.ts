@@ -25,6 +25,12 @@ import { CreateOriginalDto } from './dto/OriginalDto/create-original.dto';
 import { UpdateOriginalDto } from './dto/OriginalDto/update-original.dto';
 import { CreateClassifyTypeDto } from './dto/ClassifyTypeDto/create-classify_type.dto';
 import { UpdateClassifyTypeDto } from './dto/ClassifyTypeDto/update-classify_type.dto';
+import { CreateHistoryReportProductDto } from './dto/HistoryReportProduct/create-history_report_product.dto';
+import { Request } from 'express';
+import { UpdateHistoryReportProductDto } from './dto/HistoryReportProduct/update-history_report_product.dto';
+import { CreateLikeReportProductDto } from './dto/LikeReportProduct/create-like_report_product.dto';
+import { CreateCommentReportProductDto } from './dto/CommentReportProduct/create-comment_report_product.dto';
+import { UpdateCommentReportProductDto } from './dto/CommentReportProduct/update-comment_code_product.dto';
 
 @Injectable()
 export class ProductService {
@@ -104,10 +110,14 @@ export class ProductService {
     images: Express.Multer.File[],
   ) {
     try {
+      console.log(updateProductDto);
       const result = await firstValueFrom(
         this.productClient.send(
           { cmd: 'update-product' },
-          { id, updateProductDto },
+          {
+            id,
+            updateProductDto,
+          },
         ),
       );
       if (!result)
@@ -985,6 +995,313 @@ export class ProductService {
           'Activity container not found',
           HttpStatus.NOT_FOUND,
         );
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createHistoryReportCode(
+    req: Request,
+    createHistoryReportCode: CreateHistoryReportProductDto,
+  ) {
+    try {
+      const user = req['user'];
+      if (user) {
+        if (user.role === 'admin') {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'create-history_report_code' },
+              { ...createHistoryReportCode, user_support: user.sub },
+            ),
+          );
+        } else {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'create-history_report_code' },
+              { ...createHistoryReportCode, customer: user.sub },
+            ),
+          );
+        }
+      } else {
+        return await firstValueFrom(
+          this.productClient.send(
+            { cmd: 'create-history_report_code' },
+            createHistoryReportCode,
+          ),
+        );
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateHistoryReportCode(
+    req: Request,
+    id: string,
+    updateHistoryReportCodeProduct: UpdateHistoryReportProductDto,
+  ) {
+    try {
+      const user = req['user'];
+      if (user) {
+        if (user.role === 'admin') {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'update-history_report_code' },
+              {
+                id,
+                updateReportCode: updateHistoryReportCodeProduct,
+                role: 'admin',
+                user_support: user.sub,
+              },
+            ),
+          );
+        } else {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'update-history_report_code' },
+              {
+                id,
+                updateReportCode: updateHistoryReportCodeProduct,
+                role: 'customer',
+                customer: user.sub,
+              },
+            ),
+          );
+        }
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Vui lòng đăng nhập để thay đổi',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createLikeReportCode(
+    req: Request,
+    createLikeReportCode: CreateLikeReportProductDto,
+  ) {
+    try {
+      const user = req['user'];
+      if (user) {
+        if (user.role === 'admin') {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'create-like_report_code' },
+              { ...createLikeReportCode, user_support: user.sub },
+            ),
+          );
+        } else {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'create-like_report_code' },
+              { ...createLikeReportCode, customer: user.sub },
+            ),
+          );
+        }
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Vui lòng đăng nhập để thả cảm xúc',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteLikeReportCode(req: Request, history_report: string) {
+    try {
+      const user = req['user'];
+      if (user) {
+        if (user.role === 'admin') {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'delete-like_report_code' },
+              { history_report, id: user.sub, role: 'admin' },
+            ),
+          );
+        } else {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'delete-like_report_code' },
+              { history_report, id: user.sub, role: 'customer' },
+            ),
+          );
+        }
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Vui lòng đăng nhập để thả cảm xúc',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createCommentReportCode(
+    req: Request,
+    createCommentReportCode: CreateCommentReportProductDto,
+  ) {
+    try {
+      const user = req['user'];
+      if (user) {
+        if (user.role === 'admin') {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'create-comment_report_code' },
+              { ...createCommentReportCode, user_support: user.sub },
+            ),
+          );
+        } else {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'create-comment_report_code' },
+              { ...createCommentReportCode, customer: user.sub },
+            ),
+          );
+        }
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Vui lòng đăng nhập để thả cảm xúc',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateCommentReportCode(
+    req: Request,
+    id: string,
+    updateCommentReportCode: UpdateCommentReportProductDto,
+  ) {
+    try {
+      const user = req['user'];
+      if (user) {
+        if (user.role === 'admin') {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'update-comment_report_code' },
+              {
+                id,
+                updateCommentReportCode,
+                user_id: user.sub,
+                role: 'admin',
+              },
+            ),
+          );
+        } else {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'update-comment_report_code' },
+              {
+                id,
+                updateCommentReportCode,
+                user_id: user.sub,
+                role: 'customer',
+              },
+            ),
+          );
+        }
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Vui lòng đăng nhập để thay đổi',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteCommentReportCode(req: Request, id: string) {
+    try {
+      const user = req['user'];
+      if (user) {
+        if (user.role === 'admin') {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'delete-comment_report_code' },
+              {
+                id,
+                user_support: user.sub,
+                role: 'admin',
+              },
+            ),
+          );
+        } else {
+          return await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'delete-comment_report_code' },
+              {
+                id,
+                customer: user.sub,
+                role: 'customer',
+              },
+            ),
+          );
+        }
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Vui lòng đăng nhập để xóa',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findProductByCode(id: string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-product_by_code' }, id),
+      );
+      if (!result) {
+        throw new HttpException('Product by code', HttpStatus.NOT_FOUND);
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAllReportByCode(id: string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_report_by_code' }, id),
+      );
+      if (!result) {
+        throw new HttpException('Report by code', HttpStatus.NOT_FOUND);
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAllCommentByReport(id: string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_comment_by_report' }, id),
+      );
+      if (!result) {
+        throw new HttpException('Report by code', HttpStatus.NOT_FOUND);
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAllHistoryByCode(id: string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_history_by_code' }, id),
+      );
+      if (!result) {
+        throw new HttpException('Report by code', HttpStatus.NOT_FOUND);
       }
       return result;
     } catch (error) {

@@ -1,47 +1,62 @@
-import { IsString, IsNumber, IsOptional, IsIn, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsIn,
+  IsUUID,
+  IsArray,
+} from 'class-validator';
+import { CreateListDetailDto } from '../ListDetail/create-list_detail.dto';
 
 export class CreateProductDto {
-    @IsUUID()
-    product_id: string;
+  @IsUUID()
+  product_id: string;
 
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
 
-    @IsString()
-    type: string;
+  @IsString()
+  type: string;
 
-    @IsString()
-    @IsOptional()
-    code_original: string;
+  @IsString()
+  @IsOptional()
+  code_original: string;
 
-    @IsNumber()
-    price: number;
+  @IsNumber()
+  price: number;
 
-    @IsString()
-    description: string;
+  @IsNumber()
+  @IsOptional()
+  warranty: number;
 
-    @IsString()
-    vat: string;
+  @IsString()
+  description: string;
 
-    @IsString()
-    brand: string;
+  @IsString()
+  vat: string;
 
-    @IsString()
-    original: string;
+  @IsString()
+  brand: string;
 
-    @IsOptional()
-    @IsNumber()
-    quantity?: number;
+  @IsString()
+  original: string;
 
-    @IsString()
-    unit_product: string;
+  @IsOptional()
+  @IsNumber()
+  quantity?: number;
 
-    @IsOptional()
-    @IsIn(['active', 'delete', 'hide'])
-    status?: 'active' | 'delete' | 'hide';
+  @IsString()
+  unit_product: string;
 
+  @IsOptional()
+  @IsIn(['active', 'delete', 'hide'])
+  status?: 'active' | 'delete' | 'hide';
 
-    @IsString()
-    @IsOptional()
-    supplier_product: string;
+  @IsString()
+  @IsOptional()
+  supplier_product: string;
+
+  @IsArray()
+  @IsOptional()
+  details?: CreateListDetailDto[];
 }

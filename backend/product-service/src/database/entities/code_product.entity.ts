@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Products } from './product.entity';
 import { HistoryCodeProduct } from './history_code_product.entity';
+import { HistoryReportProduct } from './history_report_product.entity';
 
 @Entity('code_product')
 export class CodeProduct {
@@ -38,4 +39,7 @@ export class CodeProduct {
 
   @OneToMany(() => HistoryCodeProduct, (history) => history.code_product)
   history: HistoryCodeProduct[];
+
+  @OneToMany(() => HistoryReportProduct, (history) => history.code_product)
+  report: HistoryReportProduct[];
 }

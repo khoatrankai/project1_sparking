@@ -1,7 +1,6 @@
 import { IsString, IsEnum, IsInt, IsOptional } from 'class-validator';
 
 export class UpdateHistoryCodeProductDto {
-
   @IsEnum(['selled', 'borrowed', 'inventory', 'export'])
   @IsOptional()
   status?: 'selled' | 'borrowed' | 'inventory' | 'export';

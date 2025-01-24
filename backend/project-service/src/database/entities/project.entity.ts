@@ -36,6 +36,9 @@ export class Projects {
   @Column({ type: 'varchar', length: 50, nullable: true })
   customer: string;
 
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  opportunity: string;
+
   @Column({ type: 'datetime', nullable: true })
   start_date: Date;
 

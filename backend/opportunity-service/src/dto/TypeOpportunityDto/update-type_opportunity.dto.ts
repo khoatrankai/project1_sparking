@@ -1,7 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateTypeOpportunitiesDto {
-
   @IsString()
   @IsOptional()
   name: string;

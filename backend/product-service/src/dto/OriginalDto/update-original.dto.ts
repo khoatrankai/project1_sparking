@@ -1,3 +1,3 @@
 export class UpdateOriginalDto {
-    name?: string;
-  }
+  name?: string;
+}

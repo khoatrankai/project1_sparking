@@ -1,7 +1,15 @@
-import { IsString, IsOptional, IsEnum, IsInt, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  MaxLength,
+  IsArray,
+} from 'class-validator';
+import { CreateListDetailDto } from '../ListDetail/create-list_detail.dto';
+import { Transform } from 'class-transformer';
 
 export class UpdateProductDto {
-
   @IsString()
   @IsOptional()
   @MaxLength(50)
@@ -18,6 +26,10 @@ export class UpdateProductDto {
   @IsInt()
   @IsOptional()
   price?: number;
+
+  @IsInt()
+  @IsOptional()
+  warranty?: number;
 
   @IsString()
   @IsOptional()
@@ -53,4 +65,9 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   supplier_product?: string;
+
+  @Transform(({ value }) => JSON.parse(value))
+  @IsArray()
+  @IsOptional()
+  details?: CreateListDetailDto[];
 }

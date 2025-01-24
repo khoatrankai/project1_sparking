@@ -37,6 +37,11 @@ import { Request } from 'express';
 import { UpdateClassifyTypeDto } from './dto/ClassifyTypeDto/update-classify_type.dto';
 import { CreateClassifyTypeDto } from './dto/ClassifyTypeDto/create-classify_type.dto';
 import { RoleGuard } from 'src/guards/role.guard';
+import { CreateHistoryReportProductDto } from './dto/HistoryReportProduct/create-history_report_product.dto';
+import { UpdateHistoryReportProductDto } from './dto/HistoryReportProduct/update-history_report_product.dto';
+import { CreateLikeReportProductDto } from './dto/LikeReportProduct/create-like_report_product.dto';
+import { CreateCommentReportProductDto } from './dto/CommentReportProduct/create-comment_report_product.dto';
+import { UpdateCommentReportProductDto } from './dto/CommentReportProduct/update-comment_code_product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -539,6 +544,96 @@ export class ProductController {
     return this.productService.updateActivityContainer(
       id,
       updateActivityContainerDto,
+    );
+  }
+
+  @Post('report')
+  async createHistoryReportCode(
+    @Req() req: Request,
+    @Body() createReport: CreateHistoryReportProductDto,
+  ) {
+    return this.productService.createHistoryReportCode(req, createReport);
+  }
+
+  @Put('report/:id')
+  async updateHistoryReportCode(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() updateReport: UpdateHistoryReportProductDto,
+  ) {
+    return this.productService.updateHistoryReportCode(req, id, updateReport);
+  }
+
+  @Post('like-report')
+  async createLikeReportCode(
+    @Req() req: Request,
+    @Body() createLikeReport: CreateLikeReportProductDto,
+  ) {
+    return this.productService.createLikeReportCode(req, createLikeReport);
+  }
+
+  @Delete('like-report/:history_report')
+  async deleteLikeReportCode(
+    @Req() req: Request,
+    @Param('history_report') history_report: string,
+  ) {
+    return this.productService.deleteLikeReportCode(req, history_report);
+  }
+
+  @Post('comment-report')
+  async createCommentReportCode(
+    @Req() req: Request,
+    @Body() createCommentReport: CreateCommentReportProductDto,
+  ) {
+    return this.productService.createCommentReportCode(
+      req,
+      createCommentReport,
+    );
+  }
+
+  @Put('comment-report/:id')
+  async updateCommentReportCode(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() updateCommentReport: UpdateCommentReportProductDto,
+  ) {
+    return this.productService.updateCommentReportCode(
+      req,
+      id,
+      updateCommentReport,
+    );
+  }
+
+  @Delete('comment-report/:id')
+  async deleteCommentReportCode(@Req() req: Request, @Param('id') id: string) {
+    return this.productService.deleteCommentReportCode(req, id);
+  }
+
+  @Get('product-code/:id')
+  async findProductByCode(@Param('id') id: string) {
+    return this.productService.findProductByCode(
+      id.replace('@code_product', ''),
+    );
+  }
+
+  @Get('report-code/:id')
+  async findAllReportByCode(@Param('id') id: string) {
+    return this.productService.findAllReportByCode(
+      id.replace('@code_product', ''),
+    );
+  }
+
+  @Get('comment-report/:id')
+  async findAllCommentByReport(@Param('id') id: string) {
+    return this.productService.findAllCommentByReport(
+      id.replace('@code_product', ''),
+    );
+  }
+
+  @Get('history-code/:id')
+  async findAllHistoryByCode(@Param('id') id: string) {
+    return this.productService.findAllHistoryByCode(
+      id.replace('@code_product', ''),
     );
   }
 }

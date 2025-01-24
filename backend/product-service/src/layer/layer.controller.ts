@@ -23,6 +23,11 @@ import { CreateOriginalDto } from 'src/dto/OriginalDto/create-original.dto';
 import { UpdateOriginalDto } from 'src/dto/OriginalDto/update-original.dto';
 import { CreateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/create-classify_type.dto';
 import { UpdateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/update-classify_type.dto';
+import { CreateHistoryReportProductDto } from 'src/dto/HistoryReportProduct/create-history_report_product.dto';
+import { UpdateHistoryReportProductDto } from 'src/dto/HistoryReportProduct/update-history_report_product.dto';
+import { CreateLikeReportProductDto } from 'src/dto/LikeReportProduct/create-like_report_product.dto';
+import { CreateCommentReportProductDto } from 'src/dto/CommentReportProduct/create-comment_report_product.dto';
+import { UpdateCommentReportProductDto } from 'src/dto/CommentReportProduct/update-comment_code_product.dto';
 
 @Controller('/product')
 @UseFilters(ConflictExceptionFilter)
@@ -41,7 +46,10 @@ export class LayerController {
 
   @MessagePattern({ cmd: 'create-product' })
   async createProduct(@Payload() createProductDto: CreateProductDto) {
-    return this.layerService.createProduct(createProductDto);
+    return this.layerService.createProduct({
+      ...createProductDto,
+      details: JSON.parse(createProductDto.details as unknown as string),
+    });
   }
 
   @MessagePattern({ cmd: 'delete-product' })
@@ -64,7 +72,10 @@ export class LayerController {
     @Payload() data: { id: string; updateProductDto: UpdateProductDto },
   ) {
     const { id, updateProductDto } = data;
-    return this.layerService.updateProduct(id, updateProductDto);
+    return this.layerService.updateProduct(id, {
+      ...updateProductDto,
+      details: JSON.parse(updateProductDto.details as unknown as string),
+    });
   }
 
   @MessagePattern({ cmd: 'update-status_product' })
@@ -405,5 +416,113 @@ export class LayerController {
       id,
       updateActivityContainerDto,
     );
+  }
+
+  @MessagePattern({ cmd: 'create-history_report_code' })
+  async createHistoryReportCodeProduct(
+    createReportCode: CreateHistoryReportProductDto,
+  ) {
+    return await this.layerService.createHistoryReportCodeProduct(
+      createReportCode,
+    );
+  }
+
+  @MessagePattern({ cmd: 'update-history_report_code' })
+  async updateHistoryReportCodeProduct(data?: {
+    id: string;
+    updateReportCode: UpdateHistoryReportProductDto;
+    user_support?: string;
+    customer?: string;
+    role?: 'admin' | 'customer';
+  }) {
+    return await this.layerService.updateHistoryReportCodeProduct(
+      data.id,
+      data.updateReportCode,
+      data.user_support,
+      data.customer,
+      data.role,
+    );
+  }
+
+  @MessagePattern({ cmd: 'create-like_report_code' })
+  async createLikeReportCodeProduct(
+    createLikeReport: CreateLikeReportProductDto,
+  ) {
+    return await this.layerService.createLikeReportCodeProduct(
+      createLikeReport,
+    );
+  }
+
+  @MessagePattern({ cmd: 'delete-like_report_code' })
+  async deleteLikeReportCodeProduct(data?: {
+    id: string;
+    history_report: string;
+    role: 'customer' | 'admin';
+  }) {
+    return await this.layerService.deleteLikeReportCodeProduct(
+      data.id,
+      data.history_report,
+      data.role,
+    );
+  }
+
+  @MessagePattern({ cmd: 'create-comment_report_code' })
+  async createCommentReportCodeProduct(
+    createCommentReport: CreateCommentReportProductDto,
+  ) {
+    console.log(createCommentReport);
+    return await this.layerService.createCommentReportCodeProduct(
+      createCommentReport,
+    );
+  }
+
+  @MessagePattern({ cmd: 'update-comment_report_code' })
+  async updateCommentReportCodeProduct(data?: {
+    id: string;
+    updateCommentReportCode: UpdateCommentReportProductDto;
+    user_id?: string;
+    role?: 'admin' | 'customer';
+  }) {
+    return await this.layerService.updateCommentReportCodeProduct(
+      data.id,
+      data.updateCommentReportCode,
+      data.user_id,
+      data.role,
+    );
+  }
+
+  @MessagePattern({ cmd: 'delete-comment_report_code' })
+  async deleteCommentReportCodeProduct(data?: {
+    id: string;
+    user_support?: string;
+    customer?: string;
+    role?: 'customer' | 'admin';
+  }) {
+    return await this.layerService.deleteCommentReportCodeProduct(
+      data.id,
+      data.user_support,
+      data.customer,
+      data.role,
+    );
+  }
+
+  @MessagePattern({ cmd: 'find-product_by_code' })
+  async findProductByCode(id: string) {
+    return await this.layerService.findProductByCode(id);
+  }
+
+  @MessagePattern({ cmd: 'find-all_comment_by_report' })
+  async findAllCommentByReport(id: string) {
+    return await this.layerService.findAllCommentByReport(id);
+  }
+
+  @MessagePattern({ cmd: 'find-all_report_by_code' })
+  async findAllReportByCode(id: string) {
+    return await this.layerService.findAllReportByCode(id);
+  }
+
+  @MessagePattern({ cmd: 'find-all_history_by_code' })
+  async findAllHistoryCodeProductsByCode(id: string) {
+    return await this.layerService.findAllHistoryCodeProductsByCode(id);
   }
 }

@@ -102,7 +102,6 @@ export class AuthService {
   }
 
   async login(userLoginDto: UserLoginDto) {
-    console.log('vao roi');
     const user = await firstValueFrom(
       this.usersClient.send({ cmd: 'login-user' }, userLoginDto.email),
     );

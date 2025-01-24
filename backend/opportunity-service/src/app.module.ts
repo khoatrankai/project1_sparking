@@ -12,10 +12,12 @@ import { LayerModule } from './layer/layer.module';
       useClass: ConflictExceptionFilter,
     },
   ],
-  imports: [ ConfigModule.forRoot({
-    isGlobal: true, 
-  }),
-    DatabaseModule,LayerModule
-  ]
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    DatabaseModule,
+    LayerModule,
+  ],
 })
 export class AppModule {}

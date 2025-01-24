@@ -42,6 +42,16 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ClassifyType } from 'src/database/entities/classify_type.entity';
 import { CreateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/create-classify_type.dto';
 import { UpdateClassifyTypeDto } from 'src/dto/ClassifyTypeDto/update-classify_type.dto';
+import { CreateListDetailDto } from 'src/dto/ListDetail/create-list_detail.dto';
+import { ListDetail } from 'src/database/entities/list_detail.entity';
+import { CreateHistoryReportProductDto } from 'src/dto/HistoryReportProduct/create-history_report_product.dto';
+import { HistoryReportProduct } from 'src/database/entities/history_report_product.entity';
+import { CommentReportProduct } from 'src/database/entities/comment_report_product.entity';
+import { LikeReportProduct } from 'src/database/entities/like_report_product.entity';
+import { UpdateHistoryReportProductDto } from 'src/dto/HistoryReportProduct/update-history_report_product.dto';
+import { CreateLikeReportProductDto } from 'src/dto/LikeReportProduct/create-like_report_product.dto';
+import { CreateCommentReportProductDto } from 'src/dto/CommentReportProduct/create-comment_report_product.dto';
+import { UpdateCommentReportProductDto } from 'src/dto/CommentReportProduct/update-comment_code_product.dto';
 
 @Injectable()
 export class LayerService {
@@ -69,6 +79,16 @@ export class LayerService {
     private codeProductRepository: Repository<CodeProduct>,
     @InjectRepository(Products)
     private readonly productRepository: Repository<Products>,
+    @InjectRepository(ListDetail)
+    private readonly listDetailRepository: Repository<ListDetail>,
+    @InjectRepository(HistoryReportProduct)
+    private readonly historyReportProductRepository: Repository<HistoryReportProduct>,
+    @InjectRepository(CommentReportProduct)
+    private readonly commentReportProductRepository: Repository<CommentReportProduct>,
+    @InjectRepository(LikeReportProduct)
+    private readonly likeReportProductRepository: Repository<LikeReportProduct>,
+    @Inject('USER') private readonly userClient: ClientProxy,
+    @Inject('CUSTOMER') private readonly customerClient: ClientProxy,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -107,6 +127,21 @@ export class LayerService {
     }
   }
 
+  async createListDetail(createListDetail: CreateListDetailDto) {
+    const id = uuidv4();
+    const newData = this.listDetailRepository.create({
+      ...createListDetail,
+      detail_id: id,
+    });
+    return await this.listDetailRepository.save(newData);
+  }
+
+  async deleteAllListDetail(product_id: string) {
+    return await this.listDetailRepository.delete({
+      product: In([product_id]),
+    });
+  }
+
   async createProduct(createProductDto: CreateProductDto) {
     const type = await this.typeProductRepository.findOne({
       where: { type_product_id: createProductDto.type },
@@ -131,7 +166,18 @@ export class LayerService {
       brand,
       original,
     });
-    return await this.productRepository.save(product);
+    const dataSave = await this.productRepository.save(product);
+    if (dataSave) {
+      Promise.all(
+        createProductDto?.details.map(async (dt) => {
+          return await this.createListDetail({
+            ...dt,
+            product: dataSave,
+          });
+        }),
+      );
+      return dataSave;
+    }
   }
 
   async deleteProduct(datas: string[]) {
@@ -175,6 +221,7 @@ export class LayerService {
       .leftJoinAndSelect('product.type', 'type')
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.original', 'original')
+      .leftJoinAndSelect('product.details', 'details')
       .leftJoinAndSelect('product.unit_product', 'unit_product')
       .leftJoinAndSelect('product.supplier_product', 'supplier_product')
       .where('product.product_id = :id', { id })
@@ -186,30 +233,47 @@ export class LayerService {
     id: string,
     updateProductDto: UpdateProductDto,
   ): Promise<Products> {
+    const { details, ...reqUpdateProduct } = updateProductDto;
     const type = await this.typeProductRepository.findOne({
-      where: { type_product_id: updateProductDto.type },
+      where: { type_product_id: reqUpdateProduct.type },
     });
     const unit_product = await this.unitProductRepository.findOne({
-      where: { unit_id: updateProductDto.unit_product },
+      where: { unit_id: reqUpdateProduct.unit_product },
     });
     const brand = await this.brandRepository.findOne({
-      where: { brand_id: updateProductDto.brand },
+      where: { brand_id: reqUpdateProduct.brand },
     });
     const original = await this.originalRepository.findOne({
-      where: { original_id: updateProductDto.original },
+      where: { original_id: reqUpdateProduct.original },
     });
     const supplier_product = await this.supplierProductRepository.findOne({
-      where: { supplier_id: updateProductDto.supplier_product },
+      where: { supplier_id: reqUpdateProduct.supplier_product },
     });
     await this.productRepository.update(id, {
-      ...updateProductDto,
+      ...reqUpdateProduct,
       type,
       unit_product,
       supplier_product,
       brand,
       original,
     });
-    return await this.productRepository.findOne({ where: { product_id: id } });
+
+    const dataUpdate = await this.productRepository.findOne({
+      where: { product_id: id },
+    });
+    if (dataUpdate) {
+      await this.deleteAllListDetail(dataUpdate.product_id);
+
+      Promise.all(
+        details.map(async (dt) => {
+          return await this.createListDetail({
+            ...dt,
+            product: dataUpdate,
+          });
+        }),
+      );
+    }
+    return dataUpdate;
   }
 
   async updateStatusProduct(
@@ -960,5 +1024,319 @@ export class LayerService {
 
   async deleteHistoryCodeProduct(id: string) {
     await this.historyCodeProductRepository.delete(id);
+  }
+
+  async createHistoryReportCodeProduct(
+    createReport: CreateHistoryReportProductDto,
+  ) {
+    try {
+      const id = uuidv4();
+      const code_product = await this.codeProductRepository.findOneBy({
+        code_product_id: createReport.code_product,
+      });
+      const newData = this.historyReportProductRepository.create({
+        ...createReport,
+        code_product: code_product,
+        history_id: id,
+      });
+      await this.historyReportProductRepository.save(newData);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Gửi báo cáo thành công',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Gửi báo cáo không thành công',
+      };
+    }
+  }
+
+  async updateHistoryReportCodeProduct(
+    id: string,
+    updateReport: UpdateHistoryReportProductDto,
+    user_support?: string,
+    customer?: string,
+    role?: 'admin' | 'customer',
+  ) {
+    try {
+      await this.historyReportProductRepository.update(
+        role === 'admin'
+          ? { history_id: id, user_support }
+          : { history_id: id, customer },
+        updateReport,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Cập nhật báo cáo thành công',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Cập nhật báo cáo không thành công',
+      };
+    }
+  }
+
+  async createLikeReportCodeProduct(
+    createLikeReportProductDto: CreateLikeReportProductDto,
+  ) {
+    try {
+      const id = uuidv4();
+      const history_report =
+        await this.historyReportProductRepository.findOneBy({
+          history_id: createLikeReportProductDto.history_report,
+        });
+      const newData = this.likeReportProductRepository.create({
+        ...createLikeReportProductDto,
+        history_report,
+        like_id: id,
+      });
+      await this.likeReportProductRepository.save(newData);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Thả cảm xúc thành công',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Thả cảm xúc không thành công',
+      };
+    }
+  }
+
+  async deleteLikeReportCodeProduct(
+    id: string,
+    history_report: string,
+    role: 'customer' | 'admin',
+  ) {
+    try {
+      const dataRemove =
+        role === 'admin'
+          ? await this.likeReportProductRepository.delete({
+              history_report: In([history_report]),
+              user_support: id,
+            })
+          : await this.likeReportProductRepository.delete({
+              history_report: In([history_report]),
+              customer: id,
+            });
+      if (dataRemove) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Hủy cảm xúc thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Hủy cảm xúc không thành công',
+      };
+    }
+  }
+
+  async createCommentReportCodeProduct(
+    createCommentReportProductDto: CreateCommentReportProductDto,
+  ) {
+    try {
+      const id = uuidv4();
+      const history_report =
+        await this.historyReportProductRepository.findOneBy({
+          history_id: createCommentReportProductDto.history_report,
+        });
+      const newData = this.commentReportProductRepository.create({
+        ...createCommentReportProductDto,
+        history_report,
+        comment_id: id,
+      });
+      await this.commentReportProductRepository.save(newData);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Bình luận thành công',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Bình luận không thành công',
+      };
+    }
+  }
+
+  async updateCommentReportCodeProduct(
+    id: string,
+    updateComment: UpdateCommentReportProductDto,
+    user_id?: string,
+    role?: 'admin' | 'customer',
+  ) {
+    try {
+      await this.commentReportProductRepository.update(
+        role === 'admin'
+          ? { user_support: user_id, comment_id: id }
+          : { customer: user_id, comment_id: id },
+        updateComment,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Cập nhật bình luận thành công',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Cập nhật bình luận không thành công',
+      };
+    }
+  }
+
+  async deleteCommentReportCodeProduct(
+    id: string,
+    user_support?: string,
+    customer?: string,
+    role?: 'customer' | 'admin',
+  ) {
+    try {
+      const dataRemove =
+        role === 'admin'
+          ? await this.commentReportProductRepository.delete({
+              comment_id: id,
+              user_support,
+            })
+          : await this.commentReportProductRepository.delete({
+              comment_id: id,
+              customer,
+            });
+      if (dataRemove) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Xóa bình luận thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa bình luận không thành công',
+      };
+    }
+  }
+
+  async findProductByCode(id: string) {
+    const data = await this.codeProductRepository.findOne({
+      where: { code_product_id: id },
+      relations: [
+        'history',
+        'product',
+        'product.details',
+        'product.picture_urls',
+      ],
+    });
+    if (!data) {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Không tìm thấy code này',
+      };
+    }
+    let time_warranty: number = -1;
+    const dataSelled = data.history
+      .sort((a, b) => {
+        return b.created_at.getTime() - a.created_at.getTime();
+      })
+      .find((dt) => dt.status === 'selled');
+    let warranty_start: Date = undefined;
+    let warranty_end: Date = undefined;
+    if (dataSelled) {
+      const createdAt = new Date(dataSelled.created_at);
+
+      const futureDate = new Date(createdAt);
+      futureDate.setMonth(futureDate.getMonth() + (data.product.warranty ?? 0));
+      warranty_start = createdAt;
+      warranty_end = futureDate;
+      const now = new Date();
+      const totalMonthsRemaining =
+        (futureDate.getFullYear() - now.getFullYear()) * 12 +
+        (futureDate.getMonth() - now.getMonth());
+      time_warranty =
+        totalMonthsRemaining > 0 ? Number(totalMonthsRemaining) : 0;
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      data: {
+        ...data,
+        time_warranty,
+        history: [],
+        warranty_end,
+        warranty_start,
+      },
+    };
+  }
+
+  async findAllReportByCode(id: string) {
+    const reportAll = await this.historyReportProductRepository
+      .createQueryBuilder('report')
+      .leftJoinAndSelect('report.comment', 'comment')
+      .leftJoinAndSelect('report.like', 'like')
+      .where('report.code_product = :id', { id })
+      .orderBy('report.created_at', 'ASC')
+      .getMany();
+
+    const userIds = reportAll.map((dt) => dt.user_support);
+    const userData = await firstValueFrom(
+      this.userClient.send({ cmd: 'get-user_ids' }, userIds),
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      data: reportAll.map((dt, index) => {
+        return { ...dt, user_support: userData[index] };
+      }),
+    };
+  }
+
+  async findAllCommentByReport(id: string) {
+    const reportAll = await this.historyReportProductRepository.findOne({
+      where: { history_id: id },
+      relations: ['comment', 'like'],
+    });
+    // const customerIds = reportAll.comment.map((dt) => dt.customer)
+
+    const userIds = [
+      ...reportAll.comment.map((dt) => dt.user_support),
+      reportAll.user_support,
+    ];
+    const userData = await firstValueFrom(
+      this.userClient.send({ cmd: 'get-user_ids' }, userIds),
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      data: {
+        ...reportAll,
+        user_support: userData[userIds.length - 1],
+        comment: reportAll.comment
+          .map((dt, index) => {
+            return { ...dt, user_support: userData[index] };
+          })
+          .sort((a, b) => {
+            return (
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime()
+            );
+          }),
+      },
+    };
+  }
+
+  async findAllHistoryCodeProductsByCode(id: string) {
+    try {
+      return {
+        statusCode: HttpStatus.OK,
+        data: await this.historyCodeProductRepository.find({
+          where: { code_product: In([id]) },
+          relations: ['code_product', 'activity_container'],
+          order: { created_at: 'ASC' },
+        }),
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Lỗi rồi',
+      };
+    }
   }
 }

@@ -1,4 +1,4 @@
 export class UpdatePictureProductDto {
-    url?: string;
-    product?: string;
-  }
+  url?: string;
+  product?: string;
+}

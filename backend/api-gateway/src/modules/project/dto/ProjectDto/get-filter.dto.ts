@@ -5,4 +5,9 @@ export class GetFilterProjectDto {
   @IsOptional()
   @Length(1, 50)
   customer?: string;
+
+  @IsString()
+  @IsOptional()
+  @Length(1, 50)
+  opportunity?: string;
 }

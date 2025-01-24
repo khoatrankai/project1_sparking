@@ -130,6 +130,45 @@ export class UserService {
     }
   }
 
+  async updatePasswordUser(
+    user_id: string,
+    updateDto: {
+      old_password: string;
+      new_password: string;
+      again_password: string;
+    },
+  ) {
+    try {
+      const userData = await this.accountUserRepository.findOneBy({ user_id });
+      const check = await bcrypt.compare(
+        updateDto.old_password.toString(),
+        userData.password,
+      );
+      if (check) {
+        const pass = await this.hashPassword(updateDto.new_password.toString());
+        await this.accountUserRepository.update(user_id, {
+          password: pass,
+        });
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Cập nhật mật khẩu thành công',
+        };
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Cập nhật mật khẩu thất bại',
+      };
+    } catch (err) {
+      console.log(err);
+      if (err.code === 'ER_DUP_ENTRY') {
+        const errField = this.extractDuplicateField(err.sqlMessage);
+        throw new ConflictException(`${errField} đã tồn tại.`);
+      }
+
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
+  }
+
   async findUser(email: string): Promise<AccountUsers> {
     const data = await this.accountUserRepository.findOne({
       where: { email: email },

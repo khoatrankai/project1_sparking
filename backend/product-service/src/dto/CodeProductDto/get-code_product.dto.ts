@@ -1,6 +1,5 @@
-
-import { GetHistoryCodeProductDto } from "../HistoryCodeProduct/get-history_code_product.dto";
-import { GetProductDto } from "../ProductDto/get-product.dto";
+import { GetHistoryCodeProductDto } from '../HistoryCodeProduct/get-history_code_product.dto';
+import { GetProductDto } from '../ProductDto/get-product.dto';
 
 export class GetCodeProductDto {
   code_product_id: string;
@@ -9,5 +8,5 @@ export class GetCodeProductDto {
   product: GetProductDto; // ID sản phẩm
   created_at: Date;
   updated_at: Date;
-  history?: GetHistoryCodeProductDto[]
+  history?: GetHistoryCodeProductDto[];
 }

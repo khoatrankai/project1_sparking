@@ -13,6 +13,7 @@ import { CodeProduct } from './code_product.entity';
 import { SupplierProduct } from './supplier_product.entity';
 import { Brands } from './brand.entity';
 import { Originals } from './original.entity';
+import { ListDetail } from './list_detail.entity';
 @Entity('products')
 export class Products {
   @PrimaryColumn({ type: 'varchar', length: 50 })
@@ -38,6 +39,9 @@ export class Products {
 
   @Column({ type: 'int' })
   price: number;
+
+  @Column({ type: 'int' })
+  warranty: number;
 
   @Column({ type: 'text' })
   description: string;
@@ -67,6 +71,9 @@ export class Products {
 
   @OneToMany(() => CodeProduct, (codeProduct) => codeProduct.product)
   code_product: CodeProduct[];
+
+  @OneToMany(() => ListDetail, (detail) => detail.product)
+  details: ListDetail[];
 
   @ManyToOne(() => SupplierProduct, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'supplier_product' })

@@ -1,8 +1,12 @@
-import { IsString, IsEnum, IsOptional, MaxLength, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  MaxLength,
+  IsDate,
+} from 'class-validator';
 
 export class UpdateCodeProductDto {
-
-
   @IsString()
   @IsOptional()
   @MaxLength(50)

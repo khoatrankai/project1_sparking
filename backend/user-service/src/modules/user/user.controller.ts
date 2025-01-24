@@ -53,6 +53,19 @@ export class UserController {
     return this.userService.updateUser(data.user_id, data.updateUserDto);
   }
 
+  @MessagePattern({ cmd: 'update-password_user' })
+  updatePasswordUser(
+    @Payload('user_id') user_id: string,
+    @Payload('updateUserDto')
+    updateUserDto: {
+      old_password: string;
+      new_password: string;
+      again_password: string;
+    },
+  ) {
+    return this.userService.updatePasswordUser(user_id, updateUserDto);
+  }
+
   @MessagePattern({ cmd: 'login-user' })
   findUser(username: string): Promise<AccountUsers> {
     return this.userService.findUser(username);

@@ -1,4 +1,4 @@
 export class GetTypeProjectDto {
-    type_id: string;
-    name_type: string;
-  }
+  type_id: string;
+  name_type: string;
+}

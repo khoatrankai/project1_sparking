@@ -13,6 +13,10 @@ import { Originals } from './entities/original.entity';
 import { ClassifyType } from './entities/classify_type.entity';
 import { createConnection } from 'mysql2/promise';
 import { ConfigService } from '@nestjs/config';
+import { CommentReportProduct } from './entities/comment_report_product.entity';
+import { LikeReportProduct } from './entities/like_report_product.entity';
+import { HistoryReportProduct } from './entities/history_report_product.entity';
+import { ListDetail } from './entities/list_detail.entity';
 
 @Module({
   imports: [
@@ -48,6 +52,10 @@ import { ConfigService } from '@nestjs/config';
             Brands,
             Originals,
             ClassifyType,
+            CommentReportProduct,
+            LikeReportProduct,
+            HistoryReportProduct,
+            ListDetail,
           ],
           // synchronize: true,
           // dropSchema: true,

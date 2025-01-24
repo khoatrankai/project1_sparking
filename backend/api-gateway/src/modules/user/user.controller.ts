@@ -64,6 +64,19 @@ export class UserController {
     );
   }
 
+  @Put('update-password')
+  async updatePasswordUser(
+    @Req() req: Request,
+    @Body()
+    updateUserDto: {
+      old_password: string;
+      new_password: string;
+      again_password: string;
+    },
+  ) {
+    return await this.userService.updatePasswordUser(req, updateUserDto);
+  }
+
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['user', 'user-create', 'admin-top'])
   @SetMetadata('type', ['admin'])
