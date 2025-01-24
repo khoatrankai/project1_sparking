@@ -26,6 +26,11 @@ export class UpdateProductDto {
   @IsNumber()
   price?: number;
 
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional() // The price is required
+  warranty?: number = 0;
+
   @IsOptional()
   @IsString()
   description?: string;

@@ -16,6 +16,8 @@ export class GetProductDto {
   description: string;
   vat: string;
   brand: GetBrandDto;
+
+  warranty?: number;
   original: GetOriginalDto;
   profit: string;
   quantity: number;

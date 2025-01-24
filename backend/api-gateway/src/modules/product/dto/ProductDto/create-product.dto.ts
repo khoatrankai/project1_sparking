@@ -30,6 +30,11 @@ export class CreateProductDto {
   @IsOptional() // The price is required
   price?: number = 0;
 
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional() // The price is required
+  warranty?: number = 0;
+
   @IsString()
   @IsNotEmpty() // The description is required
   description: string;
