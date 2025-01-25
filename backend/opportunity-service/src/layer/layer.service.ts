@@ -30,6 +30,7 @@ import { GetFilterOpportunitiesDto } from 'src/dto/OpportunityDto/get-filter.dto
 export class LayerService {
   constructor(
     @Inject('USER') private readonly usersClient: ClientProxy,
+    @Inject('CUSTOMER') private readonly customerClient: ClientProxy,
     @InjectRepository(Opportunities)
     private opportunitiesRepository: Repository<Opportunities>,
     @InjectRepository(TypeOpportunities)
@@ -173,20 +174,39 @@ export class LayerService {
     id: string,
     updateOpportunitiesDto: UpdateOpportunitiesDto,
   ) {
-    const type_source = await this.typeSourcesRepository.findOne({
-      where: { type_source_id: updateOpportunitiesDto.type_source },
+    const type_source = await this.typeSourcesRepository.findOneBy({
+      type_source_id: updateOpportunitiesDto.type_source,
     });
-    const type_opportunity = await this.typeOpportunitiesRepository.findOne({
-      where: { type_opportunity_id: updateOpportunitiesDto.type_opportunity },
+    const type_opportunity = await this.typeOpportunitiesRepository.findOneBy({
+      type_opportunity_id: updateOpportunitiesDto.type_opportunity,
+    });
+    const updatedOpportunity = await this.opportunitiesRepository.findOne({
+      where: { opportunity_id: id },
     });
     await this.opportunitiesRepository.update(id, {
       ...updateOpportunitiesDto,
       type_opportunity: type_opportunity,
       type_source: type_source,
     });
-    const updatedOpportunity = await this.opportunitiesRepository.findOne({
-      where: { opportunity_id: id },
-    });
+
+    if (
+      updateOpportunitiesDto.status === 'success' &&
+      updatedOpportunity.status !== 'success'
+    ) {
+      console.log('vao nay');
+      const res = await firstValueFrom(
+        this.customerClient.send(
+          { cmd: 'create-customer_opportunity' },
+          updatedOpportunity,
+        ),
+      );
+      if (res.statusCode === 201) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Chuyển đổi thành công',
+        };
+      }
+    }
     return {
       statusCode: HttpStatus.OK,
       data: updatedOpportunity,

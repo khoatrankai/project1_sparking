@@ -18,6 +18,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           port: 3005,
         },
       },
+      {
+        name: 'CUSTOMER',
+        transport: Transport.TCP,
+        options: {
+          host: 'customer_service',
+          port: 3006,
+        },
+      },
     ]),
     TypeOrmModule.forFeature([TypeOpportunities, TypeSources, Opportunities]),
   ],

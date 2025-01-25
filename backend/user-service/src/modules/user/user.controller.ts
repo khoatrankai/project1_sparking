@@ -40,6 +40,11 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
+  @MessagePattern({ cmd: 'register-user_mail' })
+  createUserMail(createUserDto: CreateUserDto) {
+    return this.userService.createUserMail(createUserDto);
+  }
+
   @MessagePattern({ cmd: 'delete-user' })
   async deleteTypeRole(datas: string[]) {
     return this.userService.deleteUser(datas);

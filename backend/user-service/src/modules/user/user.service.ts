@@ -53,6 +53,15 @@ export class UserService {
 
   async createUser(registerDto: CreateUserDto): Promise<ResultResponse> {
     try {
+      const checkUser = await this.accountUserRepository.findOneBy({
+        email: registerDto.email,
+      });
+      if (checkUser) {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Tài khoản đã tồn tại',
+        };
+      }
       const id = uuidv4();
       const group_user = registerDto.group_user
         ? await this.groupUserRepository.findOne({
@@ -65,6 +74,40 @@ export class UserService {
         user_id: id,
         password: pass,
         group_user,
+      });
+      await this.accountUserRepository.save(user);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Tạo tài khoản thành công',
+      };
+    } catch (err) {
+      console.log(err);
+      if (err.code === 'ER_DUP_ENTRY') {
+        const errField = this.extractDuplicateField(err.sqlMessage);
+        throw new ConflictException(`${errField} đã tồn tại.`);
+      }
+
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
+  }
+
+  async createUserMail(data: { email: string; password: string }) {
+    try {
+      const checkUser = await this.accountUserRepository.findOneBy({
+        email: data.email,
+      });
+      if (checkUser) {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Tài khoản đã tồn tại',
+        };
+      }
+      const id = uuidv4();
+      const pass = await this.hashPassword(data.password);
+      const user = this.accountUserRepository.create({
+        user_id: id,
+        email: data.email,
+        password: pass,
       });
       await this.accountUserRepository.save(user);
       return {

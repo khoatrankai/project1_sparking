@@ -7,11 +7,23 @@ import { SendMailDto } from 'src/dto/info-mail.dto';
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
- @MessagePattern({cmd:'send-email'})
-  sendMail(sendMail:SendMailDto){
-    console.log("co nhan")
-    return this.emailService.sendMail(sendMail.to,sendMail.subject,sendMail.text)
+  @MessagePattern({ cmd: 'send-email' })
+  sendMail(sendMail: SendMailDto) {
+    return this.emailService.sendMail(
+      sendMail.to,
+      sendMail.subject,
+      sendMail.text,
+      sendMail.html,
+    );
   }
- 
-  
+
+  @MessagePattern({ cmd: 'send-email-sign' })
+  sendMailSign(sendMail: SendMailDto) {
+    return this.emailService.sendMailSign(
+      sendMail.to,
+      sendMail.subject,
+      sendMail.text,
+      sendMail.html,
+    );
+  }
 }

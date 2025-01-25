@@ -181,4 +181,19 @@ export class CustomerController {
   getAllCustomer(data: GetAllCustomerDto) {
     return this.customerService.getAllCustomer(data.page, data.limit);
   }
+
+  @MessagePattern({ cmd: 'create-customer_opportunity' })
+  createCustomerOpportunity(data: {
+    name_contact: string;
+    company_name: string;
+    email: string;
+    position: string;
+    address: string;
+    website: string;
+    phone_number: string;
+    province: string;
+    user_support: string;
+  }) {
+    return this.customerService.createCustomerOpportunity(data);
+  }
 }

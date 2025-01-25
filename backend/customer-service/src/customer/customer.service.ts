@@ -50,6 +50,7 @@ export class CustomerService {
     private readonly accountCustomerRepository: Repository<AccountCustomers>,
     private configService: ConfigService,
     @Inject('SYSTEM') private readonly systemClient: ClientProxy,
+    @Inject('MAIL') private readonly mailClient: ClientProxy,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -158,6 +159,114 @@ export class CustomerService {
     } catch {
       return {
         statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
+  generateRandomPassword = (length = 12) => {
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      password += chars[randomIndex];
+    }
+    return password;
+  };
+
+  async createCustomerOpportunity(data: {
+    name_contact: string;
+    company_name: string;
+    email: string;
+    position: string;
+    address: string;
+    website: string;
+    phone_number: string;
+    province: string;
+    user_support: string;
+  }) {
+    const checkContact = await this.accountCustomerRepository.findOneBy({
+      email: data.email,
+    });
+    const dataCompanyNew = this.customerInfoRepository.create({
+      address_delivery: data.address,
+      province: data.province,
+      website: data.website,
+      phone_number: data.phone_number,
+      name_company: data.company_name,
+      staff_support: data.user_support,
+      info_id: uuidv4(),
+    });
+    const dataCompany = await this.customerInfoRepository.save(dataCompanyNew);
+    if (checkContact) {
+      const infoContactNew = this.infoContactRepository.create({
+        customer: checkContact,
+        info_company: dataCompany,
+        info_contact_id: uuidv4(),
+      });
+      const dataContact = await this.infoContactRepository.save(infoContactNew);
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: dataContact,
+        message: 'Tạo liên hệ thành công',
+      };
+    } else {
+      const pass = this.generateRandomPassword(10);
+      const customerNew = this.accountCustomerRepository.create({
+        full_name: data.name_contact,
+        email: data.email,
+        phone_number: data.phone_number,
+        customer_id: uuidv4(),
+        position: data.position,
+        password: await this.hashPassword(pass),
+      });
+      const dataCustomer =
+        await this.accountCustomerRepository.save(customerNew);
+      const infoContactNew = this.infoContactRepository.create({
+        customer: dataCustomer,
+        info_company: dataCompany,
+        info_contact_id: uuidv4(),
+      });
+      const dataContact = await this.infoContactRepository.save(infoContactNew);
+      await firstValueFrom(
+        this.mailClient.emit(
+          { cmd: 'send-email' },
+          {
+            to: data.email,
+            subject: 'Mật khẩu tạm thời của bạn',
+            text: `${pass}`,
+            html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+         <div style="text-align: center; margin-bottom: 20px;">
+    <img 
+      src="https://project-admin-bice.vercel.app/_next/image?url=%2Flogo.png&w=256&q=75" 
+      alt="Công ty Sparking" 
+      style="max-width: 150px; height: auto;" 
+    />
+  </div>
+        <h2 style="color: #4CAF50; text-align: center;">Mật khẩu tạm thời của bạn</h2>
+        <p>Chào ${data.name_contact},</p>
+        <p>Cảm ơn bạn đã tin tưởng chúng tôi. Đây là thông tin mật khẩu của bạn:</p>
+        <p style="font-size: 18px; font-weight: bold; color: #4CAF50; margin: 10px 0;">
+          ${pass}
+        </p>
+        <p>Vui lòng sử dụng mật khẩu này để đăng nhập. Sau khi đăng nhập thành công, bạn cần thay đổi mật khẩu của mình để đảm bảo an toàn.</p>
+        <a 
+          href="${this.configService.get<string>('DOMAIN')}/login?status=customer" 
+          style="display: inline-block; padding: 10px 15px; font-size: 16px; color: white; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">
+          Đăng nhập
+        </a>
+        <p style="margin-top: 20px;">Nếu bạn không yêu cầu mật khẩu tạm thời này, vui lòng liên hệ với chúng tôi ngay lập tức.</p>
+        <p style="margin-top: 20px;">Trân trọng,<br/>Đội ngũ hỗ trợ</p>
+      </div>
+        `,
+          },
+        ),
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: dataContact,
+        message: 'Tạo liên hệ thành công',
       };
     }
   }

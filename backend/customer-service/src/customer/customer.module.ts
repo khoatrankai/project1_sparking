@@ -21,6 +21,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           port: 3004,
         },
       },
+      {
+        name: 'MAIL',
+        transport: Transport.TCP,
+        options: {
+          host: 'email_service',
+          port: 3003,
+        },
+      },
     ]),
     TypeOrmModule.forFeature([
       GroupCustomer,

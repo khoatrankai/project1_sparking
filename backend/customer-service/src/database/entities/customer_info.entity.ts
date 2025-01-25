@@ -16,23 +16,23 @@ export class CustomerInfo {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   info_id: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   name_company: string;
 
   @ManyToOne(() => GroupCustomer, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'group_customer' })
   group_customer: GroupCustomer;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   tax_code: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   province: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   opportunity: string;
 
-  @Column({ type: 'varchar', length: 12 })
+  @Column({ type: 'varchar', length: 12, nullable: true })
   phone_number: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
@@ -47,10 +47,10 @@ export class CustomerInfo {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_establish: Date;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'text', nullable: true })
   address_payment: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'text', nullable: true })
   address_delivery: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })

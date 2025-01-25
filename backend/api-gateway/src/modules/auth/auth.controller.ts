@@ -30,6 +30,12 @@ export class AuthController {
     return this.authService.createUser(otpUserDto);
   }
 
+  @Post('/send-req-sign')
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  sendReqSign(@Body('email') email: string) {
+    return this.authService.sendReqSign(email);
+  }
+
   @Post('/logout')
   logOut(@Res() res: Response) {
     return this.authService.logOut(res);
@@ -37,8 +43,14 @@ export class AuthController {
 
   @Get('/verify')
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  verifyUser(@Query() verifyUserDto: VerifyUserDto) {
-    return this.authService.verifyUser(verifyUserDto);
+  verifyUser(@Query() verifyUserDto: VerifyUserDto, @Res() res: Response) {
+    return this.authService.verifyUser(verifyUserDto, res);
+  }
+
+  @Get('/verify-sign')
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  verifyUserSign(@Query() verifyUserDto: VerifyUserDto, @Res() res: Response) {
+    return this.authService.verifyUserSign(verifyUserDto, res);
   }
 
   @Post('/login')

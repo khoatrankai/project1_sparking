@@ -7,10 +7,14 @@ import { TokenResponse } from 'src/modules/auth/interfaces/token.interface';
 import { CreateUserDto } from './dto/create_user.dto';
 import { VerifyUserDto } from './dto/verify_user.dto';
 import { UserLoginDto } from './dto/user_login.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(@Inject('AUTH') private readonly authClient: ClientProxy) {}
+  constructor(
+    @Inject('AUTH') private readonly authClient: ClientProxy,
+    private configService: ConfigService,
+  ) {}
   getHello(): string {
     return 'Hello World!';
   }
@@ -20,10 +24,42 @@ export class AuthService {
     return data;
   }
 
-  verifyUser(verifyUserDto: VerifyUserDto) {
-    console.log(verifyUserDto);
-    const data = this.authClient.send({ cmd: 'verify' }, verifyUserDto);
+  async verifyUser(verifyUserDto: VerifyUserDto, res: Response) {
+    const data = await firstValueFrom(
+      this.authClient.send({ cmd: 'verify' }, verifyUserDto),
+    );
+    if (data.statusCode === 201) {
+      res.redirect(
+        `${this.configService.get<string>('DOMAIN')}/login?status=success`,
+      );
+    } else {
+      res.redirect(
+        `${this.configService.get<string>('DOMAIN')}/login?status=fail`,
+      );
+    }
     return data;
+  }
+
+  async verifyUserSign(verifyUserDto: VerifyUserDto, res: Response) {
+    const data = await firstValueFrom(
+      this.authClient.send({ cmd: 'verify-sign' }, verifyUserDto),
+    );
+    if (data.statusCode === 201) {
+      res.redirect(
+        `${this.configService.get<string>('DOMAIN')}/login?status=success`,
+      );
+    } else {
+      res.redirect(
+        `${this.configService.get<string>('DOMAIN')}/login?status=fail`,
+      );
+    }
+    return data;
+  }
+
+  async sendReqSign(email: string) {
+    return await firstValueFrom(
+      this.authClient.send({ cmd: 'send-req-sign' }, email),
+    );
   }
 
   async loginUser(userLoginDto: UserLoginDto, res: Response) {

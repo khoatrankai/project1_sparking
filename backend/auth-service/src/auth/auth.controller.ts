@@ -24,6 +24,16 @@ export class AuthController {
     return this.authService.verify(verifyUserDto);
   }
 
+  @MessagePattern({ cmd: 'send-req-sign' })
+  sendRequestSign(email: string) {
+    return this.authService.sendRequestSign(email);
+  }
+
+  @MessagePattern({ cmd: 'verify-sign' })
+  verifyMail(verifyUserDto: VerifyUserDto) {
+    return this.authService.verifyMail(verifyUserDto);
+  }
+
   @MessagePattern({ cmd: 'login' })
   loginUser(userLoginDto: UserLoginDto) {
     console.log('vao roi');

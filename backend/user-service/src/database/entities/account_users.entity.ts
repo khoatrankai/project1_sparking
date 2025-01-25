@@ -14,10 +14,10 @@ export class AccountUsers {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   user_id: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'text', default: '' })
   first_name: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'text', default: '' })
   last_name: string;
 
   @Column({ type: 'varchar', length: 50 })
