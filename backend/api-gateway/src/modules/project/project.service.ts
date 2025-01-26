@@ -44,6 +44,15 @@ export class ProjectService {
       .toPromise();
   }
 
+  async sendFindAllProjectsByToken(customer_id: string) {
+    return await firstValueFrom(
+      this.projectClient.send(
+        { cmd: 'find-all_projects_by_token' },
+        customer_id,
+      ),
+    );
+  }
+
   async sendGetProjectAbout() {
     return await firstValueFrom(
       this.projectClient.send({ cmd: 'get-project_about' }, {}),

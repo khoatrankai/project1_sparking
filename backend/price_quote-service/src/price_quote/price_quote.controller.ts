@@ -60,6 +60,13 @@ export class PriceQuoteController {
     };
   }
 
+  @MessagePattern({ cmd: 'find-all_price_quotes_by_token' })
+  async findAllPriceQuoteByToken(customer_id: string) {
+    const priceQuotes =
+      await this.priceQuoteService.findAllPriceQuoteByToken(customer_id);
+    return priceQuotes;
+  }
+
   @MessagePattern({ cmd: 'get-full_revenue_name' })
   async getFullRevenueByIDType(name: string) {
     const priceQuotes =

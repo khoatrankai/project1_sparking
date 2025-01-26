@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   SetMetadata,
   UploadedFiles,
   UseGuards,
@@ -26,6 +27,7 @@ import { GetFilterPaymentDto } from './dto/PaymentDto/get-filter.dto';
 import { GetFilterContractDto } from './dto/ContractDto/get-filter.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateDocumentContractDto } from './dto/DocumentContractDto/create-document_contract.dto';
+import { Request } from 'express';
 
 @Controller('contract')
 export class ContractController {
@@ -154,6 +156,16 @@ export class ContractController {
   @SetMetadata('type', ['admin'])
   async getContracts() {
     return this.contractService.getContracts();
+  }
+
+  @Get('/all-customer')
+  async getContractsByToken(@Req() req: Request) {
+    return this.contractService.getContractsByToken(req['customer'].sub);
+  }
+
+  @Get('/all-payment-customer')
+  async getPaymentsByToken(@Req() req: Request) {
+    return this.contractService.getPaymentsByToken(req['customer'].sub);
   }
 
   @Get('/payment-by-project/:id')

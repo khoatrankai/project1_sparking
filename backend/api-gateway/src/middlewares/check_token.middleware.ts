@@ -14,7 +14,11 @@ export class CheckTokenMiddleware implements NestMiddleware {
       const token =
         req.cookies['accessToken'] ||
         req.headers['authorization']?.split(' ')[1];
-      console.log(token);
+      const tokenCustomer =
+        req.cookies['accessTokenCustomer'] ||
+        req.headers['authorization']?.split(' ')[1];
+
+      //ADMIN
       if (token) {
         try {
           const decoded = jwt.verify(token, this.jwtSecret);
@@ -65,6 +69,62 @@ export class CheckTokenMiddleware implements NestMiddleware {
             });
             if (payload) {
               req['user'] = payload;
+            }
+          } catch {}
+        }
+      }
+
+      //CUSTOMER
+      if (tokenCustomer) {
+        try {
+          const decoded = jwt.verify(tokenCustomer, this.jwtSecret);
+          if (decoded) {
+            req['customer'] = decoded;
+          }
+        } catch {
+          const refresh =
+            req.cookies['refreshTokenCustomer'] ||
+            req.headers['authorization']?.split(' ')[1];
+          if (refresh) {
+            try {
+              const payload = jwt.verify(refresh, this.jwtSecret);
+              delete payload['exp'];
+              const newAccessToken = jwt.sign(payload, this.jwtSecret, {
+                expiresIn: this.configService.get<string>(
+                  'JWT_ACCESS_TOKEN_EXPIRES_IN',
+                ),
+              });
+              res.cookie('accessTokenCustomer', newAccessToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+              });
+              if (payload) {
+                req['customer'] = payload;
+              }
+            } catch {}
+          }
+        }
+      } else {
+        const refresh =
+          req.cookies['refreshTokenCustomer'] ||
+          req.headers['authorization']?.split(' ')[1];
+        if (refresh) {
+          try {
+            const payload = jwt.verify(refresh, this.jwtSecret);
+            delete payload['exp'];
+            const newAccessToken = jwt.sign(payload, this.jwtSecret, {
+              expiresIn: this.configService.get<string>(
+                'JWT_ACCESS_TOKEN_EXPIRES_IN',
+              ),
+            });
+            res.cookie('accessTokenCustomer', newAccessToken, {
+              httpOnly: true,
+              secure: true,
+              sameSite: 'strict',
+            });
+            if (payload) {
+              req['customer'] = payload;
             }
           } catch {}
         }

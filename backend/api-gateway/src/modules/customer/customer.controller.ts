@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   SetMetadata,
   UploadedFiles,
   UseGuards,
@@ -29,6 +30,7 @@ import { GetAllCustomerDto } from './dto/get_all_customer.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { RoleGuard } from 'src/guards/role.guard';
 import { GetFilterAccountCustomersDto } from './dto/get-filter-account.dto';
+import { Request } from 'express';
 
 @Controller('customer')
 export class CustomerController {
@@ -96,6 +98,11 @@ export class CustomerController {
   @SetMetadata('type', ['admin'])
   getAllCustomer(@Query() data: GetAllCustomerDto) {
     return this.customerService.getAllCustomer(data);
+  }
+
+  @Get('get-all-customer-by-token')
+  getAllCustomerByToken(@Req() req: Request) {
+    return this.customerService.getAllCustomerByToken(req['customer'].sub);
   }
 
   @Get('get-customer-id')
@@ -226,6 +233,19 @@ export class CustomerController {
     );
   }
 
+  @Put('update-account-customer-profile')
+  @UseInterceptors(FilesInterceptor('picture_url', 1))
+  updateAccountCustomerProfile(
+    @Req() req: Request,
+    @Body() updateAccountCustomerDto: UpdateAccountCustomersDto,
+    @UploadedFiles() picture_url: Express.Multer.File[],
+  ) {
+    return this.customerService.updateAccountCustomer(
+      { ...updateAccountCustomerDto, customer_id: req['customer'].sub },
+      picture_url?.[0],
+    );
+  }
+
   @Get('get-all-account-customer')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', [
@@ -345,5 +365,26 @@ export class CustomerController {
   @SetMetadata('type', ['admin'])
   updateRoleCustomer(@Body() updateRoleCustomerDto: UpdateRoleCustomerDto) {
     return this.customerService.updateRoleCustomer(updateRoleCustomerDto);
+  }
+
+  @Get('/profile')
+  async getCustomerProfile(@Req() req: Request) {
+    return await this.customerService.getCustomerProfile(req);
+  }
+
+  @Put('update-password')
+  async updatePasswordCustomer(
+    @Req() req: Request,
+    @Body()
+    updateCustomerDto: {
+      old_password: string;
+      new_password: string;
+      again_password: string;
+    },
+  ) {
+    return await this.customerService.updatePasswordCustomer(
+      req,
+      updateCustomerDto,
+    );
   }
 }

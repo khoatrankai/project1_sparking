@@ -202,6 +202,80 @@ export class ContractService {
     };
   }
 
+  async getAllContractByToken(customer_id: string) {
+    try {
+      const resInfo = await firstValueFrom(
+        this.customersClient.send(
+          { cmd: 'get-all_customer_by_token' },
+          customer_id,
+        ),
+      );
+      if (resInfo.statusCode === 200 && resInfo.data.length > 0) {
+        const idsInfo = resInfo.data.map((dt: any) => dt.customer_id);
+        const data = await this.contractRepository.find({
+          where: { customer: In(idsInfo) },
+          relations: ['type_contract'],
+        });
+        return {
+          statusCode: HttpStatus.OK,
+          data: data.map((dt) => {
+            return {
+              ...dt,
+              customer: resInfo.data.find(
+                (dtt: any) => dtt.customer_id === dt.customer,
+              ),
+            };
+          }),
+          message: 'Contract retrieved successfully',
+        };
+      }
+      return {
+        statusCode: HttpStatus.OK,
+        data: [],
+        message: 'Contract retrieved successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Lỗi rồi',
+      };
+    }
+  }
+
+  async getAllPaymentByToken(customer_id: string) {
+    try {
+      const resInfo = await firstValueFrom(
+        this.customersClient.send(
+          { cmd: 'get-all_customer_by_token' },
+          customer_id,
+        ),
+      );
+      if (resInfo.statusCode === 200 && resInfo.data.length > 0) {
+        const idsInfo = resInfo.data.map((dt: any) => dt.customer_id);
+        const data = await this.paymentRepository
+          .createQueryBuilder('payment')
+          .leftJoinAndSelect('payment.contract', 'contract')
+          .where('contract.project IN (:...projects)', { projects: idsInfo })
+          .getMany();
+        return {
+          statusCode: HttpStatus.OK,
+          data: data,
+          message: 'Contract retrieved successfully',
+        };
+      }
+      return {
+        statusCode: HttpStatus.OK,
+        data: [],
+        message: 'Contract retrieved successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Lỗi rồi',
+      };
+    }
+  }
+
   async getContractAbout() {
     const today = new Date();
     const weekDate = new Date();

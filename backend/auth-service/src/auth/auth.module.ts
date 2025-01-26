@@ -17,6 +17,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         },
       },
       {
+        name: 'CUSTOMER',
+        transport: Transport.TCP,
+        options: {
+          host: 'customer_service',
+          port: 3006,
+        },
+      },
+      {
         name: 'MAIL',
         transport: Transport.TCP,
         options: {

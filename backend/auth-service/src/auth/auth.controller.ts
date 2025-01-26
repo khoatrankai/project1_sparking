@@ -36,8 +36,12 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'login' })
   loginUser(userLoginDto: UserLoginDto) {
-    console.log('vao roi');
     return this.authService.login(userLoginDto);
+  }
+
+  @MessagePattern({ cmd: 'login-customer' })
+  loginCustomer(userLoginDto: UserLoginDto) {
+    return this.authService.loginCustomer(userLoginDto);
   }
 
   @MessagePattern({ cmd: 'refresh-token' })

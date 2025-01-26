@@ -182,6 +182,21 @@ export class CustomerController {
     return this.customerService.getAllCustomer(data.page, data.limit);
   }
 
+  @MessagePattern({ cmd: 'get-all_customer_by_token' })
+  getAllCustomerByToken(customer_id: string) {
+    return this.customerService.getAllCustomerByToken(customer_id);
+  }
+
+  @MessagePattern({ cmd: 'login-customer' })
+  findCustomer(username: string) {
+    return this.customerService.findCustomer(username);
+  }
+
+  @MessagePattern({ cmd: 'get-account_customer_profile' })
+  getCustomerProfile(customer_id: string) {
+    return this.customerService.getCustomerProfile(customer_id);
+  }
+
   @MessagePattern({ cmd: 'create-customer_opportunity' })
   createCustomerOpportunity(data: {
     name_contact: string;
@@ -195,5 +210,21 @@ export class CustomerController {
     user_support: string;
   }) {
     return this.customerService.createCustomerOpportunity(data);
+  }
+
+  @MessagePattern({ cmd: 'update-password_customer' })
+  updatePasswordCustomer(
+    @Payload('customer_id') customer_id: string,
+    @Payload('updateCustomerDto')
+    updateCustomerDto: {
+      old_password: string;
+      new_password: string;
+      again_password: string;
+    },
+  ) {
+    return this.customerService.updatePasswordCustomer(
+      customer_id,
+      updateCustomerDto,
+    );
   }
 }

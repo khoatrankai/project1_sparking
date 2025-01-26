@@ -1,4 +1,9 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpStatus,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { GroupCustomer } from 'src/database/entities/group_customer.entity';
 import { CreateGroupCustomerDto } from 'src/dto/create_group.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -161,6 +166,13 @@ export class CustomerService {
         statusCode: HttpStatus.BAD_REQUEST,
       };
     }
+  }
+
+  async findCustomer(email: string) {
+    const data = await this.accountCustomerRepository.findOneBy({
+      email: email,
+    });
+    return data;
   }
 
   generateRandomPassword = (length = 12) => {
@@ -870,6 +882,26 @@ export class CustomerService {
     }
   }
 
+  async getAllCustomerByToken(customer_id?: string) {
+    try {
+      const dataAll = await this.customerInfoRepository
+        .createQueryBuilder('info')
+        .leftJoin('info.infoContacts', 'infoContacts')
+        .leftJoin('infoContacts.customer', 'customers')
+        .where('customers.customer_id = :customer_id', { customer_id })
+        .getMany();
+      return {
+        statusCode: HttpStatus.OK,
+        data: dataAll,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
   async getCustomerID(info_id: string) {
     try {
       const data = await this.customerInfoRepository.findOne({
@@ -911,6 +943,54 @@ export class CustomerService {
       return {
         statusCode: HttpStatus.BAD_REQUEST,
       };
+    }
+  }
+
+  async getCustomerProfile(customer_id: string) {
+    const data = await this.accountCustomerRepository.findOneBy({
+      customer_id: customer_id,
+    });
+    data && delete data.password;
+    return {
+      statusCode: HttpStatus.OK,
+      data: data,
+    };
+  }
+
+  async updatePasswordCustomer(
+    customer_id: string,
+    updateDto: {
+      old_password: string;
+      new_password: string;
+      again_password: string;
+    },
+  ) {
+    try {
+      const userData = await this.accountCustomerRepository.findOneBy({
+        customer_id: customer_id ?? '',
+      });
+      console.log(userData, customer_id);
+      const check = await bcrypt.compare(
+        updateDto.old_password,
+        userData.password,
+      );
+      if (check) {
+        const pass = await this.hashPassword(updateDto.new_password);
+        await this.accountCustomerRepository.update(customer_id, {
+          password: pass,
+        });
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Cập nhật mật khẩu thành công',
+        };
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Cập nhật mật khẩu thất bại',
+      };
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
     }
   }
 }

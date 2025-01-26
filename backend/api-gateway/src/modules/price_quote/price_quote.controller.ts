@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import { PriceQuoteFilterDto } from './dto/PriceQuoteDto/get_filter_price_quote.
 import { RoleGuard } from 'src/guards/role.guard';
 import { CreateTypePackageDto } from './dto/TypePackageDto/create_type_package.dto';
 import { UpdateTypePackageDto } from './dto/TypePackageDto/update_type_package.dto';
+import { Request } from 'express';
 
 @Controller('price_quote')
 export class PriceQuoteController {
@@ -34,6 +36,11 @@ export class PriceQuoteController {
   @SetMetadata('type', ['admin'])
   getAll(@Query() filter?: PriceQuoteFilterDto) {
     return this.priceQuetoService.sendGetPriceQueto(filter);
+  }
+
+  @Get('all-customer')
+  getAllByToken(@Req() req: Request) {
+    return this.priceQuetoService.sendGetPriceQuetoByToken(req['customer'].sub);
   }
 
   @Get('dashboard')

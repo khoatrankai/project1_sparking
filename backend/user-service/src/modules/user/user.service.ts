@@ -184,11 +184,11 @@ export class UserService {
     try {
       const userData = await this.accountUserRepository.findOneBy({ user_id });
       const check = await bcrypt.compare(
-        updateDto.old_password.toString(),
+        updateDto.old_password,
         userData.password,
       );
       if (check) {
-        const pass = await this.hashPassword(updateDto.new_password.toString());
+        const pass = await this.hashPassword(updateDto.new_password);
         await this.accountUserRepository.update(user_id, {
           password: pass,
         });

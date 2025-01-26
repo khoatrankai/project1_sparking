@@ -35,6 +35,11 @@ export class LayerController {
     return await this.layerService.findAllProjects(filter);
   }
 
+  @MessagePattern({ cmd: 'find-all_projects_by_token' })
+  async findAllProjectsByToken(customer_id: string) {
+    return await this.layerService.findAllProjectsByToken(customer_id);
+  }
+
   // Handle retrieval of a single project by ID
   @MessagePattern({ cmd: 'find-one_project' })
   async findOneProject(@Payload() id: string) {

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { UpdateGroupCustomerDto } from './dto/update_group.dto';
 import { CreateRoleTypeCustomerDto } from './dto/create_role_type_customer.dto';
@@ -16,6 +16,7 @@ import { GetAllCustomerDto } from './dto/get_all_customer.dto';
 import { firstValueFrom } from 'rxjs';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { GetFilterAccountCustomersDto } from './dto/get-filter-account.dto';
+import { Request } from 'express';
 // import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
@@ -34,6 +35,13 @@ export class CustomerService {
 
   async getAllCustomer(data: GetAllCustomerDto) {
     return this.customerClient.send({ cmd: 'get-all_customer' }, data);
+  }
+
+  async getAllCustomerByToken(customer_id: string) {
+    return this.customerClient.send(
+      { cmd: 'get-all_customer_by_token' },
+      customer_id,
+    );
   }
 
   async getGroupCustomer() {
@@ -233,5 +241,41 @@ export class CustomerService {
       { cmd: 'update-role_customer' },
       updateRoleCustomerDto,
     );
+  }
+
+  async getCustomerProfile(req: Request) {
+    const customer = req['customer'];
+    if (customer) {
+      return await firstValueFrom(
+        this.customerClient.send(
+          { cmd: 'get-account_customer_profile' },
+          customer.sub,
+        ),
+      );
+    }
+    return {
+      statusCode: HttpStatus.BAD_REQUEST,
+      message: 'Lấy thông tin thất bại',
+    };
+  }
+
+  async updatePasswordCustomer(
+    req: Request,
+    updateCustomerDto: {
+      old_password: string;
+      new_password: string;
+      again_password: string;
+    },
+  ) {
+    const customer = req['customer'];
+    if (customer) {
+      return this.customerClient.send(
+        { cmd: 'update-password_customer' },
+        {
+          customer_id: customer.sub,
+          updateCustomerDto,
+        },
+      );
+    }
   }
 }

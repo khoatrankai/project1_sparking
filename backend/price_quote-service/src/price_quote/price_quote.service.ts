@@ -235,15 +235,6 @@ export class PriceQuoteService {
   }
 
   async findAllPriceQuote(filter?: PriceQuoteFilterDto) {
-    // const data = await this.priceQuoteRepository.find({ relations: ['products'] });
-    // const userIds = data.map((dt)=>dt.user_support)
-    // const projectIds = data.map((dt)=>dt.project)
-    // const dataUsers = await firstValueFrom(this.usersClient.send({cmd:'get-user_ids'},userIds))
-    // const dataProjects = await firstValueFrom(this.projectsClient.send({cmd:'get-project_ids'},projectIds))
-    // return data.map((dt,index)=>{
-    //   return{...dt,user_support:dataUsers[index],project:dataProjects[index]}
-    // })
-
     const project = filter.project ?? null;
     const customer = filter.customer ?? null;
     const type_date = Number(filter.type_date) ?? null;
@@ -329,6 +320,45 @@ export class PriceQuoteService {
     });
 
     // return result;
+  }
+
+  async findAllPriceQuoteByToken(customer_id: string) {
+    try {
+      const resProject = await firstValueFrom(
+        this.projectsClient.send(
+          { cmd: 'find-all_projects_by_token' },
+          customer_id,
+        ),
+      );
+      if (resProject.statusCode === 200 && resProject.data.length > 0) {
+        const idsProject = resProject.data.map((dt: any) => dt.project_id);
+        const data = await this.priceQuoteRepository.find({
+          where: { project: In(idsProject) },
+        });
+        return {
+          statusCode: HttpStatus.OK,
+          data: data.map((dt) => {
+            return {
+              ...dt,
+              project: resProject.data.find(
+                (dtt: any) => dtt.project_id === dt.project,
+              ),
+            };
+          }),
+          message: 'Lấy báo giá thành công',
+        };
+      }
+      return {
+        statusCode: HttpStatus.OK,
+        data: [],
+        message: 'Lấy báo giá thành công',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Lỗi rồi',
+      };
+    }
   }
 
   async updatePriceQuote(id: string, updatePriceQuoteDto: UpdatePriceQuoteDto) {

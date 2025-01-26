@@ -110,6 +110,16 @@ export class ContractController {
     return this.contractService.getContractByProject(project);
   }
 
+  @MessagePattern({ cmd: 'get-contracts_by_token' })
+  async getAllContractByToken(customer_id: string) {
+    return this.contractService.getAllContractByToken(customer_id);
+  }
+
+  @MessagePattern({ cmd: 'get-payments_by_token' })
+  async getAllPaymentByToken(customer_id: string) {
+    return this.contractService.getAllPaymentByToken(customer_id);
+  }
+
   // Payment patterns
   @MessagePattern({ cmd: 'create-payment' })
   async createPayment(@Payload() createPaymentDto: CreatePaymentDto) {

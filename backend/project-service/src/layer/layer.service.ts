@@ -117,6 +117,45 @@ export class LayerService {
     };
   }
 
+  async findAllProjectsByToken(customer_id: string) {
+    try {
+      const resInfo = await firstValueFrom(
+        this.customersClient.send(
+          { cmd: 'get-all_customer_by_token' },
+          customer_id,
+        ),
+      );
+      if (resInfo.statusCode === 200 && resInfo.data.length > 0) {
+        const idsInfo = resInfo.data.map((dt: any) => dt.customer_id);
+        const data = await this.projectsRepository.find({
+          where: { customer: In(idsInfo) },
+        });
+        return {
+          statusCode: HttpStatus.OK,
+          data: data.map((dt) => {
+            return {
+              ...dt,
+              customer: resInfo.data.find(
+                (dtt: any) => dtt.customer_id === dt.customer,
+              ),
+            };
+          }),
+          message: 'Projects retrieved successfully',
+        };
+      }
+      return {
+        statusCode: HttpStatus.OK,
+        data: [],
+        message: 'Projects retrieved successfully',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Lỗi rồi',
+      };
+    }
+  }
+
   // async getAboutProject(): Promise<any> {
   //   const projects = await this.projectsRepository.find();
 

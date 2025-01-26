@@ -21,6 +21,7 @@ import { CreateUserDto } from 'src/dto/create_user.dto';
 export class AuthService {
   constructor(
     @Inject('USER') private readonly usersClient: ClientProxy,
+    @Inject('CUSTOMER') private readonly customersClient: ClientProxy,
     @Inject('MAIL') private readonly mailClient: ClientProxy,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -175,7 +176,7 @@ export class AuthService {
             <h2 style="color: #4CAF50; text-align: center;" > Gửi bạn mật khẩu tạm thời </h2>
             <p>Chào ${dataEncord['email']},</p>
             <p>Cảm ơn bạn đã đợi trong thời chúng tôi xác thực. Đây là thông tin mật khẩu của bạn:</p>
-            <p style="font-size: 18px; font-weight: bold; color: #4CAF50; margin: 10px 0;">
+            <p style="font-size: 18px; font-weight: bold; color: #4CAF50; margin: 10px 0;">activity-ready
                ${pass}
             </p>
             <p>Vui lòng sử dụng mật khẩu này để đăng nhập. Sau khi đăng nhập thành công, bạn cần thay đổi mật khẩu của mình để đảm bảo an toàn.</p>
@@ -311,7 +312,7 @@ export class AuthService {
     const user = await firstValueFrom(
       this.usersClient.send({ cmd: 'login-user' }, userLoginDto.email),
     );
-    if (user) {
+    if (user && user.status === 'active') {
       const payload = { email: user.email, sub: user.user_id, role: 'admin' };
       const accessToken = this.jwtService.sign(payload, {
         expiresIn: process.env['JWT_ACCESS_TOKEN_EXPIRES_IN'],
@@ -323,6 +324,28 @@ export class AuthService {
     }
     throw new InternalServerErrorException();
   }
+
+  async loginCustomer(userLoginDto: UserLoginDto) {
+    const user = await firstValueFrom(
+      this.customersClient.send({ cmd: 'login-customer' }, userLoginDto.email),
+    );
+    if (user && user.status === 'active') {
+      const payload = {
+        email: user.email,
+        sub: user.customer_id,
+        role: 'customer',
+      };
+      const accessToken = this.jwtService.sign(payload, {
+        expiresIn: process.env['JWT_ACCESS_TOKEN_EXPIRES_IN'],
+      });
+      const refreshToken = this.jwtService.sign(payload, {
+        expiresIn: process.env['JWT_REFRESH_TOKEN_EXPIRES_IN'],
+      });
+      return { accessToken, refreshToken };
+    }
+    throw new InternalServerErrorException();
+  }
+
   async refreshTokens(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken, {

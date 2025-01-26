@@ -111,6 +111,18 @@ export class ContractService {
     );
   }
 
+  async getContractsByToken(customer_id: string) {
+    return firstValueFrom(
+      this.contractClient.send({ cmd: 'get-contracts_by_token' }, customer_id),
+    );
+  }
+
+  async getPaymentsByToken(customer_id: string) {
+    return firstValueFrom(
+      this.contractClient.send({ cmd: 'get-payments_by_token' }, customer_id),
+    );
+  }
+
   async getContractAbout() {
     return firstValueFrom(
       this.contractClient.send({ cmd: 'get-contract_about' }, {}),

@@ -94,6 +94,36 @@ export class AuthService {
     }
   }
 
+  async loginCustomer(userLoginDto: UserLoginDto, res: Response) {
+    try {
+      const data: TokenResponse = await firstValueFrom(
+        this.authClient.send({ cmd: 'login-customer' }, userLoginDto),
+      );
+      res.cookie('accessTokenCustomer', data.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+
+      res.cookie('refreshTokenCustomer', data.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        // domain:"localhost",
+        sameSite: 'none',
+      });
+      return res.json({
+        statusCode: HttpStatus.OK,
+        message: 'Đăng nhập thành công',
+      });
+    } catch (err) {
+      console.log(err);
+      return res.json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Đăng nhập thất bại',
+      });
+    }
+  }
+
   async logOut(res: Response) {
     try {
       res.cookie('accessToken', '', {
@@ -120,6 +150,32 @@ export class AuthService {
     }
   }
 
+  async logOutCustomer(res: Response) {
+    try {
+      res.cookie('accessTokenCustomer', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+
+      res.cookie('refreshTokenCustomer', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+      return res.json({
+        statusCode: HttpStatus.OK,
+        message: 'Đăng xuất thành công',
+      });
+    } catch (err) {
+      console.log(err);
+      return res.json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Đăng xuất thất bại',
+      });
+    }
+  }
+
   async refreshToken(res: Response, req: Request) {
     try {
       const newAccessToken: string = await firstValueFrom(
@@ -129,6 +185,31 @@ export class AuthService {
         ),
       );
       res.cookie('accessToken', newAccessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+      return res.json({
+        statusCode: HttpStatus.OK,
+        message: 'RefreshToken Success',
+      });
+    } catch (err) {
+      return res.json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'RefreshToken Fail',
+      });
+    }
+  }
+
+  async refreshTokenCustomer(res: Response, req: Request) {
+    try {
+      const newAccessToken: string = await firstValueFrom(
+        this.authClient.send(
+          { cmd: 'refresh-token' },
+          req.cookies['refreshTokenCustomer'],
+        ),
+      );
+      res.cookie('accessTokenCustomer', newAccessToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',

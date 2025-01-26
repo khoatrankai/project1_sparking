@@ -41,6 +41,11 @@ export class AuthController {
     return this.authService.logOut(res);
   }
 
+  @Post('/logout-customer')
+  logOutCustomer(@Res() res: Response) {
+    return this.authService.logOutCustomer(res);
+  }
+
   @Get('/verify')
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   verifyUser(@Query() verifyUserDto: VerifyUserDto, @Res() res: Response) {
@@ -57,6 +62,12 @@ export class AuthController {
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   loginUser(@Body() userLoginDto: UserLoginDto, @Res() res: Response) {
     return this.authService.loginUser(userLoginDto, res);
+  }
+
+  @Post('/login-customer')
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  loginCustomer(@Body() userLoginDto: UserLoginDto, @Res() res: Response) {
+    return this.authService.loginCustomer(userLoginDto, res);
   }
 
   @Post('/refresh-token')

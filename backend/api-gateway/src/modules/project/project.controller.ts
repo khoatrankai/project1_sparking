@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   SetMetadata,
   UploadedFiles,
   UseGuards,
@@ -20,6 +21,7 @@ import { UpdateTypeProjectDto } from './dto/TypeProjectDto/update-type_project.d
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { RoleGuard } from 'src/guards/role.guard';
 import { GetFilterProjectDto } from './dto/ProjectDto/get-filter.dto';
+import { Request } from 'express';
 
 @Controller('project')
 export class ProjectController {
@@ -73,6 +75,11 @@ export class ProjectController {
   @SetMetadata('type', ['admin'])
   async findAllProjects(@Query() filter?: GetFilterProjectDto) {
     return this.projectService.sendFindAllProjects(filter);
+  }
+
+  @Get('all-customer')
+  async findAllProjectsByToken(@Req() req: Request) {
+    return this.projectService.sendFindAllProjectsByToken(req['customer'].sub);
   }
 
   @Get('about')
