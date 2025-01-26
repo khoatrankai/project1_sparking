@@ -243,11 +243,9 @@ export class RoleService {
 
   async getFullRoleUserByID(id: string) {
     try {
-      const user = await this.accountUserRepository.findOne({
-        where: { user_id: id },
-      });
+      const user = await this.accountUserRepository.findOneBy({ user_id: id });
       const datas = await this.roleUserRepository.find({
-        where: { user_info: user, status: true },
+        where: { user_info: In([user]), status: true },
         relations: ['role_type'],
       });
       return {
