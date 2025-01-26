@@ -72,11 +72,19 @@ export class ActivityController {
   async getAllActivitiesReady(@Param('id') id: string) {
     return this.activityService.sendGetAllActivitiesReady(id);
   }
+  @Get('activity-ready/user/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
+  async sendGetAllActivitiesReadyByUser(
+    @Req() req: Request,
+    @Param('id') id: string,
+  ) {
+    return this.activityService.sendGetAllActivitiesReadyByUser(id, req);
+  }
 
   @Get('work-ready')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['activity', 'admin-top'])
-  @SetMetadata('type', ['admin'])
+  @SetMetadata('checkfull', ['all'])
   async getAllWorksReady(@Req() req: Request) {
     return this.activityService.sendGetAllWorksReady(req?.['user']?.sub);
   }
@@ -479,12 +487,26 @@ export class ActivityController {
     return this.activityService.sendGetAllWorkUrgent();
   }
 
+  @Get('work-urgent/user')
+  @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
+  async getAllWorkUrgentByUser(@Req() req: Request) {
+    return this.activityService.sendGetAllWorkUrgent(req['user'].sub);
+  }
+
   @Get('work-expired-urgent/all')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async getAllWorkExpiredUrgent() {
     return this.activityService.sendGetAllWorkExpiredUrgent();
+  }
+
+  @Get('work-expired-urgent/user')
+  @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
+  async getAllWorkExpiredUrgentByUser(@Req() req: Request) {
+    return this.activityService.sendGetAllWorkExpiredUrgent(req['user'].sub);
   }
 
   // Type Work Methods

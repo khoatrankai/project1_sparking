@@ -32,7 +32,7 @@ export class OpportunityController {
 
   @Post()
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async createOpportunity(
     @Body() createOpportunityDto: CreateOpportunitiesDto,
@@ -45,8 +45,7 @@ export class OpportunityController {
 
   @Get('dashboard-status')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
-  @SetMetadata('type', ['admin'])
+  @SetMetadata('checkfull', ['all'])
   async getOpportunityDashboardStatus() {
     // return ""
     return this.opportunitiesService.sendGetOpportunityDashboard();
@@ -54,7 +53,7 @@ export class OpportunityController {
 
   @Delete()
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteOpportunity(@Body() datas: string[]) {
     return this.opportunitiesService.sendDeleteOpportunity(datas);
@@ -62,7 +61,7 @@ export class OpportunityController {
 
   @Get('all')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async findAllOpportunities(@Query() filter?: GetFilterOpportunitiesDto) {
     return this.opportunitiesService.sendGetAllOpportunities(filter);
@@ -70,7 +69,7 @@ export class OpportunityController {
 
   @Get('id/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
   @SetMetadata('type', ['admin'])
   async findOneOpportunity(@Param('id') id: string) {
     return this.opportunitiesService.sendGetOpportunity(id);
@@ -78,7 +77,7 @@ export class OpportunityController {
 
   @Put('update/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async updateOpportunity(
     @Param('id') id: string,
@@ -93,7 +92,7 @@ export class OpportunityController {
   // Type Opportunity Endpoints
   @Post('type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async createTypeOpportunity(
     @Body() createTypeOpportunityDto: CreateTypeOpportunitiesDto,
@@ -105,7 +104,7 @@ export class OpportunityController {
 
   @Delete('type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteTypeOpportunity(@Body() datas: string[]) {
     return this.opportunitiesService.sendDeleteTypeOpportunity(datas);
@@ -113,7 +112,7 @@ export class OpportunityController {
 
   @Get('type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
   @SetMetadata('type', ['admin'])
   async findAllTypeOpportunities() {
     return this.opportunitiesService.sendGetAllTypeOpportunities();
@@ -129,7 +128,7 @@ export class OpportunityController {
 
   @Get('type/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
   @SetMetadata('type', ['admin'])
   async findOneTypeOpportunity(@Param('id') id: string) {
     return this.opportunitiesService.sendGetTypeOpportunity(id);
@@ -137,7 +136,7 @@ export class OpportunityController {
 
   @Put('type/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async updateTypeOpportunity(
     @Param('id') id: string,
@@ -152,7 +151,7 @@ export class OpportunityController {
   // Type Source Endpoints
   @Post('source')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async createTypeSource(@Body() createTypeSourceDto: CreateTypeSourcesDto) {
     return this.opportunitiesService.sendCreateTypeSource(createTypeSourceDto);
@@ -160,7 +159,7 @@ export class OpportunityController {
 
   @Delete('source')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteTypeSource(@Body() datas: string[]) {
     return this.opportunitiesService.sendDeleteTypeSource(datas);
@@ -168,7 +167,7 @@ export class OpportunityController {
 
   @Get('source')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
   @SetMetadata('type', ['admin'])
   async findAllTypeSources() {
     return this.opportunitiesService.sendGetAllTypeSources();
@@ -176,7 +175,7 @@ export class OpportunityController {
 
   @Get('source-full')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
   @SetMetadata('type', ['admin'])
   async findFullTypeSources() {
     return this.opportunitiesService.sendGetFullTypeSources();
@@ -184,7 +183,7 @@ export class OpportunityController {
 
   @Get('get-opportunity-filter')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
   @SetMetadata('type', ['admin'])
   getCustomerFilter(
     @Query('time_first') time_first: number,
@@ -195,7 +194,7 @@ export class OpportunityController {
 
   @Get('source/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
   @SetMetadata('type', ['admin'])
   async findOneTypeSource(@Param('id') id: string) {
     return this.opportunitiesService.sendGetTypeSource(id);
@@ -203,7 +202,7 @@ export class OpportunityController {
 
   @Put('source/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['opportunity', 'admin-top'])
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-edit'])
   @SetMetadata('type', ['admin'])
   async updateTypeSource(
     @Param('id') id: string,

@@ -33,7 +33,7 @@ export class ProjectController {
   // Endpoint to create a new project
   @Post()
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('picture_url', 1))
   async createProject(
@@ -48,7 +48,7 @@ export class ProjectController {
 
   @Delete()
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteProject(@Body() datas: string[]) {
     return this.projectService.sendDeleteProject(datas);
@@ -60,10 +60,15 @@ export class ProjectController {
   @SetMetadata('roles', [
     'project',
     'contract',
+    'contract-edit',
+    'contract-read',
     'price_quote',
+    'price_quote-edit',
+    'price_quote-read',
     'contract-update',
     'contract-create',
     'admin-top',
+    'project-read',
   ])
   @SetMetadata('type', ['admin'])
   async findAllProjects(@Query() filter?: GetFilterProjectDto) {
@@ -72,7 +77,7 @@ export class ProjectController {
 
   @Get('about')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
   @SetMetadata('type', ['admin'])
   async aboutProject() {
     return this.projectService.sendGetProjectAbout();
@@ -81,7 +86,7 @@ export class ProjectController {
   // Endpoint to retrieve a single project by ID
   @Get('id/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
   @SetMetadata('type', ['admin'])
   async findOneProject(@Param('id') id: string) {
     return this.projectService.sendFindOneProject(id);
@@ -90,7 +95,7 @@ export class ProjectController {
   // Endpoint to update a project by ID
   @Put('update/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('picture_url', 1))
   async updateProject(
@@ -108,7 +113,7 @@ export class ProjectController {
 
   @Post('type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
   @SetMetadata('type', ['admin'])
   async createTypeProject(@Body() createTypeProjectDto: CreateTypeProjectDto) {
     return this.projectService.createTypeProject(createTypeProjectDto);
@@ -116,7 +121,7 @@ export class ProjectController {
 
   @Delete('type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteTypeProject(@Body() datas: string[]) {
     return this.projectService.sendDeleteTypeProject(datas);
@@ -124,7 +129,7 @@ export class ProjectController {
 
   @Get('type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
   @SetMetadata('type', ['admin'])
   async findAllTypeProject() {
     return this.projectService.findAllTypeProject();
@@ -132,7 +137,7 @@ export class ProjectController {
 
   @Get('type-full')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
   @SetMetadata('type', ['admin'])
   async findFullTypeProject() {
     return this.projectService.findFullTypeProject();
@@ -140,7 +145,7 @@ export class ProjectController {
 
   @Get('type/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
   @SetMetadata('type', ['admin'])
   async findOneTypeProject(@Param('id') id: string) {
     return this.projectService.findOneTypeProject(id);
@@ -148,7 +153,7 @@ export class ProjectController {
 
   @Put('type/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['project', 'admin-top'])
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
   @SetMetadata('type', ['admin'])
   async updateTypeProject(
     @Param('id') id: string,

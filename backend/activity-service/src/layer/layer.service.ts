@@ -320,7 +320,7 @@ export class LayerService {
     }
   }
 
-  async getAllActivitiesReady(type: string) {
+  async getAllActivitiesReady(type: string, user_id?: string) {
     const dataType = 'week';
     const today = new Date();
     const weekDate = new Date();
@@ -329,9 +329,16 @@ export class LayerService {
       .createQueryBuilder('activity')
       .leftJoin('activity.status', 'status')
       .leftJoin('activity.type', 'type')
+      .leftJoin('activity.works', 'works')
+      .leftJoin('works.list_user', 'list_user')
       .where(
-        'type.type_activity_id = :type AND status.position = 1 AND activity.time_start BETWEEN :now AND :later',
-        { type, now: today.toISOString(), later: weekDate.toISOString() },
+        `type.type_activity_id = :type AND status.position = 1 AND activity.time_start BETWEEN :now AND :later ${user_id ? 'AND list_user.user = :user_id' : ''}`,
+        {
+          type,
+          now: today.toISOString(),
+          later: weekDate.toISOString(),
+          user_id,
+        },
       )
       .getMany();
 
@@ -381,7 +388,7 @@ export class LayerService {
     };
   }
 
-  async getAllWorkUrgent() {
+  async getAllWorkUrgent(user_id?: string) {
     try {
       const today = new Date().toISOString().split('T')[0];
       const data = await this.worksRepository
@@ -389,12 +396,14 @@ export class LayerService {
         .leftJoinAndSelect('work.status', 'status')
         .leftJoinAndSelect('work.type', 'type')
         .leftJoinAndSelect('work.activity', 'activity')
+        .leftJoin('work.list_user', 'list_user')
         .where(
-          'status.name_tag != :completed AND DATE(work.time_end) >= :today AND work.urgent = :urgent',
+          `status.name_tag != :completed AND DATE(work.time_end) >= :today AND work.urgent = :urgent ${user_id ? 'AND list_user.user = :user_id' : ''}`,
           {
             today,
             completed: 'completed',
             urgent: true,
+            user_id,
           },
         )
         .orderBy('work.time_end', 'ASC')
@@ -423,7 +432,7 @@ export class LayerService {
     }
   }
 
-  async getAllWorkExpiredUrgent() {
+  async getAllWorkExpiredUrgent(user_id?: string) {
     try {
       const today = new Date().toISOString().split('T')[0];
       const data = await this.worksRepository
@@ -431,11 +440,13 @@ export class LayerService {
         .leftJoinAndSelect('work.status', 'status')
         .leftJoinAndSelect('work.type', 'type')
         .leftJoinAndSelect('work.activity', 'activity')
+        .leftJoinAndSelect('work.list_user', 'list_user')
         .where(
-          'status.name_tag != :completed AND DATE(work.time_end) < :today',
+          `status.name_tag != :completed AND DATE(work.time_end) < :today ${user_id ? 'AND list_user.user = :user_id' : ''}`,
           {
             today,
             completed: 'completed',
+            user_id,
           },
         )
         .orderBy('work.time_end', 'DESC')

@@ -44,7 +44,7 @@ export class CustomerController {
   // @SetMetadata('roles', [
   //   'customer',
   //   'customer-read',
-  //   'customer-update',
+  //   'customer-edit',
   //   'admin-top',
   // ])
   // @SetMetadata('type', ['admin'])
@@ -54,12 +54,7 @@ export class CustomerController {
 
   @Post('create-group-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', [
-    'customer',
-    'customer-create',
-    'customer-update',
-    'admin-top',
-  ])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   createGroupCustomer(@Body() createGroupCustomerDto: CreateGroupCustomerDto) {
     return this.customerService.createGroupCustomer(createGroupCustomerDto);
@@ -67,7 +62,7 @@ export class CustomerController {
 
   @Delete('/group-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteTypeMethod(@Body() datas: string[]) {
     return this.customerService.sendDeleteGroupCustomer(datas);
@@ -86,9 +81,16 @@ export class CustomerController {
   @SetMetadata('roles', [
     'customer',
     'project',
+    'project-read',
+    'project-edit',
     'customer-read',
+    'customer-edit',
     'contract',
+    'contract-read',
+    'contract-edit',
     'product',
+    'product-read',
+    'product-edit',
     'admin-top',
   ])
   @SetMetadata('type', ['admin'])
@@ -98,7 +100,12 @@ export class CustomerController {
 
   @Get('get-customer-id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-read', 'admin-top'])
+  @SetMetadata('roles', [
+    'customer',
+    'customer-read',
+    'admin-top',
+    'customer-edit',
+  ])
   @SetMetadata('type', ['admin'])
   getCustomerID(@Query('info_id') info_id: string) {
     return this.customerService.getCustomerID(info_id);
@@ -106,7 +113,12 @@ export class CustomerController {
 
   @Get('get-customer-dashboard')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-read', 'admin-top'])
+  @SetMetadata('roles', [
+    'customer',
+    'customer-read',
+    'admin-top',
+    'customer-edit',
+  ])
   @SetMetadata('type', ['admin'])
   getCustomerDashboard() {
     return this.customerService.getCustomerDashboard();
@@ -114,7 +126,12 @@ export class CustomerController {
 
   @Get('get-customer-filter')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-read', 'admin-top'])
+  @SetMetadata('roles', [
+    'customer',
+    'customer-read',
+    'admin-top',
+    'customer-edit',
+  ])
   @SetMetadata('type', ['admin'])
   getCustomerFilter(
     @Query('group') group: string,
@@ -126,7 +143,7 @@ export class CustomerController {
 
   @Put('update-group-customer/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   updateGroupCustomer(
     @Param('id') id: string,
@@ -140,7 +157,7 @@ export class CustomerController {
 
   @Post('create-role-type-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   createRoleTypeCustomer(
     @Body() createRoleTypeCustomerDto: CreateRoleTypeCustomerDto,
@@ -152,7 +169,7 @@ export class CustomerController {
 
   @Delete('/role-type-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteRoleTypeCustomer(@Body() datas: string[]) {
     return this.customerService.sendDeleteRoleTypeCustomer(datas);
@@ -160,7 +177,7 @@ export class CustomerController {
 
   @Put('update-role-type-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   updateRoleTypeCustomer(
     @Body() updateRoleTypeCustomerDto: UpdateRoleTypeCustomerDto,
@@ -172,7 +189,7 @@ export class CustomerController {
 
   @Post('create-account-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-create', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('picture_url', 1))
   createAccountCustomer(
@@ -187,7 +204,7 @@ export class CustomerController {
 
   @Delete('/account-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteAccountCustomer(@Body() datas: string[]) {
     return this.customerService.sendDeleteAccountCustomer(datas);
@@ -195,7 +212,7 @@ export class CustomerController {
 
   @Put('update-account-customer/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('picture_url', 1))
   updateAccountCustomer(
@@ -211,7 +228,12 @@ export class CustomerController {
 
   @Get('get-all-account-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', [
+    'customer',
+    'customer-edit',
+    'admin-top',
+    'customer-read',
+  ])
   @SetMetadata('type', ['admin'])
   getAllAccountCustomer(@Query() filter?: GetFilterAccountCustomersDto) {
     return this.customerService.getAllAccountCustomer(filter);
@@ -219,7 +241,12 @@ export class CustomerController {
 
   @Get('get-id-account-customer/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', [
+    'customer',
+    'customer-edit',
+    'admin-top',
+    'customer-read',
+  ])
   @SetMetadata('type', ['admin'])
   getIDAccountCustomer(@Param('id') id: string) {
     return this.customerService.getIDAccountCustomer(id);
@@ -227,7 +254,7 @@ export class CustomerController {
 
   @Post('create-customer-info')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('picture_url', 1))
   createCustomerInfo(
@@ -242,7 +269,7 @@ export class CustomerController {
 
   @Delete('/customer-info')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteCustomerInfo(@Body() datas: string[]) {
     // console.log(datas)
@@ -251,7 +278,7 @@ export class CustomerController {
 
   @Put('update-customer-info')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('picture_url', 1))
   updateCustomerInfo(
@@ -266,7 +293,7 @@ export class CustomerController {
 
   @Put('update-status-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   updateStatusCustomer(@Body() updateCustomerInfoDto: UpdateCustomerInfoDto) {
     return this.customerService.updateStatusCustomer(updateCustomerInfoDto);
@@ -274,7 +301,7 @@ export class CustomerController {
 
   @Post('create-info-contact')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   createInfoContact(@Body() createInfoContactDto: CreateInfoContactDto) {
     return this.customerService.createInfoContact(createInfoContactDto);
@@ -282,7 +309,7 @@ export class CustomerController {
 
   @Delete('/info-contact')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteInfoContact(@Body() datas: string[]) {
     return this.customerService.sendDeleteInfoContact(datas);
@@ -290,7 +317,7 @@ export class CustomerController {
 
   @Put('update-info-contact')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   updateInfoContact(@Body() updateInfoContactDto: UpdateInfoContactDto) {
     return this.customerService.updateInfoContact(updateInfoContactDto);
@@ -298,7 +325,7 @@ export class CustomerController {
 
   @Post('create-role-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   createRoleCustomer(@Body() createRoleCustomerDto: CreateRoleCustomerDto) {
     return this.customerService.createRoleCustomer(createRoleCustomerDto);
@@ -306,7 +333,7 @@ export class CustomerController {
 
   @Delete('/role-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteRoleCustomer(@Body() datas: string[]) {
     return this.customerService.sendDeleteRoleCustomer(datas);
@@ -314,7 +341,7 @@ export class CustomerController {
 
   @Put('update-role-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['customer', 'customer-update', 'admin-top'])
+  @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   updateRoleCustomer(@Body() updateRoleCustomerDto: UpdateRoleCustomerDto) {
     return this.customerService.updateRoleCustomer(updateRoleCustomerDto);

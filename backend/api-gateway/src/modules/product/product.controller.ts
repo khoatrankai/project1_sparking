@@ -54,7 +54,7 @@ export class ProductController {
 
   @Get('about')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   getAbout() {
     return this.productService.getAboutProduct();
@@ -62,7 +62,7 @@ export class ProductController {
 
   @Post('new')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('images', 5))
   async createProduct(
@@ -74,7 +74,7 @@ export class ProductController {
 
   @Delete()
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteProduct(@Body() datas: string[]) {
     return this.productService.sendDeleteProduct(datas);
@@ -82,7 +82,7 @@ export class ProductController {
 
   @Put('id/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('images', 5))
   async updateProduct(
@@ -95,7 +95,7 @@ export class ProductController {
 
   @Put('/status/id/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateStatusProduct(
     @Param('id') id: string,
@@ -106,7 +106,13 @@ export class ProductController {
 
   @Get('all')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'price_quote', 'admin-top'])
+  @SetMetadata('roles', [
+    'product',
+    'price_quote',
+    'admin-top',
+    'price_quote-read',
+    'product-read',
+  ])
   @SetMetadata('type', ['admin'])
   async findAllProduct() {
     return this.productService.findAllProduct();
@@ -114,7 +120,7 @@ export class ProductController {
 
   @Get('id/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneProduct(@Param('id') id: string) {
     return this.productService.findOneProduct(id);
@@ -123,7 +129,7 @@ export class ProductController {
   // CodeProduct endpoints
   @Post('code')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async createCodeProduct(@Body() createCodeProductDto: CreateCodeProductDto) {
     return this.productService.createCodeProduct(createCodeProductDto);
@@ -131,7 +137,7 @@ export class ProductController {
 
   @Get('code')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllCodeProduct() {
     return this.productService.findAllCodeProduct();
@@ -139,7 +145,7 @@ export class ProductController {
 
   @Get('code/all/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllCodeProductID(@Param('id') id: string) {
     return this.productService.findAllCodeProductID(id);
@@ -147,7 +153,7 @@ export class ProductController {
 
   @Get('code/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneCodeProduct(@Param('id') id: string) {
     return this.productService.findOneCodeProduct(id);
@@ -155,7 +161,7 @@ export class ProductController {
 
   @Get('code_url')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneUrlCodeProduct(@Query('url') url: string) {
     return this.productService.findOneUrlCodeProduct(url);
@@ -163,7 +169,7 @@ export class ProductController {
 
   @Get('code_client')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneClientCodeProduct(@Req() req: Request) {
     const linkClient = req.headers.origin;
@@ -172,7 +178,7 @@ export class ProductController {
 
   @Put('code/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateCodeProduct(
     @Param('id') id: string,
@@ -184,7 +190,7 @@ export class ProductController {
   // PictureProduct endpoints
   @Post('picture')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async createPictureProduct(
     @Body() createPictureProductDto: CreatePictureProductDto,
@@ -194,7 +200,7 @@ export class ProductController {
 
   @Get('picture')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllPictureProduct() {
     return this.productService.findAllPictureProduct();
@@ -202,7 +208,7 @@ export class ProductController {
 
   @Get('picture/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOnePictureProduct(@Param('id') id: string) {
     return this.productService.findOnePictureProduct(id);
@@ -210,7 +216,7 @@ export class ProductController {
 
   @Put('picture/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updatePictureProduct(
     @Param('id') id: string,
@@ -224,7 +230,7 @@ export class ProductController {
 
   @Delete('picture')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async deletePictureProduct(@Body() data: string[]) {
     return this.productService.deletePictureProduct(data);
@@ -233,7 +239,7 @@ export class ProductController {
   // TypeProduct endpoints
   @Post('type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async createTypeProduct(@Body() createTypeProductDto: CreateTypeProductDto) {
     return this.productService.createTypeProduct(createTypeProductDto);
@@ -241,7 +247,7 @@ export class ProductController {
 
   @Get('type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllTypeProduct() {
     return this.productService.findAllTypeProduct();
@@ -249,7 +255,7 @@ export class ProductController {
 
   @Get('type/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneTypeProduct(@Param('id') id: string) {
     return this.productService.findOneTypeProduct(id);
@@ -257,7 +263,7 @@ export class ProductController {
 
   @Put('type/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateTypeProduct(
     @Param('id') id: string,
@@ -269,7 +275,7 @@ export class ProductController {
 
   @Post('classify_type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async createClassifyType(
     @Body() createClassifyTypeDto: CreateClassifyTypeDto,
@@ -279,7 +285,7 @@ export class ProductController {
 
   @Get('classify_type')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllClassifyType() {
     return this.productService.findAllClassifyType();
@@ -287,7 +293,7 @@ export class ProductController {
 
   @Get('classify_type/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneClassifyType(@Param('id') id: string) {
     return this.productService.findOneClassifyType(id);
@@ -295,7 +301,7 @@ export class ProductController {
 
   @Get('classify_type_name/:name')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneClassifyTypeName(@Param('name') name: string) {
     return this.productService.findOneClassifyTypeName(name);
@@ -303,7 +309,7 @@ export class ProductController {
 
   @Put('classify_type/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateClassifyType(
     @Param('id') id: string,
@@ -314,7 +320,7 @@ export class ProductController {
 
   @Post('brand')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async createBrand(@Body() createBrandDto: CreateBrandDto) {
     return this.productService.createBrand(createBrandDto);
@@ -322,7 +328,7 @@ export class ProductController {
 
   @Delete('brand')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteBrand(@Body() datas: string[]) {
     return this.productService.sendDeleteBrand(datas);
@@ -330,7 +336,7 @@ export class ProductController {
 
   @Get('brand')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllBrand() {
     return this.productService.findAllBrand();
@@ -338,7 +344,7 @@ export class ProductController {
 
   @Get('brand/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneBrand(@Param('id') id: string) {
     return this.productService.findOneBrand(id);
@@ -346,7 +352,7 @@ export class ProductController {
 
   @Put('brand/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateBrand(
     @Param('id') id: string,
@@ -357,7 +363,7 @@ export class ProductController {
 
   @Post('original')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async createOriginal(@Body() createOriginalDto: CreateOriginalDto) {
     return this.productService.createOriginal(createOriginalDto);
@@ -365,7 +371,7 @@ export class ProductController {
 
   @Delete('original')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteOriginal(@Body() datas: string[]) {
     return this.productService.sendDeleteOriginal(datas);
@@ -373,7 +379,7 @@ export class ProductController {
 
   @Get('original')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllOriginal() {
     return this.productService.findAllOriginal();
@@ -381,7 +387,7 @@ export class ProductController {
 
   @Get('original/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneOriginal(@Param('id') id: string) {
     return this.productService.findOneOriginal(id);
@@ -389,7 +395,7 @@ export class ProductController {
 
   @Put('original/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateOriginal(
     @Param('id') id: string,
@@ -401,7 +407,7 @@ export class ProductController {
   // UnitProduct endpoints
   @Post('unit')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async createUnitProduct(@Body() createUnitProductDto: CreateUnitProductDto) {
     return this.productService.createUnitProduct(createUnitProductDto);
@@ -409,7 +415,7 @@ export class ProductController {
 
   @Delete('unit')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteUnitProduct(@Body() datas: string[]) {
     return this.productService.sendDeleteUnitProduct(datas);
@@ -417,7 +423,7 @@ export class ProductController {
 
   @Get('unit')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'price_quote', 'admin-top'])
+  @SetMetadata('roles', ['product', 'price_quote', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllUnitProduct() {
     return this.productService.findAllUnitProduct();
@@ -425,7 +431,7 @@ export class ProductController {
 
   @Get('unit/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneUnitProduct(@Param('id') id: string) {
     return this.productService.findOneUnitProduct(id);
@@ -433,7 +439,7 @@ export class ProductController {
 
   @Put('unit/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateUnitProduct(
     @Param('id') id: string,
@@ -444,7 +450,7 @@ export class ProductController {
 
   @Post('supplier')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async createSupplierProduct(
     @Body() createSupplierProductDto: CreateSupplierProductDto,
@@ -453,6 +459,9 @@ export class ProductController {
   }
 
   @Post('suppliers')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
   async createSuppliersProduct(
     @Body() createSupplierProductDto: CreateSupplierProductDto[],
   ) {
@@ -461,7 +470,7 @@ export class ProductController {
 
   @Delete('supplier')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteSupplierProduct(@Body() datas: string[]) {
     return this.productService.sendDeleteSupplierProduct(datas);
@@ -469,7 +478,7 @@ export class ProductController {
 
   @Get('supplier')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllSupplierProduct() {
     return this.productService.findAllSupplierProduct();
@@ -477,7 +486,7 @@ export class ProductController {
 
   @Get('supplier/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findOneSupplierProduct(@Param('id') id: string) {
     return this.productService.findOneSupplierProduct(id);
@@ -485,7 +494,7 @@ export class ProductController {
 
   @Put('supplier/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateSupplierProduct(
     @Param('id') id: string,
@@ -499,7 +508,7 @@ export class ProductController {
 
   @Post('activity_container')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async createActivityContainer(
     @Body() createActivityContainerDto: CreateActivityContainerDto,
@@ -511,7 +520,7 @@ export class ProductController {
 
   @Delete('activity_container')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async sendDeleteActivityContainer(@Body() datas: string[]) {
     return this.productService.sendDeleteActivityContainer(datas);
@@ -519,7 +528,7 @@ export class ProductController {
 
   @Get('activity_container')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findAllActivityContainers(@Query('type') type: string) {
     return this.productService.findAllActivityContainers(type);
@@ -527,7 +536,7 @@ export class ProductController {
 
   @Get('activity_container/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
   @SetMetadata('type', ['admin'])
   async findActivityContainerById(@Param('id') id: string) {
     return this.productService.findActivityContainerById(id);
@@ -535,7 +544,7 @@ export class ProductController {
 
   @Put('activity_container/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top'])
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
   @SetMetadata('type', ['admin'])
   async updateActivityContainer(
     @Param('id') id: string,

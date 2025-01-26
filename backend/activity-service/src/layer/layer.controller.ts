@@ -91,8 +91,11 @@ export class LayerController {
   }
 
   @MessagePattern('get-all_activities_ready')
-  async getAllActivitiesReady(id: string) {
-    return await this.layerService.getAllActivitiesReady(id);
+  async getAllActivitiesReady(
+    @Payload('id') id: string,
+    @Payload('user_id') user_id?: string,
+  ) {
+    return await this.layerService.getAllActivitiesReady(id, user_id);
   }
 
   @MessagePattern('get-all_works_ready')
@@ -311,13 +314,13 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'get-all_work_urgent' })
-  async getAllWorkUrgent() {
-    return this.layerService.getAllWorkUrgent();
+  async getAllWorkUrgent(user_id?: string) {
+    return this.layerService.getAllWorkUrgent(user_id);
   }
 
   @MessagePattern({ cmd: 'get-all_work_expired_urgent' })
-  async getAllWorkExpiredUrgent() {
-    return this.layerService.getAllWorkExpiredUrgent();
+  async getAllWorkExpiredUrgent(user_id?: string) {
+    return this.layerService.getAllWorkExpiredUrgent(user_id);
   }
 
   @MessagePattern({ cmd: 'create-type_work' })

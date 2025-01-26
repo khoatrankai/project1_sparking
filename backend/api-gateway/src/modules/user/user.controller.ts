@@ -40,7 +40,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'user-one', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Get('info')
   findOneInfo(@Query('user_id') user_id: string): Promise<InfoUserInterface> {
@@ -48,7 +48,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'user-update', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Put('update/:id')
   @UseInterceptors(FilesInterceptor('picture_url', 1))
@@ -78,7 +78,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'user-create', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Post('create')
   @UseInterceptors(FilesInterceptor('picture_url', 1))
@@ -90,7 +90,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'user-delete', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Delete()
   async sendDeleteUser(@Body() datas: string[]) {
@@ -98,7 +98,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'role-create', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Post('create-role-type')
   async createRoleType(@Body() createRoleTypeUserDto: CreateRoleTypeUserDto) {
@@ -106,7 +106,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'role-delete', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Delete('role-type')
   async sendDeleteRoleType(@Body() datas: string[]) {
@@ -114,7 +114,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'role-update', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Put('update-role-type')
   async updateRoleType(@Body() updateRoleTypeUserDto: UpdateRoleTypeUserDto) {
@@ -122,7 +122,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'role-user-add', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Post('add-role-user')
   async addRoleUser(@Body() createRoleUserDto: CreateRoleUserDto) {
@@ -130,7 +130,7 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'role-user-update', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Put('update-role-user')
   async updateRoleUser(@Body() updateRoleUserDto: UpdateRoleUserDto) {
@@ -157,11 +157,19 @@ export class UserController {
   }
 
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'user-id', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @Get('/admin/id/:id')
   async getUserIDAdmin(@Param('id') id: string) {
     return await this.userService.getUserIDAdmin(id);
+  }
+
+  @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
+  @SetMetadata('type', ['admin'])
+  @Get('/admin/user')
+  async getUserIDAdminByUser(@Req() req: Request) {
+    return await this.userService.getUserIDAdmin(req['user'].sub);
   }
 
   @Get('/profile')
@@ -214,6 +222,14 @@ export class UserController {
     return await this.userService.getFullRoleUserByID(id);
   }
 
+  @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
+  @SetMetadata('type', ['admin'])
+  @Get('get-full-role-user')
+  async getFullRoleUserByUser(@Req() req: Request) {
+    return await this.userService.getFullRoleUserByID(req['user'].sub);
+  }
+
   @Get('get-full-role-user-access')
   async getFullRoleUserByAccess(@Req() req: Request) {
     return await this.userService.getFullRoleUserByAccess(req);
@@ -253,7 +269,7 @@ export class UserController {
 
   @Post('create-group-user')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'user-create', 'user-update', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   createGroupUser(@Body() createGroupUserDto: CreateGroupUserDto) {
     return this.userService.createGroupUser(createGroupUserDto);
@@ -261,7 +277,7 @@ export class UserController {
 
   @Delete('/group-user')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'user-update', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteGroupUser(@Body() datas: string[]) {
     return this.userService.sendDeleteGroupUser(datas);
@@ -269,7 +285,7 @@ export class UserController {
 
   @Put('update-group-user/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['user', 'user-update', 'admin-top'])
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   updateGroupUser(
     @Param('id') id: string,
@@ -286,7 +302,6 @@ export class UserController {
   @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
   getUserFilter(@Query('group') group: string) {
-    console.log('vao');
     return this.userService.getUserFilter(group);
   }
 }

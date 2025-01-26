@@ -41,7 +41,7 @@ export class ContractController {
   @SetMetadata('roles', [
     'contract',
     'contract-read',
-    'contract-update',
+    'contract-edit',
     'admin-top',
   ])
   @SetMetadata('type', ['admin'])
@@ -51,15 +51,19 @@ export class ContractController {
 
   @Get('dashboard')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'admin-top'])
-  @SetMetadata('type', ['admin'])
+  @SetMetadata('checkfull', ['all'])
   async getFullContractDashboard() {
     return this.contractService.getFullContractDashboard();
   }
 
   @Get('contract-by-type-id/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'admin-top'])
+  @SetMetadata('roles', [
+    'contract',
+    'admin-top',
+    'contract-read',
+    'contract-read',
+  ])
   @SetMetadata('type', ['admin'])
   async getFullContractByTypeID(@Param('id') id: string) {
     return this.contractService.getFullContractByTypeID(id);
@@ -70,7 +74,7 @@ export class ContractController {
   @SetMetadata('roles', [
     'contract',
     'contract-read',
-    'contract-update',
+    'contract-edit',
     'admin-top',
   ])
   @SetMetadata('type', ['admin'])
@@ -80,7 +84,7 @@ export class ContractController {
 
   @Post('/type-contract')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async createTypeContract(
     @Body() createTypeContractDto: CreateTypeContractDto,
@@ -90,7 +94,7 @@ export class ContractController {
 
   @Delete('type-contract')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteTypeContract(@Body() datas: string[]) {
     return this.contractService.sendDeleteTypeContract(datas);
@@ -99,7 +103,7 @@ export class ContractController {
   // Update a type contract
   @Put('/type-contract/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async updateTypeContract(
     @Param('id') id: string,
@@ -114,7 +118,7 @@ export class ContractController {
   // Create a new contract
   @Post('/create')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-create', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async createContract(@Body() createContractDto: CreateContractDto) {
     return this.contractService.createContract(createContractDto);
@@ -122,7 +126,7 @@ export class ContractController {
 
   @Delete()
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-delete', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteContract(@Body() datas: string[]) {
     return this.contractService.sendDeleteContract(datas);
@@ -131,7 +135,7 @@ export class ContractController {
   // Update an existing contract
   @Put('update/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async updateContract(
     @Param('id') id: string,
@@ -187,7 +191,7 @@ export class ContractController {
   // Create a new payment
   @Post('/payment')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'payment-create', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'payment-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
     return this.contractService.createPayment(createPaymentDto);
@@ -195,7 +199,7 @@ export class ContractController {
 
   @Get('/debt-supplier')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['payment', 'contract', 'admin-top'])
+  @SetMetadata('roles', ['payment', 'contract', 'admin-top', 'payment-read'])
   @SetMetadata('type', ['admin'])
   async getDebtSupplier() {
     return this.contractService.getDebtSupplier();
@@ -203,7 +207,7 @@ export class ContractController {
 
   @Get('/payment-contract-dashboard')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['payment', 'contract', 'admin-top'])
+  @SetMetadata('roles', ['payment', 'contract', 'admin-top', 'payment-read'])
   @SetMetadata('type', ['admin'])
   async getPaymentContractDashboard() {
     return this.contractService.getPaymentContractDashboard();
@@ -211,15 +215,14 @@ export class ContractController {
 
   @Get('/revenue-total-contract')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['payment', 'contract', 'admin-top'])
-  @SetMetadata('type', ['admin'])
+  @SetMetadata('checkfull', ['all'])
   async getRevenueTotalContract() {
     return this.contractService.getRevenueTotalContract();
   }
 
   @Get('/payment-expired-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['payment', 'contract', 'admin-top'])
+  @SetMetadata('roles', ['payment', 'contract', 'admin-top', 'payment-read'])
   @SetMetadata('type', ['admin'])
   async getPaymentExpiredCustomer() {
     return this.contractService.getPaymentExpiredCustomer();
@@ -227,7 +230,7 @@ export class ContractController {
 
   @Get('/payment-ready-customer')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['payment', 'contract', 'admin-top'])
+  @SetMetadata('roles', ['payment', 'contract', 'admin-top', 'payment-read'])
   @SetMetadata('type', ['admin'])
   async getPaymentReadyCustomer() {
     return this.contractService.getPaymentReadyCustomer();
@@ -235,7 +238,7 @@ export class ContractController {
 
   @Get('/payment-ready-supplier')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['payment', 'contract', 'admin-top'])
+  @SetMetadata('roles', ['payment', 'contract', 'admin-top', 'payment-read'])
   @SetMetadata('type', ['admin'])
   async getPaymentReadySupplier() {
     return this.contractService.getPaymentReadySupplier();
@@ -243,7 +246,7 @@ export class ContractController {
 
   @Get('/current-year')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['payment', 'contract', 'admin-top'])
+  @SetMetadata('roles', ['payment', 'contract', 'admin-top', 'contract-read'])
   @SetMetadata('type', ['admin'])
   async getYearCurrentContracts() {
     return this.contractService.getYearCurrentContracts();
@@ -251,7 +254,7 @@ export class ContractController {
 
   @Delete('/payment')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'payment-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'payment-edit', 'admin-top', 'payment'])
   @SetMetadata('type', ['admin'])
   async sendDeletePayment(@Body() datas: string[]) {
     return this.contractService.sendDeletePayment(datas);
@@ -260,7 +263,7 @@ export class ContractController {
   // Update an existing payment
   @Put('/payment/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'payment-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'payment-edit', 'admin-top', 'payment'])
   @SetMetadata('type', ['admin'])
   async updatePayment(
     @Param('id') id: string,
@@ -284,7 +287,7 @@ export class ContractController {
   // Create a new type method
   @Post('/type-method')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'payment-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'payment-edit', 'admin-top', 'payment'])
   @SetMetadata('type', ['admin'])
   async createTypeMethod(@Body() createTypeMethodDto: CreateTypeMethodDto) {
     return this.contractService.createTypeMethod(createTypeMethodDto);
@@ -292,7 +295,7 @@ export class ContractController {
 
   @Delete('/type-method')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'payment-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'payment-edit', 'admin-top', 'payment'])
   @SetMetadata('type', ['admin'])
   async sendDeleteTypeMethod(@Body() datas: string[]) {
     return this.contractService.sendDeleteTypeMethod(datas);
@@ -301,7 +304,7 @@ export class ContractController {
   // Update an existing type method
   @Put('/type-method/:id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'payment-update', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'payment-edit', 'admin-top', 'payment'])
   @SetMetadata('type', ['admin'])
   async updateTypeMethod(
     @Param('id') id: string,
@@ -316,7 +319,7 @@ export class ContractController {
   @SetMetadata('roles', [
     'contract',
     'payment-read',
-    'payment-update',
+    'payment-edit',
     'admin-top',
   ])
   @SetMetadata('type', ['admin'])
@@ -326,7 +329,7 @@ export class ContractController {
 
   @Post('document/create')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-create', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   @UseInterceptors(FilesInterceptor('url'))
   async createDocumentContract(
@@ -342,7 +345,7 @@ export class ContractController {
 
   @Delete('document/delete')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-create', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async deleteDocumentContract(@Query('id') document_id: string) {
     return this.contractService.sendDeleteDocumentContract(document_id);
@@ -350,7 +353,7 @@ export class ContractController {
 
   @Get('document/all/:contract_id')
   @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['contract', 'contract-create', 'admin-top'])
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async getAllDocumentContract(@Param('contract_id') contract_id: string) {
     return this.contractService.sendGetAllDocumentContract(contract_id);

@@ -23,6 +23,7 @@ import { CreatePictureActivityDto } from './dto/PictureActivityDto/create-pictur
 import { GetActivityDto } from './dto/ActivityDto/get-activity.dto';
 import { GetFilterActivityDto } from './dto/ActivityDto/get-filter.dto';
 import { GetFilterWorkDto } from './dto/WorkDto/get-filter.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class ActivityService {
@@ -169,7 +170,16 @@ export class ActivityService {
 
   async sendGetAllActivitiesReady(id: string) {
     return await firstValueFrom(
-      this.activityClient.send('get-all_activities_ready', id),
+      this.activityClient.send('get-all_activities_ready', { id }),
+    );
+  }
+
+  async sendGetAllActivitiesReadyByUser(id: string, req: Request) {
+    return await firstValueFrom(
+      this.activityClient.send('get-all_activities_ready', {
+        id,
+        user_id: req['user'].sub,
+      }),
     );
   }
 
@@ -481,15 +491,15 @@ export class ActivityService {
     );
   }
 
-  async sendGetAllWorkUrgent() {
+  async sendGetAllWorkUrgent(user_id?: string) {
     return await firstValueFrom(
-      this.activityClient.send({ cmd: 'get-all_work_urgent' }, {}),
+      this.activityClient.send({ cmd: 'get-all_work_urgent' }, user_id),
     );
   }
 
-  async sendGetAllWorkExpiredUrgent() {
+  async sendGetAllWorkExpiredUrgent(user_id?: string) {
     return await firstValueFrom(
-      this.activityClient.send({ cmd: 'get-all_work_expired_urgent' }, {}),
+      this.activityClient.send({ cmd: 'get-all_work_expired_urgent' }, user_id),
     );
   }
 
