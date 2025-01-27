@@ -1,13 +1,12 @@
 import { IsString, IsEnum, IsOptional, IsArray } from 'class-validator';
 
 export class CreateActivityContainerDto {
-
   @IsString()
   @IsOptional()
   activity_container_id: string;
 
-  @IsEnum(['import', 'export'])
-  type: 'import' | 'export';
+  @IsEnum(['import', 'export', 'status'])
+  type: 'import' | 'export' | 'status';
 
   @IsString()
   @IsOptional()
@@ -27,10 +26,22 @@ export class CreateActivityContainerDto {
 
   @IsArray()
   @IsOptional()
-  list_code?:{price:number,code:string,status:'selled'|'borrowed',vat?:string,profit?:string}[]
+  list_code?: {
+    price: number;
+    code: string;
+    status:
+      | 'selled'
+      | 'borrowed'
+      | 'inventory'
+      | 'warranty'
+      | 'maintenance'
+      | 'export';
+    vat?: string;
+    profit?: string;
+    date_expired?: Date;
+  }[];
 
   @IsArray()
   @IsOptional()
-  list_product?:{quantity:number,product:string,price:number}[]
-
+  list_product?: { quantity: number; product: string; price: number }[];
 }

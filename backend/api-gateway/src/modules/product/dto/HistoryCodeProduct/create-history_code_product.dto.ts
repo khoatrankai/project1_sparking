@@ -1,12 +1,32 @@
-import { IsString, IsEnum, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateHistoryCodeProductDto {
   @IsString()
   @IsNotEmpty()
   history_id: string;
 
-  @IsEnum(['selled', 'borrowed', 'inventory', 'export'])
-  status: 'selled' | 'borrowed' | 'inventory' | 'export';
+  @IsEnum([
+    'selled',
+    'borrowed',
+    'inventory',
+    'export',
+    'warranty',
+    'maintenance',
+  ])
+  @IsOptional()
+  status?:
+    | 'selled'
+    | 'borrowed'
+    | 'inventory'
+    | 'export'
+    | 'maintenance'
+    | 'warranty';
 
   @IsInt()
   @IsOptional()

@@ -5,8 +5,8 @@ export class GetActivityContainerDto {
   @IsString()
   activity_container_id: string;
 
-  @IsEnum(['import', 'export'])
-  type: 'import' | 'export';
+  @IsEnum(['import', 'export', 'status'])
+  type: 'import' | 'export' | 'status';
 
   @IsString()
   @IsOptional()
@@ -33,4 +33,3 @@ export class GetActivityContainerDto {
   @IsArray()
   list_code: GetHistoryCodeProductDto[];
 }
- 

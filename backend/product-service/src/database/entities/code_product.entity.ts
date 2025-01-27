@@ -22,7 +22,14 @@ export class CodeProduct {
 
   @Column({
     type: 'enum',
-    enum: ['selled', 'borrowed', 'inventory', 'export'],
+    enum: [
+      'selled',
+      'borrowed',
+      'inventory',
+      'export',
+      'warranty',
+      'maintenance',
+    ],
     default: 'inventory',
   })
   status: string;

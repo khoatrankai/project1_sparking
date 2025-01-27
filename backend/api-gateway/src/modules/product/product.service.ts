@@ -299,6 +299,43 @@ export class ProductService {
     }
   }
 
+  async findOneUrlCodeProductStatus(url: string) {
+    try {
+      const name_tag = url.split('@')?.[1];
+      if (name_tag) {
+        const linkCode = await firstValueFrom(
+          this.systemClient.send({ cmd: 'get-link_system' }, name_tag),
+        );
+        if (linkCode && url.includes(linkCode.link)) {
+          const result = await firstValueFrom(
+            this.productClient.send(
+              { cmd: 'find-status_code_product' },
+              url.replace(linkCode.link, ''),
+            ),
+          );
+          if (!result)
+            throw new HttpException(
+              'Code product not found',
+              HttpStatus.NOT_FOUND,
+            );
+          if (result.length === 0)
+            throw new HttpException(
+              'Sản phẩm đã xuất kho',
+              HttpStatus.NOT_FOUND,
+            );
+          return { statusCode: HttpStatus.OK, data: result };
+        }
+      }
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        data: {},
+        message: 'Sản phẩm không tìm thấy',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async updateCodeProduct(
     id: string,
     updateCodeProductDto: UpdateCodeProductDto,
@@ -1007,31 +1044,13 @@ export class ProductService {
     createHistoryReportCode: CreateHistoryReportProductDto,
   ) {
     try {
-      const user = req['user'];
-      if (user) {
-        if (user.role === 'admin') {
-          return await firstValueFrom(
-            this.productClient.send(
-              { cmd: 'create-history_report_code' },
-              { ...createHistoryReportCode, user_support: user.sub },
-            ),
-          );
-        } else {
-          return await firstValueFrom(
-            this.productClient.send(
-              { cmd: 'create-history_report_code' },
-              { ...createHistoryReportCode, customer: user.sub },
-            ),
-          );
-        }
-      } else {
-        return await firstValueFrom(
-          this.productClient.send(
-            { cmd: 'create-history_report_code' },
-            createHistoryReportCode,
-          ),
-        );
-      }
+      const customer = req['customer'];
+      return await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-history_report_code' },
+          { ...createHistoryReportCode, customer: customer?.sub },
+        ),
+      );
     } catch (error) {
       throw error;
     }
@@ -1074,6 +1093,34 @@ export class ProductService {
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Vui lòng đăng nhập để thay đổi',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateStatusHistoryReportCode(
+    req: Request,
+    id: string,
+    updateHistoryReportCodeProduct: UpdateHistoryReportProductDto,
+  ) {
+    try {
+      console.log(id, updateHistoryReportCodeProduct);
+      const user = req['user'];
+      if (user) {
+        return await firstValueFrom(
+          this.productClient.send(
+            { cmd: 'update-status_history_report_code' },
+            {
+              id,
+              updateReportCode: updateHistoryReportCodeProduct,
+            },
+          ),
+        );
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Bạn không có quyền thay đổi nội dung',
       };
     } catch (error) {
       throw error;

@@ -348,6 +348,18 @@ export class LayerService {
     });
   }
 
+  async findOneCodeProductStatus(id: string): Promise<CodeProduct | undefined> {
+    return await this.codeProductRepository.findOne({
+      where: { code: id },
+      relations: [
+        'product',
+        'product.supplier_product',
+        'product.type',
+        'product.unit_product',
+      ],
+    });
+  }
+
   async updateCodeProduct(
     id: string,
     updateCodeProductDto: UpdateCodeProductDto,
@@ -816,6 +828,7 @@ export class LayerService {
             price: dt.price,
             vat: dt.vat,
             profit: dt.profit,
+            date_expired: dt.date_expired,
           });
         }),
       );
@@ -1067,6 +1080,24 @@ export class LayerService {
           : { history_id: id, customer },
         updateReport,
       );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Cập nhật báo cáo thành công',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Cập nhật báo cáo không thành công',
+      };
+    }
+  }
+
+  async updateStatusHistoryReportCodeProduct(
+    id: string,
+    updateReport: UpdateHistoryReportProductDto,
+  ) {
+    try {
+      await this.historyReportProductRepository.update(id, updateReport);
       return {
         statusCode: HttpStatus.OK,
         message: 'Cập nhật báo cáo thành công',

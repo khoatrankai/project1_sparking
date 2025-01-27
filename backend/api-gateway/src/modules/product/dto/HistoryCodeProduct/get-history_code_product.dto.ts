@@ -7,11 +7,24 @@ export class GetHistoryCodeProductDto {
   @IsOptional()
   history_id?: string;
 
-  @IsEnum(['selled', 'borrowed', 'inventory', 'export'])
+  @IsEnum([
+    'selled',
+    'borrowed',
+    'inventory',
+    'export',
+    'warranty',
+    'maintenance',
+  ])
   @IsOptional()
-  status?: 'selled' | 'borrowed' | 'inventory' | 'export';
+  status?:
+    | 'selled'
+    | 'borrowed'
+    | 'inventory'
+    | 'export'
+    | 'maintenance'
+    | 'warranty';
 
-  @IsString() 
+  @IsString()
   @IsOptional()
   code_product?: GetCodeProductDto; // ID of CodeProduct
 

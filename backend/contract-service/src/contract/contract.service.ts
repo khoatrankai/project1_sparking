@@ -483,11 +483,11 @@ export class ContractService {
   // Update an existing Payment
   async updatePayment(payment_id: string, updatePaymentDto: UpdatePaymentDto) {
     try {
-      const contract = await this.contractRepository.findOne({
-        where: { contract_id: updatePaymentDto.contract },
+      const contract = await this.contractRepository.findOneBy({
+        contract_id: updatePaymentDto.contract ?? '',
       });
-      const type_method = await this.typeMethodRepository.findOne({
-        where: { type_method_id: updatePaymentDto.type_method },
+      const type_method = await this.typeMethodRepository.findOneBy({
+        type_method_id: updatePaymentDto.type_method ?? '',
       });
       await this.paymentRepository.update(payment_id, {
         ...updatePaymentDto,

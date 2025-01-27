@@ -113,6 +113,11 @@ export class LayerController {
     return this.layerService.findOneCodeProduct(id);
   }
 
+  @MessagePattern({ cmd: 'find-status_code_product' })
+  async findOneCodeProductStatus(@Payload() id: string) {
+    return this.layerService.findOneCodeProductStatus(id);
+  }
+
   @MessagePattern({ cmd: 'update-code_product' })
   async updateCodeProduct(
     @Payload() data: { id: string; updateCodeProductDto: UpdateCodeProductDto },
@@ -441,6 +446,17 @@ export class LayerController {
       data.user_support,
       data.customer,
       data.role,
+    );
+  }
+
+  @MessagePattern({ cmd: 'update-status_history_report_code' })
+  async updateStatusHistoryReportCodeProduct(data?: {
+    id: string;
+    updateReportCode: UpdateHistoryReportProductDto;
+  }) {
+    return await this.layerService.updateStatusHistoryReportCodeProduct(
+      data.id,
+      data.updateReportCode,
     );
   }
 

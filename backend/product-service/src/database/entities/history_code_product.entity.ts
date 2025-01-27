@@ -17,7 +17,14 @@ export class HistoryCodeProduct {
 
   @Column({
     type: 'enum',
-    enum: ['selled', 'borrowed', 'inventory', 'export'],
+    enum: [
+      'selled',
+      'borrowed',
+      'inventory',
+      'export',
+      'warranty',
+      'maintenance',
+    ],
     default: 'inventory',
   })
   status: string;
@@ -36,6 +43,9 @@ export class HistoryCodeProduct {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @Column({ type: 'datetime', nullable: true })
+  date_expired: Date;
 
   @ManyToOne(() => CodeProduct, (codeProduct) => codeProduct.history, {
     onDelete: 'CASCADE',

@@ -1,4 +1,10 @@
-import { IsString, IsEnum, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  IsNotEmpty,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateCodeProductDto {
   @IsString()
@@ -11,12 +17,24 @@ export class CreateCodeProductDto {
   @MaxLength(50)
   code: string;
 
-  @IsEnum(['selled', 'borrowed', 'inventory', 'export'])
+  @IsEnum([
+    'selled',
+    'borrowed',
+    'inventory',
+    'export',
+    'warranty',
+    'maintenance',
+  ])
   @IsOptional()
-  status?: 'selled' | 'borrowed' | 'inventory' | 'export';
+  status?:
+    | 'selled'
+    | 'borrowed'
+    | 'inventory'
+    | 'export'
+    | 'maintenance'
+    | 'warranty';
 
   @IsString()
   @IsNotEmpty()
   product: string;
-
 }

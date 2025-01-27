@@ -167,6 +167,14 @@ export class ProductController {
     return this.productService.findOneUrlCodeProduct(url);
   }
 
+  @Get('status-code_url')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
+  @SetMetadata('type', ['admin'])
+  async findOneUrlCodeProductStatus(@Query('url') url: string) {
+    return this.productService.findOneUrlCodeProductStatus(url);
+  }
+
   @Get('code_client')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
@@ -571,6 +579,19 @@ export class ProductController {
     @Body() updateReport: UpdateHistoryReportProductDto,
   ) {
     return this.productService.updateHistoryReportCode(req, id, updateReport);
+  }
+
+  @Put('report-status/:id')
+  async updateStatusHistoryReportCode(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() updateReport: UpdateHistoryReportProductDto,
+  ) {
+    return this.productService.updateStatusHistoryReportCode(
+      req,
+      id,
+      updateReport,
+    );
   }
 
   @Post('like-report')

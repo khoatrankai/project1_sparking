@@ -13,7 +13,11 @@ export class ActivityContainer {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   activity_container_id: string;
 
-  @Column({ type: 'enum', enum: ['import', 'export'], default: 'import' })
+  @Column({
+    type: 'enum',
+    enum: ['import', 'export', 'status'],
+    default: 'import',
+  })
   type: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
