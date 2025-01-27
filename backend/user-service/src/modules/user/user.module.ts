@@ -5,11 +5,24 @@ import { UserService } from './user.service';
 import { AccountUsers } from 'src/database/entities/account_users.entity';
 import { GroupUser } from 'src/database/entities/group_user.entity';
 import { ListGroupRole } from 'src/database/entities/list_group_role.entity';
+import { RoleTypeUser } from 'src/database/entities/role_type_user.entity';
+import { RoleService } from '../role/role.service';
+import { RoleUser } from 'src/database/entities/role_user.entity';
+import { CategoryRoleUser } from 'src/database/entities/category_role_user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AccountUsers, GroupUser, ListGroupRole])],
+  imports: [
+    TypeOrmModule.forFeature([
+      AccountUsers,
+      GroupUser,
+      ListGroupRole,
+      RoleTypeUser,
+      RoleUser,
+      CategoryRoleUser,
+    ]),
+  ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, RoleService],
   // exports:[TypeOrmModule]
 })
 export class UserModule {}

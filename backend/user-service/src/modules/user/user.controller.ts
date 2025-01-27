@@ -105,4 +105,18 @@ export class UserController {
   getUserFilter(@Payload('group') group?: string) {
     return this.userService.getUserFilter(group);
   }
+
+  @MessagePattern({ cmd: 'update-group_role' })
+  updateGroupRole(
+    @Payload('group_id') group_id: string,
+    @Payload('list_role')
+    list_role: string[],
+  ) {
+    return this.userService.updateGroupRole(group_id, list_role);
+  }
+
+  @MessagePattern({ cmd: 'get-role_by_group' })
+  getRoleByGroup(group_id: string) {
+    return this.userService.getRoleByGroup(group_id);
+  }
 }

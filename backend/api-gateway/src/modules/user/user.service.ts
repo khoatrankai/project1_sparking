@@ -79,11 +79,12 @@ export class UserService {
     createUserDto: CreateUserDto,
     picture_url: Express.Multer.File,
   ) {
-    const data = await this.cloudinaryService.uploadFile(picture_url);
-    console.log(data);
+    const data = picture_url
+      ? await this.cloudinaryService.uploadFile(picture_url)
+      : undefined;
     return this.usersClient.send(
       { cmd: 'register-user' },
-      { ...createUserDto, picture_url: data.secure_url },
+      { ...createUserDto, picture_url: data ? data.secure_url : undefined },
     );
   }
 
@@ -255,6 +256,18 @@ export class UserService {
   async getUserFilter(group?: string) {
     return await firstValueFrom(
       this.usersClient.send({ cmd: 'get-user_filter' }, { group }),
+    );
+  }
+
+  async updateGroupRole(data: { group_id: string; list_role: string[] }) {
+    return await firstValueFrom(
+      this.usersClient.send({ cmd: 'update-group_role' }, data),
+    );
+  }
+
+  async getRoleByGroup(group_id: string) {
+    return await firstValueFrom(
+      this.usersClient.send({ cmd: 'get-role_by_group' }, group_id),
     );
   }
 }

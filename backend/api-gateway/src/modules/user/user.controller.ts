@@ -172,6 +172,22 @@ export class UserController {
     return await this.userService.getUserIDAdmin(req['user'].sub);
   }
 
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  @Put('/group-role/:id')
+  async updateGroupRole(@Param('id') id: string, @Body() list_role: string[]) {
+    return await this.userService.updateGroupRole({ group_id: id, list_role });
+  }
+
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  @Get('/group-role/:id')
+  async getRoleByGroup(@Param('id') id: string) {
+    return await this.userService.getRoleByGroup(id);
+  }
+
   @Get('/profile')
   async getUserIDProfile(@Req() req: Request) {
     return await this.userService.getUserIDProfile(req);

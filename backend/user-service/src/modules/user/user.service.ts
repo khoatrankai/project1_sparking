@@ -16,6 +16,9 @@ import { UpdateUserDto } from 'src/dto/update_user.dto';
 import { GroupUser } from 'src/database/entities/group_user.entity';
 import { CreateGroupUserDto } from 'src/dto/GroupUser/create_group.dto';
 import { UpdateGroupUserDto } from 'src/dto/GroupUser/update_group.dto';
+import { ListGroupRole } from 'src/database/entities/list_group_role.entity';
+import { RoleTypeUser } from 'src/database/entities/role_type_user.entity';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class UserService {
@@ -24,7 +27,12 @@ export class UserService {
     private readonly accountUserRepository: Repository<AccountUsers>,
     @InjectRepository(GroupUser)
     private readonly groupUserRepository: Repository<GroupUser>,
+    @InjectRepository(ListGroupRole)
+    private readonly listGroupRoleRepository: Repository<ListGroupRole>,
+    @InjectRepository(RoleTypeUser)
+    private readonly roleTypeRepository: Repository<RoleTypeUser>,
     private configService: ConfigService,
+    private roleService: RoleService,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -68,6 +76,7 @@ export class UserService {
             where: { group_id: registerDto.group_user },
           })
         : undefined;
+
       const pass = await this.hashPassword(registerDto.password);
       const user = this.accountUserRepository.create({
         ...registerDto,
@@ -75,7 +84,22 @@ export class UserService {
         password: pass,
         group_user,
       });
-      await this.accountUserRepository.save(user);
+      const data = await this.accountUserRepository.save(user);
+      if (group_user && data) {
+        const dataRoleGroup = await this.roleTypeRepository
+          .createQueryBuilder('role_type')
+          .leftJoin('role_type.group_role', 'group_role')
+          .leftJoin('group_role.group_user', 'group_user')
+          .where('group_user.group_id = :group_id', {
+            group_id: registerDto.group_user,
+          })
+          .select('role_type.role_type_id')
+          .getMany();
+        await this.roleService.updateFullRoleUserByID({
+          id: data.user_id,
+          role_type: dataRoleGroup.map((dt) => dt.role_type_id),
+        });
+      }
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Tạo tài khoản thành công',
@@ -362,5 +386,50 @@ export class UserService {
       statusCode: HttpStatus.OK,
       data,
     };
+  }
+
+  async updateGroupRole(group_id: string, list_role: string[]) {
+    try {
+      await this.listGroupRoleRepository.delete({ group_user: In([group_id]) });
+      const group_user = await this.groupUserRepository.findOneBy({ group_id });
+      const dataSaveList = await Promise.all(
+        list_role.map(async (dt) => {
+          return this.listGroupRoleRepository.create({
+            list_id: uuidv4(),
+            role_type: await this.roleTypeRepository.findOneBy({
+              role_type_id: dt,
+            }),
+            group_user,
+          });
+        }),
+      );
+      const saveList = await this.listGroupRoleRepository.save(dataSaveList);
+      if (saveList) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Cập nhật role cho phòng bàn thành công',
+        };
+      }
+    } catch {}
+  }
+
+  async getRoleByGroup(group_id: string) {
+    try {
+      const data = await this.roleTypeRepository
+        .createQueryBuilder('role_type')
+        .leftJoin('role_type.group_role', 'group_role')
+        .leftJoin('group_role.group_user', 'group_user')
+        .where('group_user.group_id = :group_id', { group_id })
+        .getMany();
+      return {
+        statusCode: HttpStatus.OK,
+        data,
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Lỗi rồi',
+      };
+    }
   }
 }
