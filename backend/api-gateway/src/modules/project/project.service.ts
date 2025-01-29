@@ -22,11 +22,13 @@ export class ProjectService {
     createProjectDto: CreateProjectDto,
     picture_url: Express.Multer.File,
   ) {
-    const data = await this.cloudinaryService.uploadFile(picture_url);
+    const data = picture_url
+      ? await this.cloudinaryService.uploadFile(picture_url)
+      : undefined;
     return this.projectClient
       .send(
         { cmd: 'create-project' },
-        { ...createProjectDto, picture_url: data.secure_url },
+        { ...createProjectDto, picture_url: data?.secure_url },
       )
       .toPromise();
   }
