@@ -378,7 +378,9 @@ export class ContractService {
   async getYearCurrentContracts() {
     const result = await this.contractRepository
       .createQueryBuilder('contract')
-      .where('YEAR(contract.created_at) = :year', { year: 2024 })
+      .where('YEAR(contract.created_at) = :year', {
+        year: new Date().getFullYear(),
+      })
       .orderBy('contract.price', 'DESC')
       .getMany();
     // const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_id'},result.customer))
@@ -856,7 +858,7 @@ export class ContractService {
   }
 
   async getFullContractDashboard() {
-    const currentYear = 2024;
+    const currentYear = new Date().getFullYear();
     const result = await this.typeContractRepository
       .createQueryBuilder('typeContract')
       .leftJoin('typeContract.contracts', 'contracts')
@@ -874,7 +876,7 @@ export class ContractService {
   }
 
   async getFullContractByIDType(id: string) {
-    const currentYear = 2024;
+    const currentYear = new Date().getFullYear();
     const result = await this.typeContractRepository
       .createQueryBuilder('typeContract')
       .leftJoin('typeContract.contracts', 'contracts')
@@ -1050,7 +1052,9 @@ export class ContractService {
     // const year = new Date().getFullYear()
     const data = await this.contractRepository
       .createQueryBuilder('contract')
-      .where('YEAR(contract.date_start) = :year', { year: 2024 })
+      .where('YEAR(contract.date_start) = :year', {
+        year: new Date().getFullYear(),
+      })
       .select('SUM(contract.price)', 'total')
       .getRawOne();
     return {

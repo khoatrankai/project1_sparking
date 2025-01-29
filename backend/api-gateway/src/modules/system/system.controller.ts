@@ -161,6 +161,12 @@ export class SystemController {
   getOneTarget(@Param('id') id: string) {
     return this.systemService.getTarget(id);
   }
+
+  @Get('target_revenue_year')
+  getTargetYear() {
+    return this.systemService.getTargetYear();
+  }
+
   @Post('target_revenue')
   createTarget(@Body() data: CreateTargetRevenueDto) {
     return this.systemService.createTarget(data);

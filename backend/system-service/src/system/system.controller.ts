@@ -94,6 +94,11 @@ export class SystemController {
     return this.systemService.getTarget(id);
   }
 
+  @MessagePattern({ cmd: 'get-target_revenue_year' })
+  getTargetYear() {
+    return this.systemService.getTargetYear();
+  }
+
   @MessagePattern({ cmd: 'create-target_revenue' })
   createTarget(data: CreateTargetRevenueDto) {
     return this.systemService.createTarget(data);

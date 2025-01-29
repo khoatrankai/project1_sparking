@@ -197,6 +197,16 @@ export class SystemService {
     };
   }
 
+  async getTargetYear() {
+    const data = await this.targetRevenueRepository.findOneBy({
+      year: new Date().getFullYear(),
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
+  }
+
   async deleteProvinces(datas: string[]) {
     try {
       const rm = await this.provinceRepository.delete({

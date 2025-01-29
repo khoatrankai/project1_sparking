@@ -79,7 +79,10 @@ export class LayerService {
       .createQueryBuilder('opportunity')
       .where(
         'YEAR(opportunity.created_at) = :year AND opportunity.status IN (:...statuses)',
-        { statuses: ['cancel', 'pending', 'success'], year: 2024 },
+        {
+          statuses: ['cancel', 'pending', 'success'],
+          year: new Date().getFullYear(),
+        },
       )
       .select('opportunity.status', 'status')
       .addSelect('COUNT(*)', 'count')

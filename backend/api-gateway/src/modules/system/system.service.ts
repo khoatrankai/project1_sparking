@@ -336,6 +336,10 @@ export class SystemService {
     return this.systemClient.send({ cmd: 'get-target_revenue' }, id);
   }
 
+  async getTargetYear() {
+    return this.systemClient.send({ cmd: 'get-target_revenue_year' }, {});
+  }
+
   async getAllTarget() {
     return this.systemClient.send({ cmd: 'get-all_target_revenue' }, {});
   }
