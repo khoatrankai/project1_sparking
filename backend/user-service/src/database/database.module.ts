@@ -8,6 +8,9 @@ import { createConnection } from 'mysql2/promise';
 import { ConfigService } from '@nestjs/config';
 import { GroupUser } from './entities/group_user.entity';
 import { ListGroupRole } from './entities/list_group_role.entity';
+import { Notify } from './entities/notify.entity';
+import { NotifyRole } from './entities/notify_role.entity';
+import { NotifyUser } from './entities/notify_user.entity';
 
 @Module({
   imports: [
@@ -38,6 +41,9 @@ import { ListGroupRole } from './entities/list_group_role.entity';
             CategoryRoleUser,
             GroupUser,
             ListGroupRole,
+            Notify,
+            NotifyRole,
+            NotifyUser,
           ],
           // synchronize: true,
           // dropSchema: true,

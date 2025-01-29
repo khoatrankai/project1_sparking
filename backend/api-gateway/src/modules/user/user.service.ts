@@ -270,4 +270,25 @@ export class UserService {
       this.usersClient.send({ cmd: 'get-role_by_group' }, group_id),
     );
   }
+
+  async getNotifyByUser(user_id: string, page: number, limit: number) {
+    return await firstValueFrom(
+      this.usersClient.send({ cmd: 'get-notify' }, { user_id, page, limit }),
+    );
+  }
+
+  async updateNotifyByUser(user_id: string, notify_user_id?: string) {
+    return await firstValueFrom(
+      this.usersClient.send(
+        { cmd: 'update-notify' },
+        { user_id, notify_user_id },
+      ),
+    );
+  }
+
+  async getCountNotifyByUser(user_id: string) {
+    return await firstValueFrom(
+      this.usersClient.send({ cmd: 'get-count-notify' }, { user_id }),
+    );
+  }
 }

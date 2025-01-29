@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { CategoryRoleUser } from './category_role_user.entity';
 import { ListGroupRole } from './list_group_role.entity';
+import { RoleUser } from './role_user.entity';
 
 @Entity('role_type_user')
 export class RoleTypeUser {
@@ -26,4 +27,7 @@ export class RoleTypeUser {
 
   @OneToMany(() => ListGroupRole, (groupRole) => groupRole.role_type)
   group_role: ListGroupRole[];
+
+  @OneToMany(() => RoleUser, (roleUser) => roleUser.role_type)
+  role_user: RoleUser[];
 }

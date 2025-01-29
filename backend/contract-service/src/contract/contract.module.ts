@@ -21,6 +21,14 @@ import { DocumentContract } from 'src/database/entities/document_contract.entity
         },
       },
       {
+        name: 'USER',
+        transport: Transport.TCP,
+        options: {
+          host: 'user_service',
+          port: 3005,
+        },
+      },
+      {
         name: 'PROJECT',
         transport: Transport.TCP,
         options: {

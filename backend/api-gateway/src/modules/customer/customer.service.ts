@@ -172,10 +172,12 @@ export class CustomerService {
     createCustomerInfoDto: CreateCustomerInfoDto,
     picture_url: Express.Multer.File,
   ) {
-    const data = await this.cloudinaryService.uploadFile(picture_url);
+    const data = picture_url
+      ? await this.cloudinaryService.uploadFile(picture_url)
+      : undefined;
     return this.customerClient.send(
       { cmd: 'create-customer_info' },
-      { ...createCustomerInfoDto, picture_url: data.secure_url },
+      { ...createCustomerInfoDto, picture_url: data?.secure_url },
     );
   }
 
@@ -189,7 +191,9 @@ export class CustomerService {
     updateCustomerInfoDto: UpdateCustomerInfoDto,
     picture_url: Express.Multer.File,
   ) {
-    const data = await this.cloudinaryService.uploadFile(picture_url);
+    const data = picture_url
+      ? await this.cloudinaryService.uploadFile(picture_url)
+      : undefined;
     return this.customerClient.send(
       { cmd: 'update-customer_info' },
       { ...updateCustomerInfoDto, picture_url: data?.secure_url },

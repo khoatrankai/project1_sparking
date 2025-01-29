@@ -11,15 +11,18 @@ import { CreateTypeProjectDto } from 'src/dto/TypeProjectDto/create-type_project
 import { TypeProject } from 'src/database/entities/type_project.entity';
 import { UpdateTypeProjectDto } from 'src/dto/TypeProjectDto/update-type_project.dto';
 import { GetFilterProjectDto } from 'src/dto/ProjectDto/get-filter.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class LayerService {
   constructor(
     @Inject('CUSTOMER') private readonly customersClient: ClientProxy,
+    @Inject('USER') private readonly userClient: ClientProxy,
     @InjectRepository(Projects)
     private readonly projectsRepository: Repository<Projects>,
     @InjectRepository(TypeProject)
     private readonly typeProjectRepository: Repository<TypeProject>,
+    private readonly configService: ConfigService,
   ) {}
 
   // Create a new project
@@ -29,7 +32,16 @@ export class LayerService {
       project_id: uuidv4(),
     });
     const savedProject = await this.projectsRepository.save(project);
-
+    await firstValueFrom(
+      this.userClient.emit(
+        { cmd: 'create-notify' },
+        {
+          description: 'Thông báo có một dự án mới',
+          link: `${this.configService.get<string>('DOMAIN')}/admin/project?id=${savedProject.project_id}`,
+          notify_role: ['admin-top', 'project'],
+        },
+      ),
+    );
     return {
       statusCode: HttpStatus.CREATED,
       data: savedProject,

@@ -9,6 +9,9 @@ import { RoleTypeUser } from 'src/database/entities/role_type_user.entity';
 import { RoleService } from '../role/role.service';
 import { RoleUser } from 'src/database/entities/role_user.entity';
 import { CategoryRoleUser } from 'src/database/entities/category_role_user.entity';
+import { Notify } from 'src/database/entities/notify.entity';
+import { NotifyRole } from 'src/database/entities/notify_role.entity';
+import { NotifyUser } from 'src/database/entities/notify_user.entity';
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { CategoryRoleUser } from 'src/database/entities/category_role_user.entit
       RoleTypeUser,
       RoleUser,
       CategoryRoleUser,
+      Notify,
+      NotifyRole,
+      NotifyUser,
     ]),
   ],
   controllers: [UserController],

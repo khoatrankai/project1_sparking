@@ -34,11 +34,13 @@ import { GetFilterPaymentDto } from 'src/dto/PaymentDto/get-filter.dto';
 import { GetFilterContractDto } from 'src/dto/ContractDto/get-filter.dto';
 import { CreateDocumentContractDto } from 'src/dto/DocumentContractDto/create-document_contract.dto';
 import { DocumentContract } from 'src/database/entities/document_contract.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ContractService {
   constructor(
     @Inject('CUSTOMER') private readonly customersClient: ClientProxy,
+    @Inject('USER') private readonly userClient: ClientProxy,
     @Inject('PRODUCT') private readonly productsClient: ClientProxy,
     @Inject('PROJECT') private readonly projectsClient: ClientProxy,
     @InjectRepository(Contract)
@@ -51,6 +53,7 @@ export class ContractService {
     private paymentRepository: Repository<Payment>,
     @InjectRepository(TypeMethod)
     private typeMethodRepository: Repository<TypeMethod>,
+    private readonly configService: ConfigService,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -128,7 +131,16 @@ export class ContractService {
         type_contract: typeContract,
       });
       await this.contractRepository.save(dataNew);
-
+      await firstValueFrom(
+        this.userClient.emit(
+          { cmd: 'create-notify' },
+          {
+            description: 'Thông báo có hợp đồng mới',
+            link: `${this.configService.get<string>('DOMAIN')}/admin/contract?id=${id}`,
+            notify_role: ['admin-top', 'contract'],
+          },
+        ),
+      );
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Contract created successfully',
@@ -451,6 +463,16 @@ export class ContractService {
         type_method,
       });
       await this.paymentRepository.save(payment);
+      await firstValueFrom(
+        this.userClient.emit(
+          { cmd: 'create-notify' },
+          {
+            description: 'Thông báo có hóa đơn mới',
+            link: `${this.configService.get<string>('DOMAIN')}/admin/payment?id=${payment.payment_id}`,
+            notify_role: ['admin-top', 'contract', 'payment'],
+          },
+        ),
+      );
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Payment created successfully',

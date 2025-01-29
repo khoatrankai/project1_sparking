@@ -283,6 +283,33 @@ export class UserController {
     return this.userService.getGroupUser();
   }
 
+  @Get('get-notify')
+  getNotifyByUser(
+    @Req() req: Request,
+    @Query() data: { page?: number; limit: number },
+  ) {
+    return this.userService.getNotifyByUser(
+      req?.['user']?.sub,
+      Number(data.page),
+      Number(data.limit),
+    );
+  }
+
+  @Get('get-count-notify')
+  getCountNotifyByUser(@Req() req: Request) {
+    return this.userService.getCountNotifyByUser(req?.['user']?.sub);
+  }
+
+  @Put('update-notify/:id')
+  updateNotifyByUser(@Req() req: Request, @Param('id') id: string) {
+    return this.userService.updateNotifyByUser(req?.['user']?.sub, id);
+  }
+
+  @Put('update-all-notify')
+  updateAllNotifyByUser(@Req() req: Request) {
+    return this.userService.updateNotifyByUser(req?.['user']?.sub);
+  }
+
   @Post('create-group-user')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['user', 'user-edit', 'user-edit', 'admin-top'])

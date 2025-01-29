@@ -9,6 +9,7 @@ import { AccountUsers } from 'src/database/entities/account_users.entity';
 import { UpdateUserDto } from 'src/dto/update_user.dto';
 import { CreateGroupUserDto } from 'src/dto/GroupUser/create_group.dto';
 import { UpdateGroupUserDto } from 'src/dto/GroupUser/update_group.dto';
+import { CreateNotifyrDto } from 'src/dto/Notify/create_notify.dto';
 
 @Controller()
 @UseFilters(ConflictExceptionFilter)
@@ -38,6 +39,33 @@ export class UserController {
   @MessagePattern({ cmd: 'register-user' })
   createUser(createUserDto: CreateUserDto): Promise<ResultResponse> {
     return this.userService.createUser(createUserDto);
+  }
+
+  @MessagePattern({ cmd: 'create-notify' })
+  createNotify(createData: CreateNotifyrDto) {
+    return this.userService.createNotify(createData);
+  }
+
+  @MessagePattern({ cmd: 'get-notify' })
+  getNotify(getData: { user_id: string; page: number; limit: number }) {
+    return this.userService.getNotifyByUser(
+      getData.user_id,
+      getData.page,
+      getData.limit,
+    );
+  }
+
+  @MessagePattern({ cmd: 'update-notify' })
+  updateStatusNotify(getData: { user_id: string; notify_user_id?: string }) {
+    return this.userService.updateStatusNotify(
+      getData.user_id,
+      getData.notify_user_id,
+    );
+  }
+
+  @MessagePattern({ cmd: 'get-count-notify' })
+  getCountNotify(getData: { user_id: string }) {
+    return this.userService.getCountNotify(getData.user_id);
   }
 
   @MessagePattern({ cmd: 'register-user_mail' })

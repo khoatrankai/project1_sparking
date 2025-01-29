@@ -1,7 +1,12 @@
-import { IsString, Length, IsEnum, IsOptional, IsDateString } from 'class-validator';
+import {
+  IsString,
+  Length,
+  IsEnum,
+  IsOptional,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateCustomerInfoDto {
-
   @IsString()
   @Length(1, 50)
   name_company: string;
@@ -9,7 +14,7 @@ export class CreateCustomerInfoDto {
   @IsString()
   @Length(1, 50)
   @IsOptional()
-  group_customer?: string; 
+  group_customer?: string;
 
   @IsString()
   @Length(1, 50)
@@ -34,20 +39,20 @@ export class CreateCustomerInfoDto {
   website?: string;
 
   @IsEnum(['vnd', 'usd'])
-  type_money: string;
+  type_money: string = 'vnd';
 
   @IsDateString()
   @IsOptional()
   date_establish?: Date;
 
-
   @IsString()
   @Length(1, 50)
   @IsOptional()
   opportunity?: string;
-  
+
   @IsString()
   @Length(1, 50)
+  @IsOptional()
   address_payment: string;
 
   @IsString()

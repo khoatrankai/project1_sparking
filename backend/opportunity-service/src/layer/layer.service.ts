@@ -25,6 +25,7 @@ import { UpdateTypeSourcesDto } from 'src/dto/TypeSourceDto/update-type_source.d
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { GetFilterOpportunitiesDto } from 'src/dto/OpportunityDto/get-filter.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class LayerService {
@@ -37,6 +38,7 @@ export class LayerService {
     private typeOpportunitiesRepository: Repository<TypeOpportunities>,
     @InjectRepository(TypeSources)
     private typeSourcesRepository: Repository<TypeSources>,
+    private configService: ConfigService,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -55,7 +57,17 @@ export class LayerService {
       type_source: type_source,
       opportunity_id: uuidv4(),
     });
-    await this.opportunitiesRepository.save(opportunity);
+    const dataOK = await this.opportunitiesRepository.save(opportunity);
+    await firstValueFrom(
+      this.usersClient.emit(
+        { cmd: 'create-notify' },
+        {
+          description: 'Thông báo có một cơ hội mới',
+          link: `${this.configService.get<string>('DOMAIN')}/admin/opportunity?id=${dataOK.opportunity_id}`,
+          notify_role: ['admin-top', 'opportunity'],
+        },
+      ),
+    );
     return {
       statusCode: HttpStatus.CREATED,
       data: opportunity,
@@ -193,13 +205,13 @@ export class LayerService {
       updateOpportunitiesDto.status === 'success' &&
       updatedOpportunity.status !== 'success'
     ) {
-      console.log('vao nay');
       const res = await firstValueFrom(
         this.customerClient.send(
           { cmd: 'create-customer_opportunity' },
           updatedOpportunity,
         ),
       );
+
       if (res.statusCode === 201) {
         return {
           statusCode: HttpStatus.OK,

@@ -48,6 +48,7 @@ import { firstValueFrom } from 'rxjs';
 import { GetActivityDto } from 'src/dto/ActivityDto/get-activity.dto';
 import { GetFilterActivityDto } from 'src/dto/ActivityDto/get-filter.dto';
 import { GetFilterWorkDto } from 'src/dto/WorkDto/get-filter.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class LayerService {
@@ -74,6 +75,7 @@ export class LayerService {
     private readonly pictureWorkRepository: Repository<PictureWork>,
     @InjectRepository(ListUser)
     private readonly listUserRepository: Repository<ListUser>,
+    private readonly configService: ConfigService,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -86,7 +88,6 @@ export class LayerService {
       where: { status_activity_id: createActivityDto.status },
       relations: ['activity'],
     });
-    console.log(status);
     const maxPosition = status.activity.reduce((preValue, currValue) => {
       return preValue < currValue.position ? currValue.position : preValue;
     }, 0);
@@ -100,7 +101,18 @@ export class LayerService {
         position: maxPosition + 1,
       });
       const result = await this.activitiesRepository.save(newActivity);
+
       if (result) {
+        await firstValueFrom(
+          this.usersClient.emit(
+            { cmd: 'create-notify' },
+            {
+              description: 'Thông báo có hoạt động mới',
+              link: `${this.configService.get<string>('DOMAIN')}/admin/activity?id=${result.activity_id}`,
+              notify_role: ['admin-top', 'activity'],
+            },
+          ),
+        );
         await this.createPictureActivity(
           picture_urls.map((dt) => {
             return { ...dt, activity: result.activity_id };
@@ -122,6 +134,16 @@ export class LayerService {
         position: maxPosition + 1,
       });
       const result = await this.activitiesRepository.save(newActivity);
+      await firstValueFrom(
+        this.usersClient.emit(
+          { cmd: 'create-notify' },
+          {
+            description: 'Thông báo có hoạt động mới',
+            link: `${this.configService.get<string>('DOMAIN')}/admin/activity?id=${result.activity_id}`,
+            notify_role: ['admin-top', 'activity'],
+          },
+        ),
+      );
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Activity created successfully',
@@ -1017,6 +1039,16 @@ export class LayerService {
             createWorkDto.list_users.map((dt) => {
               return { work: result.work_id, user: dt, list_id: '' };
             }),
+          );
+          await firstValueFrom(
+            this.usersClient.emit(
+              { cmd: 'create-notify' },
+              {
+                description: 'Thông báo bạn được thêm vào một công việc',
+                link: `${this.configService.get<string>('DOMAIN')}/admin/work?id=${result.work_id}`,
+                notify_user: createWorkDto.list_users,
+              },
+            ),
           );
         }
       }

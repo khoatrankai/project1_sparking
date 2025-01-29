@@ -19,6 +19,10 @@ import { UpdateGroupUserDto } from 'src/dto/GroupUser/update_group.dto';
 import { ListGroupRole } from 'src/database/entities/list_group_role.entity';
 import { RoleTypeUser } from 'src/database/entities/role_type_user.entity';
 import { RoleService } from '../role/role.service';
+import { CreateNotifyrDto } from 'src/dto/Notify/create_notify.dto';
+import { Notify } from 'src/database/entities/notify.entity';
+import { NotifyRole } from 'src/database/entities/notify_role.entity';
+import { NotifyUser } from 'src/database/entities/notify_user.entity';
 
 @Injectable()
 export class UserService {
@@ -31,6 +35,12 @@ export class UserService {
     private readonly listGroupRoleRepository: Repository<ListGroupRole>,
     @InjectRepository(RoleTypeUser)
     private readonly roleTypeRepository: Repository<RoleTypeUser>,
+    @InjectRepository(Notify)
+    private readonly notifyRepository: Repository<Notify>,
+    @InjectRepository(NotifyRole)
+    private readonly notifyRoleRepository: Repository<NotifyRole>,
+    @InjectRepository(NotifyUser)
+    private readonly notifyUserRepository: Repository<NotifyUser>,
     private configService: ConfigService,
     private roleService: RoleService,
   ) {}
@@ -85,6 +95,11 @@ export class UserService {
         group_user,
       });
       const data = await this.accountUserRepository.save(user);
+      await this.createNotify({
+        description: 'Thông báo có nhân sự mới',
+        link: `${this.configService.get<string>('DOMAIN')}/admin/user?id=${data.user_id}`,
+        notify_role: ['admin-top', 'user'],
+      });
       if (group_user && data) {
         const dataRoleGroup = await this.roleTypeRepository
           .createQueryBuilder('role_type')
@@ -429,6 +444,182 @@ export class UserService {
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Lỗi rồi',
+      };
+    }
+  }
+
+  async createNotify(createData: CreateNotifyrDto) {
+    try {
+      console.log(createData);
+      const newNotify = this.notifyRepository.create({
+        description: createData.description,
+        link: createData.link,
+      });
+      const dataNotify = await this.notifyRepository.save(newNotify);
+      if (createData.notify_role && createData?.notify_role?.length > 0) {
+        console.log('Vao day', createData);
+        const listRoleType = await this.roleTypeRepository.find({
+          where: { name_tag: In(createData.notify_role) },
+        });
+        const listNewNotifyRole = await Promise.all(
+          listRoleType.map(async (dt) => {
+            return this.notifyRoleRepository.create({
+              notify: dataNotify,
+              role: dt,
+            });
+          }),
+        );
+        await this.notifyRoleRepository.save(listNewNotifyRole);
+        const listUser = await this.accountUserRepository
+          .createQueryBuilder('account_user')
+          .leftJoin('account_user.role_user', 'role_user')
+          .leftJoin('role_user.role_type', 'role_type')
+          .where('role_type.name_tag In (:...roles)', {
+            roles: createData.notify_role,
+          })
+          .getMany();
+        const listNewNotifyUser = await Promise.all(
+          listUser.map(async (dt) => {
+            return this.notifyUserRepository.create({
+              notify: dataNotify,
+              user: dt,
+            });
+          }),
+        );
+        await this.notifyUserRepository.save(listNewNotifyUser);
+      } else {
+        if (createData.notify_user && createData?.notify_user?.length > 0) {
+          const listUser = await this.accountUserRepository.find({
+            where: { user_id: In(createData.notify_user) },
+          });
+          const listNewNotifyUser = await Promise.all(
+            listUser.map(async (dt) => {
+              return this.notifyUserRepository.create({
+                notify: dataNotify,
+                user: dt,
+              });
+            }),
+          );
+          await this.notifyUserRepository.save(listNewNotifyUser);
+        } else {
+          const listUser = await this.accountUserRepository.find({});
+          const listNewNotifyUser = await Promise.all(
+            listUser.map(async (dt) => {
+              return this.notifyUserRepository.create({
+                notify: dataNotify,
+                user: dt,
+              });
+            }),
+          );
+          await this.notifyUserRepository.save(listNewNotifyUser);
+        }
+      }
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Tạo thông báo thành công',
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: err,
+      };
+    }
+  }
+
+  async getNotifyByUser(user_id: string, page: number, limit: number) {
+    try {
+      const countData = await this.notifyUserRepository
+        .createQueryBuilder('notify_user')
+        .leftJoinAndSelect('notify_user.notify', 'notify')
+        .leftJoin('notify_user.user', 'user')
+        .where('user.user_id = :user_id', { user_id })
+        .getCount();
+      const totalPage = Math.ceil(countData / limit);
+      const data = await this.notifyUserRepository
+        .createQueryBuilder('notify_user')
+        .leftJoinAndSelect('notify_user.notify', 'notify')
+        .leftJoin('notify_user.user', 'user')
+        .where('user.user_id = :user_id', { user_id })
+        .orderBy('notify.created_at', 'DESC')
+        .take(limit)
+        .skip((page - 1) * limit)
+        .getMany();
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: {
+          total_page: totalPage,
+          page,
+          data,
+        },
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Không lấy được thông báo',
+      };
+    }
+  }
+
+  async updateStatusNotify(user_id: string, notify_user_id?: string) {
+    try {
+      if (notify_user_id) {
+        const data = await this.notifyUserRepository.update(
+          { notify_user_id, user: In([user_id]) },
+          { status: true },
+        );
+        if (data) {
+          return {
+            statusCode: HttpStatus.OK,
+            message: 'Cập nhật trạng thái thông báo thành công',
+          };
+        }
+      } else {
+        const data = await this.notifyUserRepository.update(
+          { user: In([user_id]) },
+          { status: true },
+        );
+        if (data) {
+          return {
+            statusCode: HttpStatus.OK,
+            message: 'Cập nhật trạng thái thông báo thành công',
+          };
+        }
+      }
+
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Cập nhật trạng thái thông báo thất bại',
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Cập nhật trạng thái thông báo thất bại',
+      };
+    }
+  }
+
+  async getCountNotify(user_id: string) {
+    try {
+      const countData = await this.notifyUserRepository
+        .createQueryBuilder('notify_user')
+        .leftJoinAndSelect('notify_user.notify', 'notify')
+        .leftJoin('notify_user.user', 'user')
+        .where('user.user_id = :user_id AND notify_user.status = :status', {
+          user_id,
+          status: false,
+        })
+        .getCount();
+      return {
+        statusCode: HttpStatus.OK,
+        data: countData,
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.OK,
+        data: 0,
       };
     }
   }

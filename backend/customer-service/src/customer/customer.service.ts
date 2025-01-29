@@ -56,6 +56,7 @@ export class CustomerService {
     private configService: ConfigService,
     @Inject('SYSTEM') private readonly systemClient: ClientProxy,
     @Inject('MAIL') private readonly mailClient: ClientProxy,
+    @Inject('USER') private readonly userClient: ClientProxy,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -210,6 +211,16 @@ export class CustomerService {
       info_id: uuidv4(),
     });
     const dataCompany = await this.customerInfoRepository.save(dataCompanyNew);
+    await firstValueFrom(
+      this.userClient.emit(
+        { cmd: 'create-notify' },
+        {
+          description: 'Thông báo có khách hàng mới từ cơ hội',
+          link: `${this.configService.get<string>('DOMAIN')}/admin/customer?id=${dataCompany.info_id}`,
+          notify_role: ['admin-top', 'opportunity', 'customer'],
+        },
+      ),
+    );
     if (checkContact) {
       const infoContactNew = this.infoContactRepository.create({
         customer: checkContact,
@@ -576,7 +587,16 @@ export class CustomerService {
         });
         await this.customerInfoRepository.save(dataMew);
       }
-
+      await firstValueFrom(
+        this.userClient.emit(
+          { cmd: 'create-notify' },
+          {
+            description: 'Thông báo có một khách hàng mới',
+            link: `${this.configService.get<string>('DOMAIN')}/admin/customer?id=${id}`,
+            notify_role: ['admin-top', 'customer'],
+          },
+        ),
+      );
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Tạo thông tin khách hàng thành công',
