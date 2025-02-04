@@ -304,7 +304,7 @@ export class ActivityService {
     picture_urls: Express.Multer.File[],
   ) {
     try {
-      // console.log(picture_urls)
+      // //console.log(picture_urls)
       if (picture_urls && picture_urls.length > 0) {
         const datas = await this.cloudinaryService.uploadFiles(picture_urls);
         if (datas.length > 0) {
@@ -328,7 +328,7 @@ export class ActivityService {
         };
       }
     } catch (err) {
-      console.log(err);
+      //console.log(err);
     }
   }
 
@@ -583,7 +583,7 @@ export class ActivityService {
     picture_urls: Express.Multer.File[],
   ) {
     try {
-      // console.log(picture_urls)
+      // //console.log(picture_urls)
       if (picture_urls && picture_urls.length > 0) {
         const datas = await this.cloudinaryService.uploadFiles(picture_urls);
         if (datas.length > 0) {
@@ -607,7 +607,7 @@ export class ActivityService {
         };
       }
     } catch (err) {
-      console.log(err);
+      //console.log(err);
     }
   }
 

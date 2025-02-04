@@ -64,7 +64,6 @@ export class AuthService {
 
   async loginUser(userLoginDto: UserLoginDto, res: Response) {
     try {
-      console.log('goi vao');
       const data: TokenResponse = await firstValueFrom(
         this.authClient.send({ cmd: 'login' }, userLoginDto),
       );
@@ -86,7 +85,7 @@ export class AuthService {
         message: 'Đăng nhập thành công',
       });
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return res.json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Đăng nhập thất bại',
@@ -116,7 +115,7 @@ export class AuthService {
         message: 'Đăng nhập thành công',
       });
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return res.json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Đăng nhập thất bại',
@@ -142,7 +141,7 @@ export class AuthService {
         message: 'Đăng xuất thành công',
       });
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return res.json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Đăng xuất thất bại',
@@ -168,7 +167,7 @@ export class AuthService {
         message: 'Đăng xuất thành công',
       });
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return res.json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Đăng xuất thất bại',

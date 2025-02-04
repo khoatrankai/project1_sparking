@@ -45,7 +45,6 @@ export class RoleGuard implements CanActivate {
             { user_id: user['sub'], role_name_tag: roles },
           ),
         );
-        console.log(check, 'test', user);
         if (check.statusCode === 200) {
           return true;
         }

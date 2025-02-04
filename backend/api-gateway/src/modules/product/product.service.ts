@@ -110,7 +110,7 @@ export class ProductService {
     images: Express.Multer.File[],
   ) {
     try {
-      console.log(updateProductDto);
+      //console.log(updateProductDto);
       const result = await firstValueFrom(
         this.productClient.send(
           { cmd: 'update-product' },
@@ -648,7 +648,7 @@ export class ProductService {
         data: result,
       };
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       throw new HttpException(
         'Failed to create brand product',
         HttpStatus.BAD_REQUEST,
@@ -1105,7 +1105,7 @@ export class ProductService {
     updateHistoryReportCodeProduct: UpdateHistoryReportProductDto,
   ) {
     try {
-      console.log(id, updateHistoryReportCodeProduct);
+      //console.log(id, updateHistoryReportCodeProduct);
       const user = req['user'];
       if (user) {
         return await firstValueFrom(

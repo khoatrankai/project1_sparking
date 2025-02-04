@@ -146,7 +146,7 @@ export class ContractService {
         message: 'Contract created successfully',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Failed to create Contract',
@@ -1129,7 +1129,7 @@ export class ContractService {
       where: { contract: In([contract_id]) },
       order: { created_at: 'DESC' },
     });
-    console.log(documentContract);
+    //console.log(documentContract);
     if (!documentContract) {
       throw new NotFoundException(`DocumentContract not found`);
     }

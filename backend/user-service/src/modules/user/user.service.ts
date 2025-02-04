@@ -120,7 +120,7 @@ export class UserService {
         message: 'Tạo tài khoản thành công',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       if (err.code === 'ER_DUP_ENTRY') {
         const errField = this.extractDuplicateField(err.sqlMessage);
         throw new ConflictException(`${errField} đã tồn tại.`);
@@ -154,7 +154,7 @@ export class UserService {
         message: 'Tạo tài khoản thành công',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       if (err.code === 'ER_DUP_ENTRY') {
         const errField = this.extractDuplicateField(err.sqlMessage);
         throw new ConflictException(`${errField} đã tồn tại.`);
@@ -202,7 +202,7 @@ export class UserService {
         message: 'Cập nhật tài khoản thành công',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       if (err.code === 'ER_DUP_ENTRY') {
         const errField = this.extractDuplicateField(err.sqlMessage);
         throw new ConflictException(`${errField} đã tồn tại.`);
@@ -241,7 +241,7 @@ export class UserService {
         message: 'Cập nhật mật khẩu thất bại',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       if (err.code === 'ER_DUP_ENTRY') {
         const errField = this.extractDuplicateField(err.sqlMessage);
         throw new ConflictException(`${errField} đã tồn tại.`);
@@ -450,14 +450,14 @@ export class UserService {
 
   async createNotify(createData: CreateNotifyrDto) {
     try {
-      console.log(createData);
+      //console.log(createData);
       const newNotify = this.notifyRepository.create({
         description: createData.description,
         link: createData.link,
       });
       const dataNotify = await this.notifyRepository.save(newNotify);
       if (createData.notify_role && createData?.notify_role?.length > 0) {
-        console.log('Vao day', createData);
+        //console.log('Vao day', createData);
         const listRoleType = await this.roleTypeRepository.find({
           where: { name_tag: In(createData.notify_role) },
         });
@@ -519,7 +519,7 @@ export class UserService {
         message: 'Tạo thông báo thành công',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: err,
@@ -555,7 +555,7 @@ export class UserService {
         },
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Không lấy được thông báo',

@@ -292,7 +292,7 @@ export class CustomerController {
   @SetMetadata('roles', ['customer', 'customer-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteCustomerInfo(@Body() datas: string[]) {
-    // console.log(datas)
+    // //console.log(datas)
     return this.customerService.sendDeleteCustomerInfo(datas);
   }
 

@@ -261,7 +261,7 @@ export class LayerService {
     id: string,
     updateProjectDto: UpdateProjectDto,
   ): Promise<any> {
-    console.log(updateProjectDto);
+    //console.log(updateProjectDto);
     const updateResult = await this.projectsRepository.update(
       id,
       updateProjectDto,

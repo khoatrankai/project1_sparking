@@ -109,7 +109,7 @@ export class PriceQuoteService {
         'parts.type_package',
       ],
     });
-    // console.log(priceQuote.parts[0].products)
+    // //console.log(priceQuote.parts[0].products)
     const resParts = await Promise.all(
       priceQuote.parts.map(async (dt) => {
         const productIds = dt.products.map((dt) => dt.product);
@@ -405,7 +405,7 @@ export class PriceQuoteService {
   async updateStatusPriceQuote(
     listPriceQuote: { price_quote_id: string; status: string }[],
   ) {
-    console.log(listPriceQuote);
+    //console.log(listPriceQuote);
     const data = Promise.all(
       listPriceQuote.map(async (dt) => {
         await this.priceQuoteRepository.update(dt.price_quote_id, {
@@ -566,7 +566,7 @@ export class PriceQuoteService {
           where: { package_id: updateListPartDto.type_package },
         })
       : null;
-    // console.log(typePackage, updateListPartDto);
+    // //console.log(typePackage, updateListPartDto);
     return await this.listPartRepository.update(id, {
       ...updateListPartDto,
       type_package: typePackage,

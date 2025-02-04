@@ -397,7 +397,7 @@ export class LayerService {
         product,
       });
     });
-    // console.log(dataCreate)
+    // //console.log(dataCreate)
     return await this.pictureProductRepository.save(dataCreate);
   }
 

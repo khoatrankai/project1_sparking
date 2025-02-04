@@ -54,7 +54,7 @@ export class OpportunityService {
     id: string,
     updateOpportunityDto: UpdateOpportunitiesDto,
   ) {
-    console.log(updateOpportunityDto);
+    //console.log(updateOpportunityDto);
     return this.opportunityClient.send(
       { cmd: 'update-opportunity' },
       { id, data: updateOpportunityDto },
@@ -64,7 +64,7 @@ export class OpportunityService {
   async sendCreateTypeOpportunity(
     createTypeOpportunityDto: CreateTypeOpportunitiesDto,
   ) {
-    console.log(createTypeOpportunityDto);
+    //console.log(createTypeOpportunityDto);
     return await firstValueFrom(
       this.opportunityClient.send(
         { cmd: 'create-type_opportunity' },

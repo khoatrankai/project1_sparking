@@ -81,7 +81,7 @@ export class SystemService {
   }
 
   async createProvinces(createProvincesDto: CreateProvinceDto[]) {
-    console.log(createProvincesDto);
+    //console.log(createProvincesDto);
     return this.systemClient.send(
       { cmd: 'create-provinces' },
       createProvincesDto,
@@ -237,7 +237,7 @@ export class SystemService {
 
   // Product methods
   async createProduct(createProductDto: CreateProductDto) {
-    console.log('vo');
+    //console.log('vo');
     return this.systemClient.send({ cmd: 'create-product' }, createProductDto);
   }
 

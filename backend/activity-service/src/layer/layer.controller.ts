@@ -53,7 +53,6 @@ export class LayerController {
       updateActivityDto: UpdateActivityDto;
     },
   ) {
-    console.log(payload.updateActivityDto);
     return await this.layerService.updateActivity(
       payload.activity_id,
       payload.updateActivityDto,
@@ -76,7 +75,6 @@ export class LayerController {
 
   @MessagePattern('get-activity_by_contract')
   async getActivityByContract(@Payload() contract_id: string) {
-    console.log(contract_id);
     return await this.layerService.getActivityByContract(contract_id);
   }
 

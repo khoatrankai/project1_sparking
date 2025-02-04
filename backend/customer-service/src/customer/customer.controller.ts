@@ -133,7 +133,7 @@ export class CustomerController {
 
   @MessagePattern({ cmd: 'update-customer_info' })
   updateCustomerInfo(updateCustomerInfo: UpdateCustomerInfoDto) {
-    console.log(updateCustomerInfo);
+    //console.log(updateCustomerInfo);
     return this.customerService.updateCustomerInfo(updateCustomerInfo);
   }
 

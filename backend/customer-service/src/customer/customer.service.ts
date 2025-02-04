@@ -422,7 +422,7 @@ export class CustomerService {
         message: 'Đã tạo thành công',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
 
@@ -602,7 +602,7 @@ export class CustomerService {
         message: 'Tạo thông tin khách hàng thành công',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Tạo thông tin khách hàng thất bại',
@@ -827,7 +827,7 @@ export class CustomerService {
         },
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
       };
@@ -895,7 +895,7 @@ export class CustomerService {
         data: dataAll,
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
       };
@@ -915,7 +915,7 @@ export class CustomerService {
         data: dataAll,
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
       };
@@ -933,7 +933,7 @@ export class CustomerService {
         data: data,
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
       };
@@ -953,13 +953,13 @@ export class CustomerService {
           data.province_delivery,
         ),
       );
-      console.log(dataProvince);
+      //console.log(dataProvince);
       return {
         statusCode: HttpStatus.OK,
         data: { ...data, province_delivery: dataProvince },
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
       };
@@ -989,7 +989,7 @@ export class CustomerService {
       const userData = await this.accountCustomerRepository.findOneBy({
         customer_id: customer_id ?? '',
       });
-      console.log(userData, customer_id);
+      //console.log(userData, customer_id);
       const check = await bcrypt.compare(
         updateDto.old_password,
         userData.password,
@@ -1009,7 +1009,7 @@ export class CustomerService {
         message: 'Cập nhật mật khẩu thất bại',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       throw new InternalServerErrorException('Không thể tạo người dùng mới');
     }
   }

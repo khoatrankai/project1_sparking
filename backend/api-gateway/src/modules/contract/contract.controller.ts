@@ -348,7 +348,6 @@ export class ContractController {
     @Body() createDocumentContractDto: CreateDocumentContractDto,
     @UploadedFiles() url: Express.Multer.File[],
   ) {
-    console.log(url);
     return this.contractService.sendCreateDocumentContract(
       createDocumentContractDto,
       url,

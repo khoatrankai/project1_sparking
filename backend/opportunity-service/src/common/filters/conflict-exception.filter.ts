@@ -13,7 +13,7 @@ export class ConflictExceptionFilter implements ExceptionFilter {
   catch(exception: ConflictException, host: ArgumentsHost) {
     const context = host.switchToRpc();
     const ctx = context.getContext();
-    console.log(ctx);
+    //console.log(ctx);
     const message = exception.message;
 
     // Xử lý lỗi tùy theo giao thức bạn đang sử dụng

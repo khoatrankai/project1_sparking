@@ -5,7 +5,7 @@ export class TargetRevenue {
   @PrimaryGeneratedColumn('uuid')
   target_id: string;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'bigint', default: 0 })
   revenue: number;
 
   @Column({

@@ -4,7 +4,7 @@ import { PipeTransform, Injectable } from '@nestjs/common';
 @Injectable()
 export class ParseDatePipe implements PipeTransform {
   transform(value: any) {
-    console.log(value)
+    //console.log(value)
     // if (value && typeof value === 'string') {
     //   const parsedDate = parseISO(value); // Convert string to Date
     //   if (isNaN(parsedDate.getTime())) {

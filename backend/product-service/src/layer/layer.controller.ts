@@ -486,7 +486,7 @@ export class LayerController {
   async createCommentReportCodeProduct(
     createCommentReport: CreateCommentReportProductDto,
   ) {
-    console.log(createCommentReport);
+    //console.log(createCommentReport);
     return await this.layerService.createCommentReportCodeProduct(
       createCommentReport,
     );

@@ -71,7 +71,7 @@ export class PriceQuoteController {
   @SetMetadata('roles', ['price_quote', 'admin-top', 'price_quote-edit'])
   @SetMetadata('type', ['admin'])
   async createPriceQuote(@Body() createPriceQuoteDto: CreatePriceQuoteDto) {
-    // console.log(createPriceQuoteDto.parts[0].price_quotes[0].list_detail)
+    // //console.log(createPriceQuoteDto.parts[0].price_quotes[0].list_detail)
     return this.priceQuetoService.sendCreatePriceQueto(createPriceQuoteDto);
   }
 

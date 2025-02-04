@@ -110,7 +110,7 @@ export class ProjectController {
     @Body() updateProjectDto: UpdateProjectDto,
     @UploadedFiles() picture_url: Express.Multer.File[],
   ) {
-    // console.log(updateProjectDto,picture_url,id)
+    // //console.log(updateProjectDto,picture_url,id)
     return this.projectService.sendUpdateProject(
       id,
       updateProjectDto,

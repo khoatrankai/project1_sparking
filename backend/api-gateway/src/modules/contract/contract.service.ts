@@ -270,7 +270,7 @@ export class ContractService {
     picture_urls: Express.Multer.File[],
   ) {
     try {
-      // console.log(picture_urls)
+      // //console.log(picture_urls)
       if (picture_urls && picture_urls.length > 0) {
         const type = picture_urls?.[0]?.originalname.split('.').pop();
         const datas = await this.cloudinaryService.uploadFiles(picture_urls);
@@ -296,7 +296,7 @@ export class ContractService {
         };
       }
     } catch (err) {
-      console.log(err);
+      //console.log(err);
     }
   }
 

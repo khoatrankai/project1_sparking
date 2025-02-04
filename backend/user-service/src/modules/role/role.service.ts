@@ -155,7 +155,7 @@ export class RoleService {
         statusCode: HttpStatus.BAD_REQUEST,
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
       };
