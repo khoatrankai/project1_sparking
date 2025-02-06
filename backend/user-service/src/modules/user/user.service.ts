@@ -305,6 +305,9 @@ export class UserService {
   }
 
   async getUserIDs(user_ids: string[]) {
+    if (!user_ids || user_ids.length === 0) {
+      return [];
+    }
     const data = await this.accountUserRepository.find({
       select: ['first_name', 'last_name', 'email', 'picture_url', 'user_id'],
       where: { user_id: In(user_ids) },
@@ -622,5 +625,15 @@ export class UserService {
         data: 0,
       };
     }
+  }
+
+  async getUserbyGroupUser(group_ids: string[]) {
+    if (!group_ids && group_ids.length === 0) {
+      return [];
+    }
+    const users = await this.accountUserRepository.find({
+      where: { group_user: In(group_ids) },
+    });
+    return users.map((dt) => dt.user_id);
   }
 }

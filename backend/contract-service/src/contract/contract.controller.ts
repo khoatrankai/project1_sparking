@@ -101,7 +101,7 @@ export class ContractController {
   }
 
   @MessagePattern({ cmd: 'get-contract_ids' })
-  async getContractIds(@Payload() data: string[]) {
+  async getContractIds(data: string[]) {
     return this.contractService.getContractIDs(data);
   }
 

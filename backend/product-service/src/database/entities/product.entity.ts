@@ -5,6 +5,8 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { PictureProduct } from './picture_product.entity';
 import { UnitProduct } from './unit_product.entity';
@@ -78,4 +80,10 @@ export class Products {
   @ManyToOne(() => SupplierProduct, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'supplier_product' })
   supplier_product: SupplierProduct;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }

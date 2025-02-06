@@ -1,6 +1,7 @@
 services:
   api_gateway:
     build: ./api-gateway
+    image: khoatrankai/api-gateway:latest
     ports:
       - "3001:3001"
     volumes:
@@ -10,56 +11,67 @@ services:
       - PORT=3001
   user_service:
     build: ./user-service
+    image: khoatrankai/user-service:latest
     volumes:
       - ./user-service/src:/usr/src/app/src
     command: npm run start:dev
   auth_service:
     build: ./auth-service
+    image: khoatrankai/auth-service:latest
     volumes:
       - ./auth-service/src:/usr/src/app/src
     command: npm run start:dev
   email_service:
     build: ./email-service
+    image: khoatrankai/email-service:latest
     volumes:
       - ./email-service/src:/usr/src/app/src
     command: npm run start:dev
   activity_service:
     build: ./activity-service
+    image: khoatrankai/activity-service:latest
     volumes:
       - ./activity-service/src:/usr/src/app/src
     command: npm run start:dev
   contract_service:
     build: ./contract-service
+    image: khoatrankai/contract-service:latest
     volumes:
       - ./contract-service/src:/usr/src/app/src
     command: npm run start:dev
   customer_service:
     build: ./customer-service
+    image: khoatrankai/customer-service:latest
     volumes:
       - ./customer-service/src:/usr/src/app/src
     command: npm run start:dev
   opportunity_service:
     build: ./opportunity-service
+    image: khoatrankai/opportunity-service:latest
     volumes:
       - ./opportunity-service/src:/usr/src/app/src
     command: npm run start:dev
   price_quote_service:
     build: ./price_quote-service
+    image: khoatrankai/price-quote-service:latest
     volumes:
       - ./price_quote-service/src:/usr/src/app/src
     command: npm run start:dev
   product_service:
     build: ./product-service
+    image: khoatrankai/product-service:latest
     volumes:
       - ./product-service/src:/usr/src/app/src
     command: npm run start:dev
   project_service:
     build: ./project-service
+    image: khoatrankai/project-service:latest
     volumes:
       - ./project-service/src:/usr/src/app/src
     command: npm run start:dev
   system_service:
     build: ./system-service
+    image: khoatrankai/system-service:latest
     volumes:
       - ./system-service/src:/usr/src/app/src
     command: npm run start:dev

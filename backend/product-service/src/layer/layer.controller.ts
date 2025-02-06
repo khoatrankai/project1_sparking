@@ -541,4 +541,17 @@ export class LayerController {
   async findAllHistoryCodeProductsByCode(id: string) {
     return await this.layerService.findAllHistoryCodeProductsByCode(id);
   }
+
+  @MessagePattern({ cmd: 'find-product_by_type' })
+  async findProductSell(data: {
+    name_tag: string;
+    page: number;
+    limit: number;
+  }) {
+    return await this.layerService.findProductSell(
+      data.name_tag,
+      data.page,
+      data.limit,
+    );
+  }
 }

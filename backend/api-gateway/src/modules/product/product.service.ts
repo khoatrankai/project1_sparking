@@ -1355,4 +1355,22 @@ export class ProductService {
       throw error;
     }
   }
+
+  async findProductByType(data: {
+    name_tag: string;
+    page: number;
+    limit: number;
+  }) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-product_by_type' }, data),
+      );
+      if (!result) {
+        throw new HttpException('product by type', HttpStatus.NOT_FOUND);
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

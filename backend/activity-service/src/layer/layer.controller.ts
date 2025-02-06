@@ -92,13 +92,32 @@ export class LayerController {
   async getAllActivitiesReady(
     @Payload('id') id: string,
     @Payload('user_id') user_id?: string,
+    @Payload('group_user') group_user?: string,
+    @Payload('project') project?: string,
+    @Payload('contract') contract?: string,
   ) {
-    return await this.layerService.getAllActivitiesReady(id, user_id);
+    return await this.layerService.getAllActivitiesReady(
+      id,
+      user_id,
+      group_user,
+      project,
+      contract,
+    );
   }
 
   @MessagePattern('get-all_works_ready')
-  async getAllWorksReady(@Payload('user_id') user_id: string) {
-    return await this.layerService.getAllWorkReady(user_id);
+  async getAllWorksReady(
+    @Payload('user_id') user_id: string,
+    @Payload('group_user') group_user?: string,
+    @Payload('project') project?: string,
+    @Payload('contract') contract?: string,
+  ) {
+    return await this.layerService.getAllWorkReady(
+      user_id,
+      group_user,
+      project,
+      contract,
+    );
   }
 
   @MessagePattern('get-all_year_activities')
@@ -312,13 +331,33 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'get-all_work_urgent' })
-  async getAllWorkUrgent(user_id?: string) {
-    return this.layerService.getAllWorkUrgent(user_id);
+  async getAllWorkUrgent(filters?: {
+    user_id?: string;
+    group_user?: string;
+    project?: string;
+    contract?: string;
+  }) {
+    return this.layerService.getAllWorkUrgent(
+      filters.user_id,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
 
   @MessagePattern({ cmd: 'get-all_work_expired_urgent' })
-  async getAllWorkExpiredUrgent(user_id?: string) {
-    return this.layerService.getAllWorkExpiredUrgent(user_id);
+  async getAllWorkExpiredUrgent(filters?: {
+    user_id?: string;
+    group_user?: string;
+    project?: string;
+    contract?: string;
+  }) {
+    return this.layerService.getAllWorkExpiredUrgent(
+      filters.user_id,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
 
   @MessagePattern({ cmd: 'create-type_work' })

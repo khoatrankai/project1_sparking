@@ -69,6 +69,9 @@ export class LayerService {
   }
 
   async getProjectIDs(project_ids: string[]) {
+    if (!project_ids || project_ids.length === 0) {
+      return [];
+    }
     const data = await this.projectsRepository.find({
       select: ['project_id', 'name', 'type'],
       where: { project_id: In(project_ids) },

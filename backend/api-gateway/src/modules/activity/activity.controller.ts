@@ -69,8 +69,17 @@ export class ActivityController {
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'admin-top'])
   @SetMetadata('type', ['admin'])
-  async getAllActivitiesReady(@Param('id') id: string) {
-    return this.activityService.sendGetAllActivitiesReady(id);
+  async getAllActivitiesReady(
+    @Param('id') id: string,
+    @Query()
+    filters?: { group_user?: string; project?: string; contract?: string },
+  ) {
+    return this.activityService.sendGetAllActivitiesReady(
+      id,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
   @Get('activity-ready/user/:id')
   @UseGuards(RoleGuard)
@@ -78,15 +87,50 @@ export class ActivityController {
   async sendGetAllActivitiesReadyByUser(
     @Req() req: Request,
     @Param('id') id: string,
+    @Query()
+    filters?: { group_user?: string; project?: string; contract?: string },
   ) {
-    return this.activityService.sendGetAllActivitiesReadyByUser(id, req);
+    return this.activityService.sendGetAllActivitiesReadyByUser(
+      id,
+      req,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
+  }
+
+  @Get('work-ready/user')
+  @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
+  async getAllWorksReadyByUser(
+    @Req() req: Request,
+    @Query()
+    filters?: { group_user?: string; project?: string; contract?: string },
+  ) {
+    return this.activityService.sendGetAllWorksReadyByUser(
+      req?.['user']?.sub,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
 
   @Get('work-ready')
   @UseGuards(RoleGuard)
   @SetMetadata('checkfull', ['all'])
-  async getAllWorksReady(@Req() req: Request) {
-    return this.activityService.sendGetAllWorksReady(req?.['user']?.sub);
+  async getAllWorksReady(
+    @Query()
+    filters?: {
+      group_user?: string;
+      project?: string;
+      contract?: string;
+    },
+  ) {
+    return this.activityService.sendGetAllWorksReady(
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
 
   @Get('work-by-project/:id')
@@ -483,30 +527,80 @@ export class ActivityController {
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
-  async getAllWorkUrgent() {
-    return this.activityService.sendGetAllWorkUrgent();
+  async getAllWorkUrgent(
+    @Query()
+    filters?: {
+      group_user?: string;
+      project?: string;
+      contract?: string;
+    },
+  ) {
+    return this.activityService.sendGetAllWorkUrgent(
+      undefined,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
 
   @Get('work-urgent/user')
   @UseGuards(RoleGuard)
   @SetMetadata('checkfull', ['all'])
-  async getAllWorkUrgentByUser(@Req() req: Request) {
-    return this.activityService.sendGetAllWorkUrgent(req['user'].sub);
+  async getAllWorkUrgentByUser(
+    @Req() req: Request,
+    @Query()
+    filters?: {
+      group_user?: string;
+      project?: string;
+      contract?: string;
+    },
+  ) {
+    return this.activityService.sendGetAllWorkUrgent(
+      req['user'].sub,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
 
   @Get('work-expired-urgent/all')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
-  async getAllWorkExpiredUrgent() {
-    return this.activityService.sendGetAllWorkExpiredUrgent();
+  async getAllWorkExpiredUrgent(
+    @Query()
+    filters?: {
+      group_user?: string;
+      project?: string;
+      contract?: string;
+    },
+  ) {
+    return this.activityService.sendGetAllWorkExpiredUrgent(
+      undefined,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
 
   @Get('work-expired-urgent/user')
   @UseGuards(RoleGuard)
   @SetMetadata('checkfull', ['all'])
-  async getAllWorkExpiredUrgentByUser(@Req() req: Request) {
-    return this.activityService.sendGetAllWorkExpiredUrgent(req['user'].sub);
+  async getAllWorkExpiredUrgentByUser(
+    @Req() req: Request,
+    @Query()
+    filters?: {
+      group_user?: string;
+      project?: string;
+      contract?: string;
+    },
+  ) {
+    return this.activityService.sendGetAllWorkExpiredUrgent(
+      req['user'].sub,
+      filters.group_user,
+      filters.project,
+      filters.contract,
+    );
   }
 
   // Type Work Methods

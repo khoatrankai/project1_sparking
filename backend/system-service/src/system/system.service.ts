@@ -416,6 +416,9 @@ export class SystemService {
   }
 
   async getProfitIDs(profit_ids: string[]) {
+    if (!profit_ids || profit_ids.length === 0) {
+      return [];
+    }
     const data = await this.profitRepository.find({
       where: { profit_id: In(profit_ids) },
     });

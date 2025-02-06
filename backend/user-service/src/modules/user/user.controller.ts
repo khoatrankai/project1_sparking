@@ -147,4 +147,9 @@ export class UserController {
   getRoleByGroup(group_id: string) {
     return this.userService.getRoleByGroup(group_id);
   }
+
+  @MessagePattern({ cmd: 'get-user-ids-group' })
+  getUserbyGroupUser(group_ids: string[]) {
+    return this.userService.getUserbyGroupUser(group_ids);
+  }
 }

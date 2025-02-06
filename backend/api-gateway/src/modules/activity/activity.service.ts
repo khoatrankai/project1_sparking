@@ -168,24 +168,67 @@ export class ActivityService {
     );
   }
 
-  async sendGetAllActivitiesReady(id: string) {
-    return await firstValueFrom(
-      this.activityClient.send('get-all_activities_ready', { id }),
-    );
-  }
-
-  async sendGetAllActivitiesReadyByUser(id: string, req: Request) {
+  async sendGetAllActivitiesReady(
+    id: string,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
     return await firstValueFrom(
       this.activityClient.send('get-all_activities_ready', {
         id,
-        user_id: req['user'].sub,
+        group_user,
+        project,
+        contract,
       }),
     );
   }
 
-  async sendGetAllWorksReady(user_id: string) {
+  async sendGetAllActivitiesReadyByUser(
+    id: string,
+    req: Request,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
     return await firstValueFrom(
-      this.activityClient.send('get-all_works_ready', { user_id }),
+      this.activityClient.send('get-all_activities_ready', {
+        id,
+        user_id: req['user'].sub,
+        group_user,
+        project,
+        contract,
+      }),
+    );
+  }
+
+  async sendGetAllWorksReadyByUser(
+    user_id: string,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
+    return await firstValueFrom(
+      this.activityClient.send('get-all_works_ready', {
+        user_id,
+        group_user,
+        project,
+        contract,
+      }),
+    );
+  }
+
+  async sendGetAllWorksReady(
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
+    return await firstValueFrom(
+      this.activityClient.send('get-all_works_ready', {
+        group_user,
+        project,
+        contract,
+      }),
     );
   }
 
@@ -491,15 +534,31 @@ export class ActivityService {
     );
   }
 
-  async sendGetAllWorkUrgent(user_id?: string) {
+  async sendGetAllWorkUrgent(
+    user_id?: string,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
     return await firstValueFrom(
-      this.activityClient.send({ cmd: 'get-all_work_urgent' }, user_id),
+      this.activityClient.send(
+        { cmd: 'get-all_work_urgent' },
+        { user_id, group_user, project, contract },
+      ),
     );
   }
 
-  async sendGetAllWorkExpiredUrgent(user_id?: string) {
+  async sendGetAllWorkExpiredUrgent(
+    user_id?: string,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
     return await firstValueFrom(
-      this.activityClient.send({ cmd: 'get-all_work_expired_urgent' }, user_id),
+      this.activityClient.send(
+        { cmd: 'get-all_work_expired_urgent' },
+        { user_id, group_user, project, contract },
+      ),
     );
   }
 

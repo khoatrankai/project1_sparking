@@ -404,6 +404,9 @@ export class ContractService {
     };
   }
   async getContractIDs(contract_ids: string[]) {
+    if (!contract_ids || contract_ids.length === 0) {
+      return [];
+    }
     const data = await this.contractRepository.find({
       where: { contract_id: In(contract_ids) },
     });

@@ -119,9 +119,6 @@ export class ProductController {
   }
 
   @Get('id/:id')
-  @UseGuards(RoleGuard)
-  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
-  @SetMetadata('type', ['admin'])
   async findOneProduct(@Param('id') id: string) {
     return this.productService.findOneProduct(id);
   }
@@ -665,5 +662,12 @@ export class ProductController {
     return this.productService.findAllHistoryByCode(
       id.replace('@code_product', ''),
     );
+  }
+
+  @Get('get-products')
+  findProductByType(
+    @Query() data: { name_tag: string; page: number; limit: number },
+  ) {
+    return this.productService.findProductByType(data);
   }
 }

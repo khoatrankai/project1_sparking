@@ -198,6 +198,9 @@ export class LayerService {
   }
 
   async getProductIDs(product_ids: string[]) {
+    if (!product_ids || product_ids.length === 0) {
+      return [];
+    }
     const data = await this.productRepository.find({
       where: { product_id: In(product_ids) },
       relations: ['type', 'unit_product', 'code_product', 'brand', 'original'],
@@ -211,6 +214,7 @@ export class LayerService {
     return await this.productRepository.find({
       where: { status: Not('delete') },
       relations: ['type', 'unit_product', 'code_product'],
+      order: { created_at: 'DESC' },
     });
   }
 
@@ -477,6 +481,9 @@ export class LayerService {
   }
 
   async getTypeProductIDs(type_ids: string[]) {
+    if (!type_ids || type_ids.length === 0) {
+      return [];
+    }
     const data = await this.typeProductRepository.find({
       where: { type_product_id: In(type_ids) },
       relations: ['classify_type'],
@@ -761,6 +768,9 @@ export class LayerService {
   }
 
   async getSupplierProductIDs(supplier_ids: string[]) {
+    if (!supplier_ids || supplier_ids.length === 0) {
+      return [];
+    }
     const data = await this.supplierProductRepository.find({
       where: { supplier_id: In(supplier_ids) },
     });
@@ -1370,5 +1380,50 @@ export class LayerService {
         message: 'Lỗi rồi',
       };
     }
+  }
+
+  async findProductSell(name_tag: string, page: number, limit: number) {
+    console.log(name_tag, page, limit);
+    const name_classify = 'sell';
+    const type = await this.typeProductRepository
+      .createQueryBuilder('type')
+      .leftJoin('type.classify_type', 'classify_type')
+      .where(
+        'type.name_tag = :name_tag AND classify_type.name = :name_classify',
+        { name_tag, name_classify },
+      )
+      .getOne();
+    const countData = await this.productRepository
+      .createQueryBuilder('product')
+      .leftJoin('product.type', 'type')
+      .leftJoin('type.classify_type', 'classify_type')
+      .where(
+        'type.name_tag = :name_tag AND classify_type.name = :name_classify',
+        { name_tag, name_classify },
+      )
+      .getCount();
+    const totalPage = Math.ceil(countData / limit);
+    const products = await this.productRepository
+      .createQueryBuilder('product')
+      .leftJoin('product.type', 'type')
+      .leftJoin('type.classify_type', 'classify_type')
+      .leftJoinAndSelect('product.picture_urls', 'picture_urls')
+      .where(
+        'type.name_tag = :name_tag AND classify_type.name = :name_classify',
+        { name_tag, name_classify },
+      )
+      .orderBy('product.created_at', 'DESC')
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getMany();
+    return {
+      statusCode: HttpStatus.OK,
+      data: {
+        total_page: totalPage,
+        page: Number(page),
+        name_type: type?.name,
+        products,
+      },
+    };
   }
 }

@@ -342,93 +342,153 @@ export class LayerService {
     }
   }
 
-  async getAllActivitiesReady(type: string, user_id?: string) {
-    const dataType = 'week';
-    const today = new Date();
-    const weekDate = new Date();
-    weekDate.setDate(today.getDate() + 7);
-    const data = await this.activitiesRepository
-      .createQueryBuilder('activity')
-      .leftJoin('activity.status', 'status')
-      .leftJoin('activity.type', 'type')
-      .leftJoin('activity.works', 'works')
-      .leftJoin('works.list_user', 'list_user')
-      .where(
-        `type.type_activity_id = :type AND status.position = 1 AND activity.time_start BETWEEN :now AND :later ${user_id ? 'AND list_user.user = :user_id' : ''}`,
-        {
-          type,
-          now: today.toISOString(),
-          later: weekDate.toISOString(),
-          user_id,
-        },
-      )
-      .getMany();
-
-    const contractIds = data.map((dt) => dt.contract);
-    const dataContract = await firstValueFrom(
-      this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
-    );
-    return {
-      statusCode: HttpStatus.OK,
-      data: data.map((dt, index) => {
-        return { ...dt, contract: dataContract[index] };
-      }),
-    };
-  }
-
-  async getAllWorkReady(user_id: string) {
-    const dataType = 'week';
-    const today = new Date();
-    const weekDate = new Date();
-    weekDate.setDate(today.getDate() + 7);
-    const data = await this.worksRepository
-      .createQueryBuilder('work')
-      .leftJoin('work.status', 'status')
-      .leftJoinAndSelect('work.type', 'type')
-      .leftJoin('work.list_user', 'list_user')
-      .leftJoinAndSelect('work.activity', 'activity')
-      .where(
-        'list_user.user = :user_id  AND status.position = 1 AND work.time_start BETWEEN :now AND :later',
-        { now: today.toISOString(), later: weekDate.toISOString(), user_id },
-      )
-      .getMany();
-
-    const contractIds = data
-      .filter((dt) => dt.activity)
-      .map((dt) => dt.activity.contract);
-    const dataContract = await firstValueFrom(
-      this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
-    );
-    return {
-      statusCode: HttpStatus.OK,
-      data: data.map((dt, index) => {
-        return {
-          ...dt,
-          activity: { ...dt.activity, contract: dataContract[index] },
-        };
-      }),
-    };
-  }
-
-  async getAllWorkUrgent(user_id?: string) {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const data = await this.worksRepository
-        .createQueryBuilder('work')
-        .leftJoinAndSelect('work.status', 'status')
-        .leftJoinAndSelect('work.type', 'type')
-        .leftJoinAndSelect('work.activity', 'activity')
-        .leftJoin('work.list_user', 'list_user')
+  async getAllActivitiesReady(
+    type: string,
+    user_id?: string,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
+    if (group_user && !user_id) {
+      const userIds = await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-user-ids-group' }, [group_user]),
+      );
+      let contracts = [];
+      if (contract) {
+        contracts = [contract];
+      } else {
+        if (project) {
+          const dataContracts = await firstValueFrom(
+            this.contractsClient.send(
+              { cmd: 'get-contract_by_project_id' },
+              project,
+            ),
+          );
+          contracts = dataContracts;
+        }
+      }
+      const today = new Date();
+      const weekDate = new Date();
+      weekDate.setDate(today.getDate() + 7);
+      const data = await this.activitiesRepository
+        .createQueryBuilder('activity')
+        .leftJoin('activity.status', 'status')
+        .leftJoin('activity.type', 'type')
+        .leftJoin('activity.works', 'works')
+        .leftJoin('works.list_user', 'list_user')
         .where(
-          `status.name_tag != :completed AND DATE(work.time_end) >= :today AND work.urgent = :urgent ${user_id ? 'AND list_user.user = :user_id' : ''}`,
+          `type.type_activity_id = :type AND status.position = 1 AND activity.time_start BETWEEN :now AND :later AND list_user.user  IN (:...userIds) ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
           {
-            today,
-            completed: 'completed',
-            urgent: true,
-            user_id,
+            type,
+            now: today.toISOString(),
+            later: weekDate.toISOString(),
+            userIds,
+            contracts,
           },
         )
-        .orderBy('work.time_end', 'ASC')
+        .getMany();
+
+      const contractIds = data.map((dt) => dt.contract);
+      const dataContract = await firstValueFrom(
+        this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        data: data.map((dt, index) => {
+          return { ...dt, contract: dataContract[index] };
+        }),
+      };
+    } else {
+      let contracts = [];
+      if (contract) {
+        contracts = [contract];
+      } else {
+        if (project) {
+          const dataContracts = await firstValueFrom(
+            this.contractsClient.send(
+              { cmd: 'get-contract_by_project_id' },
+              project,
+            ),
+          );
+          contracts = dataContracts;
+        }
+      }
+      const today = new Date();
+      const weekDate = new Date();
+      weekDate.setDate(today.getDate() + 7);
+      const data = await this.activitiesRepository
+        .createQueryBuilder('activity')
+        .leftJoin('activity.status', 'status')
+        .leftJoin('activity.type', 'type')
+        .leftJoin('activity.works', 'works')
+        .leftJoin('works.list_user', 'list_user')
+        .where(
+          `type.type_activity_id = :type AND status.position = 1 AND activity.time_start BETWEEN :now AND :later ${user_id ? 'AND list_user.user = :user_id' : ''} ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+          {
+            type,
+            now: today.toISOString(),
+            later: weekDate.toISOString(),
+            user_id,
+            contracts,
+          },
+        )
+        .getMany();
+
+      const contractIds = data.map((dt) => dt.contract);
+      const dataContract = await firstValueFrom(
+        this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        data: data.map((dt, index) => {
+          return { ...dt, contract: dataContract[index] };
+        }),
+      };
+    }
+  }
+
+  async getAllWorkReady(
+    user_id: string,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
+    if (group_user && !user_id) {
+      const userIds = await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-user-ids-group' }, [group_user]),
+      );
+      let contracts = [];
+      if (contract) {
+        contracts = [contract];
+      } else {
+        if (project) {
+          const dataContracts = await firstValueFrom(
+            this.contractsClient.send(
+              { cmd: 'get-contract_by_project_id' },
+              project,
+            ),
+          );
+          contracts = dataContracts;
+        }
+      }
+      const today = new Date();
+      const weekDate = new Date();
+      weekDate.setDate(today.getDate() + 7);
+      const data = await this.worksRepository
+        .createQueryBuilder('work')
+        .leftJoin('work.status', 'status')
+        .leftJoinAndSelect('work.type', 'type')
+        .leftJoin('work.list_user', 'list_user')
+        .leftJoinAndSelect('work.activity', 'activity')
+        .where(
+          `status.position = 1 AND work.time_start BETWEEN :now AND :later  AND list_user.user  IN (:...userIds) ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+          {
+            now: today.toISOString(),
+            later: weekDate.toISOString(),
+            userIds,
+            contracts,
+          },
+        )
         .getMany();
 
       const contractIds = data
@@ -446,6 +506,170 @@ export class LayerService {
           };
         }),
       };
+    } else {
+      let contracts = [];
+      if (contract) {
+        contracts = [contract];
+      } else {
+        if (project) {
+          const dataContracts = await firstValueFrom(
+            this.contractsClient.send(
+              { cmd: 'get-contract_by_project_id' },
+              project,
+            ),
+          );
+          contracts = dataContracts;
+        }
+      }
+      const today = new Date();
+      const weekDate = new Date();
+      weekDate.setDate(today.getDate() + 7);
+      const data = await this.worksRepository
+        .createQueryBuilder('work')
+        .leftJoin('work.status', 'status')
+        .leftJoinAndSelect('work.type', 'type')
+        .leftJoin('work.list_user', 'list_user')
+        .leftJoinAndSelect('work.activity', 'activity')
+        .where(
+          `status.position = 1 AND work.time_start BETWEEN :now AND :later ${user_id ? 'AND list_user.user = :user_id' : ''} ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+          {
+            now: today.toISOString(),
+            later: weekDate.toISOString(),
+            user_id,
+            contracts,
+          },
+        )
+        .getMany();
+
+      const contractIds = data
+        .filter((dt) => dt.activity)
+        .map((dt) => dt.activity.contract);
+      const dataContract = await firstValueFrom(
+        this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        data: data.map((dt, index) => {
+          return {
+            ...dt,
+            activity: { ...dt.activity, contract: dataContract[index] },
+          };
+        }),
+      };
+    }
+  }
+
+  async getAllWorkUrgent(
+    user_id?: string,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
+    try {
+      if (group_user && !user_id) {
+        const userIds = await firstValueFrom(
+          this.usersClient.send({ cmd: 'get-user-ids-group' }, [group_user]),
+        );
+        let contracts = [];
+        if (contract) {
+          contracts = [contract];
+        } else {
+          if (project) {
+            const dataContracts = await firstValueFrom(
+              this.contractsClient.send(
+                { cmd: 'get-contract_by_project_id' },
+                project,
+              ),
+            );
+            contracts = dataContracts;
+          }
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const data = await this.worksRepository
+          .createQueryBuilder('work')
+          .leftJoinAndSelect('work.status', 'status')
+          .leftJoinAndSelect('work.type', 'type')
+          .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoin('work.list_user', 'list_user')
+          .where(
+            `status.name_tag != :completed AND DATE(work.time_end) >= :today AND work.urgent = :urgent AND list_user.user  IN (:...userIds) ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+            {
+              today,
+              completed: 'completed',
+              urgent: true,
+              userIds,
+              contracts,
+            },
+          )
+          .orderBy('work.time_end', 'ASC')
+          .getMany();
+
+        const contractIds = data
+          .filter((dt) => dt.activity)
+          .map((dt) => dt.activity.contract);
+        const dataContract = await firstValueFrom(
+          this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+        );
+        return {
+          statusCode: HttpStatus.OK,
+          data: data.map((dt, index) => {
+            return {
+              ...dt,
+              activity: { ...dt.activity, contract: dataContract[index] },
+            };
+          }),
+        };
+      } else {
+        let contracts = [];
+        if (contract) {
+          contracts = [contract];
+        } else {
+          if (project) {
+            const dataContracts = await firstValueFrom(
+              this.contractsClient.send(
+                { cmd: 'get-contract_by_project_id' },
+                project,
+              ),
+            );
+            contracts = dataContracts;
+          }
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const data = await this.worksRepository
+          .createQueryBuilder('work')
+          .leftJoinAndSelect('work.status', 'status')
+          .leftJoinAndSelect('work.type', 'type')
+          .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoin('work.list_user', 'list_user')
+          .where(
+            `status.name_tag != :completed AND DATE(work.time_end) >= :today AND work.urgent = :urgent ${user_id ? 'AND list_user.user = :user_id' : ''}  ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+            {
+              today,
+              completed: 'completed',
+              urgent: true,
+              user_id,
+              contracts,
+            },
+          )
+          .orderBy('work.time_end', 'ASC')
+          .getMany();
+
+        const contractIds = data
+          .filter((dt) => dt.activity)
+          .map((dt) => dt.activity.contract);
+        const dataContract = await firstValueFrom(
+          this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+        );
+        return {
+          statusCode: HttpStatus.OK,
+          data: data.map((dt, index) => {
+            return {
+              ...dt,
+              activity: { ...dt.activity, contract: dataContract[index] },
+            };
+          }),
+        };
+      }
     } catch {
       return {
         statusCode: HttpStatus.BAD_REQUEST,
@@ -454,40 +678,121 @@ export class LayerService {
     }
   }
 
-  async getAllWorkExpiredUrgent(user_id?: string) {
+  async getAllWorkExpiredUrgent(
+    user_id?: string,
+    group_user?: string,
+    project?: string,
+    contract?: string,
+  ) {
     try {
-      const today = new Date().toISOString().split('T')[0];
-      const data = await this.worksRepository
-        .createQueryBuilder('work')
-        .leftJoinAndSelect('work.status', 'status')
-        .leftJoinAndSelect('work.type', 'type')
-        .leftJoinAndSelect('work.activity', 'activity')
-        .leftJoinAndSelect('work.list_user', 'list_user')
-        .where(
-          `status.name_tag != :completed AND DATE(work.time_end) < :today ${user_id ? 'AND list_user.user = :user_id' : ''}`,
-          {
-            today,
-            completed: 'completed',
-            user_id,
-          },
-        )
-        .orderBy('work.time_end', 'DESC')
-        .getMany();
-      const contractIds = data
-        .filter((dt) => dt.activity)
-        .map((dt) => dt.activity.contract);
-      const dataContract = await firstValueFrom(
-        this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
-      );
-      return {
-        statusCode: HttpStatus.OK,
-        data: data.map((dt, index) => {
-          return {
-            ...dt,
-            activity: { ...dt.activity, contract: dataContract[index] },
-          };
-        }),
-      };
+      if (group_user && !user_id) {
+        const userIds = await firstValueFrom(
+          this.usersClient.send({ cmd: 'get-user-ids-group' }, [group_user]),
+        );
+        let contracts = [];
+        if (contract) {
+          contracts = [contract];
+        } else {
+          if (project) {
+            const dataContracts = await firstValueFrom(
+              this.contractsClient.send(
+                { cmd: 'get-contract_by_project_id' },
+                project,
+              ),
+            );
+            contracts = dataContracts;
+          }
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const data = await this.worksRepository
+          .createQueryBuilder('work')
+          .leftJoinAndSelect('work.status', 'status')
+          .leftJoinAndSelect('work.type', 'type')
+          .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.list_user', 'list_user')
+          .where(
+            `status.name_tag != :completed AND DATE(work.time_end) < :today  AND list_user.user  IN (:...userIds) ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+            {
+              today,
+              completed: 'completed',
+              userIds,
+              contracts,
+            },
+          )
+          .orderBy('work.time_end', 'DESC')
+          .getMany();
+        const contractIds = data
+          .filter((dt) => dt.activity)
+          .map((dt) => dt.activity.contract);
+        const dataContract = await firstValueFrom(
+          this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+        );
+
+        return {
+          statusCode: HttpStatus.OK,
+          data: data.map((dt, index) => {
+            return {
+              ...dt,
+              activity: {
+                ...dt.activity,
+                contract: dataContract[index] ?? dt.activity.contract,
+              },
+            };
+          }),
+        };
+      } else {
+        let contracts = [];
+        if (contract) {
+          contracts = [contract];
+        } else {
+          if (project) {
+            const dataContracts = await firstValueFrom(
+              this.contractsClient.send(
+                { cmd: 'get-contract_by_project_id' },
+                project,
+              ),
+            );
+            contracts = dataContracts;
+          }
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const data = await this.worksRepository
+          .createQueryBuilder('work')
+          .leftJoinAndSelect('work.status', 'status')
+          .leftJoinAndSelect('work.type', 'type')
+          .leftJoinAndSelect('work.activity', 'activity')
+          .leftJoinAndSelect('work.list_user', 'list_user')
+          .where(
+            `status.name_tag != :completed AND DATE(work.time_end) < :today ${user_id ? 'AND list_user.user = :user_id' : ''} ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+            {
+              today,
+              completed: 'completed',
+              user_id,
+              contracts,
+            },
+          )
+          .orderBy('work.time_end', 'DESC')
+          .getMany();
+        const contractIds = data
+          .filter((dt) => dt.activity)
+          .map((dt) => dt.activity.contract);
+        const dataContract = await firstValueFrom(
+          this.contractsClient.send({ cmd: 'get-contract_ids' }, contractIds),
+        );
+
+        return {
+          statusCode: HttpStatus.OK,
+          data: data.map((dt, index) => {
+            return {
+              ...dt,
+              activity: {
+                ...dt.activity,
+                contract: dataContract[index] ?? dt.activity.contract,
+              },
+            };
+          }),
+        };
+      }
     } catch {
       return {
         statusCode: HttpStatus.BAD_REQUEST,

@@ -78,6 +78,9 @@ export class CustomerService {
   }
 
   async getCustomerIDs(customer_ids: string[]) {
+    if (!customer_ids || customer_ids.length === 0) {
+      return [];
+    }
     const data = await this.customerInfoRepository.find({
       where: { info_id: In(customer_ids) },
     });
