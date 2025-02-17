@@ -368,7 +368,9 @@ export class LayerService {
         }
       }
       const today = new Date();
+      today.setHours(0, 0, 0, 0);
       const weekDate = new Date();
+      weekDate.setHours(0, 0, 0, 0);
       weekDate.setDate(today.getDate() + 7);
       const data = await this.activitiesRepository
         .createQueryBuilder('activity')
@@ -377,11 +379,11 @@ export class LayerService {
         .leftJoin('activity.works', 'works')
         .leftJoin('works.list_user', 'list_user')
         .where(
-          `type.type_activity_id = :type AND status.position = 1 AND activity.time_start BETWEEN :now AND :later AND list_user.user  IN (:...userIds) ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+          `type.type_activity_id = :type OR status.position = 1 OR (activity.time_start BETWEEN :now AND :later AND list_user.user  IN (:...userIds) ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''})`,
           {
             type,
-            now: today.toISOString(),
-            later: weekDate.toISOString(),
+            now: today.toISOString().slice(0, 19).replace('T', ' '),
+            later: weekDate.toISOString().slice(0, 19).replace('T', ' '),
             userIds,
             contracts,
           },
@@ -414,7 +416,9 @@ export class LayerService {
         }
       }
       const today = new Date();
+      today.setHours(0, 0, 0, 0);
       const weekDate = new Date();
+      weekDate.setHours(0, 0, 0, 0);
       weekDate.setDate(today.getDate() + 7);
       const data = await this.activitiesRepository
         .createQueryBuilder('activity')
@@ -423,11 +427,11 @@ export class LayerService {
         .leftJoin('activity.works', 'works')
         .leftJoin('works.list_user', 'list_user')
         .where(
-          `type.type_activity_id = :type AND status.position = 1 AND activity.time_start BETWEEN :now AND :later ${user_id ? 'AND list_user.user = :user_id' : ''} ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+          `type.type_activity_id = :type OR status.position = 1 OR (activity.time_start BETWEEN :now AND :later ${user_id ? 'AND list_user.user = :user_id' : ''} ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''})`,
           {
             type,
-            now: today.toISOString(),
-            later: weekDate.toISOString(),
+            now: today.toISOString().slice(0, 19).replace('T', ' '),
+            later: weekDate.toISOString().slice(0, 19).replace('T', ' '),
             user_id,
             contracts,
           },
@@ -453,6 +457,30 @@ export class LayerService {
     project?: string,
     contract?: string,
   ) {
+    // if(user_id === '3a603f84-a99f-4e1d-835f-acbcb7b59f6a'){
+    //   const today = new Date();
+    //   today.setHours(0, 0, 0, 0);
+    //   const weekDate = new Date();
+    //   weekDate.setHours(0, 0, 0, 0);
+    //   weekDate.setDate(today.getDate() + 7);
+    //   console.log('hnay:',today.toISOString().slice(0, 19).replace('T', ' '))
+    //   const data = await this.worksRepository
+    //     .createQueryBuilder('work')
+    //     .leftJoin('work.status', 'status')
+    //     .leftJoinAndSelect('work.type', 'type')
+    //     .leftJoin('work.list_user', 'list_user')
+    //     .leftJoinAndSelect('work.activity', 'activity')
+    //     .where(
+    //       `status.position = 1 AND work.time_start BETWEEN :now AND :later `,
+    //       {
+    //         now: today.toISOString().slice(0, 19).replace('T', ' '),
+    //         later: weekDate.toISOString().slice(0, 19).replace('T', ' '),
+    //       },
+    //     )
+    //     .getMany();
+
+    //     console.log(data)
+    // }
     if (group_user && !user_id) {
       const userIds = await firstValueFrom(
         this.usersClient.send({ cmd: 'get-user-ids-group' }, [group_user]),
@@ -472,7 +500,9 @@ export class LayerService {
         }
       }
       const today = new Date();
+      today.setHours(0, 0, 0, 0);
       const weekDate = new Date();
+      weekDate.setHours(0, 0, 0, 0);
       weekDate.setDate(today.getDate() + 7);
       const data = await this.worksRepository
         .createQueryBuilder('work')
@@ -481,10 +511,10 @@ export class LayerService {
         .leftJoin('work.list_user', 'list_user')
         .leftJoinAndSelect('work.activity', 'activity')
         .where(
-          `status.position = 1 AND work.time_start BETWEEN :now AND :later  AND list_user.user  IN (:...userIds) ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+          `status.position = 1 OR (work.time_start BETWEEN :now AND :later  AND list_user.user  IN (:...userIds) ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''})`,
           {
-            now: today.toISOString(),
-            later: weekDate.toISOString(),
+            now: today.toISOString().slice(0, 19).replace('T', ' '),
+            later: weekDate.toISOString().slice(0, 19).replace('T', ' '),
             userIds,
             contracts,
           },
@@ -522,19 +552,21 @@ export class LayerService {
         }
       }
       const today = new Date();
+      today.setHours(0, 0, 0, 0);
       const weekDate = new Date();
+      weekDate.setHours(0, 0, 0, 0);
       weekDate.setDate(today.getDate() + 7);
       const data = await this.worksRepository
-        .createQueryBuilder('work')
-        .leftJoin('work.status', 'status')
-        .leftJoinAndSelect('work.type', 'type')
-        .leftJoin('work.list_user', 'list_user')
-        .leftJoinAndSelect('work.activity', 'activity')
+        .createQueryBuilder('works')
+        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.type', 'type')
+        .leftJoin('works.list_user', 'list_user')
+        .leftJoinAndSelect('works.activity', 'activity')
         .where(
-          `status.position = 1 AND work.time_start BETWEEN :now AND :later ${user_id ? 'AND list_user.user = :user_id' : ''} ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''}`,
+          `status.position = 1 OR (works.time_start BETWEEN :now AND :later ${user_id ? 'AND list_user.user = :user_id' : ''} ${contracts.length > 0 ? 'AND activity.contract IN (:...contracts)' : ''})`,
           {
-            now: today.toISOString(),
-            later: weekDate.toISOString(),
+            now: today.toISOString().slice(0, 19).replace('T', ' '),
+            later: weekDate.toISOString().slice(0, 19).replace('T', ' '),
             user_id,
             contracts,
           },

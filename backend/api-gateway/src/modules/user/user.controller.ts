@@ -246,6 +246,7 @@ export class UserController {
     return await this.userService.getFullRoleUserByID(req['user'].sub);
   }
 
+
   @Get('get-full-role-user-access')
   async getFullRoleUserByAccess(@Req() req: Request) {
     return await this.userService.getFullRoleUserByAccess(req);

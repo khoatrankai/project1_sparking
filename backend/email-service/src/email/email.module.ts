@@ -14,8 +14,8 @@ import { ConfigModule } from '@nestjs/config';
           host:'smtp.gmail.com',
           secure: false,
           auth:{
-            user: 'kaitv.com.vn@gmail.com',
-            pass:'mlbgelpkwhtfqvcm'
+            user: 'nguyenhiepninh15102003@gmail.com',
+            pass:'qorurwrvszdokbvd'
           }
         }
       })
