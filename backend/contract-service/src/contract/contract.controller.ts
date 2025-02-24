@@ -252,4 +252,14 @@ export class ContractController {
   async getAllDocumentContract(@Payload() contract_id: string) {
     return await this.contractService.getAllDocumentContract(contract_id);
   }
+
+  @MessagePattern({ cmd: 'get-opportunity_by_contract' })
+  async getOpportunityByContract() {
+    return this.contractService.getOpportunityByContract();
+  }
+
+  @MessagePattern({ cmd: 'get-contract_by_opportunity' })
+  async getContractsByOpportunityID(opportunity_id:string) {
+    return this.contractService.getContractsByOpportunityID(opportunity_id);
+  }
 }

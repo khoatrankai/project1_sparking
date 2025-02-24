@@ -1,3 +1,4 @@
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   HttpStatus,
@@ -38,6 +39,8 @@ export class PriceQuoteService {
   constructor(
     @Inject('USER') private readonly usersClient: ClientProxy,
     @Inject('PRODUCT') private readonly productsClient: ClientProxy,
+    @Inject('CUSTOMER') private readonly customersClient: ClientProxy,
+    @Inject('OPPORTUNITY') private readonly opportunitiesClient: ClientProxy,
     @Inject('SYSTEM') private readonly systemClient: ClientProxy,
     @Inject('PROJECT') private readonly projectsClient: ClientProxy,
     @InjectRepository(PriceQuote)
@@ -55,29 +58,61 @@ export class PriceQuoteService {
     return 'Hello World!';
   }
   async createPriceQuote(createPriceQuoteDto: CreatePriceQuoteDto) {
-    const { parts, ...dataPriceQuote } = createPriceQuoteDto;
-    const priceQuote = this.priceQuoteRepository.create({
-      ...dataPriceQuote,
-      price_quote_id: uuidv4(),
-    });
-    const resPriceQuote = await this.priceQuoteRepository.save(priceQuote);
-    if (resPriceQuote) {
-      const resList = await this.createListParts(parts, resPriceQuote);
-      if (resList.length > 0) {
+    if(createPriceQuoteDto.opportunity){
+      //chuyen doi customer tu co hoi
+      const resCustomerInfo = await firstValueFrom(this.opportunitiesClient.send({cmd:'update-opportunity-by-price_quote'},createPriceQuoteDto.opportunity))
+      if(resCustomerInfo.statusCode === 200 || resCustomerInfo.statusCode === 201){
+        const { parts, ...dataPriceQuote } = createPriceQuoteDto;
+        const priceQuote = this.priceQuoteRepository.create({
+          ...dataPriceQuote,
+          price_quote_id: uuidv4(),
+          customer:resCustomerInfo.data
+          
+        });
+        const resPriceQuote = await this.priceQuoteRepository.save(priceQuote);
+        if (resPriceQuote) {
+          const resList = await this.createListParts(parts, resPriceQuote);
+          if (resList.length > 0) {
+            return {
+              statusCode: HttpStatus.CREATED,
+              message: 'Tạo báo giá thành công',
+            };
+          }
+          return {
+            statusCode: HttpStatus.CREATED,
+            message: 'Tạo báo giá thành công nhưng danh sách không được tạo',
+          };
+        }
+        
+      }
+     
+    }else{
+      const { parts, ...dataPriceQuote } = createPriceQuoteDto;
+      const priceQuote = this.priceQuoteRepository.create({
+        ...dataPriceQuote,
+        price_quote_id: uuidv4(),
+      });
+      const resPriceQuote = await this.priceQuoteRepository.save(priceQuote);
+      if (resPriceQuote) {
+        const resList = await this.createListParts(parts, resPriceQuote);
+        if (resList.length > 0) {
+          return {
+            statusCode: HttpStatus.CREATED,
+            message: 'Tạo báo giá thành công',
+          };
+        }
         return {
           statusCode: HttpStatus.CREATED,
-          message: 'Tạo báo giá thành công',
+          message: 'Tạo báo giá thành công nhưng danh sách không được tạo',
         };
       }
-      return {
-        statusCode: HttpStatus.CREATED,
-        message: 'Tạo báo giá thành công nhưng danh sách không được tạo',
-      };
+      
     }
     return {
       statusCode: HttpStatus.BAD_REQUEST,
       message: 'Tạo báo giá không thành công',
     };
+    
   }
 
   async deletePriceQuote(datas: string[]) {
@@ -165,12 +200,14 @@ export class PriceQuoteService {
       where: { price_quote_id: id },
       relations: ['parts', 'parts.products', 'parts.products.list_detail'],
     });
-    const dataProject = await firstValueFrom(
+    const dataProject = priceQuote.project ? await firstValueFrom(
       this.projectsClient.send(
         { cmd: 'find-one_full_project' },
         priceQuote.project,
       ),
-    );
+    ):{data:undefined}
+    const customerInfo = (priceQuote.customer && !priceQuote.project) ? (await firstValueFrom(this.customersClient.send({cmd:'get-full_info_customer_id'},priceQuote.customer))).data : undefined
+    
     const dataUser = await firstValueFrom(
       this.usersClient.send(
         { cmd: 'get-user_id' },
@@ -230,6 +267,7 @@ export class PriceQuoteService {
             new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
         ),
       project: dataProject.data,
+      customer:customerInfo,
       user_support: dataUser,
     };
   }
@@ -305,21 +343,34 @@ export class PriceQuoteService {
 
     const userIds = result.map((dt) => dt.user_support);
     const projectIds = result.map((dt) => dt.project);
+    const customerIds = result.map((dt) => dt.customer);
     const dataUsers = await firstValueFrom(
       this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
     );
     const dataProjects = await firstValueFrom(
       this.projectsClient.send({ cmd: 'get-project_ids' }, projectIds),
     );
+    const dataCustomers = await firstValueFrom(
+      this.customersClient.send({ cmd: 'get-customer_ids' }, customerIds),
+    );
     return result.map((dt, index) => {
       return {
         ...dt,
         user_support: dataUsers[index],
         project: dataProjects[index],
+        customer:dataCustomers[index]
       };
     });
 
     // return result;
+  }
+
+  async findAllPriceQuoteByOpportunity(idOpportunity:string) {
+    const datas = await this.priceQuoteRepository.find({where:{opportunity:In([idOpportunity])}})
+    return {
+      statusCode:HttpStatus.OK,
+      data:datas
+    }
   }
 
   async findAllPriceQuoteByToken(customer_id: string) {
@@ -360,6 +411,7 @@ export class PriceQuoteService {
       };
     }
   }
+
 
   async updatePriceQuote(id: string, updatePriceQuoteDto: UpdatePriceQuoteDto) {
     const { parts, ...reqUpdatePriceQuote } = updatePriceQuoteDto;
@@ -730,4 +782,27 @@ export class PriceQuoteService {
       message: 'Cập nhật thành công',
     };
   }
+
+  async getPriceQuoteByOpportunity(opportunityIds:string[]){
+    if(opportunityIds && opportunityIds.length > 0){
+      const dataPriceQuotes = await this.priceQuoteRepository.find({where:{opportunity:In(opportunityIds)}})
+      const datas = opportunityIds.map((ids)=>{
+        const count = dataPriceQuotes.filter((dt)=> dt.opportunity === ids)
+        return {count:count.length,datas:count}
+      })
+      return {
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }
+    return []
+  }
+
+  async getOpportunityOK(){
+    const check = await this.priceQuoteRepository.createQueryBuilder('priceQuote').where('priceQuote.opportunity IS NOT NULL').getMany()
+    return check.map((dt) => dt.opportunity)
+  }
+
+ 
+
 }

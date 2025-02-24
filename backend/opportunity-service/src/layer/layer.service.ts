@@ -31,11 +31,14 @@ import { ConfigService } from '@nestjs/config';
 export class LayerService {
   constructor(
     @Inject('USER') private readonly usersClient: ClientProxy,
+    @Inject('PRICEQUOTE') private readonly priceQuoteClient: ClientProxy,
+    @Inject('CONTRACT') private readonly contractClient: ClientProxy,
     @Inject('CUSTOMER') private readonly customerClient: ClientProxy,
     @InjectRepository(Opportunities)
     private opportunitiesRepository: Repository<Opportunities>,
     @InjectRepository(TypeOpportunities)
     private typeOpportunitiesRepository: Repository<TypeOpportunities>,
+    
     @InjectRepository(TypeSources)
     private typeSourcesRepository: Repository<TypeSources>,
     private configService: ConfigService,
@@ -185,6 +188,7 @@ export class LayerService {
     };
   }
 
+
   async updateOpportunity(
     id: string,
     updateOpportunitiesDto: UpdateOpportunitiesDto,
@@ -227,6 +231,38 @@ export class LayerService {
       data: updatedOpportunity,
       message: 'Cập nhật thành công',
     };
+  }
+
+  async updateOpportunityByPriceQuote(
+    id: string,
+  ) {
+
+    const updatedOpportunity = await this.opportunitiesRepository.findOne({
+      where: { opportunity_id: id },
+    });
+    if(updatedOpportunity.status === 'pending'){
+      await this.opportunitiesRepository.update(id, {status:'send'
+      });
+    }
+   
+      const res = await firstValueFrom(
+        this.customerClient.send(
+          { cmd: 'create-customer_opportunity' },
+          updatedOpportunity,
+        ),
+      );
+
+      if (res.statusCode === 201) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Chuyển đổi thành công',
+          data:res?.data?.info_id
+        };
+      }
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Chuyển đổi không thành công'
+      };
   }
 
   async createTypeOpportunity(
@@ -301,9 +337,12 @@ export class LayerService {
       relations: ['type_source', 'type_opportunity'],
       order: { created_at: 'DESC' },
     });
+    const dataCountPrice = (await firstValueFrom(this.priceQuoteClient.send({cmd:'get-price_quote-opportunities'},data.map(dt => dt.opportunity_id)))).data as {count:number,datas:[]}
     return {
       statusCode: HttpStatus.OK,
-      data,
+      data:data.map((dt,index)=>{
+        return {...dt,price_quote:dataCountPrice?.[index].count ?? 0}
+      }),
     };
   }
 
@@ -412,5 +451,100 @@ export class LayerService {
       statusCode: HttpStatus.OK,
       data: updatedTypeSource,
     };
+  }
+
+  async detailTypeOpportunityInYear(start_year?:number,end_year?:number){
+
+     // Basic validation for start and end year
+  if (start_year < 1900 || start_year > new Date().getFullYear()) {
+    throw new Error('Invalid start year');
+  }
+  if (end_year && (end_year < 1900 || end_year > new Date().getFullYear())) {
+    throw new Error('Invalid end year');
+  }
+
+  // Default to current year if start_year or end_year is not provided
+  const opportunities = await this.typeOpportunitiesRepository
+    .createQueryBuilder('typeOpportunity')
+    .leftJoinAndSelect('typeOpportunity.opportunities', 'opportunities')
+    .where(` ${start_year ? 'YEAR(opportunities.created_at) > :dateStart' : ''}`, { dateStart: Number(start_year)-1 })
+    .andWhere(` ${end_year ? 'YEAR(opportunities.created_at) < :dateEnd' : ''}`, { dateEnd: Number(end_year)+1 })
+    .getMany();
+  return {
+    statusCode: HttpStatus.OK,
+    data: opportunities.map((dt) => {
+      return { ...dt, opportunities: dt.opportunities.length };
+    }),
+  };
+  }
+
+  async getOpportunityByPriceQuote (){ 
+    try{
+      const opportunitiesOK = await firstValueFrom(this.priceQuoteClient.send({cmd:'get-opportunity-ok'},{})) as string[]
+      if(opportunitiesOK && opportunitiesOK.length > 0){
+        const opportunities = await this.opportunitiesRepository.find({where:{opportunity_id:In(opportunitiesOK)},order:{created_at:'DESC'}})
+        const countOpportunities = (await firstValueFrom(this.priceQuoteClient.send({cmd:'get-price_quote-opportunities'},opportunities.map(dt => dt.opportunity_id)))).data as {count:number,datas:[]}
+        return {
+          statusCode:HttpStatus.OK,
+          data:opportunities.map((dt,index)=>{
+            return {...dt,price_quotes:countOpportunities?.[index].count ?? 0}
+          })
+        }
+      }
+      return {
+        statusCode:HttpStatus.OK,
+        data:[]
+      }
+     
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:'Lỗi'
+      }
+    }
+    
+  }
+
+  async getOpportunityHaveContract(start_year?:number,end_year?:number){
+    let start_date = new Date().getFullYear()
+    let end_date = new Date().getFullYear()
+    if(start_year){
+      start_date = start_year
+    }
+    if(end_year){
+      end_date = end_year
+    }
+    const dataOpportunities = await firstValueFrom(
+      this.contractClient.send({ cmd: 'get-opportunity_by_contract' }, {})
+    ) as { opportunity: string, count: number }[];
+  
+    const listOpportunity = dataOpportunities.map(dt => dt.opportunity);
+  
+    const resOpportunities = await this.opportunitiesRepository
+      .createQueryBuilder('opportunities')
+      .where('opportunities.opportunity_id IN (:...listOpportunity)', { listOpportunity })
+      .andWhere(` ${end_date ? 'YEAR(opportunities.created_at) < :dateEnd' : ''}`, { dateEnd: Number(end_date)+1 })
+      .andWhere(` ${start_date ? 'YEAR(opportunities.created_at) > :dateStart' : ''}`, { dateStart: Number(start_date)-1 })
+      .getMany()
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: resOpportunities.map((dt) => {
+        const opportunity = dataOpportunities.find(dtt => dtt.opportunity === dt.opportunity_id);
+        return { ...dt, contracts: opportunity?.count ?? 0 };
+      })
+    };
+  }
+
+  async getDashboardTotalReason(){
+    const countPause = await this.opportunitiesRepository.find({where:{status:'pause'}})
+    const countCancel = await this.opportunitiesRepository.find({where:{status:'cancel'}})
+    return {
+      statusCode:HttpStatus.OK,
+      data:{
+        pause:countPause,
+        cancel:countCancel
+      }
+    }
   }
 }

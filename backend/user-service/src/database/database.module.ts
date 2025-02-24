@@ -11,6 +11,7 @@ import { ListGroupRole } from './entities/list_group_role.entity';
 import { Notify } from './entities/notify.entity';
 import { NotifyRole } from './entities/notify_role.entity';
 import { NotifyUser } from './entities/notify_user.entity';
+import { TimeKeeping } from './entities/timekeeping.entity';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { NotifyUser } from './entities/notify_user.entity';
             Notify,
             NotifyRole,
             NotifyUser,
+            TimeKeeping
           ],
           // synchronize: true,
           // dropSchema: true,

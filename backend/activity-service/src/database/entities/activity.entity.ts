@@ -77,3 +77,5 @@ export class Activities {
   @OneToMany(() => Works, (work) => work.activity, { cascade: true })
   works: Works[];
 }
+
+

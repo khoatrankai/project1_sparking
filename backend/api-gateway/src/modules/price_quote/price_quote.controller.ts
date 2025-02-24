@@ -63,6 +63,7 @@ export class PriceQuoteController {
   @SetMetadata('roles', ['price_quote', 'admin-top', 'price_quote-read'])
   @SetMetadata('type', ['admin'])
   getOneExport(@Param() data: { id: string }) {
+    console.log("bam")
     return this.priceQuetoService.exportExcelPriceQuote(data.id);
   }
 
@@ -155,6 +156,16 @@ export class PriceQuoteController {
     @Body() updateTypePackageDto: UpdateTypePackageDto,
   ) {
     return this.priceQuetoService.updateTypePackage(id, updateTypePackageDto);
+  }
+
+  @Get('by-opportunity/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['price_quote', 'admin-top', 'price_quote-edit','opportunity'])
+  @SetMetadata('type', ['admin'])
+  async getPriceQuotesByOpportunities(
+    @Param('id') id: string,
+  ) {
+    return this.priceQuetoService.getPriceQuotesByOpportunities([id]);
   }
 
   // @Get('get-filter')

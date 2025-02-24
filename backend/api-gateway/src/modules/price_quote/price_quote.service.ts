@@ -101,7 +101,7 @@ export class PriceQuoteService {
         ),
       );
       return result;
-    } catch (error) {
+    } catch{
       throw new HttpException(
         'Failed to create type product',
         HttpStatus.BAD_REQUEST,
@@ -121,7 +121,7 @@ export class PriceQuoteService {
         this.priceQuoteClient.send({ cmd: 'find-all_type_package' }, {}),
       );
       return result;
-    } catch (error) {
+    } catch {
       throw new HttpException(
         'Failed to fetch type products',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -155,6 +155,18 @@ export class PriceQuoteService {
       );
       if (!result)
         throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getPriceQuotesByOpportunities(ids: string[]) {
+    try {
+      const result = await firstValueFrom(
+        this.priceQuoteClient.send({ cmd: 'get-price_quote-opportunities' }, ids),
+      );
+      if (!result)
+        throw new HttpException('TypePackage not found', HttpStatus.NOT_FOUND);
       return result;
     } catch (error) {
       throw error;

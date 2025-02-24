@@ -21,6 +21,14 @@ import { TypePackage } from 'src/database/entities/type_package.entity';
         },
       },
       {
+        name: 'OPPORTUNITY',
+        transport: Transport.TCP,
+        options: {
+          host: 'opportunity_service',
+          port: 3011,
+        },
+      },
+      {
         name: 'PROJECT',
         transport: Transport.TCP,
         options: {
@@ -44,6 +52,14 @@ import { TypePackage } from 'src/database/entities/type_package.entity';
           port: 3004,
         },
       },
+      {
+        name: 'CUSTOMER',
+        transport: Transport.TCP,
+        options: {
+          host: 'customer_service',
+          port: 3006,
+        },
+      }
     ]),
     TypeOrmModule.forFeature([
       PriceQuote,

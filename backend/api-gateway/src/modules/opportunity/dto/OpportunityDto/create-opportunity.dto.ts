@@ -25,7 +25,7 @@ export class CreateOpportunitiesDto {
   name_contact?: string;
 
   @IsOptional()
-  @IsEnum(['delete', 'hide','success','pending','cancel'])
+  @IsEnum(['delete', 'hide','success','pending','cancel','send','pause'])
   status?: string;
 
   @IsOptional()

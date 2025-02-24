@@ -348,4 +348,28 @@ export class UserController {
   getUserFilter(@Query('group') group: string) {
     return this.userService.getUserFilter(group);
   }
+
+  @Get('check-timekeeping')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  checkTimeKeeping(@Req() req: Request) {
+    return this.userService.checkTimeKeeping(req);
+  }
+
+  @Post('timekeeping')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  createTimeKeeping(@Req() req: Request) {
+    return this.userService.createTimeKeeping(req);
+  }
+
+  @Get('timekeeping')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  getTimeKeeping(@Query() filter?: {user_id?:string,group?:string}) {
+    return this.userService.getTimeKeeping(filter);
+  }
 }

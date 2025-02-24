@@ -9,6 +9,7 @@ import {
 import { RoleUser } from './role_user.entity';
 import { GroupUser } from './group_user.entity';
 import { NotifyUser } from './notify_user.entity';
+import { TimeKeeping } from './timekeeping.entity';
 
 @Entity('account_users')
 export class AccountUsers {
@@ -61,4 +62,7 @@ export class AccountUsers {
 
   @OneToMany(() => NotifyUser, (notifyUser) => notifyUser.user)
   notify_user: NotifyUser[];
+
+  @OneToMany(() => TimeKeeping, (timeKeeping) => timeKeeping.user_info)
+  time_keeping: TimeKeeping[];
 }

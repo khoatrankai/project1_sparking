@@ -12,6 +12,7 @@ import { CategoryRoleUser } from 'src/database/entities/category_role_user.entit
 import { Notify } from 'src/database/entities/notify.entity';
 import { NotifyRole } from 'src/database/entities/notify_role.entity';
 import { NotifyUser } from 'src/database/entities/notify_user.entity';
+import { TimeKeeping } from 'src/database/entities/timekeeping.entity';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { NotifyUser } from 'src/database/entities/notify_user.entity';
       Notify,
       NotifyRole,
       NotifyUser,
+      TimeKeeping
     ]),
   ],
   controllers: [UserController],

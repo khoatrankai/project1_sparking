@@ -213,4 +213,36 @@ export class OpportunityController {
       updateTypeSourceDto,
     );
   }
+
+  @Get('have-price-quote')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
+  @SetMetadata('type', ['admin'])
+  async sendGetOpportunitiesByPriceQuote() {
+    return this.opportunitiesService.sendGetOpportunitiesByPriceQuote();
+  }
+
+  @Get('type-opportunity-in-year')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
+  @SetMetadata('type', ['admin'])
+  async sendGetOpportunitiesInYear(@Query() data?:{start_year?:number,end_year?:number}) {
+    return this.opportunitiesService.sendGetOpportunitiesInYear(data.start_year,data.end_year);
+  }
+
+  @Get('have-contract')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
+  @SetMetadata('type', ['admin'])
+  async sendGetOpportunitiesHaveContract(@Query() data?:{start_year?:number,end_year?:number}) {
+    return this.opportunitiesService.sendGetOpportunitiesHaveContract(data.start_year,data.end_year);
+  }
+
+  @Get('dashboard-reason')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['opportunity', 'admin-top', 'opportunity-read'])
+  @SetMetadata('type', ['admin'])
+  async sendGetDashboardTotalReason() {
+    return this.opportunitiesService.sendGetDashboardTotalReason();
+  }
 }

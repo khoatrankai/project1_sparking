@@ -31,6 +31,15 @@ export class CreatePriceQuoteDto {
   @IsOptional()
   @IsString()
   user_support?: string;
+  
+
+  @IsOptional()
+  @IsString()
+  customer?: string;
+
+  @IsOptional()
+  @IsString()
+  opportunity?: string;
 
   @IsEnum(['none', 'before', 'after'])
   type_vat: string;

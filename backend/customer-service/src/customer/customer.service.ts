@@ -233,7 +233,7 @@ export class CustomerService {
       const dataContact = await this.infoContactRepository.save(infoContactNew);
       return {
         statusCode: HttpStatus.CREATED,
-        data: dataContact,
+        data: dataCompany,
         message: 'Tạo liên hệ thành công',
       };
     } else {
@@ -291,7 +291,7 @@ export class CustomerService {
       );
       return {
         statusCode: HttpStatus.CREATED,
-        data: dataContact,
+        data: dataCompany,
         message: 'Tạo liên hệ thành công',
       };
     }
@@ -949,20 +949,19 @@ export class CustomerService {
         where: { info_id },
         relations: ['group_customer'],
       });
-
-      const dataProvince = await firstValueFrom(
+      const dataProvince = data.province_delivery ? await firstValueFrom(
         this.systemClient.send(
           { cmd: 'get-province_id' },
           data.province_delivery,
         ),
-      );
+      ):undefined
       //console.log(dataProvince);
       return {
         statusCode: HttpStatus.OK,
         data: { ...data, province_delivery: dataProvince },
       };
     } catch (err) {
-      //console.log(err);
+      console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
       };

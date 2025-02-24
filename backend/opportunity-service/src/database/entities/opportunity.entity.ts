@@ -34,13 +34,16 @@ export class Opportunities {
 
   @Column({ type: 'text', nullable: true })
   list_label: string;
+  
+  @Column({ type: 'text', nullable: true })
+  reason: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   name_contact: string;
 
   @Column({
     type: 'enum',
-    enum: ['delete', 'hide', 'success', 'pending', 'cancel'],
+    enum: ['delete', 'hide', 'success', 'pending', 'cancel','send','pause'],
     default: 'pending',
   })
   status: string;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import {
   ConflictException,
   HttpStatus,
@@ -23,6 +24,7 @@ import { CreateNotifyrDto } from 'src/dto/Notify/create_notify.dto';
 import { Notify } from 'src/database/entities/notify.entity';
 import { NotifyRole } from 'src/database/entities/notify_role.entity';
 import { NotifyUser } from 'src/database/entities/notify_user.entity';
+import { TimeKeeping } from 'src/database/entities/timekeeping.entity';
 
 @Injectable()
 export class UserService {
@@ -43,6 +45,8 @@ export class UserService {
     private readonly notifyUserRepository: Repository<NotifyUser>,
     private configService: ConfigService,
     private roleService: RoleService,
+    @InjectRepository(TimeKeeping)
+    private readonly timeKeepingRepository: Repository<TimeKeeping>
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -557,7 +561,7 @@ export class UserService {
           data,
         },
       };
-    } catch (err) {
+    } catch {
       //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
@@ -636,4 +640,100 @@ export class UserService {
     });
     return users.map((dt) => dt.user_id);
   }
+
+  async updateTimeKeeping(userIds:AccountUsers){
+    const timeLast = await this.timeKeepingRepository.findOne({where:{user_info:userIds,completed:false},order:{time_start:'DESC'}})
+    await this.timeKeepingRepository.update({timekeeping_id:timeLast.timekeeping_id},{completed:true})
+    return {
+      statusCode: HttpStatus.OK,
+      message:'Đã cập nhật thời gian kết thúc'
+    }
+  }
+  async createTimeKeeping(user_id:string){
+    if(user_id){
+      const userIds = await this.accountUserRepository.findOne({where:{user_id:In([user_id])}})
+
+      if(userIds){
+        const latestTimeKeeping = await this.timeKeepingRepository.findOne({
+          where: { user_info: userIds }, 
+          order: { time_start: 'DESC' }, 
+        }); 
+        
+        if(latestTimeKeeping){
+          if(latestTimeKeeping.completed){
+            const dataNew = this.timeKeepingRepository.create({user_info:userIds})
+            await this.timeKeepingRepository.save(dataNew)
+            return {
+              statusCode: HttpStatus.CREATED,
+              message:'Đã điểm danh thành công'
+            }
+          }else{
+            const dateNow = new Date()
+            if(dateNow.getFullYear() === latestTimeKeeping.time_start.getFullYear() && dateNow.getMonth() === latestTimeKeeping.time_start.getMonth() && latestTimeKeeping.time_start.getDay() === dateNow.getDay()){
+              return this.updateTimeKeeping(userIds)
+            }else{
+              const dataNew = this.timeKeepingRepository.create({user_info:userIds})
+              await this.timeKeepingRepository.save(dataNew)
+              return {
+                statusCode: HttpStatus.CREATED,
+                message:'Đã điểm danh thành công'
+              }
+
+            }
+          }
+          
+
+          
+        }else{
+            const dataNew = this.timeKeepingRepository.create({user_info:userIds})
+            await this.timeKeepingRepository.save(dataNew)
+            return {
+              statusCode: HttpStatus.CREATED,
+              message:'Đã điểm danh thành công'
+            }
+        }
+       
+      }
+    }
+  }
+
+  async checkTimeKeeping(user_id:string){
+    const dataTimeKeeping = await this.timeKeepingRepository.findOne({where:{user_info:In([user_id])},order:{time_start:'DESC'}})
+    if(dataTimeKeeping){
+      const dateNow = new Date()
+      if(dateNow.getFullYear() === dataTimeKeeping.time_start.getFullYear() && dateNow.getMonth() === dataTimeKeeping.time_start.getMonth() && dateNow.getDay() === dataTimeKeeping.time_start.getDay() && !dataTimeKeeping.completed){
+        return {
+          statusCode:HttpStatus.OK,
+          data:true
+        }
+      }
+    }
+    return {
+      statusCode:HttpStatus.OK,
+      data:false
+    }
+
+  }
+
+
+  async getTimeKeeping(filter?:{user_id?:string,group?:string}){
+      const user_id = filter.user_id ?? null;
+      const group = filter.group ?? null;    
+      const dataTimeKeeping = await this.timeKeepingRepository
+      .createQueryBuilder('timekeepings')
+      .leftJoinAndSelect('timekeepings.user_info','user_info')
+      .leftJoin('user_info.group_user','group_user')
+      .where(`${(user_id || group) ?`${group ? `group_user.group_id = :group ${user_id ?'AND user_info.user_id = :user_id':''}`:`${user_id ? 'user_info.user_id = :user_id':''}`}`:''}`,{group,user_id})
+      .orderBy('timekeepings.time_start','DESC')
+      .getMany()
+      return {
+        statusCode:HttpStatus.OK,
+        data:dataTimeKeeping ?? []
+      }
+      
+  }
+
+ 
+
+  
 }

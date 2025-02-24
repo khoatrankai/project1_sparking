@@ -145,7 +145,7 @@ export class ContractService {
         statusCode: HttpStatus.CREATED,
         message: 'Contract created successfully',
       };
-    } catch (err) {
+    } catch {
       //console.log(err);
       return {
         statusCode: HttpStatus.BAD_REQUEST,
@@ -212,6 +212,24 @@ export class ContractService {
         return { ...dt, customer: customerInfos[index] };
       }),
     };
+  }
+
+  async getOpportunityByContract(){
+    const dataContracts = await this.contractRepository.find()
+    const projectIds =dataContracts.map(dt =>dt.project)
+    const opportunities = await firstValueFrom(this.projectsClient.send({cmd:'get-opportunity-by-project'},projectIds))
+    return opportunities
+
+    
+  }
+
+  async getContractsByOpportunityID(opportunity_id:string){
+    const projectIds = await firstValueFrom(this.projectsClient.send({cmd:'get-project-by-opportunity-id'},opportunity_id))
+    const contracts = await this.contractRepository.find({where:{project:In(projectIds)}})
+    return {
+      statusCode:HttpStatus.OK,
+      data:contracts
+    }
   }
 
   async getAllContractByToken(customer_id: string) {
@@ -1081,7 +1099,7 @@ export class ContractService {
         statusCode: HttpStatus.OK,
         message: 'TypeContract deleted successfully',
       };
-    } catch (error) {
+    } catch {
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Failed to delete TypeContract',

@@ -150,4 +150,31 @@ export class OpportunityService {
       { id, data: updateTypeSourceDto },
     );
   }
+
+  async sendGetOpportunitiesByPriceQuote(
+  ) {
+    return this.opportunityClient.send(
+      { cmd: 'get-opportunities_by_price_quote' },{}
+    );
+  }
+
+  async sendGetOpportunitiesInYear(start_year?:number,end_year?:number
+  ) {
+    return this.opportunityClient.send(
+      { cmd: 'get-detail_opportunity_year' },{start_year,end_year}
+    );
+  }
+
+  async sendGetOpportunitiesHaveContract(start_year?:number,end_year?:number
+  ) {
+    return this.opportunityClient.send(
+      { cmd: 'get-opportunities_have_contract' },{start_year,end_year}
+    );
+  }
+
+  async sendGetDashboardTotalReason() {
+    return this.opportunityClient.send(
+      { cmd: 'get-dashboard-total-reason' },{}
+    );
+  }
 }

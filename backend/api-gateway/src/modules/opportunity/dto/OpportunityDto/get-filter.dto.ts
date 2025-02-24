@@ -14,7 +14,7 @@ export class GetFilterOpportunitiesDto {
   user_support?: string;
 
   @IsOptional()
-  @IsEnum(['delete', 'hide', 'success', 'pending', 'cancel'])
+  @IsEnum(['delete', 'hide', 'success', 'pending', 'cancel','send','pause'])
   status?: string;
 
   @IsString()

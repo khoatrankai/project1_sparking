@@ -360,6 +360,25 @@ export class LayerService {
     };
   }
 
+  async getOpportunityByProject(projectIds:string[]){
+    const opportunitiesIds = await this.projectsRepository.find({where:{project_id:In(projectIds)}})
+    const dataRes = opportunitiesIds.map((dt)=>{
+      const countOpportunity = projectIds.filter((dtt)=>dt.project_id === dtt)
+      return {
+        opportunity:dt.opportunity,
+        count: countOpportunity.length ?? 0
+      }
+    })
+    return dataRes
+  }
+
+  async getProjectIdByOpportunityID(opportunity_id:string){
+    const projectsIds = await this.projectsRepository.find({where:{opportunity:In([opportunity_id])}})
+    return projectsIds.map((dt) => {
+      return dt.project_id
+    })
+  }
+
   getHello(): string {
     return 'Hello World!';
   }

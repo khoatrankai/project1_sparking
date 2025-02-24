@@ -35,7 +35,7 @@ export class UserService {
         this.usersClient.send({ cmd: 'find-profile' }, user_id),
       );
       return dataInfo;
-    } catch (err) {
+    } catch  {
       throw new InternalServerErrorException();
     }
   }
@@ -291,4 +291,39 @@ export class UserService {
       this.usersClient.send({ cmd: 'get-count-notify' }, { user_id }),
     );
   }
+
+  async createTimeKeeping(req: Request) {
+    const user = req['user']
+    if(user){
+      return await firstValueFrom(
+        this.usersClient.send({ cmd: 'timekeeping' },  user.sub),
+      );
+    }
+    return {
+      statusCode:HttpStatus.BAD_GATEWAY,
+      message:'Lỗi cổng chuyển'
+    }
+  }
+  async checkTimeKeeping(req: Request) {
+    const user = req['user']
+    if(user){
+      return await firstValueFrom(
+        this.usersClient.send({ cmd: 'check-timekeeping' },  user.sub),
+      );
+    }
+    return {
+      statusCode:HttpStatus.BAD_GATEWAY,
+      message:'Lỗi cổng chuyển'
+    }
+   
+  }
+
+  async getTimeKeeping(filter?: {user_id?:string,group?:string}) {
+      return await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-timekeeping' },  filter ?? {}),
+      );
+    }
+
+
+
 }

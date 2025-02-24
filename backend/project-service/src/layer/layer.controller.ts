@@ -104,4 +104,16 @@ export class LayerController {
     const { id, updateTypeProjectDto } = data;
     return this.layerService.updateTypeProject(id, updateTypeProjectDto);
   }
+
+  @MessagePattern({ cmd: 'get-opportunity-by-project' })
+  async getOpportunityByProject(ids: string[]) {
+    return this.layerService.getOpportunityByProject(ids);
+  }
+
+  @MessagePattern({ cmd: 'get-project-by-opportunity-id' })
+  async getProjectIdByOpportunityID(id: string) {
+    return this.layerService.getProjectIdByOpportunityID(id);
+  }
+
+  
 }

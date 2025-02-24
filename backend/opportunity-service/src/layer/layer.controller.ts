@@ -57,6 +57,11 @@ export class LayerController {
     return this.layerService.updateOpportunity(id, data);
   }
 
+  @MessagePattern({ cmd: 'update-opportunity-by-price_quote' })
+  async updateOpportunityByPriceQuote(id:string) {
+    return this.layerService.updateOpportunityByPriceQuote(id);
+  }
+
   @MessagePattern({ cmd: 'create-type_opportunity' })
   async createTypeOpportunity(data: CreateTypeOpportunitiesDto) {
     return this.layerService.createTypeOpportunity(data);
@@ -138,5 +143,26 @@ export class LayerController {
     data: UpdateTypeSourcesDto;
   }) {
     return this.layerService.updateTypeSource(id, data);
+  }
+
+
+  @MessagePattern({ cmd: 'get-opportunities_by_price_quote' })
+  async getOpportunityByPriceQuote() {
+    return this.layerService.getOpportunityByPriceQuote();
+  }
+
+  @MessagePattern({ cmd: 'get-opportunities_have_contract' })
+  async getOpportunityHaveContract(data?:{start_year?:number,end_year?:number}) {
+    return this.layerService.getOpportunityHaveContract(data.start_year,data.end_year);
+  }
+
+  @MessagePattern({ cmd: 'get-dashboard-total-reason' })
+  async getDashboardTotalReason() {
+    return this.layerService.getDashboardTotalReason();
+  }
+
+  @MessagePattern({ cmd: 'get-detail_opportunity_year' })
+  async detailTypeOpportunityInYear(data?:{start_year?:number,end_year?:number}) {
+    return this.layerService.detailTypeOpportunityInYear(data.start_year,data.end_year);
   }
 }

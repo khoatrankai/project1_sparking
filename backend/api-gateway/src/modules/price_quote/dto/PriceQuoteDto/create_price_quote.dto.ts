@@ -7,6 +7,7 @@ export class CreatePriceQuoteDto {
   price_quote_id: string;
 
   @IsString()
+  @IsOptional()
   project: string;
 
   @IsDateString()
@@ -31,6 +32,15 @@ export class CreatePriceQuoteDto {
   @IsOptional()
   @IsString()
   user_support?: string;
+
+  @IsOptional()
+  @IsString()
+  customer?: string;
+
+  @IsOptional()
+  @IsString()
+  opportunity?: string;
+
 
   @IsEnum(['none', 'before', 'after'])
   type_vat: string;

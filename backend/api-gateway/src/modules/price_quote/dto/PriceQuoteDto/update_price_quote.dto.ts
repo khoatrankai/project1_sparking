@@ -28,6 +28,15 @@ export class UpdatePriceQuoteDto {
 
   @IsOptional()
   @IsString()
+  customer?: string;
+
+  @IsOptional()
+  @IsString()
+  opportunity?: string;
+
+
+  @IsOptional()
+  @IsString()
   user_support?: string;
 
   @IsOptional()

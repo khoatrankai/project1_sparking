@@ -152,4 +152,20 @@ export class UserController {
   getUserbyGroupUser(group_ids: string[]) {
     return this.userService.getUserbyGroupUser(group_ids);
   }
+
+  @MessagePattern({ cmd: 'timekeeping' })
+  createTimeKeeping(user_id: string) {
+    return this.userService.createTimeKeeping(user_id);
+  }
+
+
+  @MessagePattern({ cmd: 'check-timekeeping' })
+  checkTimeKeeping(user_id: string) {
+    return this.userService.checkTimeKeeping(user_id);
+  }
+
+  @MessagePattern({ cmd: 'get-timekeeping' })
+  getTimeKeeping(filter?: {user_id?:string,group?:string}) {
+    return this.userService.getTimeKeeping(filter);
+  }
 }

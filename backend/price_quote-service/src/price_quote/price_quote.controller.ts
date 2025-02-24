@@ -192,4 +192,17 @@ export class PriceQuoteController {
     const { id, updateTypePackageDto } = data;
     return this.priceQuoteService.updateTypePackage(id, updateTypePackageDto);
   }
+
+  @MessagePattern({ cmd: 'get-opportunity-ok' })
+  async getOpportunityOK(
+  ) {
+    return this.priceQuoteService.getOpportunityOK();
+  }
+
+  @MessagePattern({ cmd: 'get-price_quote-opportunities' })
+  async getPriceQuoteByOpportunity(
+    opportunities: string[]
+  ) {
+    return this.priceQuoteService.getPriceQuoteByOpportunity(opportunities);
+  }
 }

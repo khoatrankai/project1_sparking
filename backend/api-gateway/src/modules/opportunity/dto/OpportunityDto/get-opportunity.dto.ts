@@ -15,6 +15,10 @@ export class GetOpportunitiesDto {
 
   @IsOptional()
   @IsString()
+  reason?: string;
+
+  @IsOptional()
+  @IsString()
   user_support?: string;
 
   @IsOptional()
@@ -26,7 +30,7 @@ export class GetOpportunitiesDto {
   name_contact?: string;
 
   @IsOptional()
-  @IsEnum(['delete', 'hide','success','pending','cancel'])
+  @IsEnum(['delete', 'hide','success','pending','cancel','send','pause'])
   status?: string;
 
   @IsOptional()

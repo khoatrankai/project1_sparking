@@ -19,6 +19,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         },
       },
       {
+        name: 'CONTRACT',
+        transport: Transport.TCP,
+        options: {
+          host: 'contract_service',
+          port: 3010,
+        },
+      },
+      {
         name: 'CUSTOMER',
         transport: Transport.TCP,
         options: {
@@ -26,6 +34,15 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           port: 3006,
         },
       },
+      {
+        name: 'PRICEQUOTE',
+        transport: Transport.TCP,
+        options: {
+          host: 'price_quote_service',
+          port: 3008,
+        },
+        
+      }
     ]),
     TypeOrmModule.forFeature([TypeOpportunities, TypeSources, Opportunities]),
   ],

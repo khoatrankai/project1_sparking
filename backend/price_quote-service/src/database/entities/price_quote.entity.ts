@@ -6,7 +6,7 @@ export class PriceQuote {
   @PrimaryColumn({ type: 'varchar', length: 50 })
   price_quote_id: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50,nullable:true })
   project: string;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
@@ -26,6 +26,12 @@ export class PriceQuote {
 
   @Column({ type: 'varchar', length: 50,nullable:true })
   user_support: string;
+
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  customer: string;
+
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  opportunity: string;
 
   @Column({ type: 'enum', enum: ['none', 'before', 'after'], default: 'none' })
   type_vat: string;
