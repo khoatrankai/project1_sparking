@@ -324,6 +324,10 @@ export class UserService {
       );
     }
 
-
+    async getTimeKeepingPerson(data?: {user_id:string,start_time:string,end_time:string}) {
+      return await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-timekeeping_person' },  data ?? {}),
+      );
+    }
 
 }

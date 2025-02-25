@@ -733,6 +733,47 @@ export class UserService {
       
   }
 
+  async getTimeKeepingOnePerson(user_id:string,start_time:string,end_time:string){
+    const start = new Date(Number(start_time))
+    const end = new Date(Number(end_time))
+    end.setDate(end.getDate() + 1);
+    const timekeepings = await this.timeKeepingRepository
+    .createQueryBuilder('timekeepings')
+    .where('timekeepings.user_info = :user_id',{user_id})
+    .andWhere('timekeepings.time_start BETWEEN :start AND :end', { start, end })
+    .orderBy('timekeepings.time_end','ASC')
+    .getMany()
+ 
+    function getHoursBetweenTimestamps(startTime:Date, endTime:Date) {
+      const startTimestamp = startTime.getTime(); // Lấy timestamp của thời gian bắt đầu
+      const endTimestamp = endTime.getTime(); // Lấy timestamp của thời gian kết thúc
+    
+      // Tính hiệu giữa 2 timestamp (kết quả là miligiây)
+      const timeDifference = endTimestamp - startTimestamp;
+    
+      // Chuyển miligiây thành giờ (1 giờ = 3,600,000 miligiây)
+      const hours = (timeDifference / 3600000);
+      return hours;
+    }
+    const res = timekeepings.map((dt,i) => {
+      const key = i+1
+      return {
+        key,
+        time_start:dt.time_start.toLocaleString("vi-VN", { 
+          timeZone: "UTC", 
+          hour12: false 
+      }),
+        time_end:dt.time_end.toLocaleString("vi-VN", { 
+          timeZone: "UTC", 
+          hour12: false 
+      }),
+        time_total:getHoursBetweenTimestamps(dt.time_start,dt.time_end)
+      }
+    })
+    return res
+
+  }
+
  
 
   

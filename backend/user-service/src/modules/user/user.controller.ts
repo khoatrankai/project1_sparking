@@ -168,4 +168,10 @@ export class UserController {
   getTimeKeeping(filter?: {user_id?:string,group?:string}) {
     return this.userService.getTimeKeeping(filter);
   }
+
+  @MessagePattern({ cmd: 'get-timekeeping_person' })
+  getTimeKeepingOnePerson(data: {user_id:string,start_time:string,end_time:string}) {
+    return this.userService.getTimeKeepingOnePerson(data.user_id,data.start_time,data.end_time);
+  }
+  
 }

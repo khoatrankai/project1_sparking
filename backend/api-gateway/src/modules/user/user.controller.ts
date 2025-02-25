@@ -372,4 +372,12 @@ export class UserController {
   getTimeKeeping(@Query() filter?: {user_id?:string,group?:string}) {
     return this.userService.getTimeKeeping(filter);
   }
+
+  @Get('timekeeping-person')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  getTimeKeepingPerson(@Query() data: {user_id:string,start_time:string,end_time:string}) {
+    return this.userService.getTimeKeepingPerson(data);
+  }
 }
