@@ -369,4 +369,11 @@ export class ContractController {
   async getAllDocumentContract(@Param('contract_id') contract_id: string) {
     return this.contractService.sendGetAllDocumentContract(contract_id);
   }
+
+  @Get('dashboard-by-project/:id')
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetDashboardTotalbyProject(@Param('id') id:string) {
+    return this.contractService.sendGetDashboardTotalbyProject(id);
+  }
 }

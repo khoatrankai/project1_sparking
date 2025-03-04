@@ -262,4 +262,9 @@ export class ContractController {
   async getContractsByOpportunityID(opportunity_id:string) {
     return this.contractService.getContractsByOpportunityID(opportunity_id);
   }
+
+  @MessagePattern({ cmd: 'get-dashboard_by_project' })
+  async getDashboardContractByProject(project_id) {
+    return this.contractService.getDashboardContractByProject(project_id);
+  }
 }

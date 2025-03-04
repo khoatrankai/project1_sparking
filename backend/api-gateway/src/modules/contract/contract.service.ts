@@ -305,4 +305,10 @@ export class ContractService {
       this.contractClient.send('get-all_document_contract', contract_id),
     );
   }
+
+  async sendGetDashboardTotalbyProject(project_id: string) {
+    return await firstValueFrom(
+      this.contractClient.send('get-dashboard_by_project', project_id),
+    );
+  }
 }

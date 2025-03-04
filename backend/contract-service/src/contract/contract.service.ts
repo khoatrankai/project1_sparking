@@ -179,10 +179,19 @@ export class ContractService {
       const typeContract = await this.typeContractRepository.findOne({
         where: { type_id: updateContract.type_contract },
       });
-      await this.contractRepository.update(updateContract.contract_id, {
-        ...updateContract,
-        type_contract: typeContract,
-      });
+      if(updateContract.status === "completed"){
+        await this.contractRepository.update(updateContract.contract_id, {
+          ...updateContract,
+          type_contract: typeContract,
+          date_completed:new Date()
+        });
+      }else{
+        await this.contractRepository.update(updateContract.contract_id, {
+          ...updateContract,
+          type_contract: typeContract,
+        });
+      }
+     
       return {
         statusCode: HttpStatus.OK,
         message: 'Contract updated successfully',
@@ -1172,4 +1181,54 @@ export class ContractService {
       await this.documentContractRepository.save(newDocumentContract);
     return { statusCode: HttpStatus.CREATED, data: savedDocumentContract };
   }
+
+  async getDashboardContractByProject(project_id:string){
+    const dataContract = await this.contractRepository.find({where:{project:In([project_id])}})
+    const completedContract = dataContract.filter(dt => dt.status === "completed")
+    const expiredSuccessContract = completedContract.filter((dt)=>{
+      const dateExpired = dt.date_expired.getTime()
+      const dateCompleted = dt.date_completed.getTime()
+      return dateCompleted <= dateExpired
+    })
+    const expiredContract = dataContract.filter((dt)=>{
+      const dateExpired = dt.date_expired.getTime()
+      const dateNow = new Date().getTime()
+      return dt.status === "active" && dateExpired < dateNow
+    })
+    const deleteContract = dataContract.filter(dt => dt.status === "delete")
+    const activityContract = dataContract.filter(dt => dt.status === "activity")
+    const dataContractOK = dataContract.sort((a,b)=>{
+      return b.created_at.getTime() - a.created_at.getTime()
+    })
+    
+    return {
+      statusCode:HttpStatus.OK,
+      data:{
+        expired_success:expiredSuccessContract.length,
+        overdue:expiredContract.length,
+        delete:deleteContract.length,
+        activity:activityContract.length,
+        statuses:{
+          pending: dataContract.filter((dt) => dt.status === "pending").length,
+          completed:dataContract.filter((dt) => dt.status === "completed").length
+        },
+        list_contract:dataContractOK.reduce((preValue:{time:string,list:Contract[]}[], currValue:Contract) => {
+          const timeCheck =  currValue.created_at.toLocaleDateString('vi-vn')
+          const dataCheck = preValue.find(dt => dt.time === timeCheck)
+          if(dataCheck){
+            return preValue.map((dt) => {
+              if(dt.time === timeCheck){
+                return {...dt,list:[...dt.time,currValue]}
+              }
+              return dt
+            })
+          }
+          return preValue.push({time:timeCheck,list:[currValue]}) 
+        }, [])
+      }
+     
+    }
+  }
+
+  
 }

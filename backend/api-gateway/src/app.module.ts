@@ -20,6 +20,7 @@ import { ContractModule } from './modules/contract/contract.module';
 import { OpportunityModule } from './modules/opportunity/opportunity.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AIGeminiModule } from './modules/ai-gemini/ai_gemini.module';
 // import { CloudinaryModule } from './cloudinary/cloudinary.module';
 // import { FriendModule } from './modules/friend/friend.module';
 // import { PagesModule } from './modules/page/page.module';
@@ -31,7 +32,7 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    ActivityModule,ProjectModule,ContractModule,OpportunityModule,AuthModule,ProposeModule,UserModule,CustomerModule,PriceQuoteModule,SystemModule,ProductModule,
+    ActivityModule,ProjectModule,ContractModule,OpportunityModule,AuthModule,AIGeminiModule,ProposeModule,UserModule,CustomerModule,PriceQuoteModule,SystemModule,ProductModule,
    ConfigModule.forRoot({
     isGlobal: true, 
     envFilePath: '.env',

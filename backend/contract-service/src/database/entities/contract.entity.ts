@@ -48,6 +48,9 @@ export class Contract {
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   date_expired: Date;
 
+  @Column({ type: 'datetime', nullable:true })
+  date_completed: Date;
+
   @Column({
     type: 'enum',
     enum: ['delete', 'active', 'hide', 'completed'],
