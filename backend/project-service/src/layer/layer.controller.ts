@@ -115,5 +115,10 @@ export class LayerController {
     return this.layerService.getProjectIdByOpportunityID(id);
   }
 
+  @MessagePattern({ cmd: 'get-dashboard-project' })
+  async getDashboardProject() {
+    return this.layerService.getDashboardProject();
+  }
+
   
 }

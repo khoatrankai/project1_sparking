@@ -6,14 +6,11 @@ import {
   IsInt,
   IsBoolean,
 } from 'class-validator';
-import { CreatePictureWorkDto } from '../PicturesWorkDto/get-picture_work.dto';
+import { CreatePictureTaskDto } from '../PicturesTaskDto/get-picture_task.dto';
 
-export class CreateWorkDto {
+export class CreateTaskDto {
   @IsString()
-  work_id: string;
-
-  @IsString()
-  type: string;
+  task_id: string;
 
   @IsString()
   status: string;
@@ -31,21 +28,23 @@ export class CreateWorkDto {
 
   @IsOptional()
   @IsString()
-  activity?: string;
-
-  @IsOptional()
-  @IsString()
-  user_create?: string;
+  work?: string;
 
   @IsDate()
+  @IsOptional()
   time_start: Date;
 
   @IsDate()
+  @IsOptional()
   time_end: Date;
 
   @IsArray()
   @IsOptional()
-  picture_urls?: CreatePictureWorkDto[];
+  picture_urls: CreatePictureTaskDto[];
+
+  @IsArray()
+  @IsOptional()
+  picture_url_type?: string[];
 
   @IsArray()
   @IsOptional()

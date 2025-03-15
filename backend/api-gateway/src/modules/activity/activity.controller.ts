@@ -203,6 +203,15 @@ export class ActivityController {
     return this.activityService.sendGetActivityByContract(contract_id);
   }
 
+  @Get('work-by-activity/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetWorkByActivity(@Param('id') activity_id: string) {
+    return this.activityService.sendGetWorkByActivity(activity_id);
+  }
+
+
   @Get('all')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'product', 'activity-read', 'admin-top'])
@@ -463,8 +472,9 @@ export class ActivityController {
   async sendCreateWork(
     @Body() createWorkDto: CreateWorkDto,
     @UploadedFiles() picture_urls: Express.Multer.File[],
+    @Req() req:Request
   ) {
-    return this.activityService.sendCreateWork(createWorkDto, picture_urls);
+    return this.activityService.sendCreateWork(createWorkDto, picture_urls,req);
   }
 
   @Delete('work')
@@ -766,5 +776,31 @@ export class ActivityController {
   @SetMetadata('type', ['admin'])
   async sendGetAllListUser(@Param('work_id') work_id: string) {
     return this.activityService.sendGetAllListUser(work_id);
+  }
+
+  @Get('dashboard-contract/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetDashboardActivityByContract(@Param('id') id: string) {
+    return this.activityService.sendGetDashboardActivityByContract(id);
+  }
+
+  @Get('dashboard-activity/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetDashboardWorkByActivity(@Param('id') id: string) {
+    return this.activityService.sendGetDashboardWorkByActivity(id);
   }
 }

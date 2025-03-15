@@ -308,7 +308,13 @@ export class ContractService {
 
   async sendGetDashboardTotalbyProject(project_id: string) {
     return await firstValueFrom(
-      this.contractClient.send('get-dashboard_by_project', project_id),
+      this.contractClient.send({cmd:'get-dashboard_by_project'}, project_id),
+    );
+  }
+
+  async sendGetContractFilterbyProject(filter: {id:string}) {
+    return await firstValueFrom(
+      this.contractClient.send({cmd:'get-contract_filter_by_project'}, filter),
     );
   }
 }

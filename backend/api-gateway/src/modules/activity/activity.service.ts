@@ -24,6 +24,9 @@ import { GetActivityDto } from './dto/ActivityDto/get-activity.dto';
 import { GetFilterActivityDto } from './dto/ActivityDto/get-filter.dto';
 import { GetFilterWorkDto } from './dto/WorkDto/get-filter.dto';
 import { Request } from 'express';
+import { CreateTaskDto } from './dto/TaskDto/create-task.dto';
+import { UpdateTaskDto } from './dto/TaskDto/update-task.dto';
+import { CreatePictureTaskDto } from './dto/PicturesTaskDto/get-picture_task.dto';
 
 @Injectable()
 export class ActivityService {
@@ -153,6 +156,12 @@ export class ActivityService {
   async sendGetActivityByContract(contract_id: string) {
     return await firstValueFrom(
       this.activityClient.send('get-activity_by_contract', contract_id),
+    );
+  }
+
+  async sendGetWorkByActivity(activity_id: string) {
+    return await firstValueFrom(
+      this.activityClient.send('get-work_by_activity', activity_id),
     );
   }
 
@@ -411,6 +420,22 @@ export class ActivityService {
     return dataDelete;
   }
 
+  async sendDeletePictureTask(picture_id: string) {
+    const dataDelete = await firstValueFrom(
+      this.activityClient.send('delete-picture_task', picture_id),
+    );
+    if (dataDelete.data) {
+      const data = await this.cloudinaryService.deleteFile(dataDelete.data);
+      if (data) {
+        return {
+          statusCode: dataDelete.statusCode,
+          message: dataDelete.message,
+        };
+      }
+    }
+    return dataDelete;
+  }
+
   async sendGetAllPictureActivity(activity_id: string) {
     return await firstValueFrom(
       this.activityClient.send('get-all_picture_activity', activity_id),
@@ -463,6 +488,7 @@ export class ActivityService {
   async sendCreateWork(
     createWorkDto: CreateWorkDto,
     picture_urls: Express.Multer.File[],
+    req:Request
   ) {
     if (picture_urls && picture_urls.length > 0) {
       const datas = await this.cloudinaryService.uploadFiles(picture_urls);
@@ -470,8 +496,41 @@ export class ActivityService {
         const { picture_url_type, ...reqCreateWork } = createWorkDto;
 
         const resultImg = await firstValueFrom(
-          this.activityClient.send('create-activity', {
+          this.activityClient.send('create-work', {
             ...reqCreateWork,
+            user_create:req['user'].sub,
+            picture_urls: picture_url_type.map((dt, index) => {
+              return { type: dt, url: datas[index] };
+            }),
+          }),
+        );
+        if (resultImg) {
+          return {
+            statusCode: HttpStatus.CREATED,
+            message: 'Work and Picture created successfully',
+          };
+        }
+      }
+    } else {
+      return await firstValueFrom(
+        this.activityClient.send({ cmd: 'create-work' }, {...createWorkDto,
+          user_create:req['user'].sub,}),
+      );
+    }
+  }
+
+  async sendCreateTask(
+    createTaskDto: CreateTaskDto,
+    picture_urls: Express.Multer.File[],
+  ) {
+    if (picture_urls && picture_urls.length > 0) {
+      const datas = await this.cloudinaryService.uploadFiles(picture_urls);
+      if (datas.length > 0) {
+        const { picture_url_type, ...reqCreateTask } = createTaskDto;
+
+        const resultImg = await firstValueFrom(
+          this.activityClient.send('create-task', {
+            ...reqCreateTask,
             picture_urls: picture_url_type.map((dt, index) => {
               return { type: dt, url: datas[index] };
             }),
@@ -495,6 +554,10 @@ export class ActivityService {
     return await firstValueFrom(this.activityClient.send('delete-work', datas));
   }
 
+  async sendDeleteTask(datas: string[]) {
+    return await firstValueFrom(this.activityClient.send('delete-task', datas));
+  }
+
   async sendUpdateWork(id: string, updateWorkDto: UpdateWorkDto) {
     return await firstValueFrom(
       this.activityClient.send(
@@ -504,9 +567,24 @@ export class ActivityService {
     );
   }
 
+  async sendUpdateTask(id: string, updateTaskDto: UpdateTaskDto) {
+    return await firstValueFrom(
+      this.activityClient.send(
+        { cmd: 'update-task' },
+        { id, data: updateTaskDto },
+      ),
+    );
+  }
+
   async sendGetWork(work_id: string) {
     return await firstValueFrom(
       this.activityClient.send({ cmd: 'get-work' }, work_id),
+    );
+  }
+
+  async sendGetTask(task_id: string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-task' }, task_id),
     );
   }
 
@@ -670,9 +748,48 @@ export class ActivityService {
     }
   }
 
+  async sendCreatePictureTask(
+    createPictureTaskDto: CreatePictureTaskDto[],
+    picture_urls: Express.Multer.File[],
+  ) {
+    try {
+      // //console.log(picture_urls)
+      if (picture_urls && picture_urls.length > 0) {
+        const datas = await this.cloudinaryService.uploadFiles(picture_urls);
+        if (datas.length > 0) {
+          const resultImg = await firstValueFrom(
+            this.activityClient.send('create-one-picture_task', {
+              ...createPictureTaskDto,
+              url: datas[0],
+            }),
+          );
+          if (resultImg) {
+            return {
+              statusCode: HttpStatus.CREATED,
+              message: 'Work and Picture created successfully',
+            };
+          }
+        }
+      } else {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Picture dont successfully',
+        };
+      }
+    } catch (err) {
+      //console.log(err);
+    }
+  }
+
   async sendGetAllPictureWork(work_id: string) {
     return await firstValueFrom(
       this.activityClient.send({ cmd: 'get-all_picture_work' }, work_id),
+    );
+  }
+
+  async sendGetAllPictureTask(task_id: string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-all_picture_task' }, task_id),
     );
   }
 
@@ -707,6 +824,18 @@ export class ActivityService {
   async sendGetAllListUser(work_id: string) {
     return await firstValueFrom(
       this.activityClient.send({ cmd: 'get-all_list_user' }, work_id),
+    );
+  }
+
+  async sendGetDashboardActivityByContract(contract_id: string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-dashboard_activity_by_contract' }, contract_id),
+    );
+  }
+
+  async sendGetDashboardWorkByActivity(activity_id: string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-dashboard_work_by_activity' }, activity_id),
     );
   }
 }

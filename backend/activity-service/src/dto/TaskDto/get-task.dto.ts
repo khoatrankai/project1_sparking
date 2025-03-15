@@ -2,18 +2,15 @@ import {
   IsString,
   IsOptional,
   IsDate,
-  IsArray,
   IsInt,
+  IsArray,
   IsBoolean,
 } from 'class-validator';
-import { CreatePictureWorkDto } from '../PicturesWorkDto/get-picture_work.dto';
 
-export class CreateWorkDto {
+export class GetTaskDto {
   @IsString()
-  work_id: string;
+  task_id: string;
 
-  @IsString()
-  type: string;
 
   @IsString()
   status: string;
@@ -21,21 +18,17 @@ export class CreateWorkDto {
   @IsString()
   name: string;
 
+  @IsOptional()
+  @IsString()
+  description?: string;
+
   @IsInt()
   @IsOptional()
   position: number;
 
   @IsOptional()
   @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  activity?: string;
-
-  @IsOptional()
-  @IsString()
-  user_create?: string;
+  work?: string;
 
   @IsDate()
   time_start: Date;
@@ -45,11 +38,7 @@ export class CreateWorkDto {
 
   @IsArray()
   @IsOptional()
-  picture_urls?: CreatePictureWorkDto[];
-
-  @IsArray()
-  @IsOptional()
-  list_users?: string[];
+  picture_urls?: string[];
 
   @IsOptional()
   @IsBoolean()

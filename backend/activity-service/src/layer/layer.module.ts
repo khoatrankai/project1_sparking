@@ -13,6 +13,8 @@ import { StatusWork } from 'src/database/entities/status_work.entity';
 import { Works } from 'src/database/entities/work.entity';
 import { ListUser } from 'src/database/entities/list_user.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { Tasks } from 'src/database/entities/task.entity';
+import { PictureTask } from 'src/database/entities/picture_task.entity';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       StatusWork,
       Works,
       ListUser,
+      Tasks,
+      PictureTask
     ]),
     ClientsModule.register([
       {

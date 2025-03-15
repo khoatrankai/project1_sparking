@@ -167,4 +167,30 @@ export class ProjectService {
       throw error;
     }
   }
+
+  async getDashboardProject() {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send({ cmd: 'get-dashboard-project' }, {}),
+      );
+      if (!result)
+        throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getFullProject(id:string) {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send({ cmd: 'find-one_full_project' }, id ??""),
+      );
+      if (!result)
+        throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

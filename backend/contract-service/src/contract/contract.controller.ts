@@ -264,7 +264,12 @@ export class ContractController {
   }
 
   @MessagePattern({ cmd: 'get-dashboard_by_project' })
-  async getDashboardContractByProject(project_id) {
+  async getDashboardContractByProject(project_id:string) {
     return this.contractService.getDashboardContractByProject(project_id);
+  }
+
+  @MessagePattern({ cmd: 'get-contract_filter_by_project' })
+  async getContractFilterByProject(filter?:{id:string}) {
+    return this.contractService.getContractFilterByProject(filter);
   }
 }

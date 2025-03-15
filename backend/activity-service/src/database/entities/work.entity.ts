@@ -13,6 +13,7 @@ import { StatusWork } from './status_work.entity';
 import { PictureWork } from './picture_work.entity';
 import { Activities } from './activity.entity';
 import { ListUser } from './list_user.entity';
+import { Tasks } from './task.entity';
 
 @Entity('works')
 export class Works {
@@ -33,6 +34,9 @@ export class Works {
 
   @Column({ type: 'varchar', length: 50 })
   name: string;
+
+  @Column({ type: 'varchar', length: 50 })
+  user_create: string;
 
   @Column({ type: 'text', nullable: true })
   description: string;
@@ -66,4 +70,7 @@ export class Works {
 
   @OneToMany(() => ListUser, (listUser) => listUser.work)
   list_user: ListUser[];
+
+  @OneToMany(() => Tasks, (task) => task.activity, { cascade: true })
+  tasks: Tasks[];
 }

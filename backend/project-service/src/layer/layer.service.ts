@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { In, Repository } from 'typeorm';
+import { Between, In, Not, Repository } from 'typeorm';
 import { Projects } from 'src/database/entities/project.entity';
 import { CreateProjectDto } from 'src/dto/ProjectDto/create-project.dto';
 import { UpdateProjectDto } from 'src/dto/ProjectDto/update-project.dto';
@@ -102,9 +102,13 @@ export class LayerService {
   // Find all projects
   async findAllProjects(filter?: GetFilterProjectDto): Promise<any> {
     const customer = filter?.customer;
+    const type = filter?.type;
     const whereCondition: any = {};
     if (customer) {
       whereCondition.customer = customer;
+    }
+    if (type) {
+      whereCondition.type = In([type]);
     }
     const projects = await this.projectsRepository.find({
       where: whereCondition,
@@ -382,4 +386,28 @@ export class LayerService {
   getHello(): string {
     return 'Hello World!';
   }
+
+  async getDashboardProject(){
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0, 0);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    const projectToday = await this.projectsRepository.find({where:{
+      created_at: Between(startOfMonth, endOfMonth),
+    }})
+    const countProjectToday = projectToday.length
+    const projectProcess = await this.projectsRepository.find({where:{status:Not(In(['completed','pause','cancel']))}})
+    const projectDelete = await this.projectsRepository.find({where:{status:In(['cancel'])}})
+    const projectCompleted = await this.projectsRepository.find({where:{status:In(['completed'])}})
+    return {
+      statusCode:HttpStatus.OK,
+      data:{
+        total_project:countProjectToday,
+        process_project:projectProcess.length,
+        completed_project:projectCompleted.length,
+        cancel_project:projectDelete.length
+      }
+    }
+  }
+  
 }

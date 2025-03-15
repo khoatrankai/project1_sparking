@@ -1,3 +1,4 @@
+import { CreatePictureTaskDto } from './../dto/PicturesTaskDto/get-picture_task.dto';
 import { Controller, Get, UseFilters } from '@nestjs/common';
 
 import { ConflictExceptionFilter } from 'src/common/filters/conflict-exception.filter';
@@ -24,6 +25,9 @@ import { UpdateWorkDto } from 'src/dto/WorkDto/update-work.dto';
 import { GetActivityDto } from 'src/dto/ActivityDto/get-activity.dto';
 import { GetFilterActivityDto } from 'src/dto/ActivityDto/get-filter.dto';
 import { GetFilterWorkDto } from 'src/dto/WorkDto/get-filter.dto';
+import { CreatePictureTaskDto } from 'src/dto/PicturesTaskDto/get-picture_task.dto';
+import { CreateTaskDto } from 'src/dto/TaskDto/create-task.dto';
+import { UpdateTaskDto } from 'src/dto/TaskDto/update-task.dto';
 
 @Controller('/activity')
 @UseFilters(ConflictExceptionFilter)
@@ -76,6 +80,21 @@ export class LayerController {
   @MessagePattern('get-activity_by_contract')
   async getActivityByContract(@Payload() contract_id: string) {
     return await this.layerService.getActivityByContract(contract_id);
+  }
+
+  @MessagePattern('get-work_by_activity')
+  async getWorkByActivity(@Payload() activity_id: string) {
+    return await this.layerService.getWorkByActivity(activity_id);
+  }
+
+  @MessagePattern({cmd:'get-dashboard_activity_by_contract'})
+  async getDashboardActivityByContract(@Payload() contract_id: string) {
+    return await this.layerService.getDashboardActivity(contract_id);
+  }
+
+  @MessagePattern({cmd:'get-dashboard_work_by_activity'})
+  async getDashboardWorkByActivity(@Payload() activity_id: string) {
+    return await this.layerService.getDashboardWork(activity_id);
   }
 
   @MessagePattern('get-work_by_project')
@@ -236,6 +255,13 @@ export class LayerController {
     return await this.layerService.createOnePictureWork(createPictureWorkDto);
   }
 
+  @MessagePattern('create-one-picture_task')
+  async createOnePictureTask(
+    @Payload() createPictureTaskDto: CreatePictureTaskDto,
+  ) {
+    return await this.layerService.createOnePictureTask(createPictureTaskDto);
+  }
+
   @MessagePattern('delete-picture_activity')
   async deletePictureActivity(@Payload() picture_id: string) {
     return await this.layerService.deletePictureActivity(picture_id);
@@ -244,6 +270,11 @@ export class LayerController {
   @MessagePattern('delete-picture_work')
   async deletePictureWork(@Payload() picture_id: string) {
     return await this.layerService.deletePictureWork(picture_id);
+  }
+
+  @MessagePattern('delete-picture_task')
+  async deletePictureTask(@Payload() picture_id: string) {
+    return await this.layerService.deletePictureTask(picture_id);
   }
 
   @MessagePattern('get-all_picture_activity')
@@ -294,19 +325,40 @@ export class LayerController {
     return this.layerService.createWork(createWorkDto);
   }
 
+  @MessagePattern({ cmd: 'create-task' })
+  async createTask(@Payload() createTaskDto: CreateTaskDto) {
+    return this.layerService.createTask(createTaskDto);
+  }
+
   @MessagePattern('delete-work')
   async deleteWork(@Payload() datas: string[]) {
     return await this.layerService.deleteWork(datas);
   }
+
+  @MessagePattern('delete-task')
+  async deleteTask(@Payload() datas: string[]) {
+    return await this.layerService.deleteTask(datas);
+  }
+
 
   @MessagePattern({ cmd: 'update-work' })
   async updateWork(@Payload() payload: { id: string; data: UpdateWorkDto }) {
     return this.layerService.updateWork(payload.id, payload.data);
   }
 
+  @MessagePattern({ cmd: 'update-task' })
+  async updateTask(@Payload() payload: { id: string; data: UpdateTaskDto }) {
+    return this.layerService.updateTask(payload.id, payload.data);
+  }
+
   @MessagePattern({ cmd: 'get-work' })
   async getWork(@Payload() work_id: string) {
     return this.layerService.getWork(work_id);
+  }
+
+  @MessagePattern({ cmd: 'get-task' })
+  async getTask(@Payload() task_id: string) {
+    return this.layerService.getTask(task_id);
   }
 
   @MessagePattern({ cmd: 'get-filter_work' })
@@ -426,9 +478,21 @@ export class LayerController {
     return this.layerService.createPictureWork(createPictureWorkDto);
   }
 
+  @MessagePattern({ cmd: 'create-picture_task' })
+  async CreatePictureTaskDto(
+    @Payload() createPictureTaskDto: CreatePictureTaskDto[],
+  ) {
+    return this.layerService.createPictureTask(createPictureTaskDto);
+  }
+
   @MessagePattern({ cmd: 'get-all_picture_work' })
   async getAllPictureWork(@Payload() work_id: string) {
     return this.layerService.getAllPictureWork(work_id);
+  }
+
+  @MessagePattern({ cmd: 'get-all_picture_task' })
+  async getAllPictureTask(@Payload() task_id: string) {
+    return this.layerService.getAllPictureTask(task_id);
   }
 
   @MessagePattern({ cmd: 'create-list_user' })

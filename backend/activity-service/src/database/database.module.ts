@@ -12,6 +12,8 @@ import { PictureWork } from './entities/picture_work.entity';
 import { createConnection } from 'mysql2/promise';
 import { ListUser } from './entities/list_user.entity';
 import { ConfigService } from '@nestjs/config';
+import { Tasks } from './entities/task.entity';
+import { PictureTask } from './entities/picture_task.entity';
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { ConfigService } from '@nestjs/config';
             StatusWork,
             PictureWork,
             ListUser,
+            Tasks,
+            PictureTask
           ],
           // synchronize: true,
           // dropSchema: true,

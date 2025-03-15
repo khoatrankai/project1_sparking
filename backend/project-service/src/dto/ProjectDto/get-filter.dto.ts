@@ -10,4 +10,9 @@ export class GetFilterProjectDto {
   @IsOptional()
   @Length(1, 50)
   opportunity?: string;
+
+  @IsString()
+  @IsOptional()
+  @Length(1, 50)
+  type?: string;
 }

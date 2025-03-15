@@ -158,6 +158,14 @@ export class ProjectController {
     return this.projectService.findOneTypeProject(id);
   }
 
+  @Get('dashboard-project')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getDashboardProject() {
+    return this.projectService.getDashboardProject();
+  }
+
   @Put('type/:id')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
@@ -167,5 +175,13 @@ export class ProjectController {
     @Body() updateTypeProjectDto: UpdateTypeProjectDto,
   ) {
     return this.projectService.updateTypeProject(id, updateTypeProjectDto);
+  }
+
+  @Get('get-full-project/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getFullProject(@Param('id') id:string) {
+    return this.projectService.getFullProject(id);
   }
 }

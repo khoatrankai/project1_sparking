@@ -313,7 +313,7 @@ export class UserService {
       return [];
     }
     const data = await this.accountUserRepository.find({
-      select: ['first_name', 'last_name', 'email', 'picture_url', 'user_id'],
+      select: ['first_name', 'last_name', 'email', 'picture_url', 'user_id','group_user'],
       where: { user_id: In(user_ids) },
     });
     const sortedData = user_ids.map((id) =>

@@ -419,16 +419,24 @@ export class ContractService {
   }
 
   async getContractID(id: string) {
-    const result = await this.contractRepository.findOne({
-      where: { contract_id: id },
-      relations: ['type_contract'],
-    });
-    // const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_id'},result.customer))
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Contracts retrieved successfully',
-      data: { ...result, type_contract: result.type_contract.type_id },
-    };
+    try{
+      const result = await this.contractRepository.findOne({
+        where: { contract_id: id },
+        relations: ['type_contract'],
+      });
+      // const customerInfos = await firstValueFrom(this.customersClient.send({cmd:'get-customer_id'},result.customer))
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Contracts retrieved successfully',
+        data: { ...result, type_contract: result.type_contract ? result.type_contract.type_id : null },
+      };
+    }catch{
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Contracts retrieved fail',
+      }
+    }
+    
   }
   async getContractIDs(contract_ids: string[]) {
     if (!contract_ids || contract_ids.length === 0) {
@@ -1183,52 +1191,78 @@ export class ContractService {
   }
 
   async getDashboardContractByProject(project_id:string){
-    const dataContract = await this.contractRepository.find({where:{project:In([project_id])}})
-    const completedContract = dataContract.filter(dt => dt.status === "completed")
-    const expiredSuccessContract = completedContract.filter((dt)=>{
-      const dateExpired = dt.date_expired.getTime()
-      const dateCompleted = dt.date_completed.getTime()
-      return dateCompleted <= dateExpired
-    })
-    const expiredContract = dataContract.filter((dt)=>{
-      const dateExpired = dt.date_expired.getTime()
-      const dateNow = new Date().getTime()
-      return dt.status === "active" && dateExpired < dateNow
-    })
-    const deleteContract = dataContract.filter(dt => dt.status === "delete")
-    const activityContract = dataContract.filter(dt => dt.status === "activity")
-    const dataContractOK = dataContract.sort((a,b)=>{
-      return b.created_at.getTime() - a.created_at.getTime()
-    })
+    try{
+      const dataContract = await this.contractRepository.find({where:{project:In([project_id])}})
+      const completedContract = dataContract.filter(dt => dt.status === "completed")
+      const hideContract = dataContract.filter(dt => dt.status === "hide")
+      const expiredSuccessContract = completedContract.filter((dt)=>{
+        const dateExpired = dt.date_expired.getTime()
+        const dateCompleted = dt.date_completed.getTime()
+        return dateCompleted <= dateExpired
+      })
+      const expiredContract = dataContract.filter((dt)=>{
+        const dateExpired = dt.date_expired.getTime()
+        const dateNow = new Date().getTime()
+        return dt.status === "active" && dateExpired < dateNow
+      })
+      const deleteContract = dataContract.filter(dt => dt.status === "delete")
+      const activeContract = dataContract.filter(dt => dt.status === "active")
+      const dataContractOK = dataContract.sort((a,b)=>{
+        return b.created_at.getTime() - a.created_at.getTime()
+      })
+      
+      return {
+        statusCode:HttpStatus.OK,
+        data:{
+          expired_success:expiredSuccessContract.length,
+          total:dataContract.length,
+          overdue:expiredContract.length,
+          delete:deleteContract.length,
+          active:activeContract.length,
+          completed:completedContract.length,
+          hide:hideContract.length,
+          statuses:{
+            pending: dataContract.filter((dt) => dt.status === "pending").length,
+            completed:dataContract.filter((dt) => dt.status === "completed").length
+          },
+          list_contract:dataContractOK.reduce((preValue:{time:string,list:Contract[]}[], currValue:Contract) => {
+            const timeCheck =  currValue.created_at.toLocaleDateString('vi-vn')
+            const dataCheck = preValue.find(dt => dt.time === timeCheck)
+            if(dataCheck){
+              return preValue.map((dt) => {
+                if(dt.time === timeCheck){
+                  return {...dt,list:[...dt.time,currValue]}
+                }
+                return dt
+              })
+            }
+            return preValue.push({time:timeCheck,list:[currValue]}) 
+          }, [])
+        }
+       
+      }
+    }catch(err){
+      console.log(err,"loi")
+    }
     
+  }
+
+  async getContractFilterByProject(filter?:{id:string}){
+    // .toLocaleDateString("vi-VN")
+    const dataContract = await this.contractRepository.find({where:{project:In([filter.id])},order:{created_at:'DESC'}})
+    const dataCustomer = dataContract.reduce((preValue,currValue)=>{
+      const time = currValue.created_at.toLocaleDateString("vi-VN")
+      if(!preValue[time]){
+        preValue[time] = []
+      }
+      preValue[time].push(currValue)
+      return preValue
+    },{})
     return {
       statusCode:HttpStatus.OK,
-      data:{
-        expired_success:expiredSuccessContract.length,
-        overdue:expiredContract.length,
-        delete:deleteContract.length,
-        activity:activityContract.length,
-        statuses:{
-          pending: dataContract.filter((dt) => dt.status === "pending").length,
-          completed:dataContract.filter((dt) => dt.status === "completed").length
-        },
-        list_contract:dataContractOK.reduce((preValue:{time:string,list:Contract[]}[], currValue:Contract) => {
-          const timeCheck =  currValue.created_at.toLocaleDateString('vi-vn')
-          const dataCheck = preValue.find(dt => dt.time === timeCheck)
-          if(dataCheck){
-            return preValue.map((dt) => {
-              if(dt.time === timeCheck){
-                return {...dt,list:[...dt.time,currValue]}
-              }
-              return dt
-            })
-          }
-          return preValue.push({time:timeCheck,list:[currValue]}) 
-        }, [])
-      }
-     
+      data:dataCustomer
     }
   }
 
-  
+ 
 }

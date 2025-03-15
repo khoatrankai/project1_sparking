@@ -49,6 +49,11 @@ import { GetActivityDto } from 'src/dto/ActivityDto/get-activity.dto';
 import { GetFilterActivityDto } from 'src/dto/ActivityDto/get-filter.dto';
 import { GetFilterWorkDto } from 'src/dto/WorkDto/get-filter.dto';
 import { ConfigService } from '@nestjs/config';
+import { CreateTaskDto } from 'src/dto/TaskDto/create-task.dto';
+import { Tasks } from 'src/database/entities/task.entity';
+import { PictureTask } from 'src/database/entities/picture_task.entity';
+import { CreatePictureTaskDto } from 'src/dto/PicturesTaskDto/get-picture_task.dto';
+import { UpdateTaskDto } from 'src/dto/TaskDto/update-task.dto';
 
 @Injectable()
 export class LayerService {
@@ -67,6 +72,10 @@ export class LayerService {
     private readonly listCodeProductRepository: Repository<ListCodeProduct>,
     @InjectRepository(Works)
     private readonly worksRepository: Repository<Works>,
+    @InjectRepository(Tasks)
+    private readonly tasksRepository: Repository<Tasks>,
+    @InjectRepository(PictureTask)
+    private readonly pictureTaskRepository: Repository<PictureTask>,
     @InjectRepository(TypeWork)
     private readonly typeWorkRepository: Repository<TypeWork>,
     @InjectRepository(StatusWork)
@@ -218,8 +227,8 @@ export class LayerService {
     const activity = await this.activitiesRepository.findOne({
       where: { activity_id },
       relations: [
-        'type',
         'status',
+        'type',
         'picture_urls',
         'list_code_product',
         'works',
@@ -234,6 +243,7 @@ export class LayerService {
       data: {
         ...activity,
         status: activity.status.status_activity_id,
+        statusinfo:activity.status,
         type: activity.type.type_activity_id,
         picture_urls: activity.picture_urls.sort(
           (a, b) =>
@@ -254,12 +264,41 @@ export class LayerService {
         'works',
         'works.list_user',
         'works.status',
-      ],
+      ],order:{created_at:'DESC'}
     });
     if (!activity)
       throw new NotFoundException(`Activity with ID ${contract_id} not found`);
     return { statusCode: HttpStatus.OK, data: activity };
   }
+
+  async getWorkByActivity(activity_id: string) {
+    const activity = await this.worksRepository.find({
+      where: { activity:In([activity_id]) },
+      relations: [
+        'type',
+        'status',
+        'picture_urls',
+        'list_user'
+      ],order:{created_at:'DESC'}
+    });
+    if (!activity)
+      throw new NotFoundException(`Activity with ID ${activity_id} not found`);
+    return { statusCode: HttpStatus.OK, data: activity };
+  }
+
+  async getTaskByWork(work_id: string) {
+    const work = await this.tasksRepository.find({
+      where: { work:In([work_id]) },
+      relations: [
+        'picture_urls',
+      ],order:{created_at:'DESC'}
+    });
+    if (!work)
+      throw new NotFoundException(`Activity with ID ${work_id} not found`);
+    return { statusCode: HttpStatus.OK, data: work };
+  }
+
+ 
 
   async getAllActivities(filter?: GetFilterActivityDto) {
     if (filter.project) {
@@ -845,8 +884,11 @@ export class LayerService {
       .where('activity.contract IN (:...contracts)', {
         contracts: listContract.length > 0 ? listContract : [''],
       })
-      .getMany();
+      .getMany() as [];
 
+      // const dataWork = works.reduce((preValue,currValue)=>{
+      //   const time = currValue.t
+      // },[])
     return {
       statusCode: HttpStatus.OK,
       data: works,
@@ -1188,6 +1230,23 @@ export class LayerService {
     };
   }
 
+  async createOnePictureTask(createPictureTaskDto: CreatePictureTaskDto) {
+    const task = await this.tasksRepository.findOne({
+      where: { task_id: createPictureTaskDto.task },
+    });
+    const newPictureTask = this.pictureTaskRepository.create({
+      ...createPictureTaskDto,
+      task,
+      picture_id: uuidv4(),
+    });
+    const result = await this.pictureTaskRepository.save(newPictureTask);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Picture Work created successfully',
+      data: result,
+    };
+  }
+
   async deletePictureActivity(picture_id: string) {
     function extractPublicId(url: string): string {
       const parts = url.split('/');
@@ -1218,6 +1277,25 @@ export class LayerService {
       where: { picture_id },
     });
     await this.pictureWorkRepository.delete({ picture_id });
+    const publicId = extractPublicId(dataDelete.url);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Picture Work deleted successfully',
+      data: publicId,
+    };
+  }
+
+  async deletePictureTask(picture_id: string) {
+    function extractPublicId(url: string): string {
+      const parts = url.split('/');
+      const fileName = parts[parts.length - 1]; // Lấy phần cuối cùng của URL
+      const publicId = fileName.split('.')[0]; // Loại bỏ phần mở rộng (.jpg, .png, ...)
+      return publicId;
+    }
+    const dataDelete = await this.pictureTaskRepository.findOne({
+      where: { picture_id },
+    });
+    await this.pictureTaskRepository.delete({ picture_id });
     const publicId = extractPublicId(dataDelete.url);
     return {
       statusCode: HttpStatus.OK,
@@ -1397,9 +1475,73 @@ export class LayerService {
     }
   }
 
+  async createTask(createTaskDto: CreateTaskDto) {
+    const work = await this.worksRepository.findOne({
+      where: { work_id: createTaskDto.work },relations:['tasks']
+    });
+    
+    const maxPosition = work.tasks.length 
+    if (createTaskDto.picture_urls) {
+      const { picture_urls, ...reqTask } = createTaskDto;
+      const newTask = this.tasksRepository.create({
+        ...reqTask,
+        task_id: uuidv4(),
+        work,
+        position: maxPosition + 1,
+      });
+      const savedTask = await this.tasksRepository.save(newTask);
+      if (savedTask) {
+        await this.createPictureWork(
+          picture_urls.map((dt) => {
+            return { ...dt, work: savedTask.task_id };
+          }),
+        );
+
+      }
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Work created successfully',
+        data: savedTask,
+      };
+    } else {
+      const { picture_urls, ...reqTask } = createTaskDto;
+      const newTask = this.tasksRepository.create({
+        ...reqTask,
+        task_id: uuidv4(),
+        work,
+      });
+      const result = await this.tasksRepository.save(newTask);
+      
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Work created successfully',
+        data: result,
+      };
+    }
+  }
+
+
   async deleteWork(datas: string[]) {
     try {
       const rm = await this.worksRepository.delete({ work_id: In(datas) });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  
+  async deleteTask(datas: string[]) {
+    try {
+      const rm = await this.tasksRepository.delete({ task_id: In(datas) });
       if (rm) {
         return {
           statusCode: HttpStatus.OK,
@@ -1457,10 +1599,34 @@ export class LayerService {
     };
   }
 
+  async updateTask(task_id: string, updateTaskDto: UpdateTaskDto) {
+    const { picture_urls, ...reqUpdateTask } = updateTaskDto;
+    const work = updateTaskDto.work
+      ? await this.worksRepository.findOne({
+          where: { work_id: In([updateTaskDto.work]) },
+        })
+      : undefined;
+   
+    
+
+    const updatedTask = await this.tasksRepository.update(task_id, {
+      ...reqUpdateTask,
+      work,
+    });
+    if (updatedTask.affected !== 0 && picture_urls) {
+      await this.createPictureTask(picture_urls);
+    }
+    return {
+      statusCode: HttpStatus.OK,
+      data: updatedTask,
+      message: 'Cập nhật thành công',
+    };
+  }
+
   async getWork(work_id: string) {
     const work = await this.worksRepository.findOne({
       where: { work_id },
-      relations: ['type', 'status', 'picture_urls', 'list_user', 'activity'],
+      relations: ['type', 'status', 'picture_urls', 'list_user', 'activity','tasks'],
     });
     const userIds = work.list_user.map((dt) => {
       return dt.user;
@@ -1468,12 +1634,27 @@ export class LayerService {
     const dataUsers = await firstValueFrom(
       this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
     );
-
-    const dataRes = { ...work, list_user: dataUsers };
+    const dataUserCreate = await firstValueFrom(
+      this.usersClient.send({ cmd: 'get-user_ids' }, [work.user_create]),
+    );
+    const dataRes = { ...work, list_user: dataUsers,user_create:dataUserCreate?.[0] };
     if (!work) {
       throw new NotFoundException(`Activity not found`);
     }
     return { statusCode: HttpStatus.OK, data: dataRes };
+  }
+
+  async getTask(task_id: string) {
+    const task = await this.tasksRepository.findOne({
+      where: { task_id },
+      relations: [ 'picture_urls',  'work'],
+    });
+    
+
+    if (!task) {
+      throw new NotFoundException(`Activity not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: task };
   }
 
   async getFilterWork(filter?: {
@@ -1945,8 +2126,22 @@ export class LayerService {
       }),
     );
     const savedPictureWork =
-      await this.pictureActivityRepository.save(newPictureWork);
+      await this.pictureWorkRepository.save(newPictureWork);
     return { statusCode: HttpStatus.CREATED, data: savedPictureWork };
+  }
+
+  async createPictureTask(createPictureTask: CreatePictureTaskDto[]) {
+    const task = await this.tasksRepository.findOne({
+      where: { task_id: createPictureTask[0].task },
+    });
+    const newPictureTask = this.pictureTaskRepository.create(
+      createPictureTask.map((dt) => {
+        return { ...dt, task, picture_id: uuidv4() };
+      }),
+    );
+    const savedPictureTask =
+      await this.pictureTaskRepository.save(newPictureTask);
+    return { statusCode: HttpStatus.CREATED, data: savedPictureTask };
   }
 
   // async deletePictureWork(datas: string[]) {
@@ -1979,6 +2174,19 @@ export class LayerService {
       throw new NotFoundException(`PictureWork not found`);
     }
     return { statusCode: HttpStatus.OK, data: pictureWork };
+  }
+
+  async getAllPictureTask(task_id: string) {
+    const task = await this.tasksRepository.findOne({ where: { task_id } });
+    const pictureTask = await this.pictureTaskRepository.find({
+      where: { task },
+      relations: ['task'],
+      order: { created_at: 'DESC' },
+    });
+    if (!pictureTask) {
+      throw new NotFoundException(`PictureWork not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: pictureTask };
   }
 
   async createListUser(createListUserDto: CreateListUserDto[]) {
@@ -2047,4 +2255,44 @@ export class LayerService {
     }
     return { statusCode: HttpStatus.OK, data: listUser };
   }
+
+  async getDashboardActivity(contract_id:string){
+    const dataActivity = await this.activitiesRepository.find({where:{contract:In([contract_id])},relations:['status']})
+    const completedActivity = dataActivity.filter((dt)=> dt.status.name_tag === "completed")
+    const processActivity = dataActivity.filter((dt)=> {
+      return dt.status.name_tag !== "completed" && dt.status.name_tag !== "delete" && dt.status.name_tag !== "cancel"
+    })
+    const deleteActivity = dataActivity.filter((dt)=> {return (dt.status.name_tag === "delete" || dt.status.name_tag === "cancel")})
+    return {
+      statusCode:HttpStatus.OK,
+      data:{
+        total:dataActivity.length,
+        completed:completedActivity.length,
+        process:processActivity.length,
+        delete:deleteActivity.length
+      }
+    }
+  }
+
+  async getDashboardWork(activity_id:string){
+    const dataWork = await this.worksRepository.find({where:{activity:In([activity_id])},relations:['status']})
+    const completedWork = dataWork.filter((dt)=> dt.status.name_tag === "completed")
+    const processWork = dataWork.filter((dt)=> {
+      return dt.status.name_tag !== "completed" && dt.status.name_tag !== "delete" && dt.status.name_tag !== "cancel"
+    })
+    const deleteWork = dataWork.filter((dt)=> {return (dt.status.name_tag === "delete" || dt.status.name_tag === "cancel")})
+    return {
+      statusCode:HttpStatus.OK,
+      data:{
+        total:dataWork.length,
+        completed:completedWork.length,
+        process:processWork.length,
+        delete:deleteWork.length
+      }
+    }
+  }
+
+  
+
+ 
 }

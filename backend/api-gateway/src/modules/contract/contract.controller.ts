@@ -374,6 +374,14 @@ export class ContractController {
   @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendGetDashboardTotalbyProject(@Param('id') id:string) {
+    console.log(id)
     return this.contractService.sendGetDashboardTotalbyProject(id);
+  }
+
+  @Get('get-contract-filter-by-project')
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetContractFilterbyProject(@Query() filter:{id:string}) {
+    return this.contractService.sendGetContractFilterbyProject(filter);
   }
 }
