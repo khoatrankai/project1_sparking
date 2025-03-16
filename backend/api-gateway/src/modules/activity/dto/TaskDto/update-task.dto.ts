@@ -7,6 +7,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { CreatePictureTaskDto } from '../PicturesTaskDto/get-picture_task.dto';
+import { Type } from 'class-transformer';
 
 export class UpdateTaskDto {
 
@@ -35,10 +36,12 @@ export class UpdateTaskDto {
   @IsOptional()
   time_start?: Date;
 
+  @Type(() => Date)
   @IsDate()
   @IsOptional()
   time_end?: Date;
 
+  @Type(() => Date)
   @IsArray()
   @IsOptional()
   picture_urls?: CreatePictureTaskDto[];

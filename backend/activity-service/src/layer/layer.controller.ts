@@ -1,4 +1,4 @@
-import { CreatePictureTaskDto } from './../dto/PicturesTaskDto/get-picture_task.dto';
+
 import { Controller, Get, UseFilters } from '@nestjs/common';
 
 import { ConflictExceptionFilter } from 'src/common/filters/conflict-exception.filter';
@@ -327,6 +327,7 @@ export class LayerController {
 
   @MessagePattern({ cmd: 'create-task' })
   async createTask(@Payload() createTaskDto: CreateTaskDto) {
+    console.log(createTaskDto,"vipp")
     return this.layerService.createTask(createTaskDto);
   }
 

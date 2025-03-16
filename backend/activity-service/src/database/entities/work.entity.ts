@@ -71,6 +71,6 @@ export class Works {
   @OneToMany(() => ListUser, (listUser) => listUser.work)
   list_user: ListUser[];
 
-  @OneToMany(() => Tasks, (task) => task.activity, { cascade: true })
+  @OneToMany(() => Tasks, (task) => task.work, { cascade: true })
   tasks: Tasks[];
 }

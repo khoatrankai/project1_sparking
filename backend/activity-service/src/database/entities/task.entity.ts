@@ -53,7 +53,7 @@ export class Tasks {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-  @OneToMany(() => PictureTask, (pictureWork) => pictureWork.work)
+  @OneToMany(() => PictureTask, (pictureWork) => pictureWork.task)
   picture_urls: PictureTask[];
 
 

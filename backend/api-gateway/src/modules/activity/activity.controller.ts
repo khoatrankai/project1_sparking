@@ -38,6 +38,8 @@ import { RoleGuard } from 'src/guards/role.guard';
 import { Request } from 'express';
 import { GetFilterActivityDto } from './dto/ActivityDto/get-filter.dto';
 import { GetFilterWorkDto } from './dto/WorkDto/get-filter.dto';
+import { CreateTaskDto } from './dto/TaskDto/create-task.dto';
+import { UpdateTaskDto } from './dto/TaskDto/update-task.dto';
 
 @Controller('activity')
 export class ActivityController {
@@ -477,12 +479,37 @@ export class ActivityController {
     return this.activityService.sendCreateWork(createWorkDto, picture_urls,req);
   }
 
+  @Post('task/create')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-update',
+    'activity-create',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  @UseInterceptors(FilesInterceptor('picture_urls'))
+  async sendCreateTask(
+    @Body() createTaskDto: CreateTaskDto,
+    @UploadedFiles() picture_urls: Express.Multer.File[],
+  ) {
+    return this.activityService.sendCreateTask(createTaskDto, picture_urls);
+  }
+
   @Delete('work')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteWork(@Body() datas: string[]) {
     return this.activityService.sendDeleteWork(datas);
+  }
+
+  @Delete('task')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteTask(@Body() datas: [string]) {
+    return this.activityService.sendDeleteTask(datas);
   }
 
   @Put('work/update/:id')
@@ -496,12 +523,31 @@ export class ActivityController {
     return this.activityService.sendUpdateWork(work_id, updateWorkDto);
   }
 
+  @Put('task/update/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateTaskk(
+    @Param('id') task_id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ) {
+    return this.activityService.sendUpdateTask(task_id, updateTaskDto);
+  }
+
   @Get('work/id/:id')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendGetWork(@Param('id') work_id: string) {
     return this.activityService.sendGetWork(work_id);
+  }
+
+  @Get('task/id/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetTask(@Param('id') task_id: string) {
+    return this.activityService.sendGetTask(task_id);
   }
 
   @Get('work-filter')

@@ -527,9 +527,8 @@ export class ActivityService {
       const datas = await this.cloudinaryService.uploadFiles(picture_urls);
       if (datas.length > 0) {
         const { picture_url_type, ...reqCreateTask } = createTaskDto;
-
         const resultImg = await firstValueFrom(
-          this.activityClient.send('create-task', {
+          this.activityClient.send({cmd:'create-task'}, {
             ...reqCreateTask,
             picture_urls: picture_url_type.map((dt, index) => {
               return { type: dt, url: datas[index] };
@@ -545,7 +544,7 @@ export class ActivityService {
       }
     } else {
       return await firstValueFrom(
-        this.activityClient.send({ cmd: 'create-work' }, createWorkDto),
+        this.activityClient.send({ cmd: 'create-task' }, createTaskDto),
       );
     }
   }
@@ -555,7 +554,7 @@ export class ActivityService {
   }
 
   async sendDeleteTask(datas: string[]) {
-    return await firstValueFrom(this.activityClient.send('delete-task', datas));
+    return await firstValueFrom(this.activityClient.send({cmd:'delete-task'}, datas));
   }
 
   async sendUpdateWork(id: string, updateWorkDto: UpdateWorkDto) {
