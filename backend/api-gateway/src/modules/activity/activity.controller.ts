@@ -849,4 +849,32 @@ export class ActivityController {
   async sendGetDashboardWorkByActivity(@Param('id') id: string) {
     return this.activityService.sendGetDashboardWorkByActivity(id);
   }
+
+  @Get('works-filter')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetWorksFilter(@Req() req:Request,@Query() filters?:{status:string,page?:string,limit?:string,type?:string}) {
+    return this.activityService.sendGetWorksFilter({...filters,user:req['user'].sub});
+  }
+
+  @Put('update-tasks')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateTasks(@Body() datas:UpdateTaskDto[]) {
+    // console.log(datas)
+    // return
+    return this.activityService.sendUpdateTasks(datas);
+  }
 }

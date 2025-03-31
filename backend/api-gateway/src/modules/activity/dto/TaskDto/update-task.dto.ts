@@ -13,6 +13,10 @@ export class UpdateTaskDto {
 
   @IsString()
   @IsOptional()
+  task_id?: string;
+
+  @IsString()
+  @IsOptional()
   status?: string;
 
   @IsString()

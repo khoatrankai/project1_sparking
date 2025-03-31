@@ -15,6 +15,8 @@ import { ListUser } from 'src/database/entities/list_user.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { Tasks } from 'src/database/entities/task.entity';
 import { PictureTask } from 'src/database/entities/picture_task.entity';
+import { Comments } from 'src/database/entities/comment.entity';
+import { Reviews } from 'src/database/entities/review.entity';
 
 @Module({
   imports: [
@@ -30,7 +32,9 @@ import { PictureTask } from 'src/database/entities/picture_task.entity';
       Works,
       ListUser,
       Tasks,
-      PictureTask
+      PictureTask,
+      Comments,
+      Reviews
     ]),
     ClientsModule.register([
       {

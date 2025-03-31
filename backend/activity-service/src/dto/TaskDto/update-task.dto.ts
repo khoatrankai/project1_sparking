@@ -9,6 +9,9 @@ import {
 import { CreatePictureTaskDto } from '../PicturesTaskDto/get-picture_task.dto';
 
 export class UpdateTaskDto {
+  @IsOptional()
+  @IsString()
+  task_id?: string;
 
   @IsString()
   @IsOptional()

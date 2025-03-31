@@ -517,4 +517,14 @@ export class LayerController {
   async getAllListUser(@Payload() work_id: string) {
     return this.layerService.getAllListUser(work_id);
   }
+
+  @MessagePattern({ cmd: 'get-works_filter' })
+  async getWorksFilter(filters?:{status:string,page?:string,limit?:string,user?:string,type?:string}) {
+    return this.layerService.getWorks(filters);
+  }
+
+  @MessagePattern({ cmd: 'update-tasks' })
+  async updateTasks(datas:UpdateTaskDto[]) {
+    return this.layerService.updateTasks(datas);
+  }
 }

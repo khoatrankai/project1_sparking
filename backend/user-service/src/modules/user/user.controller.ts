@@ -173,5 +173,10 @@ export class UserController {
   getTimeKeepingOnePerson(data: {user_id:string,start_time:string,end_time:string}) {
     return this.userService.getTimeKeepingOnePerson(data.user_id,data.start_time,data.end_time);
   }
+
+  @MessagePattern({ cmd: 'get-ids_group' })
+  getIdsByGroup(user:string) {
+    return this.userService.getIdsByGroup(user);
+  }
   
 }

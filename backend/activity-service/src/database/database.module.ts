@@ -14,6 +14,8 @@ import { ListUser } from './entities/list_user.entity';
 import { ConfigService } from '@nestjs/config';
 import { Tasks } from './entities/task.entity';
 import { PictureTask } from './entities/picture_task.entity';
+import { Comments } from './entities/comment.entity';
+import { Reviews } from './entities/review.entity';
 
 @Module({
   imports: [
@@ -49,7 +51,9 @@ import { PictureTask } from './entities/picture_task.entity';
             PictureWork,
             ListUser,
             Tasks,
-            PictureTask
+            PictureTask,
+            Comments,
+            Reviews
           ],
           // synchronize: true,
           // dropSchema: true,

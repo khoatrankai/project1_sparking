@@ -266,13 +266,15 @@ export class UserService {
     const data = await this.accountUserRepository.find({
       select: [
         'first_name',
-        'last_name',
+        'last_name', 
         'email',
         'phone_number',
         'picture_url',
         'user_id',
         'status',
+        'group_user'
       ],
+      relations:['group_user'],
       where: { status: Not('delete') },
     });
     return data;
@@ -771,6 +773,17 @@ export class UserService {
       }
     })
     return res
+
+  }
+
+  async getIdsByGroup(user?:string){
+    const group = await this.groupUserRepository.createQueryBuilder('group').leftJoinAndSelect('group.users','users').where('users.user_id =:user',{user}).getOne()
+    return {
+      statusCode:HttpStatus.OK,
+      data:group.users.map((dt)=>{
+        dt.user_id
+      })
+    }
 
   }
 

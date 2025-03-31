@@ -14,6 +14,8 @@ import { PictureWork } from './picture_work.entity';
 import { Activities } from './activity.entity';
 import { ListUser } from './list_user.entity';
 import { Tasks } from './task.entity';
+import { Comments } from './comment.entity';
+import { Reviews } from './review.entity';
 
 @Entity('works')
 export class Works {
@@ -73,4 +75,10 @@ export class Works {
 
   @OneToMany(() => Tasks, (task) => task.work, { cascade: true })
   tasks: Tasks[];
+
+  @OneToMany(() => Comments, (comment) => comment.work, { cascade: true })
+  comments: Comments[];
+
+  @OneToMany(() => Reviews, (review) => review.work, { cascade: true })
+  revies: Reviews[];
 }

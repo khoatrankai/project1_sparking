@@ -54,6 +54,9 @@ import { Tasks } from 'src/database/entities/task.entity';
 import { PictureTask } from 'src/database/entities/picture_task.entity';
 import { CreatePictureTaskDto } from 'src/dto/PicturesTaskDto/get-picture_task.dto';
 import { UpdateTaskDto } from 'src/dto/TaskDto/update-task.dto';
+import { CreateReviewDto } from 'src/dto/ReviewDto/create-review.dto';
+import { Reviews } from 'src/database/entities/review.entity';
+import { UpdateReviewDto } from 'src/dto/ReviewDto/update-review.dto';
 
 @Injectable()
 export class LayerService {
@@ -74,6 +77,8 @@ export class LayerService {
     private readonly worksRepository: Repository<Works>,
     @InjectRepository(Tasks)
     private readonly tasksRepository: Repository<Tasks>,
+    @InjectRepository(Reviews)
+    private readonly reviewsRepository: Repository<Reviews>,
     @InjectRepository(PictureTask)
     private readonly pictureTaskRepository: Repository<PictureTask>,
     @InjectRepository(TypeWork)
@@ -1476,18 +1481,22 @@ export class LayerService {
   }
 
   async createTask(createTaskDto: CreateTaskDto) {
+    const tasks = await this.tasksRepository.find({
+      where: { status:createTaskDto.status,work:In([createTaskDto.work]) },relations:['tasks']
+    });
+    
     const work = await this.worksRepository.findOne({
       where: { work_id: createTaskDto.work },relations:['tasks']
     });
     
-    const maxPosition = work.tasks.length 
+    const maxPosition = tasks.length 
     if (createTaskDto.picture_urls) {
       const { picture_urls, ...reqTask } = createTaskDto;
       const newTask = this.tasksRepository.create({
         ...reqTask,
         task_id: uuidv4(),
         work,
-        position: maxPosition + 1,
+        position: maxPosition,
       });
       const savedTask = await this.tasksRepository.save(newTask);
       if (savedTask) {
@@ -2292,7 +2301,237 @@ export class LayerService {
     }
   }
 
+  async getWorks(filters?:{status:string,page?:string,limit?:string,user?:string,type?:string}){
+      if(filters.type){
+        if(filters.type === "perform"){
+          console.log(filters)
+          const status = filters.status ?? '';
+        const page = filters.page ? Number(filters.page) : 1
+        const limit = filters.limit ? Number(filters.limit) : 0
   
+        const queryBuilder = this.worksRepository.createQueryBuilder('works')
+        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.type', 'type')
+        .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+        .leftJoinAndSelect('works.list_user', 'list_user')
+        .leftJoinAndSelect('works.tasks', 'tasks')
+        .where('status.name_tag IN (:...statuses)', { statuses: [status] })
+        .andWhere('list_user.user IN (:...user)',{user:[filters.user]})
+    
+    // Lấy tổng số bản ghi
+        const total = await queryBuilder.getCount();
+        
+        // Lấy danh sách công việc với pagination
+        const works = await queryBuilder
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getMany();
+          
+            console.log(works)
+      const listIdUser = ((works.map(dt => dt.list_user)).flat()).map(dt => dt.user)
+      const dataUser = await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-user_ids' }, listIdUser),
+      );
+      let countID = 0
+      if (!works)
+        throw new NotFoundException(`Activity not found`);
+      return { statusCode: HttpStatus.OK, data: {
+        datas:works.map((dt,index)=>{
+          return {...dt,list_user:dt.list_user.map((dtt)=>{
+            countID ++;
+            return {...dtt,...dataUser[countID-1]}
+          })}
+        }),
+        current_page: page ?? 1,
+        total_pages: Math.ceil(total / limit) ?? 1,
+      } };
+        }
+        if(filters.type === "assigned"){
+          const status = filters.status ?? '';
+        const page = filters.page ? Number(filters.page) : 1
+        const limit = filters.limit ? Number(filters.limit) : 0
+  
+        const queryBuilder = this.worksRepository.createQueryBuilder('works')
+        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.type', 'type')
+        .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+        .leftJoinAndSelect('works.list_user', 'list_user')
+        .leftJoinAndSelect('works.tasks', 'tasks')
+        .where('status.name_tag IN (:...statuses)', { statuses: [status] })
+        .andWhere('works.user_create IN (:...user)',{user:filters.user})
+    
+    // Lấy tổng số bản ghi
+        const total = await queryBuilder.getCount();
+        
+        // Lấy danh sách công việc với pagination
+        const works = await queryBuilder
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getMany();
+    
+      const listIdUser = ((works.map(dt => dt.list_user)).flat()).map(dt => dt.user)
+      const dataUser = await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-user_ids' }, listIdUser),
+      );
+      let countID = 0
+      if (!works)
+        throw new NotFoundException(`Activity not found`);
+      return { statusCode: HttpStatus.OK, data: {
+        datas:works.map((dt,index)=>{
+          return {...dt,list_user:dt.list_user.map((dtt)=>{
+            countID ++;
+            return {...dtt,...dataUser[countID-1]}
+          })}
+        }),
+        current_page: page ?? 1,
+        total_pages: Math.ceil(total / limit) ?? 1,
+      } };
+        }
+        if(filters.type === "group"){
+          const listIdsUser = (await firstValueFrom(this.usersClient.send({cmd:'get-ids_group'},filters.user))).data ?? []
+          const status = filters.status ?? '';
+        const page = filters.page ? Number(filters.page) : 1
+        const limit = filters.limit ? Number(filters.limit) : 0
+  
+        const queryBuilder = this.worksRepository.createQueryBuilder('works')
+        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.type', 'type')
+        .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+        .leftJoinAndSelect('works.list_user', 'list_user')
+        .leftJoinAndSelect('works.tasks', 'tasks')
+        .where('status.name_tag IN (:...statuses)', { statuses: [status] })
+        .andWhere('list_user.user IN (:...listIdsUser)',{listIdsUser})
+    
+    // Lấy tổng số bản ghi
+        const total = await queryBuilder.getCount();
+        
+        // Lấy danh sách công việc với pagination
+        const works = await queryBuilder
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getMany();
+    
+      const listIdUser = ((works.map(dt => dt.list_user)).flat()).map(dt => dt.user)
+      const dataUser = await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-user_ids' }, listIdUser),
+      );
+      let countID = 0
+      if (!works)
+        throw new NotFoundException(`Activity not found`);
+      return { statusCode: HttpStatus.OK, data: {
+        datas:works.map((dt,index)=>{
+          return {...dt,list_user:dt.list_user.map((dtt)=>{
+            countID ++;
+            return {...dtt,...dataUser[countID-1]}
+          })}
+        }),
+        current_page: page ?? 1,
+        total_pages: Math.ceil(total / limit) ?? 1,
+      } };
+        }
+      }else{
+        const status = filters.status ?? '';
+        const page = filters.page ? Number(filters.page) : 1
+        const limit = filters.limit ? Number(filters.limit) : 0
+  
+        const queryBuilder = this.worksRepository.createQueryBuilder('works')
+        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.type', 'type')
+        .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+        .leftJoinAndSelect('works.list_user', 'list_user')
+        .leftJoinAndSelect('works.tasks', 'tasks')
+        .where('status.name_tag IN (:...statuses)', { statuses: [status] });
+    
+    // Lấy tổng số bản ghi
+        const total = await queryBuilder.getCount();
+        
+        // Lấy danh sách công việc với pagination
+        const works = await queryBuilder
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getMany();
+    
+      const listIdUser = ((works.map(dt => dt.list_user)).flat()).map(dt => dt.user)
+      const dataUser = await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-user_ids' }, listIdUser),
+      );
+      let countID = 0
+      if (!works)
+        throw new NotFoundException(`Activity not found`);
+      return { statusCode: HttpStatus.OK, data: {
+        datas:works.map((dt,index)=>{
+          return {...dt,list_user:dt.list_user.map((dtt)=>{
+            countID ++;
+            return {...dtt,...dataUser[countID-1]}
+          })}
+        }),
+        current_page: page ?? 1,
+        total_pages: Math.ceil(total / limit) ?? 1,
+      } };
+      }
+      
+  }
+  
+  async updateTasks(datas:UpdateTaskDto[]){
+    try{
+      const updatePromises = datas.map((update) =>
+        this.tasksRepository.update(update.task_id, { status: update.status }),
+      );
+  
+      await Promise.all(updatePromises);
+      return {
+        statusCode:HttpStatus.OK,
+        message:'Cập nhật thành công'
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:'Cập nhật thất bại'
+      }
+    }
+    
+  }
 
+  async createReview(createReviewDto: CreateReviewDto) {
+    
+    
+    const work = await this.worksRepository.findOne({
+      where: { work_id: createReviewDto.work },relations:['tasks']
+    });
+    
+    
+      const newTask = this.reviewsRepository.create({
+        ...createReviewDto,
+        review_id: uuidv4(),
+        work,
+      });
+      const result = await this.reviewsRepository.save(newTask);
+      
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Review created successfully',
+        data: result,
+      };
+    }
+
+    async updateReview(review_id: string, updateReviewDto: UpdateReviewDto) {
+      const work = updateReviewDto.work
+        ? await this.worksRepository.findOne({
+            where: { work_id: In([updateReviewDto.work]) },
+          })
+        : undefined;
+     
+      
+  
+      const updatedReview = await this.reviewsRepository.update(review_id, {
+        ...updateReviewDto,
+        work,
+      });
+      return {
+        statusCode: HttpStatus.OK,
+        data: updatedReview,
+        message: 'Cập nhật thành công',
+      };
+    }
  
 }

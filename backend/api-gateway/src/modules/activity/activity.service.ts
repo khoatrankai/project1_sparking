@@ -837,4 +837,16 @@ export class ActivityService {
       this.activityClient.send({ cmd: 'get-dashboard_work_by_activity' }, activity_id),
     );
   }
+
+  async sendGetWorksFilter(filters?:{status:string,page?:string,limit?:string,user?:string,type?:string}) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-works_filter' }, filters),
+    );
+  }
+
+  async sendUpdateTasks(datas?:UpdateTaskDto[]) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'update-tasks' }, datas),
+    );
+  }
 }
