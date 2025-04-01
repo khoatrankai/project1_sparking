@@ -2358,7 +2358,7 @@ export class LayerService {
         .leftJoinAndSelect('works.list_user', 'list_user')
         .leftJoinAndSelect('works.tasks', 'tasks')
         .where('status.name_tag IN (:...statuses)', { statuses: [status] })
-        .andWhere('works.user_create IN (:...user)',{user:filters.user})
+        .andWhere('works.user_create IN (:...user)',{user:[filters.user]})
     
     // Lấy tổng số bản ghi
         const total = await queryBuilder.getCount();
