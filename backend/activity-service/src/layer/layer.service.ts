@@ -2578,9 +2578,20 @@ export class LayerService {
     
   }
 
-  async getReview(work:string) {
+  async getReviews(work:string) {
+    try{
       const reviews = await this.reviewsRepository.findBy({work:In([work])})
-    
+      return{
+        statusCode:HttpStatus.OK,
+        data:reviews
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        messager:'Lỗi rồi'
+      }
+    }
+      
    
     }
 

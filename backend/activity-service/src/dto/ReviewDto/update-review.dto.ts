@@ -14,7 +14,7 @@ export class UpdateReviewDto {
 
   @IsOptional()
     @IsNumber()
-    level: number;
+    progress: number;
   
     @IsOptional()
     @IsString()

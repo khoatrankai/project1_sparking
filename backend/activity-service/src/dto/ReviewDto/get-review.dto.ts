@@ -13,7 +13,7 @@ export class GetReviewDto {
 
   @IsOptional()
   @IsNumber()
-  level: number;
+  progress: number;
   
     @IsOptional()
     @IsString()

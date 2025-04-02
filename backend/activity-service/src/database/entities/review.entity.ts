@@ -28,8 +28,8 @@ export class Reviews {
   })
   quality: string;
 
-  @Column({ type: 'number', default:0 })
-  level: number;  
+  @Column({ type: 'int', default:0 })
+  progress: number;  
 
   @Column({ type: 'text', nullable: true })
   description: string;
