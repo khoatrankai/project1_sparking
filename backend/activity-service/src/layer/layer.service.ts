@@ -2301,10 +2301,96 @@ export class LayerService {
     }
   }
 
+  async getDashboardWorkManagement(filters?:{user?:string,type?:string}){
+    if(filters.type){
+      if(filters.type === "perform"){
+
+        const works = await this.worksRepository.createQueryBuilder('works')
+        .leftJoinAndSelect('works.status', 'status')
+          .leftJoinAndSelect('works.type', 'type')
+          .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+          .leftJoinAndSelect('works.list_user', 'list_user')
+          .leftJoinAndSelect('works.tasks', 'tasks')
+          .where('list_user.user IN (:...user)',{user:[filters.user]})
+          .getMany()
+          return {
+            statusCode:HttpStatus.OK,
+            data:{
+              total:works.length,
+              waitting:works.filter((dt)=> dt.status.name_tag === "waitting").length,
+              process:works.filter((dt)=> dt.status.name_tag === "process").length,
+              review:works.filter((dt)=> dt.status.name_tag === "review").length,
+              yet_completed:works.filter((dt)=> dt.status.name_tag === "yet_completed").length
+            }
+          }
+      }
+      if(filters.type === "assigned"){
+  
+        const works = await this.worksRepository.createQueryBuilder('works')
+        .leftJoinAndSelect('works.status', 'status')
+          .leftJoinAndSelect('works.type', 'type')
+          .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+          .leftJoinAndSelect('works.list_user', 'list_user')
+          .leftJoinAndSelect('works.tasks', 'tasks')
+          .where('works.user_create IN (:...user)',{user:[filters.user]})
+          .getMany()
+          return {
+            statusCode:HttpStatus.OK,
+            data:{
+              total:works.length,
+              waitting:works.filter((dt)=> dt.status.name_tag === "waitting").length,
+              process:works.filter((dt)=> dt.status.name_tag === "process").length,
+              review:works.filter((dt)=> dt.status.name_tag === "review").length,
+              yet_completed:works.filter((dt)=> dt.status.name_tag === "yet_completed").length
+            }
+          }
+      }
+      if(filters.type === "group"){
+        const listIdsUser = (await firstValueFrom(this.usersClient.send({cmd:'get-ids_group'},filters.user))).data ?? []
+        const works = await this.worksRepository.createQueryBuilder('works')
+        .leftJoinAndSelect('works.status', 'status')
+          .leftJoinAndSelect('works.type', 'type')
+          .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+          .leftJoinAndSelect('works.list_user', 'list_user')
+          .leftJoinAndSelect('works.tasks', 'tasks')
+          .where('list_user.user IN (:...listIdsUser)',{listIdsUser})
+          .getMany()
+          return {
+            statusCode:HttpStatus.OK,
+            data:{
+              total:works.length,
+              waitting:works.filter((dt)=> dt.status.name_tag === "waitting").length,
+              process:works.filter((dt)=> dt.status.name_tag === "process").length,
+              review:works.filter((dt)=> dt.status.name_tag === "review").length,
+              yet_completed:works.filter((dt)=> dt.status.name_tag === "yet_completed").length
+            }
+          }
+      }
+    }else{
+      const works = await this.worksRepository.createQueryBuilder('works')
+      .leftJoinAndSelect('works.status', 'status')
+        .leftJoinAndSelect('works.type', 'type')
+        .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+        .leftJoinAndSelect('works.list_user', 'list_user')
+        .leftJoinAndSelect('works.tasks', 'tasks')
+        .getMany()
+        return {
+          statusCode:HttpStatus.OK,
+          data:{
+            total:works.length,
+            waitting:works.filter((dt)=> dt.status.name_tag === "waitting").length,
+            process:works.filter((dt)=> dt.status.name_tag === "process").length,
+            review:works.filter((dt)=> dt.status.name_tag === "review").length,
+            yet_completed:works.filter((dt)=> dt.status.name_tag === "yet_completed").length
+          }
+        }
+    }
+    
+  }
+
   async getWorks(filters?:{status:string,page?:string,limit?:string,user?:string,type?:string}){
       if(filters.type){
         if(filters.type === "perform"){
-          console.log(filters)
           const status = filters.status ?? '';
         const page = filters.page ? Number(filters.page) : 1
         const limit = filters.limit ? Number(filters.limit) : 0
@@ -2491,6 +2577,12 @@ export class LayerService {
     }
     
   }
+
+  async getReview(work:string) {
+      const reviews = await this.reviewsRepository.findBy({work:In([work])})
+    
+   
+    }
 
   async createReview(createReviewDto: CreateReviewDto) {
     

@@ -877,4 +877,17 @@ export class ActivityController {
     // return
     return this.activityService.sendUpdateTasks(datas);
   }
+
+  @Get('dashboard-management')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetDashboardManagement(@Req() req:Request ,@Query() filters?:{type:string}) {
+    return this.activityService.sendGetDashboardManagement({...filters,user:req['user'].sub});
+  }
 }

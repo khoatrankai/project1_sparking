@@ -21,6 +21,15 @@ export class Reviews {
     })
   status: string;
 
+  @Column({
+    type: 'enum',
+    enum: ['excellent', 'good', 'satisfactory','fail','needs_improvement'],
+    default: 'satisfactory',
+  })
+  quality: string;
+
+  @Column({ type: 'number', default:0 })
+  level: number;  
 
   @Column({ type: 'text', nullable: true })
   description: string;

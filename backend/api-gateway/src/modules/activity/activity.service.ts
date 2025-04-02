@@ -849,4 +849,10 @@ export class ActivityService {
       this.activityClient.send({ cmd: 'update-tasks' }, datas),
     );
   }
+
+  async sendGetDashboardManagement(filters?:{user?:string,type?:string}) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-dashboard_management' }, filters),
+    );
+  }
 }

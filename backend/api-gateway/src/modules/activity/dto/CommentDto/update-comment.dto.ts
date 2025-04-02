@@ -1,23 +1,11 @@
 import {
   IsString,
   IsOptional,
-  IsNumber,
 } from 'class-validator';
-
-export class CreateReviewDto {
-  @IsString()
-  review_id: string;
-
-  @IsString()
-  status: string;
-
-  @IsOptional()
-  @IsNumber()
-  level: number;
-
+export class UpdateCommentDto {
   @IsOptional()
   @IsString()
-  quality: string;
+  comment_id: string;
 
   @IsOptional()
   @IsString()
@@ -30,5 +18,4 @@ export class CreateReviewDto {
   @IsOptional()
   @IsString()
   user_create?: string;
-
 }

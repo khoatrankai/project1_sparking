@@ -28,6 +28,8 @@ import { GetFilterWorkDto } from 'src/dto/WorkDto/get-filter.dto';
 import { CreatePictureTaskDto } from 'src/dto/PicturesTaskDto/get-picture_task.dto';
 import { CreateTaskDto } from 'src/dto/TaskDto/create-task.dto';
 import { UpdateTaskDto } from 'src/dto/TaskDto/update-task.dto';
+import { CreateReviewDto } from 'src/dto/ReviewDto/create-review.dto';
+import { UpdateReviewDto } from 'src/dto/ReviewDto/update-review.dto';
 
 @Controller('/activity')
 @UseFilters(ConflictExceptionFilter)
@@ -526,5 +528,20 @@ export class LayerController {
   @MessagePattern({ cmd: 'update-tasks' })
   async updateTasks(datas:UpdateTaskDto[]) {
     return this.layerService.updateTasks(datas);
+  }
+
+  @MessagePattern({ cmd: 'get-dashboard_management' })
+  async getDashboardWorkManagement(filters?:{user?:string,type?:string}) {
+    return this.layerService.getDashboardWorkManagement(filters);
+  }
+
+  @MessagePattern({ cmd: 'create-review' })
+  async createReview(createReviewDto: CreateReviewDto) {
+    return this.layerService.createReview(createReviewDto);
+  }
+
+  @MessagePattern({ cmd: 'update-review' })
+  async updateReview(datas:{review_id:string,data:UpdateReviewDto}) {
+    return this.layerService.updateReview(datas.review_id,datas.data);
   }
 }
