@@ -4,8 +4,6 @@ import {
 } from 'class-validator';
 
 export class CreateCommentDto {
-  @IsString()
-  comment_id: string;
 
   @IsOptional()
   @IsString()

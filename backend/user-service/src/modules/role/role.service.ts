@@ -20,8 +20,8 @@ export class RoleService {
   constructor(
     @InjectRepository(RoleUser)
     private readonly roleUserRepository: Repository<RoleUser>,
-    @InjectRepository(CategoryRoleUser)
-    private readonly categoryRoleUserRepository: Repository<CategoryRoleUser>,
+      @InjectRepository(CategoryRoleUser)
+      private readonly categoryRoleUserRepository: Repository<CategoryRoleUser>,
     private configService: ConfigService,
     @InjectRepository(RoleTypeUser)
     private readonly roleTypeUserRepository: Repository<RoleTypeUser>,

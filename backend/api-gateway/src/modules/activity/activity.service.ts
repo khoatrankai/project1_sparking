@@ -1,3 +1,4 @@
+
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateActivityDto } from './dto/ActivityDto/create-activity.dto';
@@ -27,6 +28,10 @@ import { Request } from 'express';
 import { CreateTaskDto } from './dto/TaskDto/create-task.dto';
 import { UpdateTaskDto } from './dto/TaskDto/update-task.dto';
 import { CreatePictureTaskDto } from './dto/PicturesTaskDto/get-picture_task.dto';
+import { CreateReviewDto } from './dto/ReviewDto/create-review.dto';
+import { UpdateReviewDto } from './dto/ReviewDto/update-review.dto';
+import { UpdateCommentDto } from './dto/CommentDto/update-comment.dto';
+import { CreateCommentDto } from './dto/CommentDto/create-comment.dto';
 
 @Injectable()
 export class ActivityService {
@@ -853,6 +858,48 @@ export class ActivityService {
   async sendGetDashboardManagement(filters?:{user?:string,type?:string}) {
     return await firstValueFrom(
       this.activityClient.send({ cmd: 'get-dashboard_management' }, filters),
+    );
+  }
+
+  async sendCreateReview(data:CreateReviewDto) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'create-review' }, data),
+    );
+  }
+  
+  async sendUpdateReview(review_id:string,data?:UpdateReviewDto) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'update-review' }, {data,review_id}),
+    );
+  }
+
+  async sendGetReviews(work:string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-reviews' }, work),
+    );
+  }
+
+  async sendCreateCommnet(data:CreateCommentDto) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'create-comment' }, data),
+    );
+  }
+  
+  async sendUpdateComment(comment_id:string,data?:UpdateCommentDto) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'update-comment' }, {data,comment_id}),
+    );
+  }
+
+  async sendGetComments(work:string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-comments' }, work),
+    );
+  }
+
+  async sendGetProgressByProjects(projects:string[]) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-progress_by_projects' }, projects),
     );
   }
 }

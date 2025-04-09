@@ -40,6 +40,9 @@ export class Reviews {
   @JoinColumn({ name: 'work' })
   work: Works;
 
+  @Column({ type: 'timestamp',nullable:true })
+  time_end: Date;
+
   @Column({ type: 'varchar', length: 50 })
   user_create: string;
 

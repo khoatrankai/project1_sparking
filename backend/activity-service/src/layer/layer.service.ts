@@ -57,6 +57,9 @@ import { UpdateTaskDto } from 'src/dto/TaskDto/update-task.dto';
 import { CreateReviewDto } from 'src/dto/ReviewDto/create-review.dto';
 import { Reviews } from 'src/database/entities/review.entity';
 import { UpdateReviewDto } from 'src/dto/ReviewDto/update-review.dto';
+import { Comments } from 'src/database/entities/comment.entity';
+import { CreateCommentDto } from 'src/dto/CommentDto/create-comment.dto';
+import { UpdateCommentDto } from 'src/dto/CommentDto/update-comment.dto';
 
 @Injectable()
 export class LayerService {
@@ -79,6 +82,8 @@ export class LayerService {
     private readonly tasksRepository: Repository<Tasks>,
     @InjectRepository(Reviews)
     private readonly reviewsRepository: Repository<Reviews>,
+    @InjectRepository(Comments)
+    private readonly commentsRepository: Repository<Comments>,
     @InjectRepository(PictureTask)
     private readonly pictureTaskRepository: Repository<PictureTask>,
     @InjectRepository(TypeWork)
@@ -2443,7 +2448,7 @@ export class LayerService {
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
         .leftJoinAndSelect('works.tasks', 'tasks')
-        .where('status.name_tag IN (:...statuses)', { statuses: [status] })
+        .where('status.name_tag IN (:tuses)', { statuses: [status] })
         .andWhere('works.user_create IN (:...user)',{user:[filters.user]})
     
     // Lấy tổng số bản ghi
@@ -2581,9 +2586,15 @@ export class LayerService {
   async getReviews(work:string) {
     try{
       const reviews = await this.reviewsRepository.findBy({work:In([work])})
+      const userIds = reviews.map(dt => dt.user_create)
+        const dataUsers = await firstValueFrom(
+          this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
+        );
       return{
         statusCode:HttpStatus.OK,
-        data:reviews
+        data:reviews.map((dt,index)=> {
+          return {...dt,user_create:dataUsers[index]}
+        })
       }
     }catch{
       return{
@@ -2599,7 +2610,7 @@ export class LayerService {
     
     
     const work = await this.worksRepository.findOne({
-      where: { work_id: createReviewDto.work },relations:['tasks']
+      where: { work_id: In([createReviewDto.work]) },relations:['tasks']
     });
     
     
@@ -2608,12 +2619,11 @@ export class LayerService {
         review_id: uuidv4(),
         work,
       });
-      const result = await this.reviewsRepository.save(newTask);
+      await this.reviewsRepository.save(newTask);
       
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Review created successfully',
-        data: result,
       };
     }
 
@@ -2636,5 +2646,97 @@ export class LayerService {
         message: 'Cập nhật thành công',
       };
     }
- 
+
+
+    async getComments(work:string) {
+      try{
+        const comments = (await this.commentsRepository.find({where:{work:In([work])},order:{created_at:'DESC'} }))
+        const userIds = comments.map(dt => dt.user_create)
+        const dataUsers = await firstValueFrom(
+          this.usersClient.send({ cmd: 'get-user_ids' }, userIds),
+        );
+        return{
+          statusCode:HttpStatus.OK,
+          data:comments.map((dt,index)=>{
+            return {...dt,user_create:dataUsers?.[index]}
+          })
+        }
+      }catch{
+        return{
+          statusCode:HttpStatus.BAD_REQUEST,
+          messager:'Lỗi rồi'
+        }
+      }
+        
+     
+      }
+  
+    async createComment(createCommentDto: CreateCommentDto) {
+      
+      
+      const work = await this.worksRepository.findOne({
+        where: { work_id: In([createCommentDto.work]) },relations:['tasks']
+      });
+      
+      
+        const newComment = this.commentsRepository.create({
+          ...createCommentDto,
+          comment_id: uuidv4(),
+          work,
+        });
+        await this.commentsRepository.save(newComment);
+        
+        return {
+          statusCode: HttpStatus.CREATED,
+          message: 'Comment created successfully',
+        };
+      }
+  
+      async updateComment(comment_id: string, updateCommentDto: UpdateCommentDto) {
+        const work = updateCommentDto.work
+          ? await this.worksRepository.findOne({
+              where: { work_id: In([updateCommentDto.work]) },
+            })
+          : undefined;
+       
+        
+    
+        const updatedComment = await this.commentsRepository.update(comment_id, {
+          ...updateCommentDto,
+          work,
+        });
+        return {
+          statusCode: HttpStatus.OK,
+          data: updatedComment,
+          message: 'Cập nhật thành công',
+        };
+      }
+    async getProgressByProject(project:string){
+      const contracts = await firstValueFrom(this.contractsClient.send({cmd:'get-contract_by_project_id'},project))
+      const works = await this.worksRepository.createQueryBuilder('works')
+      .leftJoin('works.activity','activity')
+      .leftJoinAndSelect('works.status','status')
+      .where('activity.contract IN (:...contracts)',{contracts})
+      .andWhere('status.name_tag =:status',{status:'completed'})
+      .select('works.status')
+      .getMany()
+
+
+      return {
+          total:works.length,
+          completed:works.map(dt => dt.status.name_tag === "completed").length
+        }
+      
+    }
+
+    async getProgressByProjects(project:string[]){
+      const progresses = await Promise.all(project.map(async(dt)=>{
+        return await this.getProgressByProject(dt)
+      }))
+
+      return {
+        statusCode:HttpStatus.OK,
+        data:progresses
+      }
+    }
 }

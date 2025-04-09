@@ -1,7 +1,9 @@
+
 import {
   IsString,
   IsOptional,
   IsNumber,
+  IsDate,
 } from 'class-validator';
 
 export class CreateReviewDto {
@@ -14,6 +16,10 @@ export class CreateReviewDto {
   @IsOptional()
   @IsNumber()
   progress: number;
+
+  @IsOptional()
+  @IsDate()
+  time_end: Date;
 
   @IsOptional()
   @IsString()

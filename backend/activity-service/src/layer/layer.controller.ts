@@ -30,6 +30,8 @@ import { CreateTaskDto } from 'src/dto/TaskDto/create-task.dto';
 import { UpdateTaskDto } from 'src/dto/TaskDto/update-task.dto';
 import { CreateReviewDto } from 'src/dto/ReviewDto/create-review.dto';
 import { UpdateReviewDto } from 'src/dto/ReviewDto/update-review.dto';
+import { CreateCommentDto } from 'src/dto/CommentDto/create-comment.dto';
+import { UpdateCommentDto } from 'src/dto/CommentDto/update-comment.dto';
 
 @Controller('/activity')
 @UseFilters(ConflictExceptionFilter)
@@ -543,5 +545,35 @@ export class LayerController {
   @MessagePattern({ cmd: 'update-review' })
   async updateReview(datas:{review_id:string,data:UpdateReviewDto}) {
     return this.layerService.updateReview(datas.review_id,datas.data);
+  }
+
+  @MessagePattern({ cmd: 'get-reviews' })
+  async getReviews(work:string) {
+    return this.layerService.getReviews(work);
+  }
+
+  @MessagePattern({ cmd: 'create-comment' })
+  async createComment(createCommentDto: CreateCommentDto) {
+    return this.layerService.createComment(createCommentDto);
+  }
+
+  @MessagePattern({ cmd: 'update-comment' })
+  async updateRevieupdateCommentw(datas:{comment_id:string,data:UpdateCommentDto}) {
+    return this.layerService.updateComment(datas.comment_id,datas.data);
+  }
+
+  @MessagePattern({ cmd: 'get-comments' })
+  async getComments(work:string) {
+    return this.layerService.getComments(work);
+  }
+
+  @MessagePattern({ cmd: 'get-progress_by_project' })
+  async getProgressByProject(project:string) {
+    return this.layerService.getProgressByProject(project);
+  }
+
+  @MessagePattern({ cmd: 'get-progress_by_projects' })
+  async getProgressByProjects(projects:string[]) {
+    return this.layerService.getProgressByProjects(projects);
   }
 }

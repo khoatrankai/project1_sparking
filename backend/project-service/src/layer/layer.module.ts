@@ -25,6 +25,14 @@ import { TypeProject } from 'src/database/entities/type_project.entity';
           port: 3005,
         },
       },
+      {
+        name: 'ACTIVITY',
+        transport: Transport.TCP,
+        options: {
+          host: 'activity_service',
+          port: 3014,
+        },
+      },
     ]),
     TypeOrmModule.forFeature([Projects, TypeProject]),
   ],

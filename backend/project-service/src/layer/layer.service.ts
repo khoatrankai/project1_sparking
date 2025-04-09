@@ -18,6 +18,7 @@ export class LayerService {
   constructor(
     @Inject('CUSTOMER') private readonly customersClient: ClientProxy,
     @Inject('USER') private readonly userClient: ClientProxy,
+    @Inject('ACTIVITY') private readonly activityClient: ClientProxy,
     @InjectRepository(Projects)
     private readonly projectsRepository: Repository<Projects>,
     @InjectRepository(TypeProject)
@@ -114,7 +115,8 @@ export class LayerService {
       where: whereCondition,
       order: { created_at: 'DESC' },
     });
-
+    const projectIds = projects.map(dt => dt.project_id)
+    const progresses = await firstValueFrom(this.activityClient.send({cmd:'get-progress_by_projects'},projectIds))
     if (!projects || projects.length === 0) {
       return {
         statusCode: HttpStatus.NO_CONTENT,
@@ -127,7 +129,7 @@ export class LayerService {
       this.customersClient.send({ cmd: 'get-customer_ids' }, customerIds),
     );
     const dataRes = projects.map((dt, index) => {
-      return { ...dt, customer: customerInfos[index] };
+      return { ...dt, customer: customerInfos[index],progress:progresses[index] };
     });
     return {
       statusCode: HttpStatus.OK,

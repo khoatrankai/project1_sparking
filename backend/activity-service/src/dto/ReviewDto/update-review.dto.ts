@@ -2,6 +2,7 @@ import {
   IsString,
   IsOptional,
   IsNumber,
+  IsDate,
 } from 'class-validator';
 export class UpdateReviewDto {
   @IsOptional()
@@ -19,6 +20,10 @@ export class UpdateReviewDto {
     @IsOptional()
     @IsString()
     quality: string;
+
+   @IsOptional()
+    @IsDate()
+    time_end: Date;
 
   @IsOptional()
   @IsString()

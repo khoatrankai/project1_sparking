@@ -42,6 +42,7 @@ import { DocumentContract } from './entities/document_contract.entity';
         };
       },
     }),
+    
   ],
 })
 export class DatabaseModule {}

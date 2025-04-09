@@ -1,12 +1,12 @@
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsOptional,
   IsNumber,
+  IsDate,
 } from 'class-validator';
 
 export class CreateReviewDto {
-  @IsString()
-  review_id: string;
 
   @IsString()
   status: string;
@@ -14,6 +14,11 @@ export class CreateReviewDto {
   @IsOptional()
   @IsNumber()
   progress: number;
+
+  @Type(()=> Date)
+  @IsOptional()
+  @IsDate()
+  time_end: Date;
 
   @IsOptional()
   @IsString()

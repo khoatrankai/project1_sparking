@@ -40,6 +40,10 @@ import { GetFilterActivityDto } from './dto/ActivityDto/get-filter.dto';
 import { GetFilterWorkDto } from './dto/WorkDto/get-filter.dto';
 import { CreateTaskDto } from './dto/TaskDto/create-task.dto';
 import { UpdateTaskDto } from './dto/TaskDto/update-task.dto';
+import { CreateReviewDto } from './dto/ReviewDto/create-review.dto';
+import { UpdateReviewDto } from './dto/ReviewDto/update-review.dto';
+import { CreateCommentDto } from './dto/CommentDto/create-comment.dto';
+import { UpdateCommentDto } from './dto/CommentDto/update-comment.dto';
 
 @Controller('activity')
 export class ActivityController {
@@ -889,5 +893,110 @@ export class ActivityController {
   @SetMetadata('type', ['admin'])
   async sendGetDashboardManagement(@Req() req:Request ,@Query() filters?:{type:string}) {
     return this.activityService.sendGetDashboardManagement({...filters,user:req['user'].sub});
+  }
+
+  @Post('create-review')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendCreateReview(@Req() req:Request,@Body() data:CreateReviewDto) {
+    // console.log(datas)
+    // return
+    return this.activityService.sendCreateReview({...data,user_create:req['user'].sub});
+  }
+
+  @Put('update-review/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateReview(@Param('id') id:string ,@Body() data:UpdateReviewDto) {
+    // console.log(datas)
+    // return
+    return this.activityService.sendUpdateReview(id,data);
+  }
+
+  @Get('get-reviews/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetReviews(@Param('id') id:string) {
+    // console.log(datas)
+    // return
+    return this.activityService.sendGetReviews(id);
+  }
+
+  @Post('create-comment')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendCreateCommnet(@Req() req:Request,@Body() data:CreateCommentDto) {
+    // console.log(datas)
+    // return
+    return this.activityService.sendCreateCommnet({...data,user_create:req['user'].sub});
+  }
+
+  @Put('update-comment/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateComment(@Param('id') id:string ,@Body() data:UpdateCommentDto) {
+    // console.log(datas)
+    // return
+    return this.activityService.sendUpdateComment(id,data);
+  }
+
+  @Get('get-comments/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetComments(@Param('id') id:string) {
+    // console.log(datas)
+    // return
+    return this.activityService.sendGetComments(id);
+  }
+
+  @Get('get-progress-by-projects')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetProgressByProjects(@Body() projects:string[]) {
+    console.log(projects)
+    // return
+    // return this.activityService.sendGetProgressByProjects(projects);
   }
 }
