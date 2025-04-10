@@ -2448,7 +2448,7 @@ export class LayerService {
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
         .leftJoinAndSelect('works.tasks', 'tasks')
-        .where('status.name_tag IN (:tuses)', { statuses: [status] })
+        .where('status.name_tag IN (:...statuses)', { statuses: [status] })
         .andWhere('works.user_create IN (:...user)',{user:[filters.user]})
     
     // Lấy tổng số bản ghi
