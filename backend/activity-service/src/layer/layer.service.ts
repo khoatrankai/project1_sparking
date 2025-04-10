@@ -2716,12 +2716,10 @@ export class LayerService {
       const works = await this.worksRepository.createQueryBuilder('works')
       .leftJoin('works.activity','activity')
       .leftJoinAndSelect('works.status','status')
-      .where('activity.contract IN (:...contracts)',{contracts})
-      .andWhere('status.name_tag =:status',{status:'completed'})
+      .where('activity.contract IN (:...contracts)',{contracts:contracts.length > 0 ? contracts: ['']})
+      .andWhere('status.name_tag IN (:...statuses)',{statuses:['completed']})
       .select('works.status')
       .getMany()
-
-
       return {
           total:works.length,
           completed:works.map(dt => dt.status.name_tag === "completed").length
@@ -2737,6 +2735,27 @@ export class LayerService {
       return {
         statusCode:HttpStatus.OK,
         data:progresses
+      }
+    }
+
+    async getListUserByProject(project_id:string){
+      const contractIds = await firstValueFrom(this.contractsClient.send({cmd: 'get-contract_by_project_id'},project_id))
+      const datas = (await this.listUserRepository.createQueryBuilder('list_user').leftJoin('list_user.work','work').leftJoin('work.activity','activity').where('activity.contract IN (:...contractIds)',{contractIds}).getMany()).map(dt => dt.user)
+      const resData = datas.filter((dt,index) => datas.indexOf(dt) === index)
+      const datasUser = await firstValueFrom(this.usersClient.send({ cmd: 'get-user_ids' },resData))
+      return datasUser
+    }
+
+    async getActivitiesByProject(project_id:string,page:number,limit:number){
+      const contractIds = await firstValueFrom(this.contractsClient.send({ cmd: 'get-contract_by_project_id' },project_id))
+      const activities = await this.activitiesRepository.createQueryBuilder('activities').leftJoinAndSelect('activities.works','works')
+      .where('activities.contract In (:...contractIds)',{contractIds})
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany()
+      return {
+        statusCode:HttpStatus.OK,
+        data:activities
       }
     }
 }

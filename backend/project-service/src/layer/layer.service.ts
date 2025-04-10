@@ -216,9 +216,9 @@ export class LayerService {
   async findOneProject(id: string): Promise<any> {
     const project = await this.projectsRepository.findOne({
       where: { project_id: id },
-      relations: ['type'],
+      relations: ['type',],
     });
-
+    const listUser = await firstValueFrom(this.activityClient.send({ cmd: 'get-list_user_by_projects' },id))
     if (!project) {
       throw new HttpException(
         {
@@ -232,7 +232,7 @@ export class LayerService {
 
     return {
       statusCode: HttpStatus.OK,
-      data: { ...project, type: project.type.type_id },
+      data: { ...project, type: project.type.type_id,user_participants:listUser },
       message: 'Project retrieved successfully',
     };
   }
@@ -411,5 +411,7 @@ export class LayerService {
       }
     }
   }
+
+ 
   
 }

@@ -576,4 +576,9 @@ export class LayerController {
   async getProgressByProjects(projects:string[]) {
     return this.layerService.getProgressByProjects(projects);
   }
+
+  @MessagePattern({ cmd: 'get-list_user_by_projects' })
+  async getListUserByProject(project_id:string) {
+    return this.layerService.getListUserByProject(project_id);
+  }
 }
