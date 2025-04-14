@@ -2521,7 +2521,7 @@ export class LayerService {
       } };
         }
       }else{
-        const status = filters.status ?? '';
+        const status = filters.status ?? undefined;
         const page = filters.page ? Number(filters.page) : 1
         const limit = filters.limit ? Number(filters.limit) : 0
   
@@ -2531,13 +2531,18 @@ export class LayerService {
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
         .leftJoinAndSelect('works.tasks', 'tasks')
-        .where('status.name_tag IN (:...statuses)', { statuses: [status] });
+
+        
+        if (status) {
+          queryBuilder.where('status.name_tag IN (:...statuses)', { statuses: [status] });
+      }
     
     // Lấy tổng số bản ghi
         const total = await queryBuilder.getCount();
         
         // Lấy danh sách công việc với pagination
         const works = await queryBuilder
+            .orderBy('works.created_at','DESC')
             .skip((page - 1) * limit)
             .take(limit)
             .getMany();
@@ -2717,13 +2722,30 @@ export class LayerService {
       .leftJoin('works.activity','activity')
       .leftJoinAndSelect('works.status','status')
       .where('activity.contract IN (:...contracts)',{contracts:contracts.length > 0 ? contracts: ['']})
-      .andWhere('status.name_tag IN (:...statuses)',{statuses:['completed']})
-      .select('works.status')
       .getMany()
       return {
           total:works.length,
-          completed:works.map(dt => dt.status.name_tag === "completed").length
+          completed:works.map(dt => dt.status.name_tag === "completed").length,
+          process:works.map(dt => dt.status.name_tag === "process").length,
+          waiting:works.map(dt => dt.status.name_tag === "waiting").length,
+          pause:works.map(dt => dt.status.name_tag === "pause").length,
+          cancel:works.map(dt => dt.status.name_tag === "cancel").length,
+          review:works.map(dt => dt.status.name_tag === "review").length,
         }
+      
+    }
+
+    async getAttachByProject(project:string){
+      const contracts = await firstValueFrom(this.contractsClient.send({cmd:'get-contract_by_project_id'},project))
+      const listPicture = await this.pictureWorkRepository.createQueryBuilder('picture_work')
+      .leftJoin('picture_work.work','works')
+      .leftJoin('works.activity','activity')
+      .where('activity.contract IN (:...contracts)',{contracts:contracts.length > 0 ? contracts: ['']})
+      .getMany()
+      return {
+        statusCode:HttpStatus.OK,
+        data:listPicture
+      }
       
     }
 
@@ -2731,7 +2753,6 @@ export class LayerService {
       const progresses = await Promise.all(project.map(async(dt)=>{
         return await this.getProgressByProject(dt)
       }))
-
       return {
         statusCode:HttpStatus.OK,
         data:progresses
@@ -2740,7 +2761,7 @@ export class LayerService {
 
     async getListUserByProject(project_id:string){
       const contractIds = await firstValueFrom(this.contractsClient.send({cmd: 'get-contract_by_project_id'},project_id))
-      const datas = (await this.listUserRepository.createQueryBuilder('list_user').leftJoin('list_user.work','work').leftJoin('work.activity','activity').where('activity.contract IN (:...contractIds)',{contractIds}).getMany()).map(dt => dt.user)
+      const datas = (await this.listUserRepository.createQueryBuilder('list_user').leftJoin('list_user.work','work').leftJoin('work.activity','activity').where('activity.contract IN (:...contractIds)',{contractIds:contractIds.length > 0 ? contractIds : [""]}).getMany()).map(dt => dt.user)
       const resData = datas.filter((dt,index) => datas.indexOf(dt) === index)
       const datasUser = await firstValueFrom(this.usersClient.send({ cmd: 'get-user_ids' },resData))
       return datasUser
@@ -2756,6 +2777,24 @@ export class LayerService {
       return {
         statusCode:HttpStatus.OK,
         data:activities
+      }
+    }
+
+    async getWorksFollowActivitiesByProject(project:string){
+      const contracts = await firstValueFrom(this.contractsClient.send({cmd:'get-contract_by_project_id'},project))
+      const dataActivity = await this.activitiesRepository.createQueryBuilder('activities')
+      .leftJoinAndSelect('activities.works','works')
+      .leftJoinAndSelect('works.status','status')
+      .leftJoinAndSelect('works.tasks','tasks')
+      .leftJoinAndSelect('works.list_user','list_user')
+      .leftJoin('works.activity','activity')
+      .where('activity.contract IN (:...contracts)',{contracts:contracts.length > 0 ? contracts: ['']})
+      .getMany()
+
+      
+      return {
+        statusCode:HttpStatus.OK,
+        data:dataActivity
       }
     }
 }

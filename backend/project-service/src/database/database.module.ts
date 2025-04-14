@@ -4,6 +4,7 @@ import { Projects } from './entities/project.entity';
 import { createConnection } from 'mysql2/promise';
 import { TypeProject } from './entities/type_project.entity';
 import { ConfigService } from '@nestjs/config';
+import { NotifyProject } from './entities/notify.entity';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { ConfigService } from '@nestjs/config';
           username: configService.get<string>('DB_USER'),
           password: configService.get<string>('DB_PASSWORD'),
           database: configService.get<string>('DB_NAME'),
-          entities: [Projects, TypeProject],
+          entities: [Projects, TypeProject,NotifyProject],
           // synchronize: true,
           // dropSchema: true,
         };

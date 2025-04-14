@@ -103,10 +103,16 @@ export class LayerService {
   // Find all projects
   async findAllProjects(filter?: GetFilterProjectDto): Promise<any> {
     const customer = filter?.customer;
+
     const type = filter?.type;
+    const status = filter?.status;
     const whereCondition: any = {};
     if (customer) {
       whereCondition.customer = customer;
+    }
+
+    if (status) {
+      whereCondition.status = status;
     }
     if (type) {
       whereCondition.type = In([type]);
@@ -114,9 +120,16 @@ export class LayerService {
     const projects = await this.projectsRepository.find({
       where: whereCondition,
       order: { created_at: 'DESC' },
+      take:filter?.limit ?? 0,
+      skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
     });
-    const projectIds = projects.map(dt => dt.project_id)
-    const progresses = await firstValueFrom(this.activityClient.send({cmd:'get-progress_by_projects'},projectIds))
+
+    const countProjects = await this.projectsRepository.count({
+      where: whereCondition,
+      order: { created_at: 'DESC' },
+    })
+    const projectIds =  projects.map(dt => dt.project_id)
+    const progresses = (await firstValueFrom(this.activityClient.send({ cmd: 'get-progress_by_projects' },projectIds)))?.data ?? []
     if (!projects || projects.length === 0) {
       return {
         statusCode: HttpStatus.NO_CONTENT,
@@ -124,17 +137,23 @@ export class LayerService {
         message: 'No projects found',
       };
     }
+    const listUsers = await Promise.all(projects.map(async(dt)=>{
+      const listUser = await firstValueFrom(this.activityClient.send({ cmd: 'get-list_user_by_projects' },dt.project_id))
+      return listUser
+    }))
     const customerIds = projects.map((dt) => dt.customer);
     const customerInfos = await firstValueFrom(
       this.customersClient.send({ cmd: 'get-customer_ids' }, customerIds),
     );
+    
     const dataRes = projects.map((dt, index) => {
-      return { ...dt, customer: customerInfos[index],progress:progresses[index] };
+      return { ...dt, customer: customerInfos[index],progress:progresses[index],user_participants: listUsers[index] };
     });
     return {
       statusCode: HttpStatus.OK,
       data: dataRes,
       message: 'Projects retrieved successfully',
+      total_pages:Math.ceil(countProjects/(filter?.limit ?? 1))
     };
   }
 
@@ -219,6 +238,8 @@ export class LayerService {
       relations: ['type',],
     });
     const listUser = await firstValueFrom(this.activityClient.send({ cmd: 'get-list_user_by_projects' },id))
+    const progresses = (await firstValueFrom(this.activityClient.send({ cmd: 'get-progress_by_project' },id)))?.data ?? []
+    const attach = (await firstValueFrom(this.activityClient.send({ cmd: 'get-attach_by_project' },id)))?.data ?? []
     if (!project) {
       throw new HttpException(
         {
@@ -232,7 +253,7 @@ export class LayerService {
 
     return {
       statusCode: HttpStatus.OK,
-      data: { ...project, type: project.type.type_id,user_participants:listUser },
+      data: { ...project, type: project.type.type_id,user_participants:listUser,progress:progresses,attach },
       message: 'Project retrieved successfully',
     };
   }

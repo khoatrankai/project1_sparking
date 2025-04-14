@@ -999,4 +999,32 @@ export class ActivityController {
     // return
     // return this.activityService.sendGetProgressByProjects(projects);
   }
+
+  @Get('get-attach-by-project')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetAttachByProject(@Query('id') project:string) {
+    // return
+    return this.activityService.sendGetAttachByProject(project);
+  }
+
+  @Get('get-works_follow_activities_by_project')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetWorksFollowActivitiesByProject(@Query('id') project:string) {
+    // return
+    return this.activityService.sendGetWorksFollowActivitiesByProject(project);
+  }
 }

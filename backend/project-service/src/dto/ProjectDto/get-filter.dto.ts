@@ -1,3 +1,4 @@
+import { IsInt } from 'class-validator';
 import { IsString, IsOptional, Length } from 'class-validator';
 
 export class GetFilterProjectDto {
@@ -15,4 +16,16 @@ export class GetFilterProjectDto {
   @IsOptional()
   @Length(1, 50)
   type?: string;
+
+  @IsString()
+  @IsOptional()
+  status?: string;
+
+  @IsInt()
+  @IsOptional()
+  limit?: number;
+
+  @IsInt()
+  @IsOptional()
+  page?: number;
 }

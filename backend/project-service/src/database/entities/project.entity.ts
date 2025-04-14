@@ -6,8 +6,10 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { TypeProject } from './type_project.entity';
+import { NotifyProject } from './notify.entity';
 
 @Entity('projects')
 export class Projects {
@@ -60,4 +62,7 @@ export class Projects {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @OneToMany(() => NotifyProject, notifyProject => notifyProject.project)
+  notify: NotifyProject[];
 }

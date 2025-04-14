@@ -577,8 +577,18 @@ export class LayerController {
     return this.layerService.getProgressByProjects(projects);
   }
 
+  @MessagePattern({ cmd: 'get-attach_by_project' })
+  async getAttachByProject(project:string) {
+    return this.layerService.getAttachByProject(project);
+  }
+
   @MessagePattern({ cmd: 'get-list_user_by_projects' })
   async getListUserByProject(project_id:string) {
     return this.layerService.getListUserByProject(project_id);
+  }
+
+  @MessagePattern({ cmd: 'get-works_follow_activity_by_project' })
+  async getWorksFollowActivitiesByProject(project_id:string) {
+    return this.layerService.getWorksFollowActivitiesByProject(project_id);
   }
 }

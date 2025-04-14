@@ -902,4 +902,16 @@ export class ActivityService {
       this.activityClient.send({ cmd: 'get-progress_by_projects' }, projects),
     );
   }
+
+  async sendGetAttachByProject(project:string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-attach_by_project' }, project),
+    );
+  }
+
+  async sendGetWorksFollowActivitiesByProject(project:string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-works_follow_activity_by_project' }, project),
+    );
+  }
 }
