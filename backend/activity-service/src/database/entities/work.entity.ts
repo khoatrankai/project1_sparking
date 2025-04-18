@@ -16,6 +16,7 @@ import { ListUser } from './list_user.entity';
 import { Tasks } from './task.entity';
 import { Comments } from './comment.entity';
 import { Reviews } from './review.entity';
+import { FolderWork } from './folder_work.entity';
 
 @Entity('works')
 export class Works {
@@ -81,4 +82,7 @@ export class Works {
 
   @OneToMany(() => Reviews, (review) => review.work, { cascade: true })
   revies: Reviews[];
+
+  @OneToMany(() => FolderWork, (folder) => folder.work, { cascade: true })
+  folders: FolderWork[];
 }

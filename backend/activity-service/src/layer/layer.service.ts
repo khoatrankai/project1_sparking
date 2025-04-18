@@ -60,6 +60,10 @@ import { UpdateReviewDto } from 'src/dto/ReviewDto/update-review.dto';
 import { Comments } from 'src/database/entities/comment.entity';
 import { CreateCommentDto } from 'src/dto/CommentDto/create-comment.dto';
 import { UpdateCommentDto } from 'src/dto/CommentDto/update-comment.dto';
+import { CreateFolderWorkDto } from 'src/dto/FolderWorkDto/create-folder_work.dto';
+import { FileWork } from 'src/database/entities/file_work.entity';
+import { FolderWork } from 'src/database/entities/folder_work.entity';
+import { CreateFileWorkDto } from 'src/dto/FileWorkDto/create-folder_work.dto';
 
 @Injectable()
 export class LayerService {
@@ -68,6 +72,10 @@ export class LayerService {
     @Inject('USER') private readonly usersClient: ClientProxy,
     @InjectRepository(Activities)
     private readonly activitiesRepository: Repository<Activities>,
+    @InjectRepository(FileWork)
+    private readonly filesRepository: Repository<FileWork>,
+    @InjectRepository(FolderWork)
+    private readonly foldersRepository: Repository<FolderWork>,
     @InjectRepository(TypeActivities)
     private readonly typeActivitiesRepository: Repository<TypeActivities>,
     @InjectRepository(StatusActivities)
@@ -1582,7 +1590,7 @@ export class LayerService {
           where: { type_work_id: In([updateWorkDto.type]) },
         })
       : undefined;
-    const status = updateWorkDto.type
+    const status = updateWorkDto.status
       ? await this.statusWorkRepository.findOne({
           where: { status_work_id: updateWorkDto.status },
         })
@@ -1640,7 +1648,7 @@ export class LayerService {
   async getWork(work_id: string) {
     const work = await this.worksRepository.findOne({
       where: { work_id },
-      relations: ['type', 'status', 'picture_urls', 'list_user', 'activity','tasks'],
+      relations: ['type', 'status', 'picture_urls', 'list_user', 'activity','tasks','folders','folders.files'],
     });
     const userIds = work.list_user.map((dt) => {
       return dt.user;
@@ -2797,4 +2805,105 @@ export class LayerService {
         data:dataActivity
       }
     }
+
+    async getCheckReview(user_create:string,work:string){
+      const checkUserWork = await this.worksRepository.findOne({where:{work_id:work,user_create}})
+      if(!checkUserWork){
+        return {
+          statusCode:HttpStatus.OK,
+          data:false
+        }
+      }
+      
+      const checkReview = await this.reviewsRepository.findOne({where:{work: In([work]),user_create}})
+      if(!checkReview){
+        return {
+          statusCode:HttpStatus.OK,
+          data:true
+        }
+      }
+      return {
+        statusCode:HttpStatus.OK,
+        data:false
+      }
+    }
+
+    async createFolderFile(data:CreateFolderWorkDto){
+      try{
+        const {files,...reqCreateFolder} = data
+        const work = await this.worksRepository.findOne({where:{work_id:In([reqCreateFolder.work])}})
+        const newData = this.foldersRepository.create({...reqCreateFolder,work,folder_id:uuidv4()})
+        const saveData = await this.foldersRepository.save(newData)
+        if(saveData && files){
+          await this.createFiles(files.map((dt)=>{
+            return {...dt,folder:saveData.folder_id}
+          }) as CreateFileWorkDto[])
+        }
+        return {
+          statusCode:HttpStatus.CREATED,
+          message:'Tạo folder thành công'
+        }
+      }catch(e){
+        return {
+          statusCode:HttpStatus.BAD_REQUEST,
+          message:'Tạo folder không thành công'
+        }
+      }
+     
+    }
+
+    async createFiles(data:CreateFileWorkDto[]){
+      try{
+        console.log(data)
+        const folder_work = await this.foldersRepository.findOne({where:{folder_id:In([data[0].folder])}})
+        const newDatas = this.filesRepository.create(data.map(dt => {
+          return {...dt,folder_work,file_id:uuidv4()}
+        }))
+        await this.filesRepository.save(newDatas)
+        return{
+          statusCode:HttpStatus.CREATED,
+          message:'Tạo file thành công'
+        }
+      }catch(e){
+        console.log(e,"loi day")
+        return{
+          statusCode:HttpStatus.BAD_REQUEST,
+          message:'Tạo file không thành công'
+        }
+      }
+      
+
+    }
+
+    async updateFolder(id:string,data:CreateFolderWorkDto){
+      try{
+        await this.foldersRepository.update(id,{name:data.name,description:data.description})
+        return{
+          statusCode:HttpStatus.OK,
+          message:'Cập nhật folder thành công'
+        }
+      }catch{
+        return{
+          statusCode:HttpStatus.BAD_REQUEST,
+          message:'Cập nhật folder không thành công'
+        }
+      }
+    }
+
+    async updateFile(id:string,data:CreateFileWorkDto){
+      try{
+        await this.filesRepository.update(id,{name:data.name})
+        return{
+          statusCode:HttpStatus.OK,
+          message:'Cập nhật file thành công'
+        }
+      }catch{
+        return{
+          statusCode:HttpStatus.BAD_REQUEST,
+          message:'Cập nhật file không thành công'
+        }
+      }
+    }
+
+    
 }

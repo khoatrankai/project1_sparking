@@ -32,6 +32,8 @@ import { CreateReviewDto } from 'src/dto/ReviewDto/create-review.dto';
 import { UpdateReviewDto } from 'src/dto/ReviewDto/update-review.dto';
 import { CreateCommentDto } from 'src/dto/CommentDto/create-comment.dto';
 import { UpdateCommentDto } from 'src/dto/CommentDto/update-comment.dto';
+import { CreateFolderWorkDto } from 'src/dto/FolderWorkDto/create-folder_work.dto';
+import { CreateFileWorkDto } from 'src/dto/FileWorkDto/create-folder_work.dto';
 
 @Controller('/activity')
 @UseFilters(ConflictExceptionFilter)
@@ -590,5 +592,30 @@ export class LayerController {
   @MessagePattern({ cmd: 'get-works_follow_activity_by_project' })
   async getWorksFollowActivitiesByProject(project_id:string) {
     return this.layerService.getWorksFollowActivitiesByProject(project_id);
+  }
+
+  @MessagePattern({ cmd: 'get-check_review' })
+  async getCheckReview(@Payload('user') user:string,@Payload('work') work:string) {
+    return this.layerService.getCheckReview(user,work);
+  }
+
+  @MessagePattern({ cmd: 'create-folder' })
+  async createFolderFile(data:CreateFolderWorkDto) {
+    return this.layerService.createFolderFile(data);
+  }
+
+  @MessagePattern({ cmd: 'update-folder' })
+  async updateFolderFile(data:{id:string,data:CreateFolderWorkDto}) {
+    return this.layerService.updateFolder(data.id,data.data);
+  }
+
+  @MessagePattern({ cmd: 'create-files' })
+  async createFiles(datas:CreateFileWorkDto[]) {
+    return this.layerService.createFiles(datas);
+  }
+
+  @MessagePattern({ cmd: 'update-file' })
+  async updateFile(data:{id:string,data:CreateFileWorkDto}) {
+    return this.layerService.updateFile(data.id,data.data);
   }
 }

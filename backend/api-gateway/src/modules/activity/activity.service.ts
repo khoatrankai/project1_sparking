@@ -32,6 +32,8 @@ import { CreateReviewDto } from './dto/ReviewDto/create-review.dto';
 import { UpdateReviewDto } from './dto/ReviewDto/update-review.dto';
 import { UpdateCommentDto } from './dto/CommentDto/update-comment.dto';
 import { CreateCommentDto } from './dto/CommentDto/create-comment.dto';
+import { CreateFolderWorkDto } from './dto/FolderWorkDto/create-folder_work.dto';
+import { CreateFileWorkDto } from './dto/FileWorkDto/create-folder_work.dto';
 
 @Injectable()
 export class ActivityService {
@@ -879,6 +881,12 @@ export class ActivityService {
     );
   }
 
+  async sendCheckReview(user:string,work:string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd:'get-check_review' }, {user,work}),
+    );
+  }
+
   async sendCreateCommnet(data:CreateCommentDto) {
     return await firstValueFrom(
       this.activityClient.send({ cmd: 'create-comment' }, data),
@@ -912,6 +920,61 @@ export class ActivityService {
   async sendGetWorksFollowActivitiesByProject(project:string) {
     return await firstValueFrom(
       this.activityClient.send({ cmd: 'get-works_follow_activity_by_project' }, project),
+    );
+  }
+
+  async sendCreateFolder(data:CreateFolderWorkDto,urls:Express.Multer.File[]) {
+    
+    // console.log(data)
+    if (urls && urls.length > 0) {
+      const datas = await this.cloudinaryService.uploadFiles(urls);
+      if (datas.length > 0) {
+        return await firstValueFrom(
+          this.activityClient.send({ cmd: 'create-folder' }, {
+            ...data,
+            files:JSON.parse(data.files as any).map((dt,index) => {
+              return{
+                ...dt,url:datas[index]
+              }
+            })
+          }),
+        );
+        
+      }
+    } else {
+      return await firstValueFrom(
+        this.activityClient.send('create-folder', data),
+      );
+    }
+  }
+
+  async sendUpdateFolder(id:string,data:CreateFolderWorkDto) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'update-folder' }, {id,data}),
+    );
+  }
+
+  async sendCreateFiles(data:CreateFileWorkDto,urls:Express.Multer.File[]) {
+    if (urls && urls.length > 0) {
+      const datas = await this.cloudinaryService.uploadFiles(urls);
+      if (datas.length > 0) {
+
+        return await firstValueFrom(
+          this.activityClient.send({ cmd: 'create-files' }, data.files.map((dt,index)=>{
+            return {...dt,url:datas[index],name:dt.name,folder:data.folder}
+          })),
+        );
+      }
+    } else {
+      return await firstValueFrom(
+        this.activityClient.send({ cmd: 'create-files' }, data),
+      );
+    }
+  }
+
+  async sendUpdateFile(id:string,data:CreateFileWorkDto) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'update-file' }, {id,data}),
     );
   }
 }

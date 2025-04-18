@@ -44,6 +44,8 @@ import { CreateReviewDto } from './dto/ReviewDto/create-review.dto';
 import { UpdateReviewDto } from './dto/ReviewDto/update-review.dto';
 import { CreateCommentDto } from './dto/CommentDto/create-comment.dto';
 import { UpdateCommentDto } from './dto/CommentDto/update-comment.dto';
+import { CreateFolderWorkDto } from './dto/FolderWorkDto/create-folder_work.dto';
+import { CreateFileWorkDto } from './dto/FileWorkDto/create-folder_work.dto';
 
 @Controller('activity')
 export class ActivityController {
@@ -940,6 +942,21 @@ export class ActivityController {
     return this.activityService.sendGetReviews(id);
   }
 
+  @Get('check-review/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendCheckReview(@Req() req:Request,@Param('id') id:string) {
+    // console.log(datas)
+    // return
+    return this.activityService.sendCheckReview(req['user'].sub,id);
+  }
+
   @Post('create-comment')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', [
@@ -1026,5 +1043,63 @@ export class ActivityController {
   async sendGetWorksFollowActivitiesByProject(@Query('id') project:string) {
     // return
     return this.activityService.sendGetWorksFollowActivitiesByProject(project);
+  }
+
+  @Post('create-folder')
+  @UseInterceptors(FilesInterceptor('url'))
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendCreateFolder(@Body() data:CreateFolderWorkDto,@UploadedFiles() urls: Express.Multer.File[]) {
+    // return
+    return this.activityService.sendCreateFolder(data,urls);
+  }
+
+  @Put('update-folder/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateFolder(@Param('id') id:string,@Body() data:CreateFolderWorkDto) {
+    // return
+    return this.activityService.sendUpdateFolder(id,data);
+  }
+
+  @Post('create-files')
+  @UseInterceptors(FilesInterceptor('url'))
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendCreateFiles(@Body() datas:CreateFileWorkDto,@UploadedFiles() urls: Express.Multer.File[]) {
+    // return
+    return this.activityService.sendCreateFiles(datas,urls);
+  }
+
+  @Put('update-file/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateFile(@Param('id') id:string,@Body() data:CreateFileWorkDto) {
+    // return
+    return this.activityService.sendUpdateFile(id,data);
   }
 }
