@@ -53,6 +53,7 @@ export class ProjectService {
         customer_id,
       ),
     );
+    
   }
 
   async sendGetProjectAbout() {
@@ -122,10 +123,10 @@ export class ProjectService {
     }
   }
 
-  async findFullTypeProject() {
+  async findFullTypeProject(filter?:{status?:string}) {
     try {
       const result = await firstValueFrom(
-        this.projectClient.send({ cmd: 'find-full_type_project' }, {}),
+        this.projectClient.send({ cmd: 'find-full_type_project' }, filter ?? {}),
       );
       return result;
     } catch (error) {
@@ -188,6 +189,32 @@ export class ProjectService {
       );
       if (!result)
         throw new HttpException('Type product not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getProjectsFilter(filter?:{type?:string,page?:number,limit?:number,user?:string,status?:string}) {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send({ cmd: 'get-projects_filter' }, filter),
+      );
+      if (!result)
+        throw new HttpException('Type project not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getDashboardManagement(filter?:{type_project?:string,user?:string}) {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send({ cmd: 'get-dashboard_management' }, filter),
+      );
+      if (!result)
+        throw new HttpException('dashboard not found', HttpStatus.NOT_FOUND);
       return result;
     } catch (error) {
       throw error;

@@ -2905,5 +2905,46 @@ export class LayerService {
       }
     }
 
+    async getListProjectByUsers(users:string[]){
+      try{
+        const listContract = (await this.activitiesRepository.createQueryBuilder('activities')
+        .leftJoin('activities.works','works')
+        .leftJoin('works.list_user','list_user')
+        .where('list_user.user In (:...user_id)',{user_id:users ?? ['']})
+        .getMany()).map(dt => dt.contract)
+        const listProject = await firstValueFrom(this.contractsClient.send({ cmd: 'get-projects_by_contracts' },listContract))
+        return listProject
+      }catch{
+        return []
+      }
+      
+      
+    }
+
+    async getDocumentsByProject(project:string){
+      const contracts = await firstValueFrom(this.contractsClient.send({ cmd: 'get-contract_by_project_id' },project))
+      console.log(contracts,"day contract",project)
+      const listFolder = await this.foldersRepository.createQueryBuilder('folders')
+      .leftJoinAndSelect('folders.files','files')
+      .leftJoin('folders.work','work')
+      .leftJoin('work.activity','activity')
+      .where('activity.contract In (:...contracts)',{contracts:contracts.length > 0 ? contracts:['']})
+      .getMany()
+
+      const listPictures = await this.pictureWorkRepository.createQueryBuilder('pictures')
+      .leftJoin('pictures.work','work')
+      .leftJoin('work.activity','activity')
+      .where('activity.contract In (:...contracts)',{contracts:contracts.length > 0 ? contracts:['']})
+      .getMany()
+
+      return {
+        statusCode:HttpStatus.OK,
+        data:{
+          pictures:listPictures,
+          folders:listFolder
+        }
+      }
+    }
+
     
 }

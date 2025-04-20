@@ -859,7 +859,7 @@ export class ActivityService {
 
   async sendGetDashboardManagement(filters?:{user?:string,type?:string}) {
     return await firstValueFrom(
-      this.activityClient.send({ cmd: 'get-dashboard_management' }, filters),
+      this.activityClient.send({ cmd:'get-dashboard_management' }, filters),
     );
   }
 
@@ -975,6 +975,12 @@ export class ActivityService {
   async sendUpdateFile(id:string,data:CreateFileWorkDto) {
     return await firstValueFrom(
       this.activityClient.send({ cmd: 'update-file' }, {id,data}),
+    );
+  }
+
+  async sendGetDocumentsByProject(id:string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-documents_by_project' }, id),
     );
   }
 }

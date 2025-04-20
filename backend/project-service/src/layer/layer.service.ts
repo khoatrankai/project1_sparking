@@ -101,10 +101,11 @@ export class LayerService {
     };
   }
   // Find all projects
-  async findAllProjects(filter?: GetFilterProjectDto): Promise<any> {
+  async   findAllProjects(filter?: GetFilterProjectDto): Promise<any> {
     const customer = filter?.customer;
 
     const type = filter?.type;
+    const type_project = filter?.type_project;
     const status = filter?.status;
     const whereCondition: any = {};
     if (customer) {
@@ -117,17 +118,48 @@ export class LayerService {
     if (type) {
       whereCondition.type = In([type]);
     }
-    const projects = await this.projectsRepository.find({
-      where: whereCondition,
-      order: { created_at: 'DESC' },
-      take:filter?.limit ?? 0,
-      skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
-    });
+    let projects = []
+    console.log(type_project)
+    if(!type_project){
+      
+      projects = await this.projectsRepository.find({
+        where: whereCondition,
+        order: { created_at: 'DESC' },
+        take:filter?.limit ?? 0,
+        skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
+      });
+    }
+    if(type_project === "perform"){
+      const projectIds = await firstValueFrom(this.activityClient.send({ cmd: 'get-projects_by_users' },[filter.user ?? ''])) ?? ['']
+      projects = await this.projectsRepository.find({
+        where: {...whereCondition,project_id:In(projectIds)},
+        order: { created_at: 'DESC' },
+        take:filter?.limit ?? 0,
+        skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
+      });
+    }
+    if(type_project === "management"){
+      projects = await this.projectsRepository.find({
+        where: {...whereCondition,user_support:In([filter.user??''])},
+        order: { created_at: 'DESC' },
+        take:filter?.limit ?? 0,
+        skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
+      });
+    }
 
-    const countProjects = await this.projectsRepository.count({
-      where: whereCondition,
-      order: { created_at: 'DESC' },
-    })
+    if(type_project === "group"){
+      const listUser = await firstValueFrom(this.userClient.send({cmd:'get-ids_group'},filter.user))
+      const projectIds = await firstValueFrom(this.activityClient.send({ cmd: 'get-projects_by_users' },listUser ?? [''])) ?? ['']
+      projects = await this.projectsRepository.find({
+        where: {...whereCondition,project_id:In(projectIds)},
+        order: { created_at: 'DESC' },
+        take:filter?.limit ?? 0,
+        skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
+      });
+    }
+    
+
+    const countProjects = projects.length
     const projectIds =  projects.map(dt => dt.project_id)
     const progresses = (await firstValueFrom(this.activityClient.send({ cmd: 'get-progress_by_projects' },projectIds)))?.data ?? []
     if (!projects || projects.length === 0) {
@@ -357,10 +389,20 @@ export class LayerService {
     };
   }
 
-  async findFullTypeProject() {
+  async findFullTypeProject(filter?:{status?:string}) {
+    const typeProject = this.typeProjectRepository.createQueryBuilder('type').leftJoinAndSelect('type.projects','projects')
+    if(filter.status){
+      
+      return {
+        statusCode: HttpStatus.OK,
+        data: await typeProject.where('projects.status =:status',{status:filter.status}).getMany()
+        
+      };
+    }
     return {
       statusCode: HttpStatus.OK,
-      data: await this.typeProjectRepository.find({ relations: ['projects'] }),
+      data: await typeProject.getMany()
+      
     };
   }
 
@@ -421,6 +463,7 @@ export class LayerService {
     const countProjectToday = projectToday.length
     const projectProcess = await this.projectsRepository.find({where:{status:Not(In(['completed','pause','cancel']))}})
     const projectDelete = await this.projectsRepository.find({where:{status:In(['cancel'])}})
+    const projectPause = await this.projectsRepository.find({where:{status:In(['pause'])}})
     const projectCompleted = await this.projectsRepository.find({where:{status:In(['completed'])}})
     return {
       statusCode:HttpStatus.OK,
@@ -428,9 +471,219 @@ export class LayerService {
         total_project:countProjectToday,
         process_project:projectProcess.length,
         completed_project:projectCompleted.length,
-        cancel_project:projectDelete.length
+        cancel_project:projectDelete.length,
+        pause_project:projectPause.length
       }
     }
+  }
+
+  async getDashboardManagement(filter?:{type_project?:string,user?:string}){
+    if(filter.type_project === "perform"){
+      const projects = await this.projectsRepository.find({where:{user_support:filter.user}})
+      return {
+        statusCode:HttpStatus.OK,
+        data:{
+          total_project:projects.length,
+          waiting_project:projects.filter((dt)=>{
+            if(dt.status === "waiting" ){
+              return true
+            }
+            return false
+          }).length,
+          process_project:projects.filter((dt)=>{
+            if(dt.status === "start"){
+              return true
+            }
+            return false
+          }).length,
+          completed_project:projects.filter((dt)=>{
+            if(dt.status === "completed"){
+              return true
+            }
+            return false
+          }).length,
+          cancel_project:projects.filter((dt)=>{
+            if(dt.status === "cancel"){
+              return true
+            }
+            return false
+          }).length,
+          pause_project:projects.filter((dt)=>{
+            if(dt.status === "pause"){
+              return true
+            }
+            return false
+          }).length
+        }
+      }
+    }
+    if(filter.type_project === "group"){
+      const userIds = (await firstValueFrom(this.userClient.send({cmd: 'get-ids_group'},filter.user))).data ?? ['']
+      const projects = await this.projectsRepository.createQueryBuilder('projects')
+      .where('projects.user_support In (:...userIds)',{userIds:userIds.length > 0 && userIds?.[0] !== null ? userIds :['']})
+      .getMany()
+      return {
+        statusCode:HttpStatus.OK,
+        data:{
+          total_project:projects.length,
+          waiting_project:projects.filter((dt)=>{
+            if(dt.status === "waiting" ){
+              return true
+            }
+            return false
+          }).length,
+          process_project:projects.filter((dt)=>{
+            if(dt.status === "start"){
+              return true
+            }
+            return false
+          }).length,
+          completed_project:projects.filter((dt)=>{
+            if(dt.status === "completed"){
+              return true
+            }
+            return false
+          }).length,
+          cancel_project:projects.filter((dt)=>{
+            if(dt.status === "cancel"){
+              return true
+            }
+            return false
+          }).length,
+          pause_project:projects.filter((dt)=>{
+            if(dt.status === "pause"){
+              return true
+            }
+            return false
+          }).length
+        }
+      }
+    }
+    if(filter.type_project === "management"){
+      const projects = await this.projectsRepository.find({where:{user_support:In([filter.user])}
+      })
+      return {
+        statusCode:HttpStatus.OK,
+        data:{
+          total_project:projects.length,
+          waiting_project:projects.filter((dt)=>{
+            if(dt.status === "waiting" ){
+              return true
+            }
+            return false
+          }).length,
+          process_project:projects.filter((dt)=>{
+            if(dt.status === "start"){
+              return true
+            }
+            return false
+          }).length,
+          completed_project:projects.filter((dt)=>{
+            if(dt.status === "completed"){
+              return true
+            }
+            return false
+          }).length,
+          cancel_project:projects.filter((dt)=>{
+            if(dt.status === "cancel"){
+              return true
+            }
+            return false
+          }).length,
+          pause_project:projects.filter((dt)=>{
+            if(dt.status === "pause"){
+              return true
+            }
+            return false
+          }).length
+        }
+      }
+    }
+    const projects = await this.projectsRepository.find()
+    return {
+      statusCode:HttpStatus.OK,
+      data:{
+        total_project:projects.length,
+        waiting_project:projects.filter((dt)=>{
+          if(dt.status === "waiting" ){
+            return true
+          }
+          return false
+        }).length,
+        process_project:projects.filter((dt)=>{
+          if(dt.status === "start"){
+            return true
+          }
+          return false
+        }).length,
+        completed_project:projects.filter((dt)=>{
+          if(dt.status === "completed"){
+            return true
+          }
+          return false
+        }).length,
+        cancel_project:projects.filter((dt)=>{
+          if(dt.status === "cancel"){
+            return true
+          }
+          return false
+        }).length,
+        pause_project:projects.filter((dt)=>{
+          if(dt.status === "pause"){
+            return true
+          }
+          return false
+        }).length
+      }
+    }
+  
+  }
+
+  async getProjectsFilter(filter?:{type?:string,page?:number,limit?:number,user?:string,status?:string}){
+    if(filter.type === "perform"){
+      const projects = await this.projectsRepository.find({where:{user_support:filter.user,status:filter.status},
+        order: { created_at: 'DESC' },
+        take:filter?.limit ?? 0,
+        skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
+      })
+      return {
+        statusCode:HttpStatus.OK,
+        data: projects
+      }
+    }
+    if(filter.type === "group"){
+      const userIds = (await firstValueFrom(this.userClient.send({cmd: 'get-ids_group'},filter.user))).data ?? ['']
+      const projects = await this.projectsRepository.find({where:{user_support:In(userIds),status:filter.status},
+        order: { created_at: 'DESC' },
+        take:filter?.limit ?? 0,
+        skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
+      })
+      return {
+        statusCode:HttpStatus.OK,
+        data: projects
+      }
+    }
+    if(filter.type === "management"){
+      const projects = await this.projectsRepository.find({where:{user_support:In([filter.user]),status:filter.status},
+        order: { created_at: 'DESC' },
+        take:filter?.limit ?? 0,
+        skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
+      })
+      return {
+        statusCode:HttpStatus.OK,
+        data: projects
+      }
+    }
+
+      const projects = await this.projectsRepository.find({
+        order: { created_at: 'DESC' },
+        take:filter?.limit ?? 0,
+        skip:((filter?.page ?? 1) - 1) * (filter?.limit ?? 0)
+      })
+      return {
+        statusCode:HttpStatus.OK,
+        data: projects
+      }
   }
 
  

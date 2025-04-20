@@ -1102,4 +1102,18 @@ export class ActivityController {
     // return
     return this.activityService.sendUpdateFile(id,data);
   }
+
+  @Get('get-documents-by-project/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetDocumentsByProject(@Param('id') project:string) {
+    // return
+    return this.activityService.sendGetDocumentsByProject(project);
+  }
 }

@@ -88,8 +88,8 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'find-full_type_project' })
-  async findFullTypeProject() {
-    return this.layerService.findFullTypeProject();
+  async findFullTypeProject(filter?:{status?:string}) {
+    return this.layerService.findFullTypeProject(filter);
   }
 
   @MessagePattern({ cmd: 'find-one_type_project' })
@@ -120,5 +120,14 @@ export class LayerController {
     return this.layerService.getDashboardProject();
   }
 
-  
+  @MessagePattern({ cmd: 'get-projects_filter' })
+  async getProjectsFilter(filter?:{type?:string,page?:number,limit?:number,user?:string,status?:string}) {
+    return this.layerService.getProjectsFilter(filter);
+  }
+
+  @MessagePattern({ cmd: 'get-dashboard_management' })
+  async getDashboardManagement(filter?:{type_project?:string,user?:string}) {
+    console.log(filter,"day ne")
+    return this.layerService.getDashboardManagement(filter);
+  }
 }

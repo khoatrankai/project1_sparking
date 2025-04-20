@@ -15,6 +15,17 @@ export class GetFilterProjectDto {
   @IsString()
   @IsOptional()
   @Length(1, 50)
+  user?: string;
+
+  @IsString()
+  @IsOptional()
+  @Length(1, 50)
+  type_project?: string;
+
+
+  @IsString()
+  @IsOptional()
+  @Length(1, 50)
   type?: string;
 
   @IsString()

@@ -483,7 +483,7 @@ export class UserService {
           .createQueryBuilder('account_user')
           .leftJoin('account_user.role_user', 'role_user')
           .leftJoin('role_user.role_type', 'role_type')
-          .where('role_type.name_tag In (:...roles)', {
+          .where('role_type.name_tag In (roles)', {
             roles: createData.notify_role,
           })
           .getMany();

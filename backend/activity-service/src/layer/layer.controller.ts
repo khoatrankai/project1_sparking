@@ -618,4 +618,14 @@ export class LayerController {
   async updateFile(data:{id:string,data:CreateFileWorkDto}) {
     return this.layerService.updateFile(data.id,data.data);
   }
+
+  @MessagePattern({ cmd: 'get-projects_by_users' })
+  async getListProjectByUsers(users:string[]) {
+    return this.layerService.getListProjectByUsers(users);
+  }
+
+  @MessagePattern({ cmd: 'get-documents_by_project' })
+  async getDocumentsByProject(project:string) {
+    return this.layerService.getDocumentsByProject(project);
+  }
 }

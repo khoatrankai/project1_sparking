@@ -272,4 +272,9 @@ export class ContractController {
   async getContractFilterByProject(filter?:{id:string}) {
     return this.contractService.getContractFilterByProject(filter);
   }
+
+  @MessagePattern({ cmd: 'get-projects_by_contracts' })
+  async getProjectsByContracts(ids:string[]) {
+    return this.contractService.getProjectsByContracts(ids);
+  }
 }

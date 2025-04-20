@@ -1264,6 +1264,15 @@ export class ContractService {
     }
   }
 
- 
+  async getProjectsByContracts(ids:string[]){
+    try{
+      console.log(ids)
+      const listProject = (await this.contractRepository.find({where:{contract_id:In(ids ?? [''])}})).map(dt => dt.project)
+      return listProject
+    }catch{
+      return []
+    }
+    
+  }
  
 }

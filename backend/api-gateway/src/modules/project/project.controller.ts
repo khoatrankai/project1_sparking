@@ -73,8 +73,8 @@ export class ProjectController {
     'project-read',
   ])
   @SetMetadata('type', ['admin'])
-  async findAllProjects(@Query() filter?: GetFilterProjectDto) {
-    return this.projectService.sendFindAllProjects(filter);
+  async findAllProjects(@Req() req:Request,@Query() filter?: GetFilterProjectDto) {
+    return this.projectService.sendFindAllProjects({...filter,user:req['user'].sub});
   }
 
   @Get('all-customer')
@@ -146,8 +146,8 @@ export class ProjectController {
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
   @SetMetadata('type', ['admin'])
-  async findFullTypeProject() {
-    return this.projectService.findFullTypeProject();
+  async findFullTypeProject(@Query() filter?:{status?:string}) {
+    return this.projectService.findFullTypeProject(filter);
   }
 
   @Get('type/:id')
@@ -183,5 +183,21 @@ export class ProjectController {
   @SetMetadata('type', ['admin'])
   async getFullProject(@Param('id') id:string) {
     return this.projectService.getFullProject(id);
+  }
+
+  @Get('get-projects-filter')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getProjectsFilter(@Req() req:Request, @Query() filter:{type?:string,page?:number,limit?:number,user?:string,status?:string}) {
+    return this.projectService.getProjectsFilter({...filter,user:req['user'].sub});
+  }
+
+  @Get('get-dashboard-management')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getDashboardManagement(@Req() req:Request, @Query() filter:{type_project?:string}) {
+    return this.projectService.getDashboardManagement({...filter,user:req['user'].sub});
   }
 }
