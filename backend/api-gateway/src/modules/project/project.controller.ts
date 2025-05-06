@@ -22,6 +22,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { RoleGuard } from 'src/guards/role.guard';
 import { GetFilterProjectDto } from './dto/ProjectDto/get-filter.dto';
 import { Request } from 'express';
+import { CreateNotifyProjectDto } from './dto/NotifyProject/create-notify_project.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -109,11 +110,12 @@ export class ProjectController {
     @Param('id') id: string,
     @Body() updateProjectDto: UpdateProjectDto,
     @UploadedFiles() picture_url: Express.Multer.File[],
+    @Req() req:Request
   ) {
     // //console.log(updateProjectDto,picture_url,id)
     return this.projectService.sendUpdateProject(
       id,
-      updateProjectDto,
+      {...updateProjectDto,user_create:req['user'].sub},
       picture_url?.[0],
     );
   }
@@ -193,11 +195,29 @@ export class ProjectController {
     return this.projectService.getProjectsFilter({...filter,user:req['user'].sub});
   }
 
+  
+
   @Get('get-dashboard-management')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
   @SetMetadata('type', ['admin'])
   async getDashboardManagement(@Req() req:Request, @Query() filter:{type_project?:string}) {
     return this.projectService.getDashboardManagement({...filter,user:req['user'].sub});
+  }
+
+  @Get('get-notifies/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getNotifies(@Param('id') id:string) {
+    return this.projectService.getNotifies(id);
+  }
+
+  @Post('create-notify')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async createNotify(@Body() data:CreateNotifyProjectDto,@Req() req:Request) {
+    return this.projectService.createNotify({...data,user_create:req['user'].sub});
   }
 }

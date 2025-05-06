@@ -12,6 +12,8 @@ import { TypeProject } from 'src/database/entities/type_project.entity';
 import { UpdateTypeProjectDto } from 'src/dto/TypeProjectDto/update-type_project.dto';
 import { GetFilterProjectDto } from 'src/dto/ProjectDto/get-filter.dto';
 import { ConfigService } from '@nestjs/config';
+import { CreateNotifyProjectDto } from 'src/dto/NotifyProject/create-notify_project.dto';
+import { NotifyProject } from 'src/database/entities/notify.entity';
 
 @Injectable()
 export class LayerService {
@@ -23,6 +25,8 @@ export class LayerService {
     private readonly projectsRepository: Repository<Projects>,
     @InjectRepository(TypeProject)
     private readonly typeProjectRepository: Repository<TypeProject>,
+    @InjectRepository(NotifyProject)
+    private readonly notifyProjectRepository: Repository<NotifyProject>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -43,6 +47,8 @@ export class LayerService {
         },
       ),
     );
+    const notify = this.notifyProjectRepository.create({notify_id:uuidv4(),description:'Đã tạo dự án',user_create:createProjectDto.user_support,project:savedProject})
+    await this.notifyProjectRepository.save(notify)
     return {
       statusCode: HttpStatus.CREATED,
       data: savedProject,
@@ -270,7 +276,8 @@ export class LayerService {
       relations: ['type',],
     });
     const listUser = await firstValueFrom(this.activityClient.send({ cmd: 'get-list_user_by_projects' },id))
-    const progresses = (await firstValueFrom(this.activityClient.send({ cmd: 'get-progress_by_project' },id)))?.data ?? []
+    const progresses = (await firstValueFrom(this.activityClient.send({ cmd: 'get-progress_by_project' },id))) ?? {}
+    console.log(progresses)
     const attach = (await firstValueFrom(this.activityClient.send({ cmd: 'get-attach_by_project' },id)))?.data ?? []
     if (!project) {
       throw new HttpException(
@@ -324,11 +331,13 @@ export class LayerService {
     updateProjectDto: UpdateProjectDto,
   ): Promise<any> {
     //console.log(updateProjectDto);
+    const {user_create,...reqUpdate} = updateProjectDto
     const updateResult = await this.projectsRepository.update(
       id,
-      updateProjectDto,
+      reqUpdate,
     );
-
+    const notify = this.notifyProjectRepository.create({notify_id:uuidv4(),description:'Đã cập nhật dự án',user_create:user_create,project:await this.projectsRepository.findOne({where:{project_id:In([id])}})})
+    await this.notifyProjectRepository.save(notify)
     if (updateResult.affected === 0) {
       throw new HttpException(
         {
@@ -686,6 +695,43 @@ export class LayerService {
       }
   }
 
+  async getAllProjectsByType(id:string){
+    const projects = await this.projectsRepository.find({where:{type:In([id??''])}})
+    return {
+      statusCode:HttpStatus.OK,
+      data:projects
+    }
+  }
  
-  
+  async createNotify(data:CreateNotifyProjectDto){
+    const project = await this.projectsRepository.findOne({where:{project_id:In([data.project ?? ''])}})
+    const newData = this.notifyProjectRepository.create({...data,notify_id:uuidv4(),project})
+    await this.notifyProjectRepository.save(newData)
+    return{
+      statusCode:HttpStatus.CREATED,
+      message:"Tạo thông báo thành công"
+    }
+  }
+
+  // async updateNotify(data:CreateNotifyProjectDto){
+  //   const project = await this.projectsRepository.findOne({where:{project_id:In([data.project ?? ''])}})
+  //   const newData = this.notifyProjectRepository.create({...data,notify_id:uuidv4(),project})
+  //   await this.notifyProjectRepository.save(newData)
+  //   return{
+  //     statusCode:HttpStatus.CREATED,
+  //     message:"Tạo thông báo thành công"
+  //   }
+  // }
+
+  async getNotifies(project_id:string){
+    
+    const datasNotify = await this.notifyProjectRepository.find({where:{project:In([project_id ?? ""])}})
+    const usersInfo = await firstValueFrom(this.userClient.send({cmd: 'get-user_ids'},datasNotify.map(dt => dt.user_create)))
+    return{
+      statusCode:HttpStatus.OK,
+      data:datasNotify.map((dt,index)=>{
+        return {...dt,user_create:usersInfo?.[index]}
+      })
+    }
+  }
 }

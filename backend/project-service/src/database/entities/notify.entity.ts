@@ -12,6 +12,9 @@ export class NotifyProject {
   @Column({ type: 'varchar', length: 50, nullable: true })
   user_create: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  url: string;
+
   @ManyToOne(() => Projects, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'project' })
   project: Projects;

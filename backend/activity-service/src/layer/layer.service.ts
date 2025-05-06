@@ -2731,14 +2731,15 @@ export class LayerService {
       .leftJoinAndSelect('works.status','status')
       .where('activity.contract IN (:...contracts)',{contracts:contracts.length > 0 ? contracts: ['']})
       .getMany()
+    
       return {
           total:works.length,
-          completed:works.map(dt => dt.status.name_tag === "completed").length,
-          process:works.map(dt => dt.status.name_tag === "process").length,
-          waiting:works.map(dt => dt.status.name_tag === "waiting").length,
-          pause:works.map(dt => dt.status.name_tag === "pause").length,
-          cancel:works.map(dt => dt.status.name_tag === "cancel").length,
-          review:works.map(dt => dt.status.name_tag === "review").length,
+          completed:works.filter(dt => dt.status.name_tag === "completed").length,
+          process:works.filter(dt => dt.status.name_tag === "process").length,
+          waiting:works.filter(dt => dt.status.name_tag === "waiting").length,
+          pause:works.filter(dt => dt.status.name_tag === "pause").length,
+          cancel:works.filter(dt => dt.status.name_tag === "cancel").length,
+          review:works.filter(dt => dt.status.name_tag === "review").length,
         }
       
     }

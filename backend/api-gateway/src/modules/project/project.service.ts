@@ -7,6 +7,7 @@ import { firstValueFrom } from 'rxjs';
 import { UpdateTypeProjectDto } from './dto/TypeProjectDto/update-type_project.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { GetFilterProjectDto } from './dto/ProjectDto/get-filter.dto';
+import { CreateNotifyProjectDto } from './dto/NotifyProject/create-notify_project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -207,6 +208,34 @@ export class ProjectService {
       throw error;
     }
   }
+
+  async getNotifies(id:string) {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send({ cmd: 'get-notifies' }, id),
+      );
+      if (!result)
+        throw new HttpException('Type project not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createNotify(data:CreateNotifyProjectDto) {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send({ cmd: 'create-notify' }, data),
+      );
+      if (!result)
+        throw new HttpException('Type project not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+ 
 
   async getDashboardManagement(filter?:{type_project?:string,user?:string}) {
     try {

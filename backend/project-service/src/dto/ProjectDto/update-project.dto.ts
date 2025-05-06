@@ -56,4 +56,8 @@ export class UpdateProjectDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsString()
+  @IsOptional()
+  user_create?: string;
 }

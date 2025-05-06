@@ -8,6 +8,7 @@ import { UpdateProjectDto } from 'src/dto/ProjectDto/update-project.dto';
 import { CreateTypeProjectDto } from 'src/dto/TypeProjectDto/create-type_project.dto';
 import { UpdateTypeProjectDto } from 'src/dto/TypeProjectDto/update-type_project.dto';
 import { GetFilterProjectDto } from 'src/dto/ProjectDto/get-filter.dto';
+import { CreateNotifyProjectDto } from 'src/dto/NotifyProject/create-notify_project.dto';
 
 @Controller('/project')
 @UseFilters(ConflictExceptionFilter)
@@ -125,9 +126,23 @@ export class LayerController {
     return this.layerService.getProjectsFilter(filter);
   }
 
+  @MessagePattern({ cmd: 'get-projects_by_type' })
+  async getProjectsByType(id:string) {
+    return this.layerService.getAllProjectsByType(id);
+  } 
+
   @MessagePattern({ cmd: 'get-dashboard_management' })
   async getDashboardManagement(filter?:{type_project?:string,user?:string}) {
-    console.log(filter,"day ne")
     return this.layerService.getDashboardManagement(filter);
+  }
+
+  @MessagePattern({ cmd: 'create-notify' })
+  async createNotify(data:CreateNotifyProjectDto) {
+    return this.layerService.createNotify(data);
+  }
+
+  @MessagePattern({ cmd: 'get-notifies' })
+  async getNotifies(id:string) {
+    return this.layerService.getNotifies(id);
   }
 }

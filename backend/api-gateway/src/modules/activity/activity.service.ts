@@ -983,4 +983,10 @@ export class ActivityService {
       this.activityClient.send({ cmd: 'get-documents_by_project' }, id),
     );
   }
+
+  async sendGetProjectsByType(id:string) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-projects_by_type' }, id),
+    );
+  }
 }
