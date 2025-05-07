@@ -143,16 +143,22 @@ export class UserService {
     );
   }
   async getUserIDProfile(req: Request) {
-    const user = req['user'];
-    if (user) {
-      return await firstValueFrom(
-        this.usersClient.send({ cmd: 'get-user_id_admin' }, user.sub),
-      );
+    try{
+      const user = req['user'];
+      if (user) {
+        return await firstValueFrom(
+          this.usersClient.send({ cmd: 'get-user_id_admin' }, user.sub),
+        );
+      }
+    }catch(err){
+      console.log(err)
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Lấy thông tin thất bại',
+      };
     }
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Lấy thông tin thất bại',
-    };
+    
+    
   }
 
   async createCategoryRole(createCategoryRole: CreateCategoryRoleUserDto) {
