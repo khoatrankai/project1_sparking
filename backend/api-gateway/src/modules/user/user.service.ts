@@ -150,6 +150,11 @@ export class UserService {
           this.usersClient.send({ cmd: 'get-user_id_admin' }, user.sub),
         );
       }
+      console.log(user)
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Lấy thông tin thất bại',
+      };
     }catch(err){
       console.log(err)
       return {

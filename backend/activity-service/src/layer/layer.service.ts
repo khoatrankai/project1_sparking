@@ -2414,8 +2414,11 @@ export class LayerService {
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
         .leftJoinAndSelect('works.tasks', 'tasks')
-        .where('status.name_tag IN (:...statuses)', { statuses: [status] })
-        .andWhere('list_user.user IN (:...user)',{user:[filters.user]})
+        .where('list_user.user IN (:...user)',{user:[filters.user]})
+          console.log("day nay",status)
+        if (status) {
+          queryBuilder.andWhere('status.name_tag IN (:...statuses)', { statuses: [status] });
+        }
     
     // Lấy tổng số bản ghi
         const total = await queryBuilder.getCount();
@@ -2456,9 +2459,11 @@ export class LayerService {
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
         .leftJoinAndSelect('works.tasks', 'tasks')
-        .where('status.name_tag IN (:...statuses)', { statuses: [status] })
-        .andWhere('works.user_create IN (:...user)',{user:[filters.user]})
+        .where('works.user_create IN (:...user)',{user:[filters.user]})
     
+        if (status) {
+          queryBuilder.andWhere('status.name_tag IN (:...statuses)', { statuses: [status] });
+        }
     // Lấy tổng số bản ghi
         const total = await queryBuilder.getCount();
         
@@ -2498,9 +2503,10 @@ export class LayerService {
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
         .leftJoinAndSelect('works.tasks', 'tasks')
-        .where('status.name_tag IN (:...statuses)', { statuses: [status] })
-        .andWhere('list_user.user IN (:...listIdsUser)',{listIdsUser})
-    
+        .where('list_user.user IN (:...listIdsUser)',{listIdsUser})
+        if (status) {
+          queryBuilder.andWhere('status.name_tag IN (:...statuses)', { statuses: [status] });
+        }
     // Lấy tổng số bản ghi
         const total = await queryBuilder.getCount();
         

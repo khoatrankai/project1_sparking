@@ -1039,7 +1039,7 @@ export class ActivityController {
     'activity-update',
     'admin-top',
   ])
-  @SetMetadata('type', ['admin'])
+  @SetMetadata('type', ['admin','customer'])
   async sendGetWorksFollowActivitiesByProject(@Query('id') project:string) {
     // return
     return this.activityService.sendGetWorksFollowActivitiesByProject(project);
@@ -1111,7 +1111,7 @@ export class ActivityController {
     'activity-update',
     'admin-top',
   ])
-  @SetMetadata('type', ['admin'])
+  @SetMetadata('type', ['admin','customer'])
   async sendGetDocumentsByProject(@Param('id') project:string) {
     // return
     return this.activityService.sendGetDocumentsByProject(project);

@@ -176,6 +176,11 @@ export class ContractController {
     return this.contractService.getPaymentReadyCustomer();
   }
 
+  @MessagePattern({ cmd: 'get-payment_ready_customer_of_customer' })
+  async getPaymentReadyCustomerOfCustomer(customer_id:string) {
+    return this.contractService.getPaymentReadyCustomerOfCustomer(customer_id);
+  }
+
   @MessagePattern({ cmd: 'get-payment_ready_supplier' })
   async getPaymentReadySupplier() {
     return this.contractService.getPaymentReadySupplier();

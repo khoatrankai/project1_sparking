@@ -1029,6 +1029,42 @@ export class ContractService {
     };
   }
 
+  async getPaymentReadyCustomerOfCustomer(customer_id:string) {
+    const today = new Date();
+    const weekDate = new Date();
+    weekDate.setDate(today.getDate() + 30);
+    const result = await this.paymentRepository
+      .createQueryBuilder('payment')
+      .leftJoin('payment.contract', 'contract')
+      .where(
+        'contract.customer =:customer_id AND payment.type = "export" AND payment.status = "pending" AND payment.date_expired BETWEEN :now AND :later',
+        { now: today.toISOString(), later: weekDate.toISOString(),customer_id },
+      )
+      .select('contract.name_contract', 'name_contract')
+      .addSelect('contract.contract_id', 'contract_id')
+      .addSelect('payment.date_expired', 'date_expired')
+      .addSelect('SUM(payment.price)', 'price')
+      .groupBy('contract_id')
+      .addGroupBy('date_expired')
+      .orderBy('date_expired', 'ASC')
+      .getRawMany();
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Payment ready',
+      data: result.map((dt) => {
+        return {
+          date_expired: dt.date_expired,
+          contract: {
+            name_contract: dt.name_contract,
+            contract_id: dt.contract_id,
+          },
+          price: Number(dt.price),
+        };
+      }),
+    };
+  }
+
   async getPaymentReadySupplier() {
     const today = new Date();
     const weekDate = new Date();

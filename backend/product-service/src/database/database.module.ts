@@ -17,6 +17,7 @@ import { CommentReportProduct } from './entities/comment_report_product.entity';
 import { LikeReportProduct } from './entities/like_report_product.entity';
 import { HistoryReportProduct } from './entities/history_report_product.entity';
 import { ListDetail } from './entities/list_detail.entity';
+import { Asset } from './entities/asset.entity';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { ListDetail } from './entities/list_detail.entity';
             LikeReportProduct,
             HistoryReportProduct,
             ListDetail,
+            Asset
           ],
           // synchronize: true,
           // dropSchema: true,

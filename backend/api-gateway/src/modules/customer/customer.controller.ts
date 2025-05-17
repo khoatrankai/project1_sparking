@@ -31,7 +31,6 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { RoleGuard } from 'src/guards/role.guard';
 import { GetFilterAccountCustomersDto } from './dto/get-filter-account.dto';
 import { Request } from 'express';
-
 @Controller('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
@@ -387,4 +386,6 @@ export class CustomerController {
       updateCustomerDto,
     );
   }
+
+   
 }

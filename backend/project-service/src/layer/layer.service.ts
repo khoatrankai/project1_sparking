@@ -14,6 +14,9 @@ import { GetFilterProjectDto } from 'src/dto/ProjectDto/get-filter.dto';
 import { ConfigService } from '@nestjs/config';
 import { CreateNotifyProjectDto } from 'src/dto/NotifyProject/create-notify_project.dto';
 import { NotifyProject } from 'src/database/entities/notify.entity';
+import { Contractor } from 'src/database/entities/contractor';
+import { UpdateContractorDto } from 'src/dto/Contractor/update_contractor.dto';
+import { CreateContractorDto } from 'src/dto/Contractor/create_contractor.dto';
 
 @Injectable()
 export class LayerService {
@@ -25,6 +28,8 @@ export class LayerService {
     private readonly projectsRepository: Repository<Projects>,
     @InjectRepository(TypeProject)
     private readonly typeProjectRepository: Repository<TypeProject>,
+    @InjectRepository(Contractor)
+    private readonly contractorRepository: Repository<Contractor>,
     @InjectRepository(NotifyProject)
     private readonly notifyProjectRepository: Repository<NotifyProject>,
     private readonly configService: ConfigService,
@@ -125,7 +130,6 @@ export class LayerService {
       whereCondition.type = In([type]);
     }
     let projects = []
-    console.log(type_project)
     if(!type_project){
       
       projects = await this.projectsRepository.find({
@@ -154,8 +158,8 @@ export class LayerService {
     }
 
     if(type_project === "group"){
-      const listUser = await firstValueFrom(this.userClient.send({cmd:'get-ids_group'},filter.user))
-      const projectIds = await firstValueFrom(this.activityClient.send({ cmd: 'get-projects_by_users' },listUser ?? [''])) ?? ['']
+      const listUser = (await firstValueFrom(this.userClient.send({cmd:'get-ids_group'},filter.user))).data  
+      const projectIds = await firstValueFrom(this.activityClient.send({ cmd: 'get-projects_by_users' },listUser[0] ? listUser :[''])) ?? ['']
       projects = await this.projectsRepository.find({
         where: {...whereCondition,project_id:In(projectIds)},
         order: { created_at: 'DESC' },
@@ -170,7 +174,7 @@ export class LayerService {
     const progresses = (await firstValueFrom(this.activityClient.send({ cmd: 'get-progress_by_projects' },projectIds)))?.data ?? []
     if (!projects || projects.length === 0) {
       return {
-        statusCode: HttpStatus.NO_CONTENT,
+        statusCode: HttpStatus.OK,
         data: [],
         message: 'No projects found',
       };
@@ -733,5 +737,93 @@ export class LayerService {
         return {...dt,user_create:usersInfo?.[index]}
       })
     }
+  }
+
+    async createContractor(
+    createContractorDto: CreateContractorDto,
+  ) {
+    const id = uuidv4();
+    const project = await this.projectsRepository.findOne({where:{project_id:In([createContractorDto.project])}})
+    const asset = this.contractorRepository.create({
+      ...createContractorDto,
+      project,
+      id: id
+    });
+    
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.CREATED,
+      message:"Tạo nhà thầu thành công",
+      data:await this.contractorRepository.save(asset)
+    };
+  }
+
+  async updateContractor(id:string,
+    updateContractorDto: UpdateContractorDto,
+  ) {
+    const project = updateContractorDto.project ? await this.projectsRepository.findOne({where:{project_id:In([updateContractorDto.project])}}) : null
+    await this.contractorRepository.update(id,{
+      ...updateContractorDto,
+      project
+    });
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Cập nhật thành công"
+    }
+  }
+
+  async deleteContractor(datas: string[]) {
+    try {
+      const rm = await this.contractorRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async getContractorsByProject(
+    id: string,
+  ) {
+    const assets = await this.contractorRepository.find({where:{project:In([id])},relations:['project']})
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Danh sách tài sản",
+      data:assets
+    };
+  }
+
+  async getContractors() {
+    const assets = await this.contractorRepository.find({relations:['project']})
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Danh sách tài sản",
+      data:assets
+    };
+  }
+
+  async getContractorByID(
+    id: string,
+  ) {
+    const asset = await this.contractorRepository.findOne({where:{id:id},relations:['project']})
+   
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Thông tin tài sản lấy thành công",
+      data:asset
+    };
   }
 }

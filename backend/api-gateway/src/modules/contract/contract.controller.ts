@@ -248,6 +248,11 @@ export class ContractController {
     return this.contractService.getPaymentReadyCustomer();
   }
 
+  @Get('/payment-ready-customer-of-customer')
+  async getPaymentReadyCustomerOfCustomer(@Req() req:Request) {
+    return this.contractService.getPaymentReadyCustomerOfCustomer(req?.['customer']?.sub ?? '');
+  }
+
   @Get('/payment-ready-supplier')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['payment', 'contract', 'admin-top', 'payment-read'])

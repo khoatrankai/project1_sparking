@@ -42,6 +42,8 @@ import { UpdateHistoryReportProductDto } from './dto/HistoryReportProduct/update
 import { CreateLikeReportProductDto } from './dto/LikeReportProduct/create-like_report_product.dto';
 import { CreateCommentReportProductDto } from './dto/CommentReportProduct/create-comment_report_product.dto';
 import { UpdateCommentReportProductDto } from './dto/CommentReportProduct/update-comment_code_product.dto';
+import { CreateAssetDto } from './dto/Asset/CreateAsset.dto';
+import { UpdateAssetDto } from './dto/Asset/UpdateAsset.dto';
 
 @Controller('product')
 export class ProductController {
@@ -669,5 +671,48 @@ export class ProductController {
     @Query() data: { name_tag: string; page: number; limit: number },
   ) {
     return this.productService.findProductByType(data);
+  }
+
+
+  @Post('asset')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
+  async createAsset(@Body() createAsset: CreateAssetDto) {
+    return this.productService.createAsset(createAsset);
+  }
+
+  @Put('asset/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
+  async updateAsset(@Param('id') id:string,@Body() updateAsset: UpdateAssetDto) {
+    return this.productService.updateAsset(id,updateAsset);
+  }
+
+  @Get('assets-by-project/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
+  @SetMetadata('type', ['admin'])
+  async getAssetsByProject(@Param('id') id:string) {
+    return this.productService.getAssetsByProject(id);
+  }
+
+
+
+  @Get('asset/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
+  @SetMetadata('type', ['admin'])
+  async getAssetByID(@Param('id') id: string) {
+    return this.productService.getAssetByID(id);
+  }
+
+  @Get('assets')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
+  @SetMetadata('type', ['admin'])
+  async getAssets() {
+    return this.productService.getAssets();
   }
 }

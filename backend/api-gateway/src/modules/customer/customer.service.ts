@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {  HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { UpdateGroupCustomerDto } from './dto/update_group.dto';
 import { CreateRoleTypeCustomerDto } from './dto/create_role_type_customer.dto';
@@ -282,4 +282,6 @@ export class CustomerService {
       );
     }
   }
+
+  
 }

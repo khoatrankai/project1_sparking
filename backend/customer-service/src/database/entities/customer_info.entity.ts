@@ -73,4 +73,6 @@ export class CustomerInfo {
 
   @OneToMany(() => InfoContact, (infoContact) => infoContact.info_company)
   infoContacts: InfoContact[];
+
+  
 }

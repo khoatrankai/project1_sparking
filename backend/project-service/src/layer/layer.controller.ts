@@ -9,6 +9,8 @@ import { CreateTypeProjectDto } from 'src/dto/TypeProjectDto/create-type_project
 import { UpdateTypeProjectDto } from 'src/dto/TypeProjectDto/update-type_project.dto';
 import { GetFilterProjectDto } from 'src/dto/ProjectDto/get-filter.dto';
 import { CreateNotifyProjectDto } from 'src/dto/NotifyProject/create-notify_project.dto';
+import { CreateContractorDto } from 'src/dto/Contractor/create_contractor.dto';
+import { UpdateContractorDto } from 'src/dto/Contractor/update_contractor.dto';
 
 @Controller('/project')
 @UseFilters(ConflictExceptionFilter)
@@ -144,5 +146,37 @@ export class LayerController {
   @MessagePattern({ cmd: 'get-notifies' })
   async getNotifies(id:string) {
     return this.layerService.getNotifies(id);
+  }
+
+  @MessagePattern({ cmd: 'create-contractor' })
+  async createContractor(
+    @Payload() createContractor: CreateContractorDto,
+  ) {
+    return this.layerService.createContractor(createContractor);
+  }
+
+  @MessagePattern({ cmd: 'update-contractor' })
+  async updateContractor(@Payload('data') updateContractor: UpdateContractorDto,@Payload('id') id: string) {
+    return this.layerService.updateContractor(id,updateContractor);
+  }
+
+  @MessagePattern({ cmd: 'get-contractors_by_project' })
+  async getContractorsByProject(@Payload() id: string) {
+    return this.layerService.getContractorsByProject(id);
+  }
+
+  @MessagePattern({ cmd: 'get-contractor_by_id' })
+  async getContractorByID(@Payload() id: string) {
+    return this.layerService.getContractorByID(id);
+  }
+
+  @MessagePattern({ cmd: 'get-contractors' })
+  async getContractors() {
+    return this.layerService.getContractors();
+  }
+
+  @MessagePattern({ cmd: 'delete-contractor' })
+  async deleteContractor(@Payload() id: string) {
+    return this.layerService.deleteContractor([id]);
   }
 }

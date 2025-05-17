@@ -18,6 +18,7 @@ import { CommentReportProduct } from 'src/database/entities/comment_report_produ
 import { LikeReportProduct } from 'src/database/entities/like_report_product.entity';
 import { HistoryReportProduct } from 'src/database/entities/history_report_product.entity';
 import { ListDetail } from 'src/database/entities/list_detail.entity';
+import { Asset } from 'src/database/entities/asset.entity';
 
 @Module({
   imports: [
@@ -46,6 +47,14 @@ import { ListDetail } from 'src/database/entities/list_detail.entity';
           port: 3006,
         },
       },
+      {
+              name: 'PROJECT',
+              transport: Transport.TCP,
+              options: {
+                host: 'project_service',
+                port: 3013,
+              },
+            },
     ]),
 
     TypeOrmModule.forFeature([
@@ -64,6 +73,7 @@ import { ListDetail } from 'src/database/entities/list_detail.entity';
       LikeReportProduct,
       HistoryReportProduct,
       ListDetail,
+      Asset
     ]),
   ],
   controllers: [LayerController],

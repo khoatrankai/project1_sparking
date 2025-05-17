@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { TypeProject } from './type_project.entity';
 import { NotifyProject } from './notify.entity';
+import { Contractor } from './contractor';
 
 @Entity('projects')
 export class Projects {
@@ -65,4 +66,7 @@ export class Projects {
 
   @OneToMany(() => NotifyProject, notifyProject => notifyProject.project)
   notify: NotifyProject[];
+
+  @OneToMany(() => Contractor, (contractor) => contractor.project)
+  contractors: Contractor[];
 }

@@ -53,6 +53,7 @@ export class CustomerService {
     private readonly roleTypeCustomerRepository: Repository<RoleTypeCustomer>,
     @InjectRepository(AccountCustomers)
     private readonly accountCustomerRepository: Repository<AccountCustomers>,
+    
     private configService: ConfigService,
     @Inject('SYSTEM') private readonly systemClient: ClientProxy,
     @Inject('MAIL') private readonly mailClient: ClientProxy,
@@ -1015,4 +1016,7 @@ export class CustomerService {
       throw new InternalServerErrorException('Không thể tạo người dùng mới');
     }
   }
+
+
+
 }

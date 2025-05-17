@@ -23,6 +23,8 @@ import { RoleGuard } from 'src/guards/role.guard';
 import { GetFilterProjectDto } from './dto/ProjectDto/get-filter.dto';
 import { Request } from 'express';
 import { CreateNotifyProjectDto } from './dto/NotifyProject/create-notify_project.dto';
+import { CreateContractorDto } from './dto/Contractor/create_contractor.dto';
+import { UpdateContractorDto } from './dto/Contractor/update_contractor.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -78,9 +80,9 @@ export class ProjectController {
     return this.projectService.sendFindAllProjects({...filter,user:req['user'].sub});
   }
 
-  @Get('all-customer')
+  @Get('all-project')
   async findAllProjectsByToken(@Req() req: Request) {
-    return this.projectService.sendFindAllProjectsByToken(req['customer'].sub);
+    return this.projectService.sendFindAllProjectsByToken(req['project'].sub);
   }
 
   @Get('about')
@@ -95,10 +97,13 @@ export class ProjectController {
   @Get('id/:id')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
-  @SetMetadata('type', ['admin'])
+  @SetMetadata('type', ['admin','project'])
+  @SetMetadata('check_project', ['project'])
   async findOneProject(@Param('id') id: string) {
     return this.projectService.sendFindOneProject(id);
   }
+
+
 
   // Endpoint to update a project by ID
   @Put('update/:id')
@@ -220,4 +225,46 @@ export class ProjectController {
   async createNotify(@Body() data:CreateNotifyProjectDto,@Req() req:Request) {
     return this.projectService.createNotify({...data,user_create:req['user'].sub});
   }
+
+   @Post('contractor')
+    @UseGuards(RoleGuard)
+    @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+    @SetMetadata('type', ['admin'])
+    async createContractor(@Body() createContractor: CreateContractorDto) {
+      return this.projectService.createContractor(createContractor);
+    }
+  
+    @Put('contractor/:id')
+    @UseGuards(RoleGuard)
+    @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+    @SetMetadata('type', ['admin'])
+    async updateContractor(@Param('id') id:string,@Body() updateContractor: UpdateContractorDto) {
+      return this.projectService.updateContractor(id,updateContractor);
+    }
+  
+    @Get('contractors-by-project/:id')
+    @UseGuards(RoleGuard)
+    @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+    @SetMetadata('type', ['admin'])
+    async getContractorsByProject(@Param('id') id:string) {
+      return this.projectService.getContractorsByProject(id);
+    }
+  
+  
+  
+    @Get('contractor/:id')
+    @UseGuards(RoleGuard)
+    @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+    @SetMetadata('type', ['admin'])
+    async getContractorByID(@Param('id') id: string) {
+      return this.projectService.getContractorByID(id);
+    }
+  
+    @Get('contractors')
+    @UseGuards(RoleGuard)
+    @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+    @SetMetadata('type', ['admin'])
+    async getContractors() {
+      return this.projectService.getContractors();
+    }
 }

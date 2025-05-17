@@ -81,6 +81,8 @@ export class Products {
   @JoinColumn({ name: 'supplier_product' })
   supplier_product: SupplierProduct;
 
+  
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

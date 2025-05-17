@@ -63,17 +63,12 @@ export class RoleGuard implements CanActivate {
             }
             return false;
           }
-          return false;
-        } else {
-          // if(role === "customer"){
-          //   const check = await firstValueFrom(this.usersClient.send({cmd:'check-role_user'},{user_id:user['sub'],role_name_tag:roles}))
-          //   if(check.statusCode === 200){
-          //       return true
-          //   }
-          //   return false
-          // }
-          // return false
-        }
+        } 
+        if (type[1] === 'customer') {
+          if (role === 'customer') {
+            return true
+          }
+        } 
       }
     }
 

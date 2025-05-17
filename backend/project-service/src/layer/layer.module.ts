@@ -6,6 +6,7 @@ import { Projects } from 'src/database/entities/project.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeProject } from 'src/database/entities/type_project.entity';
 import { NotifyProject } from '../database/entities/notify.entity';
+import { Contractor } from 'src/database/entities/contractor';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { NotifyProject } from '../database/entities/notify.entity';
         },
       },
     ]),
-    TypeOrmModule.forFeature([Projects, TypeProject,NotifyProject]),
+    TypeOrmModule.forFeature([Projects, TypeProject,NotifyProject,Contractor]),
   ],
   controllers: [LayerController],
   providers: [LayerService],

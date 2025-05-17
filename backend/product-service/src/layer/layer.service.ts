@@ -52,6 +52,9 @@ import { UpdateHistoryReportProductDto } from 'src/dto/HistoryReportProduct/upda
 import { CreateLikeReportProductDto } from 'src/dto/LikeReportProduct/create-like_report_product.dto';
 import { CreateCommentReportProductDto } from 'src/dto/CommentReportProduct/create-comment_report_product.dto';
 import { UpdateCommentReportProductDto } from 'src/dto/CommentReportProduct/update-comment_code_product.dto';
+import { Asset, AssetStatus } from 'src/database/entities/asset.entity';
+import { CreateAssetDto } from 'src/dto/Asset/CreateAsset.dto';
+import { UpdateAssetDto } from 'src/dto/Asset/UpdateAsset.dto';
 
 @Injectable()
 export class LayerService {
@@ -77,6 +80,8 @@ export class LayerService {
     private pictureProductRepository: Repository<PictureProduct>,
     @InjectRepository(CodeProduct)
     private codeProductRepository: Repository<CodeProduct>,
+     @InjectRepository(Asset)
+    private assetRepository: Repository<Asset>,
     @InjectRepository(Products)
     private readonly productRepository: Repository<Products>,
     @InjectRepository(ListDetail)
@@ -89,6 +94,7 @@ export class LayerService {
     private readonly likeReportProductRepository: Repository<LikeReportProduct>,
     @Inject('USER') private readonly userClient: ClientProxy,
     @Inject('CUSTOMER') private readonly customerClient: ClientProxy,
+    @Inject('PROJECT') private readonly projectClient: ClientProxy,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -1424,6 +1430,106 @@ export class LayerService {
         name_type: type?.name,
         products,
       },
+    };
+  }
+
+  async createAsset(
+    createAssetDto: CreateAssetDto,
+  ) {
+    const id = uuidv4();
+    const code_product = await this.codeProductRepository.findOne({where:{code_product_id:In([createAssetDto.code_product])}})
+    const asset = this.assetRepository.create({
+      ...createAssetDto,
+      code_product,
+      status:createAssetDto.status as AssetStatus,
+      id: id
+    });
+    await this.assetRepository.save(asset)
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.CREATED,
+      message:"Tạo tài sản thành công",
+      data:await this.assetRepository.save(asset)
+    };
+  }
+
+  async updateAsset(id:string,
+    updateAssetDto: UpdateAssetDto,
+  ) {
+    const code_product = updateAssetDto.code_product ? await this.codeProductRepository.findOne({where:{code_product_id:In([updateAssetDto.code_product])}}) : null
+    await this.assetRepository.update(id,{
+      ...updateAssetDto,
+      code_product
+    });
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Cập nhật thành công"
+    }
+  }
+
+  async deleteAsset(datas: string[]) {
+    try {
+      const rm = await this.assetRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async getAssetsByProject(
+    id: string,
+  ) {
+    const assets = await this.assetRepository.find({where:{project:id},relations:['code_product','code_product.product']})
+    const ids = assets.map((dt:any) => dt.customer)
+    const customerInfos = await firstValueFrom(this.customerClient.send({cmd: 'get-customer_ids'},ids))
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Danh sách tài sản",
+      data:assets.map((dt,index)=>{
+        return {...dt,customer:customerInfos[index]}
+      })
+    };
+  }
+
+  async getAssets() {
+    const assets = await this.assetRepository.find({relations:['code_product','code_product.product']})
+    const ids = assets.map((dt:any) => dt.customer)
+    const idsProject = assets.map((dt:any) => dt.project)
+    const customerInfos = await firstValueFrom(this.customerClient.send({cmd: 'get-customer_ids'},ids))
+    const dataProjects = await firstValueFrom(this.projectClient.send({cmd: 'get-project_ids'},idsProject))
+    console.log(dataProjects)
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Danh sách tài sản",
+      data:assets.map((dt,index)=>{
+        return {...dt,customer:customerInfos[index],project:dataProjects[index]}
+      })
+    };
+  }
+
+  async getAssetByID(
+    id: string,
+  ) {
+    const asset = await this.assetRepository.findOne({where:{id:id},relations:['code_product','code_product.product']})
+   
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Thông tin tài sản lấy thành công",
+      data:asset
     };
   }
 }

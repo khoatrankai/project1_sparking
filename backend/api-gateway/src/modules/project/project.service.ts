@@ -8,6 +8,8 @@ import { UpdateTypeProjectDto } from './dto/TypeProjectDto/update-type_project.d
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { GetFilterProjectDto } from './dto/ProjectDto/get-filter.dto';
 import { CreateNotifyProjectDto } from './dto/NotifyProject/create-notify_project.dto';
+import { UpdateContractDto } from '../contract/dto/ContractDto/update_contract.dto';
+import { CreateContractDto } from '../contract/dto/ContractDto/create_contract.dto';
 
 @Injectable()
 export class ProjectService {
@@ -249,4 +251,105 @@ export class ProjectService {
       throw error;
     }
   }
+
+  async createContractor(createContractorDto: CreateContractDto) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'create-contractor' },
+            { ...createContractorDto },
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to create code product',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+  
+    async deleteContractor(id:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'delete-contractor' },
+            id,
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to create code product',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+  
+    async updateContractor(id:string,updateContractorDto: UpdateContractDto) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'update-contractor' },
+            { id,data:updateContractorDto },
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to create code product',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+  
+    async getContractorsByProject(id:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'get-contractors_by_project' },
+            id,
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to create code product',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+  
+    async getContractors() {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'get-contractors' },{}
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to create code product',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+  
+    async getContractorByID(id:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'get-contractor_by_id' },
+            id,
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to create code product',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
 }

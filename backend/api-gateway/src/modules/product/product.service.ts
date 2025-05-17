@@ -31,6 +31,8 @@ import { UpdateHistoryReportProductDto } from './dto/HistoryReportProduct/update
 import { CreateLikeReportProductDto } from './dto/LikeReportProduct/create-like_report_product.dto';
 import { CreateCommentReportProductDto } from './dto/CommentReportProduct/create-comment_report_product.dto';
 import { UpdateCommentReportProductDto } from './dto/CommentReportProduct/update-comment_code_product.dto';
+import { CreateAssetDto } from './dto/Asset/CreateAsset.dto';
+import { UpdateAssetDto } from './dto/Asset/UpdateAsset.dto';
 
 @Injectable()
 export class ProductService {
@@ -1371,6 +1373,107 @@ export class ProductService {
       return result;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async createAsset(createAssetDto: CreateAssetDto) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-asset' },
+          { ...createAssetDto },
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async deleteAsset(id:string) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'delete-asset' },
+          id,
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async updateAsset(id:string,updateAssetDto: UpdateAssetDto) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-asset' },
+          { id,data:updateAssetDto },
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async getAssetsByProject(id:string) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'get-assets_by_project' },
+          id,
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async getAssets() {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'get-assets' },{}
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async getAssetByID(id:string) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'get-asset_by_id' },
+          id,
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

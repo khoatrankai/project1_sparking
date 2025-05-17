@@ -171,6 +171,12 @@ export class ContractService {
     );
   }
 
+  async getPaymentReadyCustomerOfCustomer(customer_id:string) {
+    return firstValueFrom(
+      this.contractClient.send({ cmd: 'get-payment_ready_customer_of_customer' }, customer_id),
+    );
+  }
+
   async getPaymentReadySupplier() {
     return firstValueFrom(
       this.contractClient.send({ cmd: 'get-payment_ready_supplier' }, {}),

@@ -11,6 +11,7 @@ import {
 import { Products } from './product.entity';
 import { HistoryCodeProduct } from './history_code_product.entity';
 import { HistoryReportProduct } from './history_report_product.entity';
+import { Asset } from './asset.entity';
 
 @Entity('code_product')
 export class CodeProduct {
@@ -37,6 +38,9 @@ export class CodeProduct {
   @ManyToOne(() => Products, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'product' })
   product: Products;
+
+  @OneToMany(() => Asset, (asset) => asset.code_product)
+  assets: Asset[];
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
