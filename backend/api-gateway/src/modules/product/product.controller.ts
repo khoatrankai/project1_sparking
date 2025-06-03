@@ -44,6 +44,8 @@ import { CreateCommentReportProductDto } from './dto/CommentReportProduct/create
 import { UpdateCommentReportProductDto } from './dto/CommentReportProduct/update-comment_code_product.dto';
 import { CreateAssetDto } from './dto/Asset/CreateAsset.dto';
 import { UpdateAssetDto } from './dto/Asset/UpdateAsset.dto';
+import { CreateAssetStatusDto } from './dto/StatusAsset/create.dto';
+import { UpdateAssetStatusDto } from './dto/StatusAsset/update.dto';
 
 @Controller('product')
 export class ProductController {
@@ -714,5 +716,37 @@ export class ProductController {
   @SetMetadata('type', ['admin'])
   async getAssets() {
     return this.productService.getAssets();
+  }
+
+  @Get('history-asset/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
+  @SetMetadata('type', ['admin'])
+  async getHistoriesAssetByID(@Param('id') id:string) {
+    return this.productService.getHistoriesAssetByID(id);
+  }
+
+  @Post('status-asset')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
+  async createStatusAsset(@Body() createAsset: CreateAssetStatusDto) {
+    return this.productService.createStatusAsset(createAsset);
+  }
+
+  @Put('status-asset/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
+  async updateStatusAsset(@Param('id') id:string,@Body() updateAsset: UpdateAssetStatusDto) {
+    return this.productService.updateStatusAsset(id,updateAsset);
+  }
+
+  @Get('status-asset/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-read'])
+  @SetMetadata('type', ['admin'])
+  async getStatusAssetByID(@Param('id') id:string) {
+    return this.productService.getStatusAssetByID(id);
   }
 }

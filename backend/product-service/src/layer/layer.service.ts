@@ -52,9 +52,12 @@ import { UpdateHistoryReportProductDto } from 'src/dto/HistoryReportProduct/upda
 import { CreateLikeReportProductDto } from 'src/dto/LikeReportProduct/create-like_report_product.dto';
 import { CreateCommentReportProductDto } from 'src/dto/CommentReportProduct/create-comment_report_product.dto';
 import { UpdateCommentReportProductDto } from 'src/dto/CommentReportProduct/update-comment_code_product.dto';
-import { Asset, AssetStatus } from 'src/database/entities/asset.entity';
+import { Asset, StatusAsset } from 'src/database/entities/asset.entity';
 import { CreateAssetDto } from 'src/dto/Asset/CreateAsset.dto';
 import { UpdateAssetDto } from 'src/dto/Asset/UpdateAsset.dto';
+import { HistoryAsset } from 'src/database/entities/history_asset.entity';
+import { ChangeType, CreateAssetStatusDto } from 'src/dto/StatusAsset/create.dto';
+import { UpdateAssetStatusDto } from 'src/dto/StatusAsset/update.dto';
 
 @Injectable()
 export class LayerService {
@@ -92,6 +95,10 @@ export class LayerService {
     private readonly commentReportProductRepository: Repository<CommentReportProduct>,
     @InjectRepository(LikeReportProduct)
     private readonly likeReportProductRepository: Repository<LikeReportProduct>,
+    @InjectRepository(HistoryAsset)
+    private readonly historyAssetRepository: Repository<HistoryAsset>,
+    @InjectRepository(StatusAsset)
+    private readonly statusAssetRepository: Repository<StatusAsset>,
     @Inject('USER') private readonly userClient: ClientProxy,
     @Inject('CUSTOMER') private readonly customerClient: ClientProxy,
     @Inject('PROJECT') private readonly projectClient: ClientProxy,
@@ -1441,26 +1448,100 @@ export class LayerService {
     const asset = this.assetRepository.create({
       ...createAssetDto,
       code_product,
-      status:createAssetDto.status as AssetStatus,
+      status:createAssetDto.status as StatusAsset,
       id: id
     });
-    await this.assetRepository.save(asset)
+    const data = await this.assetRepository.save(asset)
+    if(data){
+      const createHistory = this.historyAssetRepository.create({
+        id:uuidv4(),
+        asset:data,
+        description:'Tài sản đã được tạo mới'
+      })
+      await this.historyAssetRepository.save(createHistory)
+      await this.createStatusAsset({asset:id,change_type:ChangeType.NEW,end_date:new Date(),user:null})
+    }
     // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
     return {
       statusCode:HttpStatus.CREATED,
       message:"Tạo tài sản thành công",
-      data:await this.assetRepository.save(asset)
+      data:data
     };
   }
 
   async updateAsset(id:string,
     updateAssetDto: UpdateAssetDto,
   ) {
+    
     const code_product = updateAssetDto.code_product ? await this.codeProductRepository.findOne({where:{code_product_id:In([updateAssetDto.code_product])}}) : null
+    const dataNew = await this.assetRepository.findOne({where:{id:id}})
     await this.assetRepository.update(id,{
       ...updateAssetDto,
       code_product
     });
+    
+    if(dataNew){
+      if(updateAssetDto.name !== dataNew.name){
+        const createHistory = this.historyAssetRepository.create({
+        id:uuidv4(),
+        asset:dataNew,
+        description:'Tên của tài sản đã thay đổi'
+        })
+        await this.historyAssetRepository.save(createHistory)
+        
+      }
+      if(updateAssetDto.asset_code !== dataNew.asset_code){
+        const createHistory = this.historyAssetRepository.create({
+        id:uuidv4(),
+        asset:dataNew,
+        description:'Mã tài sản đã thay đổi'
+        })
+        await this.historyAssetRepository.save(createHistory)
+      }
+      if(updateAssetDto.description !== dataNew.description){
+        const createHistory = this.historyAssetRepository.create({
+        id:uuidv4(),
+        asset:dataNew,
+        description:'Mô tả tài sản đã thay đổi'
+        })
+        await this.historyAssetRepository.save(createHistory)
+      }
+      if(Number(updateAssetDto.price) !== Number(dataNew.price)){
+        const createHistory = this.historyAssetRepository.create({
+        id:uuidv4(),
+        asset:dataNew,
+        description:'Giá tài sản đã thay đổi'
+        })
+        await this.historyAssetRepository.save(createHistory)
+      }
+
+      if(updateAssetDto.serial_number !== dataNew.serial_number){
+        const createHistory = this.historyAssetRepository.create({
+        id:uuidv4(),
+        asset:dataNew,
+        description:'Serial tài sản đã thay đổi'
+        })
+        await this.historyAssetRepository.save(createHistory)
+      }
+      if(updateAssetDto.status !== dataNew.status){
+        const statusLabels: Record<StatusAsset, string> = {
+          [StatusAsset.NEW]: 'Mới',
+          [StatusAsset.IN_USE]: 'Đang sử dụng',
+          [StatusAsset.UNDER_REPAIR]: 'Đang sửa chữa',
+          [StatusAsset.RETIRED]: 'Ngưng sử dụng',
+          [StatusAsset.DAMAGED]: 'Hư hỏng',
+          [StatusAsset.LOST]: 'Thất lạc',
+          [StatusAsset.DISPOSED]: 'Thanh lý',
+        };
+          const createHistory = this.historyAssetRepository.create({
+            id: uuidv4(),
+            asset: dataNew,
+            description: `Trạng thái tài sản đã thay đổi thành ${statusLabels[updateAssetDto.status]}`,
+          });
+          await this.historyAssetRepository.save(createHistory);
+          await this.createStatusAsset({asset:id,change_type:updateAssetDto.status,end_date:new Date(),user:null})
+      }
+    }
     // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
     return {
       statusCode:HttpStatus.OK,
@@ -1531,5 +1612,71 @@ export class LayerService {
       message:"Thông tin tài sản lấy thành công",
       data:asset
     };
+  }
+
+  async getHistoriesAssetByID(id:string){
+    try{
+      const data = await this.assetRepository.findOne({where:{id:In([id])},relations:['history']})
+      return {
+        statusCode:HttpStatus.OK,
+        message:"Lấy thông tin lịch sử thành công",
+        data:data?.history ?? []
+      }
+    }catch(err){
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lấy thông tin lịch sử thất bại"
+      }
+    }
+  }
+
+  async createStatusAsset(data:CreateAssetStatusDto){
+    try{
+      const asset = await this.assetRepository.findOne({where:{id:data.asset}})
+      const dataSave = this.statusAssetRepository.create({...data,id:uuidv4(),asset})
+      await this.statusAssetRepository.save(dataSave)
+      return {
+        statusCode:HttpStatus.CREATED,
+        message:"Tạo thành công"
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Tạo không thành công"
+      }
+    }
+  }
+
+  async updateStatusAsset(id:string,data:UpdateAssetStatusDto){
+    try{
+      const asset = await this.assetRepository.findOne({where:{id:data.asset}})
+      // const dataSave = this.statusAssetRepository.create({...data,id:uuidv4()})
+      await this.statusAssetRepository.update(id,{...data,asset})
+      return {
+        statusCode:HttpStatus.OK,
+        message:"Cập nhật thành công"
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Cập nhật không thành công"
+      }
+    }
+  }
+
+  async getHistoriesStatusAssetByID(id:string){
+    try{
+      const data = await this.assetRepository.findOne({where:{id:In([id])},relations:['asset_status']})
+      return {
+        statusCode:HttpStatus.OK,
+        message:"Lấy thông tin lịch sử thành công",
+        data:data?.asset_status ?? []
+      }
+    }catch(err){
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lấy thông tin lịch sử thất bại"
+      }
+    }
   }
 }

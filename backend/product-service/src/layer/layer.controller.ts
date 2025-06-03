@@ -30,6 +30,8 @@ import { CreateCommentReportProductDto } from 'src/dto/CommentReportProduct/crea
 import { UpdateCommentReportProductDto } from 'src/dto/CommentReportProduct/update-comment_code_product.dto';
 import { CreateAssetDto } from 'src/dto/Asset/CreateAsset.dto';
 import { UpdateAssetDto } from 'src/dto/Asset/UpdateAsset.dto';
+import { CreateAssetStatusDto } from 'src/dto/StatusAsset/create.dto';
+import { UpdateAssetStatusDto } from 'src/dto/StatusAsset/update.dto';
 
 @Controller('/product')
 @UseFilters(ConflictExceptionFilter)
@@ -587,6 +589,26 @@ export class LayerController {
   @MessagePattern({ cmd: 'delete-asset' })
   async deleteAsset(@Payload() id: string) {
     return this.layerService.deleteAsset([id]);
+  }
+
+  @MessagePattern({ cmd: 'get-history_asset' })
+  async getHistoriesAssetByID(@Payload() id: string) {
+    return this.layerService.getHistoriesAssetByID(id);
+  }
+
+  @MessagePattern({ cmd: 'create-status_asset' })
+  async createStatusAsset(@Payload() data: CreateAssetStatusDto) {
+    return this.layerService.createStatusAsset(data);
+  }
+
+  @MessagePattern({ cmd: 'update-status_asset' })
+  async updateStatusAsset(@Payload('data') data: UpdateAssetStatusDto,@Payload('id') id:string) {
+    return this.layerService.updateStatusAsset(id,data);
+  }
+
+  @MessagePattern({ cmd: 'get-status_asset' })
+  async getHistoriesStatusAssetByID(@Payload() id:string) {
+    return this.layerService.getHistoriesStatusAssetByID(id);
   }
 
 }

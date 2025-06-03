@@ -19,6 +19,8 @@ import { LikeReportProduct } from 'src/database/entities/like_report_product.ent
 import { HistoryReportProduct } from 'src/database/entities/history_report_product.entity';
 import { ListDetail } from 'src/database/entities/list_detail.entity';
 import { Asset } from 'src/database/entities/asset.entity';
+import { HistoryAsset } from 'src/database/entities/history_asset.entity';
+import { AssetStatus } from 'src/database/entities/asset_status.entity';
 
 @Module({
   imports: [
@@ -73,7 +75,9 @@ import { Asset } from 'src/database/entities/asset.entity';
       LikeReportProduct,
       HistoryReportProduct,
       ListDetail,
-      Asset
+      Asset,
+      HistoryAsset,
+      AssetStatus
     ]),
   ],
   controllers: [LayerController],

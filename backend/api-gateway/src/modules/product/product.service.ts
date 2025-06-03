@@ -33,6 +33,8 @@ import { CreateCommentReportProductDto } from './dto/CommentReportProduct/create
 import { UpdateCommentReportProductDto } from './dto/CommentReportProduct/update-comment_code_product.dto';
 import { CreateAssetDto } from './dto/Asset/CreateAsset.dto';
 import { UpdateAssetDto } from './dto/Asset/UpdateAsset.dto';
+import { CreateAssetStatusDto } from './dto/StatusAsset/create.dto';
+import { UpdateAssetStatusDto } from './dto/StatusAsset/update.dto';
 
 @Injectable()
 export class ProductService {
@@ -1465,6 +1467,73 @@ export class ProductService {
       const result = (await firstValueFrom(
         this.productClient.send(
           { cmd: 'get-asset_by_id' },
+          id,
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+   async getHistoriesAssetByID(id:string) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'get-history_asset' },
+          id,
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async createStatusAsset(data:CreateAssetStatusDto) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-status_asset' },
+          data,
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+   async updateStatusAsset(id:string,data:UpdateAssetStatusDto) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-status_asset' },
+          {id,data},
+        ),
+      )) 
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create code product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+   async getStatusAssetByID(id:string) {
+    try {
+      const result = (await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'get-status_asset' },
           id,
         ),
       )) 

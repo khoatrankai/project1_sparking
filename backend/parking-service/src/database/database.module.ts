@@ -74,18 +74,22 @@ import { Counter } from './entities/counter.entity';
 import { DjangoAdminLog } from './entities/django_admin_log.entity';
 import { DjangoContentType } from './entities/django_content_type.entity';
 import { GateNotified } from './entities/gatenotified.entity';
+import { AccountAdmin } from './entities/account_admin.entity';
+import { AccountUsers } from './entities/account_users.entity';
+import { Notify } from './entities/notify.entity';
+import { AccountApartment } from './entities/account_apartment.entity';
 
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: '45.119.83.123',
       port: 3306,
       username: 'root',
-      password: '123456789',
+      password: 'x6X3pVIh10RH',
       database: 'apmsdb',
-      entities: [AggregatedCounter,AuthGroup,AuthGroupPermissions,AuthPermission,AuthUser,BlacklistPlate,LockCard,ParkingApartment,ParkingAttendance,ParkingBaselineAvailableSlot,ParkingBaselineTransactionIn,ParkingBaselineTransactionOut,ParkingBlockFee,ParkingBuilding,ParkingCamera,ParkingCard,ParkingCardAuditLogEntry,ParkingCardStatus,ParkingCardType,ParkingCheckinImage,ParkingCheckoutException,ParkingCheckoutExceptionInfo,ParkingClaimPromotion,ParkingClaimPromotionBill,ParkingClaimPromotionBillV2,ParkingClaimPromotionCoupon,ParkingClaimPromotionCouponV2,ParkingClaimPromotionGroupTenant,ParkingClaimPromotionLogError,ParkingClaimPromotionTenant,ParkingClaimPromotionV2,ParkingClaimPromotionVoucher,ParkingCompany,ParkingCurrentBlacklistState,ParkingCustomer,ParkingCustomerType,ParkingDepositActionFee,ParkingDepositPayment,ParkingDepositPaymentDetail,ParkingFeeAdjustment,ParkingForcedBarrier,ParkingImageReplicationSetting,ParkingLane,ParkingLevelFee,ParkingFee,ParkingFeeSession,ParkingSession,ParkingSetting,PauseResumeHistory,ParkingReceipt,ParkingReportData,ParkingServer,ParkingSlot,ParkingTerminal,ParkingTerminalGroup,ParkingTicketPayment,ParkingUserProfile,ParkingUserShift,ParkingVehicleBlacklist,ParkingVehicleRegistration,ParkingVehicleRegistrationAuditLogEntry,ParkingVehicleType,ParkingVoucher,UnlockCard,ParkingTurnFee,ParkingUserCard,ParkingTicketPaymentDetail,ParkingCustomerAuditLogEntry,AuthUserGroup,AuthUserUserPermission,Counter,DjangoAdminLog,DjangoContentType,GateNotified],
+      entities: [AggregatedCounter,AuthGroup,AuthGroupPermissions,AuthPermission,AuthUser,BlacklistPlate,LockCard,ParkingApartment,ParkingAttendance,ParkingBaselineAvailableSlot,ParkingBaselineTransactionIn,ParkingBaselineTransactionOut,ParkingBlockFee,ParkingBuilding,ParkingCamera,ParkingCard,ParkingCardAuditLogEntry,ParkingCardStatus,ParkingCardType,ParkingCheckinImage,ParkingCheckoutException,ParkingCheckoutExceptionInfo,ParkingClaimPromotion,ParkingClaimPromotionBill,ParkingClaimPromotionBillV2,ParkingClaimPromotionCoupon,ParkingClaimPromotionCouponV2,ParkingClaimPromotionGroupTenant,ParkingClaimPromotionLogError,ParkingClaimPromotionTenant,ParkingClaimPromotionV2,ParkingClaimPromotionVoucher,ParkingCompany,ParkingCurrentBlacklistState,ParkingCustomer,ParkingCustomerType,ParkingDepositActionFee,ParkingDepositPayment,ParkingDepositPaymentDetail,ParkingFeeAdjustment,ParkingForcedBarrier,ParkingImageReplicationSetting,ParkingLane,ParkingLevelFee,ParkingFee,ParkingFeeSession,ParkingSession,ParkingSetting,PauseResumeHistory,ParkingReceipt,ParkingReportData,ParkingServer,ParkingSlot,ParkingTerminal,ParkingTerminalGroup,ParkingTicketPayment,ParkingUserProfile,ParkingUserShift,ParkingVehicleBlacklist,ParkingVehicleRegistration,ParkingVehicleRegistrationAuditLogEntry,ParkingVehicleType,ParkingVoucher,UnlockCard,ParkingTurnFee,ParkingUserCard,ParkingTicketPaymentDetail,ParkingCustomerAuditLogEntry,AuthUserGroup,AuthUserUserPermission,Counter,DjangoAdminLog,DjangoContentType,GateNotified,AccountAdmin,AccountUsers,Notify,AccountApartment],
       // synchronize: true,
       // dropSchema: true,
     }),

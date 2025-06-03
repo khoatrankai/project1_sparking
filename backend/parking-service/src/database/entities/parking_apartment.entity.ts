@@ -7,6 +7,11 @@ import {
 } from 'typeorm';
 import { ParkingCustomer } from './parking_customer.entity';
 import { ParkingCustomerAuditLogEntry } from './parking_customerauditlogentry.entity';
+import { AccountApartment } from './account_apartment.entity';
+import { Activity } from './activities.entity';
+import { Review } from './reviews.entity';
+import { Guest } from './guests.entity';
+import { ApartmentMember } from './apartment_members.entity';
 
 @Entity('parking_apartment')
 export class ParkingApartment {
@@ -39,4 +44,19 @@ export class ParkingApartment {
 
   @OneToMany(() => ParkingCustomerAuditLogEntry, (post) => post.apartment)
   customerAuditLogEntry: ParkingCustomerAuditLogEntry[];
+
+  @OneToMany(() => AccountApartment, acountApartment => acountApartment.apartment)
+  account_apartment: AccountApartment[];
+
+  @OneToMany(() => Activity, activity => activity.apartment)
+  activities: Activity[];
+
+  @OneToMany(() => Review, review => review.apartment)
+  reviews: Review[];
+
+  @OneToMany(() => Guest, guest => guest.apartment)
+  guests: Guest[];
+
+  @OneToMany(() => ApartmentMember, apartmentMember => apartmentMember.apartment)
+  list_member: ApartmentMember[];
 }

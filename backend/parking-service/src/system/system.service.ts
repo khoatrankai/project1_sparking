@@ -1,5 +1,10 @@
-import { Injectable } from '@nestjs/common';
+
+import { HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ResultResponse } from 'src/common/interfaces/result.interface';
+import { AccountUsers } from 'src/database/entities/account_users.entity';
 import { AggregatedCounter } from 'src/database/entities/aggregatedcounter.entity';
 import { AuthGroup } from 'src/database/entities/auth_group.entity';
 import { AuthGroupPermissions } from 'src/database/entities/auth_group_permission.entity';
@@ -68,7 +73,21 @@ import { ParkingVehicleType } from 'src/database/entities/parking_vehicletype.en
 import { ParkingVoucher } from 'src/database/entities/parking_voucher.entity';
 import { UnlockCard } from 'src/database/entities/unlockcard.entity';
 import { GetFrequencyDto } from 'src/dto/GetFrequency.dto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { UpdateAccountUserDto } from 'src/dto/AccountUser/update.dto';
+import { CreateParkingApartmentDto } from 'src/dto/Apartment/create.dto';
+import { UpdateParkingApartmentDto } from 'src/dto/Apartment/update.dto';
+import { CreateAccountUserDto } from 'src/dto/AccountUser/create.dto';
+import { Notify } from 'src/database/entities/notify.entity';
+import { CreateNotifyDto } from 'src/dto/Notify/create.dto';
+import { AccountAdmin } from 'src/database/entities/account_admin.entity';
+import { UpdateNotifyDto } from 'src/dto/Notify/update.dto';
+import { Member } from 'src/database/entities/members.entity';
+import { Activity } from 'src/database/entities/activities.entity';
+import { Review } from 'src/database/entities/reviews.entity';
+import { Note } from 'src/database/entities/notes.entity';
+import { Guest } from 'src/database/entities/guests.entity';
+import { ChatUser } from 'src/database/entities/chat.entity';
 @Injectable()
 export class SystemService {
   constructor(
@@ -186,6 +205,8 @@ export class SystemService {
     private readonly parkingTicketPaymentRepository: Repository<ParkingTicketPayment>,
     @InjectRepository(ParkingUserProfile)
     private readonly parkingUserProfileRepository: Repository<ParkingUserProfile>,
+     @InjectRepository(AccountUsers)
+    private readonly accountUserRepository: Repository<AccountUsers>,
     @InjectRepository(ParkingUserShift)
     private readonly parkingUserShiftRepository: Repository<ParkingUserShift>,
     @InjectRepository(ParkingVehicleBlacklist)
@@ -206,6 +227,22 @@ export class SystemService {
     private readonly parkingUserCardRepository: Repository<ParkingUserCard>,
     @InjectRepository(ParkingTicketPaymentDetail)
     private readonly parkingTicketPaymentDetailRepository: Repository<ParkingTicketPaymentDetail>,
+     @InjectRepository(Notify)
+    private readonly notifyRepository: Repository<Notify>,
+    @InjectRepository(AccountAdmin)
+    private readonly accountAdminRepository: Repository<AccountAdmin>,
+    @InjectRepository(Member)
+    private readonly memberRepository: Repository<Member>,
+    @InjectRepository(Activity)
+    private readonly activityRepository: Repository<Activity>,
+    @InjectRepository(Review)
+    private readonly reviewRepository: Repository<Review>,
+    @InjectRepository(Note)
+    private readonly noteRepository: Repository<Note>,
+    @InjectRepository(Guest)
+    private readonly guestRepository: Repository<Guest>,
+    @InjectRepository(ChatUser)
+    private readonly chatUserRepository: Repository<ChatUser>,
   ) {}
   getHello(): string {
     return 'Hello World!';
@@ -857,5 +894,412 @@ export class SystemService {
       .getRawMany();
 
     return dataDate;
+  }
+async hashPassword(password: string): Promise<string> {
+    const hashedPassword = await bcrypt.hash(
+      password,
+      10
+    );
+    return hashedPassword;
+  }
+  async createUser(registerDto: CreateAccountUserDto): Promise<ResultResponse> {
+    try {
+      const checkUser = await this.accountUserRepository.findOneBy({
+        email: registerDto.email,
+      });
+      if (checkUser) {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Tài khoản đã tồn tại',
+        };
+      }
+      const id = uuidv4();
+      const pass = await this.hashPassword(registerDto.password);
+      const user = this.accountUserRepository.create({
+        ...registerDto,
+        id: id,
+        password: pass
+      });
+      await this.accountUserRepository.save(user);
+     
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Tạo tài khoản thành công',
+      };
+    } catch (err) {
+      //console.log(err);
+      // if (err.code === 'ER_DUP_ENTRY') {
+      //   const errField = this.extractDuplicateField(err.sqlMessage);
+      //   throw new ConflictException(`${errField} đã tồn tại.`);
+      // }
+
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
+  }
+
+  async deleteUser(datas: string[]) {
+    try {
+      const rm = await this.accountUserRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateUser(
+    id: string,
+    updateDto: UpdateAccountUserDto,
+  ): Promise<ResultResponse> {
+    try {
+      if (updateDto.password) {
+        const pass = await this.hashPassword(updateDto.password);
+        await this.accountUserRepository.update(id, {
+          ...updateDto,
+          password: pass,
+        });
+      } else {
+        await this.accountUserRepository.update(id, { ...updateDto });
+      }
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Cập nhật tài khoản thành công',
+      };
+    } catch (err) {
+      //console.log(err);
+      
+
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
+  }
+  async createApartment(data: CreateParkingApartmentDto): Promise<ResultResponse> {
+    try {
+      
+      await this.parkingApartmentRepository.save({...data});
+     
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Tạo căn hộ thành công',
+      };
+    } catch (err) {
+      //console.log(err);
+      // if (err.code === 'ER_DUP_ENTRY') {
+      //   const errField = this.extractDuplicateField(err.sqlMessage);
+      //   throw new ConflictException(`${errField} đã tồn tại.`);
+      // }
+
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
+  }
+
+  async deleteApartment(datas: string[]) {
+    try {
+      const rm = await this.parkingApartmentRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateApartment(
+    id: string,
+    updateDto: UpdateParkingApartmentDto,
+  ): Promise<ResultResponse> {
+    try {
+      
+        await this.parkingApartmentRepository.update(id, { ...updateDto });
+      
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Cập nhật tài khoản thành công',
+      };
+    } catch (err) {
+      //console.log(err);
+      
+
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
+  }
+
+  async getApartmentByID(id:number){
+    try{
+      const data = await this.parkingApartmentRepository.findOne({where:{id:id},relations:['customers']})
+      return {
+        statusCode:HttpStatus.OK,
+        data:data
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST
+      }
+    }
+  }
+
+  async getApartments(){
+    try{
+      const datas = await this.parkingApartmentRepository.find()
+      return {
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST
+      }
+    }
+  }
+
+  async getAccountUser(id:string){
+    try{
+      const data= await this.accountUserRepository.findOne({where:{id}})
+      return {
+        statusCode:HttpStatus.OK,
+        data
+      }
+    }catch{
+      return {
+              statusCode:HttpStatus.BAD_REQUEST,
+              message:"Lỗi rồi"
+            }
+    }
+  }
+
+  async createNotify(dataCreate: CreateNotifyDto): Promise<ResultResponse> {
+    try {
+      const admin = dataCreate.admin ? await this.accountAdminRepository.findOne({where:{id:dataCreate.admin}}) : undefined
+      const account = dataCreate.account ? await this.accountUserRepository.findOne({where:{id:dataCreate.account}}) : undefined
+      const data = this.notifyRepository.create({...dataCreate,admin,account})
+      await this.notifyRepository.save({...data});
+     
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Tạo thông báo thành công',
+      };
+    } catch (err) {
+      //console.log(err);
+      // if (err.code === 'ER_DUP_ENTRY') {
+      //   const errField = this.extractDuplicateField(err.sqlMessage);
+      //   throw new ConflictException(`${errField} đã tồn tại.`);
+      // }
+
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
+  }
+
+  async deleteNotify(datas: string[]) {
+    try {
+      const rm = await this.notifyRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateNotify(
+    id: string,
+    updateDto: UpdateNotifyDto,
+  ): Promise<ResultResponse> {
+    try {
+      const admin = updateDto.admin ? await this.accountAdminRepository.findOne({where:{id:updateDto.admin}}) : undefined
+      const account = updateDto.account ? await this.accountUserRepository.findOne({where:{id:updateDto.account}}) : undefined
+        await this.notifyRepository.update(id, { ...updateDto,admin,account });
+      
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Cập nhật thông báo thành công',
+      };
+    } catch (err) {
+      //console.log(err);
+      
+
+      throw new InternalServerErrorException('Không thể tạo người dùng mới');
+    }
+  }
+
+  async getNotifyByIDUser(id:string){
+    try{
+      const datas = await this.notifyRepository.find({where:{account:In([id])},relations:['admin']})
+      return {
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST
+      }
+    }
+  }
+
+  async getUsersByApartment(id:number){
+    try{
+      const datas = await this.accountUserRepository.createQueryBuilder('account_user')
+      .leftJoin('account_user.account_apartment','account_apartment')
+      .leftJoin('account_apartment.apartment','apartment')
+      .where('apartment.id =:id',{id})
+      .getMany()
+      return{
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lỗi rồi"
+      }
+    }
+  }
+
+  async getMembersByApartment(id:number){
+    try{
+      const datas = await this.memberRepository.createQueryBuilder('members')
+      .leftJoin('members.list_apartment','list_apartment')
+      .leftJoin('list_apartment.apartment','apartment')
+      .where('apartment.id =:id',{id})
+      .getMany()
+      return{
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lỗi rồi"
+      }
+    }
+  }
+
+  async getActivitiesByApartment(id:number){
+    try{
+      const datas = await this.activityRepository.createQueryBuilder('activities')
+      .leftJoin('activities.apartment','apartment')
+      .where('apartment.id =:id',{id})
+      .getMany()
+      return{
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lỗi rồi"
+      }
+    }
+  }
+
+  async getReviewsByApartment(id:number){
+    try{
+      const datas = await this.activityRepository.createQueryBuilder('reviews')
+      .leftJoin('reviews.apartment','apartment')
+      .where('apartment.id =:id',{id})
+      .getMany()
+      return{
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lỗi rồi"
+      }
+    }
+  }
+
+  async getNotesByUser(id:string){
+    try{
+      const datas = await this.noteRepository.createQueryBuilder('notes')
+      .leftJoin('notes.user','user')
+      .where('user.id =:id',{id})
+      .getMany()
+      return{
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lỗi rồi"
+      }
+    }
+  }
+
+  async getGuestByApartment(id:number){
+    try{
+      const datas = await this.guestRepository.createQueryBuilder('guests')
+      .leftJoin('guests.apartment','apartment')
+      .where('apartment.id =:id',{id})
+      .getMany()
+      return{
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lỗi rồi"
+      }
+    }
+  }
+
+  async getChatByID(id:string){
+    try{
+      const datas = await this.chatUserRepository.find({where:[{user1:In([id])},{user2:In([id])}]})
+      return{
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lỗi rồi"
+      }
+    }
+  }
+
+  async getUsersChatByID(id:string){
+    try{
+      const datas = await this.accountUserRepository.createQueryBuilder('users')
+      .leftJoin('users.chats_from','chats_from')
+      .leftJoin('users.chats_to','chats_to')
+      .where('chats_from.user1 =:id OR chats_from.user2 =:id OR chats_to.user2 =:id OR chats_to.user1 =:id',{id})
+      .getMany()
+      return{
+        statusCode:HttpStatus.OK,
+        data:datas
+      }
+    }catch{
+      return{
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Lỗi rồi"
+      }
+    }
   }
 }

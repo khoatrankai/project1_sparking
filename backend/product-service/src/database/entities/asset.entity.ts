@@ -6,10 +6,13 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany
 } from 'typeorm';
 import { CodeProduct } from './code_product.entity';
+import { HistoryAsset } from './history_asset.entity';
+import { AssetStatus } from './asset_status.entity';
 
-export enum AssetStatus {
+export enum StatusAsset {
   NEW = 'new',
   IN_USE = 'in_use',
   UNDER_REPAIR = 'under_repair',
@@ -39,10 +42,10 @@ export class Asset {
 
   @Column({
     type: 'enum',
-    enum: AssetStatus,
-    default: AssetStatus.NEW,
+    enum: StatusAsset,
+    default: StatusAsset.NEW,
   })
-  status: AssetStatus;
+  status: StatusAsset;
 
   @Column({ type: 'varchar', length: 50,nullable:true })
   customer: string;
@@ -67,4 +70,10 @@ export class Asset {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @OneToMany(() => HistoryAsset, (history) => history.asset)
+  history: HistoryAsset[];
+
+  @OneToMany(() => AssetStatus, (assetStatus) => assetStatus.asset)
+  asset_status: AssetStatus[];
 }
