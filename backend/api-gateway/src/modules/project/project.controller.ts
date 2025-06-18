@@ -98,7 +98,6 @@ export class ProjectController {
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
   @SetMetadata('type', ['admin'])
-  @SetMetadata('check_project', ['project'])
   async findOneProject(@Param('id') id: string) {
     return this.projectService.sendFindOneProject(id);
   }
