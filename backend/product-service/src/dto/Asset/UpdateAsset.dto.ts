@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsNumber } from 'class-validator';
-import { AssetStatus } from 'src/database/entities/asset.entity';
+import { StatusAsset } from 'src/database/entities/asset.entity';
 
 export class UpdateAssetDto {
 
@@ -19,9 +19,9 @@ export class UpdateAssetDto {
   @IsOptional()
   code_product: string;
 
-  @IsEnum(AssetStatus)
+  @IsEnum(StatusAsset)
   @IsOptional()
-  status?: AssetStatus;
+  status?: StatusAsset;
 
   @IsString()
   @IsOptional()

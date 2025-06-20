@@ -365,6 +365,7 @@ export class LayerController {
 
   @MessagePattern({ cmd: 'find-all_supplier_ids' })
   async findAllSupplierIds(@Payload() ids: string[]) {
+    console.log("goi qua day product")
     return this.layerService.getSupplierProductIDs(ids);
   }
 

@@ -58,6 +58,7 @@ import { UpdateAssetDto } from 'src/dto/Asset/UpdateAsset.dto';
 import { HistoryAsset } from 'src/database/entities/history_asset.entity';
 import { ChangeType, CreateAssetStatusDto } from 'src/dto/StatusAsset/create.dto';
 import { UpdateAssetStatusDto } from 'src/dto/StatusAsset/update.dto';
+import { AssetStatus } from 'src/database/entities/asset_status.entity';
 
 @Injectable()
 export class LayerService {
@@ -97,8 +98,8 @@ export class LayerService {
     private readonly likeReportProductRepository: Repository<LikeReportProduct>,
     @InjectRepository(HistoryAsset)
     private readonly historyAssetRepository: Repository<HistoryAsset>,
-    @InjectRepository(StatusAsset)
-    private readonly statusAssetRepository: Repository<StatusAsset>,
+    @InjectRepository(AssetStatus)
+    private readonly assetStatusRepository: Repository<AssetStatus>,
     @Inject('USER') private readonly userClient: ClientProxy,
     @Inject('CUSTOMER') private readonly customerClient: ClientProxy,
     @Inject('PROJECT') private readonly projectClient: ClientProxy,
@@ -1539,7 +1540,8 @@ export class LayerService {
             description: `Trạng thái tài sản đã thay đổi thành ${statusLabels[updateAssetDto.status]}`,
           });
           await this.historyAssetRepository.save(createHistory);
-          await this.createStatusAsset({asset:id,change_type:updateAssetDto.status,end_date:new Date(),user:null})
+          // const status = updateAssetDto.status as any
+          await this.createStatusAsset({asset:id,change_type:updateAssetDto.status as any,end_date:new Date(),user:null})
       }
     }
     // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
@@ -1633,8 +1635,8 @@ export class LayerService {
   async createStatusAsset(data:CreateAssetStatusDto){
     try{
       const asset = await this.assetRepository.findOne({where:{id:data.asset}})
-      const dataSave = this.statusAssetRepository.create({...data,id:uuidv4(),asset})
-      await this.statusAssetRepository.save(dataSave)
+      const dataSave = this.assetStatusRepository.create({...data,id:uuidv4(),asset})
+      await this.assetStatusRepository.save(dataSave)
       return {
         statusCode:HttpStatus.CREATED,
         message:"Tạo thành công"
@@ -1651,7 +1653,7 @@ export class LayerService {
     try{
       const asset = await this.assetRepository.findOne({where:{id:data.asset}})
       // const dataSave = this.statusAssetRepository.create({...data,id:uuidv4()})
-      await this.statusAssetRepository.update(id,{...data,asset})
+      await this.assetStatusRepository.update(id,{...data,asset})
       return {
         statusCode:HttpStatus.OK,
         message:"Cập nhật thành công"

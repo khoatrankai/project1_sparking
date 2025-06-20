@@ -37,6 +37,38 @@ export class RoleGuard implements CanActivate {
     }
     const role = user['role'];
     if (type.length > 1) {
+       if (role === 'admin') {
+        const check = await firstValueFrom(
+          this.usersClient.send(
+            { cmd: 'check-role_user' },
+            { user_id: user['sub'], role_name_tag: roles },
+          ),
+        );
+        if (check.statusCode === 200) {
+          return true;
+        }
+        return false;
+      } else {
+        if (type[0] === 'admin') {
+          if (role === 'admin') {
+            const check = await firstValueFrom(
+              this.usersClient.send(
+                { cmd: 'check-role_user' },
+                { user_id: user['sub'], role_name_tag: roles },
+              ),
+            );
+            if (check.statusCode === 200) {
+              return true;
+            }
+            return false;
+          }
+        } 
+        if (type[1] === 'customer') {
+          if (role === 'customer') {
+            return true
+          }
+        } 
+      }
     } else {
       if (role === 'admin') {
         const check = await firstValueFrom(
