@@ -66,7 +66,7 @@ export class LayerService {
         { cmd: 'create-notify' },
         {
           description: 'Thông báo có một cơ hội mới',
-          link: `${this.configService.get<string>('DOMAIN')}/admin/opportunity?id=${dataOK.opportunity_id}`,
+          link: `${this.configService.get<string>('DOMAIN')}/opportunity?id=${dataOK.opportunity_id}`,
           notify_role: ['admin-top', 'opportunity'],
         },
       ),

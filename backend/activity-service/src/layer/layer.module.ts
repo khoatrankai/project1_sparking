@@ -56,6 +56,15 @@ import { FileWork } from 'src/database/entities/file_work.entity';
           port: 3010,
         },
       },
+      
+      {
+        name: 'PRODUCT',
+        transport: Transport.TCP,
+        options: {
+          host: 'product_service',
+          port: 3012,
+        },
+      },
     ]),
   ],
   controllers: [LayerController],

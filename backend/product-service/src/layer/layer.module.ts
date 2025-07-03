@@ -57,6 +57,14 @@ import { AssetStatus } from 'src/database/entities/asset_status.entity';
                 port: 3013,
               },
             },
+            {
+              name: 'ACTIVITY',
+              transport: Transport.TCP,
+              options: {
+                host: 'activity_service',
+                port: 3014,
+              },
+            },
     ]),
 
     TypeOrmModule.forFeature([

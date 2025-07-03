@@ -69,6 +69,7 @@ import { CreateFileWorkDto } from 'src/dto/FileWorkDto/create-folder_work.dto';
 export class LayerService {
   constructor(
     @Inject('CONTRACT') private readonly contractsClient: ClientProxy,
+    @Inject('PRODUCT') private readonly productsClient: ClientProxy,
     @Inject('USER') private readonly usersClient: ClientProxy,
     @InjectRepository(Activities)
     private readonly activitiesRepository: Repository<Activities>,
@@ -135,7 +136,7 @@ export class LayerService {
             { cmd: 'create-notify' },
             {
               description: 'Thông báo có hoạt động mới',
-              link: `${this.configService.get<string>('DOMAIN')}/admin/activity?id=${result.activity_id}`,
+              link: `${this.configService.get<string>('DOMAIN')}/activity?id=${result.activity_id}`,
               notify_role: ['admin-top', 'activity'],
             },
           ),
@@ -166,7 +167,7 @@ export class LayerService {
           { cmd: 'create-notify' },
           {
             description: 'Thông báo có hoạt động mới',
-            link: `${this.configService.get<string>('DOMAIN')}/admin/activity?id=${result.activity_id}`,
+            link: `${this.configService.get<string>('DOMAIN')}/activity?id=${result.activity_id}`,
             notify_role: ['admin-top', 'activity'],
           },
         ),
@@ -270,6 +271,43 @@ export class LayerService {
       },
     };
   }
+
+  async getActivitiesByCode(code_id: string) {
+  // Fetch activities from the database with proper join and where condition
+  const activitiesCode = await firstValueFrom(this.productsClient.send({cmd:"find-activities_by_code"},code_id))
+  const activity = await this.activitiesRepository
+    .createQueryBuilder('activities')
+    .leftJoin('activities.list_code_product', 'list_code_product')
+    .leftJoinAndSelect('activities.type', 'type')
+    .leftJoinAndSelect('activities.status', 'status')
+    .where('list_code_product.code_product = :code_id ', { code_id }) // fixed parameter syntax
+    .orWhere('activities.activity_id IN (:...activitiesCode)',{activitiesCode})
+    .getMany();
+  
+  // Ensure the activity exists before trying to access its data
+  if (!activity || activity.length === 0) {
+    return {
+    statusCode: HttpStatus.OK,
+    data: activity
+  };
+  }
+
+  // Fetch contract information using the contract ID from the first activity
+  
+  const contractID = activity[0].contract;  // access the contract ID
+  const infoContract = await firstValueFrom(this.contractsClient.send({ cmd: 'get-contract_full' }, contractID)) as any;
+
+  // Return the activities with contract data merged
+  return {
+    statusCode: HttpStatus.OK,
+    data: activity.map((dt) => {
+      return {
+        ...dt,
+        contract: infoContract?.data // Attach contract info to each activity
+      };
+    }),
+  };
+}
 
   async getActivityByContract(contract_id: string) {
     const activity = await this.activitiesRepository.find({
@@ -507,6 +545,37 @@ export class LayerService {
       };
     }
   }
+
+  
+
+  async getInfoContractByActivityID(id: string) {
+  const activity = await this.activitiesRepository.findOne({
+    where: { activity_id:In([id]) }
+  });
+
+  if (!activity || !activity.contract) {
+    return {
+      statusCode: HttpStatus.NOT_FOUND,
+      message: 'Activity or contract not found'
+    };
+  }
+
+  const res = await firstValueFrom(
+    this.contractsClient.send({ cmd: "get-contract" }, activity.contract)
+  );
+
+  // Assuming res has a structure like: { statusCode: number, data: any }
+  if (res?.statusCode === 200) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: res.data
+    };
+  }
+
+  return {
+    statusCode: HttpStatus.BAD_REQUEST
+  };
+}
 
   async getAllWorkReady(
     user_id: string,
@@ -1478,7 +1547,7 @@ export class LayerService {
               { cmd: 'create-notify' },
               {
                 description: 'Thông báo bạn được thêm vào một công việc',
-                link: `${this.configService.get<string>('DOMAIN')}/admin/work?id=${result.work_id}`,
+                link: `${this.configService.get<string>('DOMAIN')}/work?id=${result.work_id}`,
                 notify_user: createWorkDto.list_users,
               },
             ),

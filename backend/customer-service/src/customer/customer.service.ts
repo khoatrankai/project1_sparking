@@ -220,7 +220,7 @@ export class CustomerService {
         { cmd: 'create-notify' },
         {
           description: 'Thông báo có khách hàng mới từ cơ hội',
-          link: `${this.configService.get<string>('DOMAIN')}/admin/customer?id=${dataCompany.info_id}`,
+          link: `${this.configService.get<string>('DOMAIN')}/customer?id=${dataCompany.info_id}`,
           notify_role: ['admin-top', 'opportunity', 'customer'],
         },
       ),
@@ -266,7 +266,7 @@ export class CustomerService {
         <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
          <div style="text-align: center; margin-bottom: 20px;">
     <img 
-      src="https://project-admin-bice.vercel.app/_next/image?url=%2Flogo.png&w=256&q=75" 
+      src="https://sparking.cloud/_next/image?url=%2Flogo.png&w=256&q=75" 
       alt="Công ty Sparking" 
       style="max-width: 150px; height: auto;" 
     />
@@ -596,7 +596,7 @@ export class CustomerService {
           { cmd: 'create-notify' },
           {
             description: 'Thông báo có một khách hàng mới',
-            link: `${this.configService.get<string>('DOMAIN')}/admin/customer?id=${id}`,
+            link: `${this.configService.get<string>('DOMAIN')}/customer?id=${id}`,
             notify_role: ['admin-top', 'customer'],
           },
         ),

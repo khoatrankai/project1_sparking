@@ -211,6 +211,15 @@ export class ActivityController {
     return this.activityService.sendGetActivityByContract(contract_id);
   }
 
+   @Get('activities-code/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetActivitiesByCode(@Param('id') code_id: string) {
+    return this.activityService.sendGetActivitiesByCode(
+      code_id.replace('@code_product', ''));
+  }
+
   @Get('work-by-activity/:id')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])

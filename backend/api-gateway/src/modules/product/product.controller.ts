@@ -647,6 +647,13 @@ export class ProductController {
     );
   }
 
+   @Get('asset-code/:id')
+  async findAssetByCode(@Param('id') id: string) {
+    return this.productService.findAssetByCode(
+      id.replace('@code_product', ''),
+    );
+  }
+
   @Get('report-code/:id')
   async findAllReportByCode(@Param('id') id: string) {
     return this.productService.findAllReportByCode(

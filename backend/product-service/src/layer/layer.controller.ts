@@ -408,6 +408,11 @@ export class LayerController {
     return await this.layerService.findAllActivityContainers(data.type);
   }
 
+  @MessagePattern({ cmd: 'find-activities_by_code' })
+  async findActivitiesByCode(@Payload() code_id:string) {
+    return await this.layerService.findActivitiesByCode(code_id);
+  }
+
   @MessagePattern({ cmd: 'find-one_activity_container' })
   async findActivityContainerById(@Payload() id: string) {
     return await this.layerService.findActivityContainerById(id);
@@ -580,6 +585,11 @@ export class LayerController {
   @MessagePattern({ cmd: 'get-asset_by_id' })
   async getAssetByID(@Payload() id: string) {
     return this.layerService.getAssetByID(id);
+  }
+
+  @MessagePattern({ cmd: 'get-asset_by_code_id' })
+  async getAssetByCodeID(@Payload() id: string) {
+    return this.layerService.getAssetByCodeID(id);
   }
 
   @MessagePattern({ cmd: 'get-assets' })

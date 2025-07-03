@@ -47,7 +47,7 @@ export class LayerService {
         { cmd: 'create-notify' },
         {
           description: 'Thông báo có một dự án mới',
-          link: `${this.configService.get<string>('DOMAIN')}/admin/project?id=${savedProject.project_id}`,
+          link: `${this.configService.get<string>('DOMAIN')}/project?id=${savedProject.project_id}`,
           notify_role: ['admin-top', 'project'],
         },
       ),

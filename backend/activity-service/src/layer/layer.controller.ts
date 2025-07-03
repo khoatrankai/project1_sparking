@@ -88,6 +88,11 @@ export class LayerController {
     return await this.layerService.getActivityByContract(contract_id);
   }
 
+  @MessagePattern('get-activities_by_code')
+  async getActivitiesByCode(@Payload() code_id: string) {
+    return await this.layerService.getActivitiesByCode(code_id);
+  }
+
   @MessagePattern('get-work_by_activity')
   async getWorkByActivity(@Payload() activity_id: string) {
     return await this.layerService.getWorkByActivity(activity_id);
@@ -127,6 +132,15 @@ export class LayerController {
       group_user,
       project,
       contract,
+    );
+  }
+
+  @MessagePattern({cmd:'get-info_contract_by_activity_id'})
+  async getInfoContractByActivityID(
+    @Payload() id: string
+  ) {
+    return await this.layerService.getInfoContractByActivityID(
+      id
     );
   }
 

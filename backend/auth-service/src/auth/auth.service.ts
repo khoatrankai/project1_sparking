@@ -73,7 +73,7 @@ export class AuthService {
             <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; border: 1px solid #eaeaea; border-radius: 8px; padding: 20px; max-width: 600px; margin: auto;">
   <div style="text-align: center; margin-bottom: 20px;">
     <img 
-      src="https://project-admin-bice.vercel.app/_next/image?url=%2Flogo.png&w=256&q=75" 
+      src="https://sparking.cloud/_next/image?url=%2Flogo.png&w=256&q=75" 
       alt="Your Company Logo" 
       style="max-width: 150px; height: auto;" 
     />
@@ -168,7 +168,7 @@ export class AuthService {
             <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
              <div style="text-align: center; margin-bottom: 20px;">
         <img 
-          src="https://project-admin-bice.vercel.app/_next/image?url=%2Flogo.png&w=256&q=75" 
+          src="https://sparking.cloud/_next/image?url=%2Flogo.png&w=256&q=75" 
           alt="Công ty Sparking" 
           style="max-width: 150px; height: auto;" 
         />
@@ -250,7 +250,7 @@ export class AuthService {
             <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; border: 1px solid #eaeaea; border-radius: 8px; padding: 20px; max-width: 600px; margin: auto;">
   <div style="text-align: center; margin-bottom: 20px;">
     <img 
-      src="https://project-admin-bice.vercel.app/_next/image?url=%2Flogo.png&w=256&q=75" 
+      src="https://sparking.cloud/_next/image?url=%2Flogo.png&w=256&q=75" 
       alt="Your Company Logo" 
       style="max-width: 150px; height: auto;" 
     />
@@ -284,7 +284,7 @@ export class AuthService {
               <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; border: 1px solid #eaeaea; border-radius: 8px; padding: 20px; max-width: 600px; margin: auto;">
     <div style="text-align: center; margin-bottom: 20px;">
       <img 
-        src="https://project-admin-bice.vercel.app/_next/image?url=%2Flogo.png&w=256&q=75" 
+        src="https://sparking.cloud/_next/image?url=%2Flogo.png&w=256&q=75" 
         alt="Your Company Logo" 
         style="max-width: 150px; height: auto;" 
       />

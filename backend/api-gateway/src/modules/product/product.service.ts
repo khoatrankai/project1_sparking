@@ -1318,6 +1318,21 @@ export class ProductService {
     }
   }
 
+  async findAssetByCode(id: string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'get-asset_by_code_id' }, id),
+      );
+      if (!result) {
+        throw new HttpException('Asset by code', HttpStatus.NOT_FOUND);
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
   async findAllReportByCode(id: string) {
     try {
       const result = await firstValueFrom(

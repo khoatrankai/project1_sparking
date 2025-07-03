@@ -66,6 +66,7 @@ export class LayerService {
     @InjectRepository(Brands)
     private brandRepository: Repository<Brands>,
     @Inject('SYSTEM') private readonly systemClient: ClientProxy,
+    @Inject('ACTIVITY') private readonly activityClient: ClientProxy,
     @InjectRepository(Originals)
     private readonly originalRepository: Repository<Originals>,
     @InjectRepository(ClassifyType)
@@ -840,7 +841,14 @@ export class LayerService {
           const idCode = uuidv4();
           const code = await this.codeProductRepository.findOne({
             where: { code: dt.code },
+            relations:['product']
           });
+          const infoContract = await firstValueFrom(this.activityClient.send({cmd:'get-info_contract_by_activity_id'},reqActivityContainer.activity))
+          const createdAt = new Date();
+          const warrantyExpiry = new Date();
+          warrantyExpiry.setMonth(createdAt.getMonth() + code?.product?.warranty);
+          const newAsset = {code_product:dt.code,asset_code:uuidv4(),customer:infoContract?.data?.customer,project:infoContract?.data?.project,name:code?.product?.name,description:code?.product?.description,price:code?.product?.price,serial_number:code?.product?.code_original,status:"new",warranty_expiry:warrantyExpiry}
+          await this.createAsset(newAsset)
           await this.codeProductRepository.update(code.code_product_id, {
             status: dt.status,
           });
@@ -1324,6 +1332,14 @@ export class LayerService {
     };
   }
 
+  async findActivitiesByCode(id:string){
+    const activities = (await this.activityContainerRepository.createQueryBuilder('activities')
+    .leftJoin('activities.list_code','list_code')
+    .where('list_code.code_product = :id',{id})
+    .getMany()).map(dt=>dt.activity)
+    return activities
+  }
+
   async findAllReportByCode(id: string) {
     const reportAll = await this.historyReportProductRepository
       .createQueryBuilder('report')
@@ -1607,6 +1623,19 @@ export class LayerService {
     id: string,
   ) {
     const asset = await this.assetRepository.findOne({where:{id:id},relations:['code_product','code_product.product']})
+   
+    // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
+    return {
+      statusCode:HttpStatus.OK,
+      message:"Thông tin tài sản lấy thành công",
+      data:asset
+    };
+  }
+
+   async getAssetByCodeID(
+    id: string,
+  ) {
+    const asset = await this.assetRepository.findOne({where:{code_product:In([id])},relations:['code_product','code_product.product']})
    
     // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
     return {

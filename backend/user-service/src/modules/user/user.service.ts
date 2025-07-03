@@ -101,7 +101,7 @@ export class UserService {
       const data = await this.accountUserRepository.save(user);
       await this.createNotify({
         description: 'Thông báo có nhân sự mới',
-        link: `${this.configService.get<string>('DOMAIN')}/admin/user?id=${data.user_id}`,
+        link: `${this.configService.get<string>('DOMAIN')}/user?id=${data.user_id}`,
         notify_role: ['admin-top', 'user'],
       });
       if (group_user && data) {

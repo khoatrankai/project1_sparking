@@ -2,9 +2,9 @@ import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, IsOptional,  IsNumber, IsDate } from 'class-validator';
 
 export class CreateAssetDto {
-  @IsString()
-  @IsOptional()
-  id: string;
+  // @IsString()
+  // @IsOptional()
+  // id: string;
 
   @IsString()
   @IsNotEmpty()

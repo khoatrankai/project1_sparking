@@ -136,7 +136,7 @@ export class ContractService {
           { cmd: 'create-notify' },
           {
             description: 'Thông báo có hợp đồng mới',
-            link: `${this.configService.get<string>('DOMAIN')}/admin/contract?id=${id}`,
+            link: `${this.configService.get<string>('DOMAIN')}/contract?id=${id}`,
             notify_role: ['admin-top', 'contract'],
           },
         ),
@@ -461,6 +461,18 @@ export class ContractService {
     return data.map((dt) => dt.contract_id);
   }
 
+  async getContractFull(id: string) {
+    const data = await this.contractRepository.findOne({where: { contract_id: id }});
+    const infoProject = await firstValueFrom(this.projectsClient.send({cmd:"get-project_ids"},[data?.project]))
+
+      return {
+      statusCode: HttpStatus.OK,
+      data:{
+        ...data,project:infoProject[0]
+      },
+    };
+  }
+
   async getPaymentByProject(project: string) {
     const data = await this.paymentRepository
       .createQueryBuilder('payment')
@@ -508,7 +520,7 @@ export class ContractService {
           { cmd: 'create-notify' },
           {
             description: 'Thông báo có hóa đơn mới',
-            link: `${this.configService.get<string>('DOMAIN')}/admin/payment?id=${payment.payment_id}`,
+            link: `${this.configService.get<string>('DOMAIN')}/payment?id=${payment.payment_id}`,
             notify_role: ['admin-top', 'contract', 'payment'],
           },
         ),

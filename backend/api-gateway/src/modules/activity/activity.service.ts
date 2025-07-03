@@ -166,6 +166,13 @@ export class ActivityService {
     );
   }
 
+  async sendGetActivitiesByCode(code_id: string) {
+    return await firstValueFrom(
+      this.activityClient.send('get-activities_by_code', code_id),
+    );
+  }
+  
+
   async sendGetWorkByActivity(activity_id: string) {
     return await firstValueFrom(
       this.activityClient.send('get-work_by_activity', activity_id),
