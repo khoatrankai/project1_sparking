@@ -38,7 +38,7 @@ export class ProjectService {
 
   async sendDeleteProject(datas: string[]) {
     return await firstValueFrom(
-      this.projectClient.send('delete-project', datas),
+      this.projectClient.send({cmd:'delete-project'}, datas),
     );
   }
 
@@ -108,7 +108,7 @@ export class ProjectService {
 
   async sendDeleteTypeProject(datas: string[]) {
     return await firstValueFrom(
-      this.projectClient.send('delete-type_project', datas),
+      this.projectClient.send({cmd:'delete-type_project'}, datas),
     );
   }
 

@@ -41,6 +41,9 @@ export class AccountUsers {
   link_in: string;
 
   @Column({ type: 'varchar', length: 50, default: '' })
+  link_zalo: string;
+
+  @Column({ type: 'varchar', length: 50, default: '' })
   link_skype: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })

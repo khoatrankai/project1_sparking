@@ -4,7 +4,6 @@ export class UpdateSupplierProductDto {
 
   @IsString()
   @IsOptional()
-  @MaxLength(50)
   name?: string;
 
   @IsString()

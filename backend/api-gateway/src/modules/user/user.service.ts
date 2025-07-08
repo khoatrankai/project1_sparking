@@ -49,12 +49,12 @@ export class UserService {
 
   async sendDeleteRoleUser(datas: string[]) {
     return await firstValueFrom(
-      this.usersClient.send('delete-role_type', datas),
+      this.usersClient.send({cmd: 'delete-role_type'}, datas),
     );
   }
 
   async sendDeleteUsers(datas: string[]) {
-    return await firstValueFrom(this.usersClient.send('delete-user', datas));
+    return await firstValueFrom(this.usersClient.send({cmd:'delete-user'}, datas));
   }
 
   async updateRoleType(updateRoleTypeUserDto: UpdateRoleTypeUserDto) {

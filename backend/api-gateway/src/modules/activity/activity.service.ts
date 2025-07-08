@@ -78,7 +78,7 @@ export class ActivityService {
 
   async sendDeleteActivity(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send('delete-activity', datas),
+      this.activityClient.send({cmd:'delete-activity'}, datas),
     );
   }
 
@@ -272,7 +272,7 @@ export class ActivityService {
 
   async sendDeleteTypeActivities(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send('delete-type_activity', datas),
+      this.activityClient.send({cmd:'delete-type_activity'}, datas),
     );
   }
 
@@ -332,7 +332,7 @@ export class ActivityService {
 
   async sendDeleteStatusActivities(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send('delete-status_activity', datas),
+      this.activityClient.send({cmd:'delete-status_activity'}, datas),
     );
   }
 
@@ -404,7 +404,7 @@ export class ActivityService {
 
   async sendDeletePictureActivity(picture_id: string) {
     const dataDelete = await firstValueFrom(
-      this.activityClient.send('delete-picture_activity', picture_id),
+      this.activityClient.send({cmd:'delete-picture_activity'}, picture_id),
     );
     if (dataDelete.data) {
       const data = await this.cloudinaryService.deleteFile(dataDelete.data);
@@ -420,7 +420,7 @@ export class ActivityService {
 
   async sendDeletePictureWork(picture_id: string) {
     const dataDelete = await firstValueFrom(
-      this.activityClient.send('delete-picture_work', picture_id),
+      this.activityClient.send({cmd:'delete-picture_work'}, picture_id),
     );
     if (dataDelete.data) {
       const data = await this.cloudinaryService.deleteFile(dataDelete.data);
@@ -436,7 +436,7 @@ export class ActivityService {
 
   async sendDeletePictureTask(picture_id: string) {
     const dataDelete = await firstValueFrom(
-      this.activityClient.send('delete-picture_task', picture_id),
+      this.activityClient.send({cmd:'delete-picture_task'}, picture_id),
     );
     if (dataDelete.data) {
       const data = await this.cloudinaryService.deleteFile(dataDelete.data);
@@ -470,7 +470,7 @@ export class ActivityService {
 
   async sendDeleteListCodeProduct(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send('delete-list_code_product', datas),
+      this.activityClient.send({cmd:'delete-list_code_product'}, datas),
     );
   }
 
@@ -564,7 +564,7 @@ export class ActivityService {
   }
 
   async sendDeleteWork(datas: string[]) {
-    return await firstValueFrom(this.activityClient.send('delete-work', datas));
+    return await firstValueFrom(this.activityClient.send({cmd:'delete-work'}, datas));
   }
 
   async sendDeleteTask(datas: string[]) {
@@ -662,7 +662,7 @@ export class ActivityService {
 
   async sendDeleteTypeWork(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send('delete-type_work', datas),
+      this.activityClient.send({cmd:'delete-type_work'}, datas),
     );
   }
 
@@ -699,7 +699,7 @@ export class ActivityService {
 
   async sendDeleteStatusWork(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send('delete-status_work', datas),
+      this.activityClient.send({cmd:'delete-status_work'}, datas),
     );
   }
 
@@ -815,7 +815,7 @@ export class ActivityService {
 
   async sendDeleteListUser(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send('delete-list_user', datas),
+      this.activityClient.send({cmd:'delete-list_user'}, datas),
     );
   }
 

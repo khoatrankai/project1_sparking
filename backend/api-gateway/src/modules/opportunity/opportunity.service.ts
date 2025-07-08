@@ -75,7 +75,7 @@ export class OpportunityService {
 
   async sendDeleteTypeOpportunity(datas: string[]) {
     return await firstValueFrom(
-      this.opportunityClient.send('delete-type_opportunity', datas),
+      this.opportunityClient.send({cmd:'delete-type_opportunity'}, datas),
     );
   }
 
@@ -125,7 +125,7 @@ export class OpportunityService {
 
   async sendDeleteTypeSource(datas: string[]) {
     return await firstValueFrom(
-      this.opportunityClient.send('delete-type_source', datas),
+      this.opportunityClient.send({cmd:'delete-type_source'}, datas),
     );
   }
 

@@ -290,6 +290,7 @@ export class UserService {
         'user_id',
         'phone_number',
         'link_facebook',
+        'link_zalo',
         'link_skype',
         'link_in',
       ],

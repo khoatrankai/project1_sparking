@@ -31,6 +31,10 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
+  link_zalo?: string;
+
+  @IsOptional()
+  @IsString()
   link_in?: string;
 
   @IsOptional()

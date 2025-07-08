@@ -38,7 +38,7 @@ export class ContractService {
 
   async sendDeleteTypeContract(datas: string[]) {
     return await firstValueFrom(
-      this.contractClient.send('delete-type_contract', datas),
+      this.contractClient.send({cmd:'delete-type_contract'}, datas),
     );
   }
 
@@ -95,7 +95,7 @@ export class ContractService {
 
   async sendDeleteContract(datas: string[]) {
     return await firstValueFrom(
-      this.contractClient.send('delete-contract', datas),
+      this.contractClient.send({cmd:'delete-contract'}, datas),
     );
   }
 
@@ -185,7 +185,7 @@ export class ContractService {
 
   async sendDeletePayment(datas: string[]) {
     return await firstValueFrom(
-      this.contractClient.send('delete-payment', datas),
+      this.contractClient.send({cmd:'delete-payment'}, datas),
     );
   }
 
@@ -227,7 +227,7 @@ export class ContractService {
 
   async sendDeleteTypeMethod(datas: string[]) {
     return await firstValueFrom(
-      this.contractClient.send('delete-type_method', datas),
+      this.contractClient.send({cmd:'delete-type_method'}, datas),
     );
   }
 
@@ -257,7 +257,7 @@ export class ContractService {
 
   async sendDeleteDocumentContract(document_id: string) {
     const dataDelete = await firstValueFrom(
-      this.contractClient.send('delete-document_contract', document_id),
+      this.contractClient.send({cmd:'delete-document_contract'}, document_id),
     );
     if (dataDelete.data) {
       const data = await this.cloudinaryService.deleteFile(dataDelete.data);

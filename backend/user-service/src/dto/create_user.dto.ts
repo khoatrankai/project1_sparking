@@ -44,6 +44,12 @@ export class CreateUserDto {
   @IsOptional()
   @IsUrl()
   @Length(1, 50)
+  link_zalo?: string;
+
+
+  @IsOptional()
+  @IsUrl()
+  @Length(1, 50)
   link_in?: string;
 
   @IsOptional()

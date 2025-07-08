@@ -40,6 +40,11 @@ export class AccountUsersDto {
   @IsOptional()
   @IsString()
   @Length(1, 50)
+  link_zalo?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
   link_in?: string;
 
   @IsOptional()

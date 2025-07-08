@@ -76,7 +76,7 @@ export class SystemService {
 
   async sendDeleteProvince(datas: string[]) {
     return await firstValueFrom(
-      this.systemClient.send('delete-provinces', datas),
+      this.systemClient.send({cmd:'delete-provinces'}, datas),
     );
   }
 
@@ -133,7 +133,7 @@ export class SystemService {
   }
 
   async sendDeleteVats(datas: string[]) {
-    return await firstValueFrom(this.systemClient.send('delete-vats', datas));
+    return await firstValueFrom(this.systemClient.send({cmd:'delete-vats'}, datas));
   }
   async createUnitProduct(createUnitDto: CreateUnitProductDto) {
     return this.systemClient.send(
@@ -163,7 +163,7 @@ export class SystemService {
 
   async sendDeleteProfits(datas: string[]) {
     return await firstValueFrom(
-      this.systemClient.send('delete-profits', datas),
+      this.systemClient.send({cmd:'delete-profits'}, datas),
     );
   }
 

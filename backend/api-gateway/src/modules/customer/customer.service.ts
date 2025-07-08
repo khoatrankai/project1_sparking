@@ -84,7 +84,7 @@ export class CustomerService {
 
   async sendDeleteGroupCustomer(datas: string[]) {
     return await firstValueFrom(
-      this.customerClient.send('delete-group_customer', datas),
+      this.customerClient.send({cmd:'delete-group_customer'}, datas),
     );
   }
 
@@ -106,7 +106,7 @@ export class CustomerService {
 
   async sendDeleteRoleTypeCustomer(datas: string[]) {
     return await firstValueFrom(
-      this.customerClient.send('delete-role_type_customer', datas),
+      this.customerClient.send({cmd:'delete-role_type_customer'}, datas),
     );
   }
 
@@ -148,7 +148,7 @@ export class CustomerService {
 
   async sendDeleteAccountCustomer(datas: string[]) {
     return await firstValueFrom(
-      this.customerClient.send('delete-account_customer', datas),
+      this.customerClient.send({cmd:'delete-account_customer'}, datas),
     );
   }
 
@@ -216,7 +216,7 @@ export class CustomerService {
 
   async sendDeleteInfoContact(datas: string[]) {
     return await firstValueFrom(
-      this.customerClient.send('delete-info_contact', datas),
+      this.customerClient.send({cmd:'delete-info_contact'}, datas),
     );
   }
 
@@ -236,7 +236,7 @@ export class CustomerService {
 
   async sendDeleteRoleCustomer(datas: string[]) {
     return await firstValueFrom(
-      this.customerClient.send('delete-role_customer', datas),
+      this.customerClient.send({cmd:'delete-role_customer'}, datas),
     );
   }
 

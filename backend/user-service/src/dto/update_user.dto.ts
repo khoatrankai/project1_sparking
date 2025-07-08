@@ -35,6 +35,11 @@ export class UpdateUserDto  {
     @IsString()
     @Length(1, 50)
     link_facebook?: string;
+
+    @IsOptional()
+    @IsString()
+    @Length(1, 50)
+    link_zalo?: string;
   
     @IsOptional()
     @IsString()

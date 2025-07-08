@@ -8,7 +8,6 @@ export class CreateSupplierProductDto {
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(50)
   name: string;
 
   @IsString()

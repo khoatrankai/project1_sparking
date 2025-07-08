@@ -52,7 +52,7 @@ export class LayerController {
   async createProduct(@Payload() createProductDto: CreateProductDto) {
     return this.layerService.createProduct({
       ...createProductDto,
-      details: JSON.parse(createProductDto.details as unknown as string),
+      details: createProductDto.details?JSON.parse(createProductDto.details as unknown as string):[],
     });
   }
 

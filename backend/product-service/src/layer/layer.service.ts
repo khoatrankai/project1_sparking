@@ -197,6 +197,7 @@ export class LayerService {
 
   async deleteProduct(datas: string[]) {
     try {
+      console.log(datas)
       const rm = await this.productRepository.delete({ product_id: In(datas) });
       if (rm) {
         return {
@@ -204,7 +205,8 @@ export class LayerService {
           message: 'Đã xóa thành công',
         };
       }
-    } catch {
+    } catch(err) {
+      console.log(err)
       return {
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Xóa thất bại',

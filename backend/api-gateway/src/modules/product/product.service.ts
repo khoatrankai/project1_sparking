@@ -95,7 +95,7 @@ export class ProductService {
 
   async sendDeleteProduct(datas: string[]) {
     return await firstValueFrom(
-      this.productClient.send('delete-product', datas),
+      this.productClient.send({cmd:'delete-product'}, datas),
     );
   }
 
@@ -221,7 +221,7 @@ export class ProductService {
 
   async sendDeleteCodeProduct(datas: string[]) {
     return await firstValueFrom(
-      this.productClient.send('delete-code_product', datas),
+      this.productClient.send({cmd:'delete-code_product'}, datas),
     );
   }
 
@@ -487,7 +487,7 @@ export class ProductService {
 
   async sendDeleteTypeProduct(datas: string[]) {
     return await firstValueFrom(
-      this.productClient.send('delete-type_product', datas),
+      this.productClient.send({cmd:'delete-type_product'}, datas),
     );
   }
 
@@ -564,7 +564,7 @@ export class ProductService {
 
   async sendDeleteClassifyType(datas: string[]) {
     return await firstValueFrom(
-      this.productClient.send('delete-classify_type', datas),
+      this.productClient.send({cmd:'delete-classify_type'}, datas),
     );
   }
 
@@ -661,7 +661,7 @@ export class ProductService {
   }
 
   async sendDeleteBrand(datas: string[]) {
-    return await firstValueFrom(this.productClient.send('delete-brand', datas));
+    return await firstValueFrom(this.productClient.send({cmd:'delete-brand'}, datas));
   }
 
   async findAllBrand() {
@@ -735,7 +735,7 @@ export class ProductService {
 
   async sendDeleteOriginal(datas: string[]) {
     return await firstValueFrom(
-      this.productClient.send('delete-original', datas),
+      this.productClient.send({cmd:'delete-original'}, datas),
     );
   }
 
@@ -811,7 +811,7 @@ export class ProductService {
 
   async sendDeleteUnitProduct(datas: string[]) {
     return await firstValueFrom(
-      this.productClient.send('delete-unit_product', datas),
+      this.productClient.send({cmd:'delete-unit_product'}, datas),
     );
   }
 
@@ -905,7 +905,7 @@ export class ProductService {
 
   async sendDeleteSupplierProduct(datas: string[]) {
     return await firstValueFrom(
-      this.productClient.send('delete-supplier_product', datas),
+      this.productClient.send({cmd:'delete-supplier_product'}, datas),
     );
   }
 
@@ -982,7 +982,7 @@ export class ProductService {
 
   async sendDeleteActivityContainer(datas: string[]) {
     return await firstValueFrom(
-      this.productClient.send('delete-activity_container', datas),
+      this.productClient.send({cmd:'delete-activity_container'}, datas),
     );
   }
 

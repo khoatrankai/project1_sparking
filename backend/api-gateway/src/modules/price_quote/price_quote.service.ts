@@ -40,7 +40,7 @@ export class PriceQuoteService {
 
   async sendDeletePriceQueto(datas: string[]) {
     return await firstValueFrom(
-      this.priceQuoteClient.send('delete-price_quote', datas),
+      this.priceQuoteClient.send({cmd:'delete-price_quote'}, datas),
     );
   }
 
@@ -111,7 +111,7 @@ export class PriceQuoteService {
 
   async sendDeleteTypePackage(datas: string[]) {
     return await firstValueFrom(
-      this.priceQuoteClient.send('delete-type_package', datas),
+      this.priceQuoteClient.send({cmd:'delete-type_package'}, datas),
     );
   }
 
