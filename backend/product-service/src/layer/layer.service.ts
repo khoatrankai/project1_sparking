@@ -59,6 +59,9 @@ import { HistoryAsset } from 'src/database/entities/history_asset.entity';
 import { ChangeType, CreateAssetStatusDto } from 'src/dto/StatusAsset/create.dto';
 import { UpdateAssetStatusDto } from 'src/dto/StatusAsset/update.dto';
 import { AssetStatus } from 'src/database/entities/asset_status.entity';
+import { Warranty, WarrantyStatus } from 'src/database/entities/warranty.entity';
+import { CreateWarrantyDto } from 'src/dto/Warranty/create.dto';
+import { UpdateWarrantyDto } from 'src/dto/Warranty/update.dto';
 
 @Injectable()
 export class LayerService {
@@ -101,7 +104,10 @@ export class LayerService {
     private readonly historyAssetRepository: Repository<HistoryAsset>,
     @InjectRepository(AssetStatus)
     private readonly assetStatusRepository: Repository<AssetStatus>,
+    @InjectRepository(Warranty)
+    private warrantyRepository: Repository<Warranty>,
     @Inject('USER') private readonly userClient: ClientProxy,
+    @Inject('CONTRACT') private readonly contractClient: ClientProxy,
     @Inject('CUSTOMER') private readonly customerClient: ClientProxy,
     @Inject('PROJECT') private readonly projectClient: ClientProxy,
   ) {}
@@ -1591,7 +1597,7 @@ export class LayerService {
   async getAssetsByProject(
     id: string,
   ) {
-    const assets = await this.assetRepository.find({where:{project:id},relations:['code_product','code_product.product']})
+    const assets = await this.assetRepository.find({where:{project:id},relations:['code_product','code_product.product','warranty']})
     const ids = assets.map((dt:any) => dt.customer)
     const customerInfos = await firstValueFrom(this.customerClient.send({cmd: 'get-customer_ids'},ids))
     // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
@@ -1605,7 +1611,7 @@ export class LayerService {
   }
 
   async getAssets() {
-    const assets = await this.assetRepository.find({relations:['code_product','code_product.product']})
+    const assets = await this.assetRepository.find({relations:['code_product','code_product.product','warranty']})
     const ids = assets.map((dt:any) => dt.customer)
     const idsProject = assets.map((dt:any) => dt.project)
     const customerInfos = await firstValueFrom(this.customerClient.send({cmd: 'get-customer_ids'},ids))
@@ -1624,7 +1630,7 @@ export class LayerService {
   async getAssetByID(
     id: string,
   ) {
-    const asset = await this.assetRepository.findOne({where:{id:id},relations:['code_product','code_product.product']})
+    const asset = await this.assetRepository.findOne({where:{id:id},relations:['code_product','code_product.product','warranty']})
    
     // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
     return {
@@ -1637,7 +1643,7 @@ export class LayerService {
    async getAssetByCodeID(
     id: string,
   ) {
-    const asset = await this.assetRepository.findOne({where:{code_product:In([id])},relations:['code_product','code_product.product']})
+    const asset = await this.assetRepository.findOne({where:{code_product:In([id])},relations:['code_product','code_product.product','warranty']})
    
     // await this.productRepository.update(createCodeProductDto.product,{quantity:product.quantity+1})
     return {
@@ -1711,5 +1717,105 @@ export class LayerService {
         message:"Lấy thông tin lịch sử thất bại"
       }
     }
+  }
+
+  async createWarranty(createWarrantyDto: CreateWarrantyDto): Promise<any> {
+    try{
+      const asset = await this.assetRepository.findOne({
+      where: { id: createWarrantyDto.asset },
+    });
+
+    if (!asset) {
+      throw new NotFoundException(`Asset with ID ${createWarrantyDto.asset} not found`);
+    }
+
+    const historyCodeProduct = await this.historyCodeProductRepository.findOne({where:{code_product:In([asset.code_product])},order: {
+    created_at: 'DESC', // cột ngày tạo để lấy bản ghi mới nhất
+    },relations:['activity_container']
+    })
+
+    const activity = historyCodeProduct?.activity_container?.activity ?? null;
+    const contractID = (await firstValueFrom(this.contractClient.send({ cmd: 'get-contract_by_project_id' },asset?.project)))?.[0] ?? undefined
+    const dataNew = {type:"warranty",status:"not_yet",name:`Bảo hành sản phẩm ${asset.name}`,contract:contractID,time_start:createWarrantyDto.date_start,time_end:createWarrantyDto.date_end}
+    await firstValueFrom(this.activityClient.send('create-activity_warranty',{data:dataNew,activity}))
+    const warranty = this.warrantyRepository.create({
+      ...createWarrantyDto,
+      id:uuidv4(),
+      asset,
+      status: createWarrantyDto.status as WarrantyStatus, 
+    });
+
+    await this.warrantyRepository.save(warranty);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Create Warranty successfully'
+    };
+    }catch(err){
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        message:"Tạo bảo hành thất bại"
+      }
+    }
+    
+  }
+
+  async updateWarranty(id: string, updateWarrantyDto: UpdateWarrantyDto): Promise<any> {
+
+    // Nếu cần cập nhật asset
+    return await this.warrantyRepository.update(id,{...updateWarrantyDto,asset:undefined,status: updateWarrantyDto?.status as WarrantyStatus, });
+  }
+
+  async getWarrantiesByAsset(id: string): Promise<any> {
+
+    // Nếu cần cập nhật asset
+    return await this.warrantyRepository.find({where:{asset:In([id])}});
+  }
+
+  async getWarrantiesByCode(id: string): Promise<any> {
+
+    // Nếu cần cập nhật asset
+    return await this.warrantyRepository.createQueryBuilder('warranties')
+    .leftJoin('warranties.asset','asset')
+    .where('asset.code_product = :code_product', { code_product: id })
+    .getMany();
+  }
+
+  async getWarrantyById(id: string): Promise<any> {
+    const warranty = await this.warrantyRepository.findOne({
+      where: { id },
+      relations: ['asset'],
+    });
+
+    if (!warranty) {
+      throw new NotFoundException(`Warranty with ID ${id} not found`);
+    }
+
+    return warranty;
+  }
+
+  async deleteWarranty(id: string): Promise<any> {
+     try {
+      const rm = await this.warrantyRepository.delete({
+        id: In([id]),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async getAllWarranties(): Promise<any> {
+    return this.warrantyRepository.find({
+      relations: ['asset'],
+      order: { created_at: 'DESC' },
+    });
   }
 }

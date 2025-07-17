@@ -35,6 +35,8 @@ import { CreateAssetDto } from './dto/Asset/CreateAsset.dto';
 import { UpdateAssetDto } from './dto/Asset/UpdateAsset.dto';
 import { CreateAssetStatusDto } from './dto/StatusAsset/create.dto';
 import { UpdateAssetStatusDto } from './dto/StatusAsset/update.dto';
+import { CreateWarrantyDto } from './dto/Warranty/create.dto';
+import { UpdateWarrantyDto } from './dto/Warranty/update.dto';
 
 @Injectable()
 export class ProductService {
@@ -490,6 +492,7 @@ export class ProductService {
       this.productClient.send({cmd:'delete-type_product'}, datas),
     );
   }
+
 
   async findAllTypeProduct() {
     try {
@@ -1558,6 +1561,115 @@ export class ProductService {
         'Failed to create code product',
         HttpStatus.BAD_REQUEST,
       );
+    }
+  }
+
+  async createWarranty(
+    createWarrantyDto: CreateWarrantyDto
+  ) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'create-warranty' },
+          { ...createWarrantyDto},
+        ),
+      );
+      return result
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async sendDeleteWarranty(data: string) {
+    return await firstValueFrom(
+      this.productClient.send({cmd:'delete-warranty'}, data),
+    );
+  }
+
+  
+
+  async updateWarranty(
+    id: string,
+    updateWarrantyDto: UpdateWarrantyDto
+  ) {
+    try {
+      //console.log(updateProductDto);
+      const result = await firstValueFrom(
+        this.productClient.send(
+          { cmd: 'update-warranty' },
+          {
+            id,
+            updateWarrantyDto,
+          },
+        ),
+      );
+      
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Product updated successfully',
+        data: result,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
+  async findAllWarranty() {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_warranty' }, {}),
+      );
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch warranty',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findAllWarrantyByAsset(id:string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_warranty_by_asset' }, id),
+      );
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch warranty',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findAllWarrantyByCode(id:string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-all_warranty_by_code' }, id),
+      );
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch warranty',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findOneWarranty(id: string) {
+    try {
+      const result = await firstValueFrom(
+        this.productClient.send({ cmd: 'find-one_warranty' }, id),
+      );
+      if (!result)
+        throw new HttpException('Warranty not found', HttpStatus.NOT_FOUND);
+      return { statusCode: HttpStatus.OK, data: result };
+    } catch (error) {
+      throw error;
     }
   }
 }

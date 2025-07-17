@@ -253,7 +253,7 @@ export class UserService {
 
   async sendDeleteGroupUser(datas: string[]) {
     return await firstValueFrom(
-      this.usersClient.send('delete-group_user', datas),
+      this.usersClient.send({cmd:'delete-group_user'}, datas),
     );
   }
 

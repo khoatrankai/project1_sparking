@@ -20,6 +20,7 @@ import { ListDetail } from './entities/list_detail.entity';
 import { Asset } from './entities/asset.entity';
 import { HistoryAsset } from './entities/history_asset.entity';
 import { AssetStatus } from './entities/asset_status.entity';
+import { Warranty } from './entities/warranty.entity';
 
 @Module({
   imports: [
@@ -61,7 +62,8 @@ import { AssetStatus } from './entities/asset_status.entity';
             ListDetail,
             Asset,
             HistoryAsset,
-            AssetStatus
+            AssetStatus,
+            Warranty
           ],
           // synchronize: true,
           // dropSchema: true,

@@ -3022,5 +3022,51 @@ export class LayerService {
       }
     }
 
+    async createActivityWarranty(createActivityDto:CreateActivityDto,activity?:string) {
+      const contract = activity ? (await this.activitiesRepository.findOne({
+        where: {
+          activity_id: In([activity])
+        },
+      }))?.contract : undefined
+      
+      const type = await this.typeActivitiesRepository.findOne({
+      where: { name_tag: createActivityDto.type },
+    });
+    const status = await this.statusActivitiesRepository.findOne({
+      where: { name_tag: createActivityDto.status },
+      relations: ['activity'],
+    });
+    const maxPosition = status.activity.reduce((preValue, currValue) => {
+      return preValue < currValue.position ? currValue.position : preValue;
+    }, 0);
+
+    const { picture_urls, ...reqActivity } = createActivityDto;
+      const newActivity = this.activitiesRepository.create({
+        ...reqActivity,
+        activity_id: uuidv4(),
+        type,
+        status,
+        position: maxPosition + 1,
+        contract: contract ? contract : reqActivity.contract,
+      });
+      const result = await this.activitiesRepository.save(newActivity);
+      await firstValueFrom(
+        this.usersClient.emit(
+          { cmd: 'create-notify' },
+          {
+            description: 'Thông báo có hoạt động mới',
+            link: `${this.configService.get<string>('DOMAIN')}/activity?id=${result.activity_id}`,
+            notify_role: ['admin-top', 'activity'],
+          },
+        ),
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Activity created successfully',
+        data: result,
+      };
+
+
+   }
     
 }

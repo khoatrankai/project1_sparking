@@ -50,6 +50,11 @@ export class LayerController {
     return await this.layerService.createActivity(createActivityDto);
   }
 
+  @MessagePattern('create-activity_warranty')
+  async createActivityWarranty(@Payload('data') createActivityDto: CreateActivityDto,@Payload('activity') activity:string) {
+    return await this.layerService.createActivityWarranty(createActivityDto,activity);
+  }
+
   @MessagePattern('delete-activity')
   async deleteActivity(@Payload() datas: string[]) {
     return await this.layerService.deleteActivity(datas);

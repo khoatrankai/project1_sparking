@@ -46,6 +46,8 @@ import { CreateAssetDto } from './dto/Asset/CreateAsset.dto';
 import { UpdateAssetDto } from './dto/Asset/UpdateAsset.dto';
 import { CreateAssetStatusDto } from './dto/StatusAsset/create.dto';
 import { UpdateAssetStatusDto } from './dto/StatusAsset/update.dto';
+import { CreateWarrantyDto } from './dto/Warranty/create.dto';
+import { UpdateWarrantyDto } from './dto/Warranty/update.dto';
 
 @Controller('product')
 export class ProductController {
@@ -290,6 +292,16 @@ export class ProductController {
     @Body() createClassifyTypeDto: CreateClassifyTypeDto,
   ) {
     return this.productService.createClassifyType(createClassifyTypeDto);
+  }
+
+  @Delete('classify_type')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
+  async deleteClassifyType(
+    @Body() ids: string[],
+  ) {
+    return this.productService.sendDeleteClassifyType(ids);
   }
 
   @Get('classify_type')
@@ -755,5 +767,77 @@ export class ProductController {
   @SetMetadata('type', ['admin'])
   async getStatusAssetByID(@Param('id') id:string) {
     return this.productService.getStatusAssetByID(id);
+  }
+
+
+  @Post('warranty')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
+  async createWarranty(
+    @Body() createWarrantyDto: CreateWarrantyDto
+  ) {
+    return this.productService.createWarranty(createWarrantyDto);
+  }
+
+  @Delete('warranty/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteWarranty(@Param('id') data: string) {
+    return this.productService.sendDeleteWarranty(data);
+  }
+
+  @Put('warranty/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['product', 'admin-top', 'product-edit'])
+  @SetMetadata('type', ['admin'])
+  async updateWarranty(
+    @Param('id') id: string,
+    @Body() updateWarrantyDto: UpdateWarrantyDto,
+  ) {
+    return this.productService.updateWarranty(id, updateWarrantyDto);
+  }
+
+  
+
+  @Get('warranty')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'product',
+    'price_quote',
+    'admin-top',
+    'price_quote-read',
+    'product-read',
+  ])
+  @SetMetadata('type', ['admin'])
+  async findAllWarranty() {
+    return this.productService.findAllWarranty();
+  }
+
+  @Get('warranty-by-asset/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'product',
+    'price_quote',
+    'admin-top',
+    'price_quote-read',
+    'product-read',
+  ])
+  @SetMetadata('type', ['admin'])
+  async findAllWarrantyByAsset(@Param('id') id: string) {
+    return this.productService.findAllWarrantyByAsset(id);
+  }
+
+  @Get('warranty-by-code/:id')
+  async findAllWarrantyByCode(@Param('id') id: string) {
+    return this.productService.findAllWarrantyByCode(
+      id.replace('@code_product', ''),
+    );
+  }
+
+  @Get('warranty/:id')
+  async findOneWarranty(@Param('id') id: string) {
+    return this.productService.findOneWarranty(id);
   }
 }

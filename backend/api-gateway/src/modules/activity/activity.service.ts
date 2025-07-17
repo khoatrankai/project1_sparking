@@ -272,7 +272,7 @@ export class ActivityService {
 
   async sendDeleteTypeActivities(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send({cmd:'delete-type_activity'}, datas),
+      this.activityClient.send('delete-type_activity', datas),
     );
   }
 
@@ -332,7 +332,7 @@ export class ActivityService {
 
   async sendDeleteStatusActivities(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send({cmd:'delete-status_activity'}, datas),
+      this.activityClient.send('delete-status_activity', datas),
     );
   }
 
@@ -662,7 +662,7 @@ export class ActivityService {
 
   async sendDeleteTypeWork(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send({cmd:'delete-type_work'}, datas),
+      this.activityClient.send('delete-type_work', datas),
     );
   }
 
@@ -699,7 +699,7 @@ export class ActivityService {
 
   async sendDeleteStatusWork(datas: string[]) {
     return await firstValueFrom(
-      this.activityClient.send({cmd:'delete-status_work'}, datas),
+      this.activityClient.send('delete-status_work', datas),
     );
   }
 

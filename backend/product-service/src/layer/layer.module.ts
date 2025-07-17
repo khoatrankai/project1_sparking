@@ -21,6 +21,7 @@ import { ListDetail } from 'src/database/entities/list_detail.entity';
 import { Asset } from 'src/database/entities/asset.entity';
 import { HistoryAsset } from 'src/database/entities/history_asset.entity';
 import { AssetStatus } from 'src/database/entities/asset_status.entity';
+import { Warranty } from 'src/database/entities/warranty.entity';
 
 @Module({
   imports: [
@@ -65,6 +66,14 @@ import { AssetStatus } from 'src/database/entities/asset_status.entity';
                 port: 3014,
               },
             },
+            {
+              name: 'CONTRACT',
+              transport: Transport.TCP,
+              options: {
+                host: 'contract_service',
+                port: 3010,
+              },
+            },
     ]),
 
     TypeOrmModule.forFeature([
@@ -85,6 +94,7 @@ import { AssetStatus } from 'src/database/entities/asset_status.entity';
       ListDetail,
       Asset,
       HistoryAsset,
+      Warranty,
       AssetStatus
     ]),
   ],

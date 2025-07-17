@@ -32,6 +32,8 @@ import { CreateAssetDto } from 'src/dto/Asset/CreateAsset.dto';
 import { UpdateAssetDto } from 'src/dto/Asset/UpdateAsset.dto';
 import { CreateAssetStatusDto } from 'src/dto/StatusAsset/create.dto';
 import { UpdateAssetStatusDto } from 'src/dto/StatusAsset/update.dto';
+import { CreateWarrantyDto } from 'src/dto/Warranty/create.dto';
+import { UpdateWarrantyDto } from 'src/dto/Warranty/update.dto';
 
 @Controller('/product')
 @UseFilters(ConflictExceptionFilter)
@@ -620,6 +622,44 @@ export class LayerController {
   @MessagePattern({ cmd: 'get-status_asset' })
   async getHistoriesStatusAssetByID(@Payload() id:string) {
     return this.layerService.getHistoriesStatusAssetByID(id);
+  }
+
+   @MessagePattern({ cmd: 'create-warranty' })
+  async createWarranty(@Payload() createWarrantyDto: CreateWarrantyDto) {
+    return this.layerService.createWarranty(createWarrantyDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-warranty' })
+  async deleteWarranty(@Payload() data: string) {
+    return this.layerService.deleteWarranty(data);
+  }
+
+  @MessagePattern({ cmd: 'find-all_warranty' })
+  async getAllWarranties() {
+    return this.layerService.getAllWarranties();
+  }
+
+  @MessagePattern({ cmd: 'find-all_warranty_by_asset' })
+  async getAllWarrantiesByAsset(id:string) {
+    return this.layerService.getWarrantiesByAsset(id);
+  }
+
+  @MessagePattern({ cmd: 'find-all_warranty_by_code' })
+  async getWarrantiesByCode(id:string) {
+    return this.layerService.getWarrantiesByCode(id);
+  }
+
+  @MessagePattern({ cmd: 'find-one_warranty' })
+  async getWarrantyById(@Payload() id: string) {
+    return this.layerService.getWarrantyById(id);
+  }
+
+  @MessagePattern({ cmd: 'update-warranty' })
+  async updateWarranty(
+    @Payload() data: { id: string; updateWarrantyDto: UpdateWarrantyDto },
+  ) {
+    const { id, updateWarrantyDto } = data;
+    return this.layerService.updateWarranty(id, updateWarrantyDto);
   }
 
 }

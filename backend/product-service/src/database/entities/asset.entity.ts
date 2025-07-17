@@ -11,6 +11,7 @@ import {
 import { CodeProduct } from './code_product.entity';
 import { HistoryAsset } from './history_asset.entity';
 import { AssetStatus } from './asset_status.entity';
+import { Warranty } from './warranty.entity';
 
 export enum StatusAsset {
   NEW = 'new',
@@ -76,4 +77,7 @@ export class Asset {
 
   @OneToMany(() => AssetStatus, (assetStatus) => assetStatus.asset)
   asset_status: AssetStatus[];
+
+  @OneToMany(() => Warranty, (warranty) => warranty.asset)
+  warranty: Warranty[];
 }
