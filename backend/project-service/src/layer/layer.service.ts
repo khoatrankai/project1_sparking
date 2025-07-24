@@ -17,6 +17,17 @@ import { NotifyProject } from 'src/database/entities/notify.entity';
 import { Contractor } from 'src/database/entities/contractor';
 import { UpdateContractorDto } from 'src/dto/Contractor/update_contractor.dto';
 import { CreateContractorDto } from 'src/dto/Contractor/create_contractor.dto';
+import { ChatGroup } from 'src/database/entities/chat_group.entity';
+import { Chat } from 'src/database/entities/chat.entity';
+import { CreateRoleProjectDto } from 'src/dto/RoleProjectDto/create-role_project.dto';
+import { RoleProject } from 'src/database/entities/role_project.entity';
+import { UpdateRoleProjectDto } from 'src/dto/RoleProjectDto/update-role_project.dto';
+import { RoleUser } from 'src/database/entities/role_user.entity';
+import { CreateChatDto } from 'src/dto/ChatDto/create-chat.dto';
+import { Contents } from 'src/database/entities/content.entity';
+import { UpdateChatDto } from 'src/dto/ChatDto/update-chat.dto';
+import { CreateContentsDto } from 'src/dto/ContentsDto/create-content.dto';
+import { UpdateContentsDto } from 'src/dto/ContentsDto/update-content.dto';
 
 @Injectable()
 export class LayerService {
@@ -28,20 +39,39 @@ export class LayerService {
     private readonly projectsRepository: Repository<Projects>,
     @InjectRepository(TypeProject)
     private readonly typeProjectRepository: Repository<TypeProject>,
+    @InjectRepository(RoleProject)
+    private readonly roleProjectRepository: Repository<RoleProject>,
+     @InjectRepository(RoleUser)
+    private readonly roleUserRepository: Repository<RoleUser>,
     @InjectRepository(Contractor)
     private readonly contractorRepository: Repository<Contractor>,
     @InjectRepository(NotifyProject)
     private readonly notifyProjectRepository: Repository<NotifyProject>,
+    @InjectRepository(ChatGroup)
+    private readonly chatGroupRepository: Repository<ChatGroup>,
+    @InjectRepository(Chat)
+    private readonly chatRepository: Repository<Chat>,
+    @InjectRepository(Contents)
+    private readonly contentsRepository: Repository<Contents>,
     private readonly configService: ConfigService,
   ) {}
 
   // Create a new project
   async createProject(createProjectDto: CreateProjectDto): Promise<any> {
+    const {users,...reqCreate} = createProjectDto
     const project = this.projectsRepository.create({
-      ...createProjectDto,
+      ...reqCreate,
       project_id: uuidv4(),
     });
     const savedProject = await this.projectsRepository.save(project);
+    const roleUsers = await Promise.all(users.map(async(user) => {
+      return this.roleUserRepository.create({
+        id: uuidv4(),
+        project: savedProject,
+        user: user.user,
+        role: await this.roleProjectRepository.findOne({where:{role_id:user.role}}),
+    })}));
+    await this.roleUserRepository.save(roleUsers)
     await firstValueFrom(
       this.userClient.emit(
         { cmd: 'create-notify' },
@@ -277,7 +307,7 @@ export class LayerService {
   async findOneProject(id: string): Promise<any> {
     const project = await this.projectsRepository.findOne({
       where: { project_id: id },
-      relations: ['type',],
+      relations: ['type','users'],
     });
     const listUser = await firstValueFrom(this.activityClient.send({ cmd: 'get-list_user_by_projects' },id))
     const progresses = (await firstValueFrom(this.activityClient.send({ cmd: 'get-progress_by_project' },id))) ?? {}
@@ -335,7 +365,7 @@ export class LayerService {
     updateProjectDto: UpdateProjectDto,
   ): Promise<any> {
     //console.log(updateProjectDto);
-    const {user_create,...reqUpdate} = updateProjectDto
+    const {user_create,users,...reqUpdate} = updateProjectDto
     const updateResult = await this.projectsRepository.update(
       id,
       reqUpdate,
@@ -356,7 +386,15 @@ export class LayerService {
     const updatedProject = await this.projectsRepository.findOne({
       where: { project_id: id },
     });
-
+    await this.roleUserRepository.delete({ project: In([id]) });
+    const roleUsers = await Promise.all(users.map(async(user) => {
+      return this.roleUserRepository.create({
+        id: uuidv4(),
+        project: updatedProject,
+        user: user.user,
+        role: await this.roleProjectRepository.findOne({where:{role_id:user.role}}),
+    })}));
+    await this.roleUserRepository.save(roleUsers)
     return {
       statusCode: HttpStatus.OK,
       data: updatedProject,
@@ -824,6 +862,206 @@ export class LayerService {
       statusCode:HttpStatus.OK,
       message:"Thông tin tài sản lấy thành công",
       data:asset
+    };
+  }
+
+  async getIDChatsByUser(id:string) {
+
+    const groups = await this.chatGroupRepository.createQueryBuilder('chat_group')
+    .leftJoin('chat_group.members', 'members')
+    .where('members.user = :id or chat_group.head = :id',{id})
+    .getMany() ?? [];
+    const chats = await this.chatRepository.createQueryBuilder('chat')
+    .where('chat.user_one = :id or chat.user_two = :id',{id})
+    .getMany() ?? [];
+    return {
+      statusCode: HttpStatus.OK,
+      data: groups?.map(dt => dt.id).concat(chats?.map(dt => dt.id)),
+      message: 'Get full chat by user'
+    };
+  }
+
+  async createRoleProject(createDto: CreateRoleProjectDto) {
+    const roleProject = this.roleProjectRepository.create({
+      ...createDto,
+      role_id: uuidv4(),
+    });
+    await this.roleProjectRepository.save(roleProject);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Role dự án tạo thành công',
+    };
+  }
+
+  async deleteRoleProject(datas: string[]) {
+    try {
+      const rm = await this.roleProjectRepository.delete({
+        role_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async findAllRoleProject() {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.roleProjectRepository.find(),
+    };
+  }
+
+
+  async findOneRoleProject(id: string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.roleProjectRepository.findOne({
+        where: { role_id: id },
+      }),
+    };
+  }
+
+  async updateRoleProject(
+    id: string,
+    updateRoleProjectDto: UpdateRoleProjectDto,
+  ) {
+    await this.roleProjectRepository.update(id, updateRoleProjectDto);
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.roleProjectRepository.findOne({
+        where: { role_id: id },
+      }),
+      message: 'Cập nhật thành công',
+    };
+  }
+
+  async createChat(createChatDto: CreateChatDto) {
+    const infoUsers = await firstValueFrom(this.userClient.send({cmd:'get-user_ids'},[createChatDto.user_one,createChatDto.user_two]))
+    const chat = this.chatRepository.create({
+      ...createChatDto,
+      name_one:infoUsers?.[0]?.first_name + infoUsers?.[0]?.last_name,
+      name_two:infoUsers?.[1]?.first_name + infoUsers?.[1]?.last_name,
+      project: await this.projectsRepository.findOne({where:{
+        project_id: createChatDto.project}
+      }),
+      id: uuidv4(),
+    });
+    await this.chatRepository.save(chat);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Chat tạo thành công',
+    };
+  }
+
+  async deleteChat(datas: string[]) {
+    try {
+      const rm = await this.chatGroupRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async findAllChatByUser(id:string,idProject:string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.chatRepository.find({where:[{user_one:id,project:In([idProject])},{user_one:id,project:In([idProject])}]}),
+    };
+  }
+  async findOneChat(id: string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.chatRepository.findOne({
+        where: { id: id },
+      }),
+    };
+  }
+
+  async updateChat(
+    id: string,
+    updateChatDto: UpdateChatDto,
+  ) {
+    await this.chatRepository.update(id, updateChatDto);
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.chatRepository.findOne({
+        where: { id: id },
+      }),
+      message: 'Cập nhật thành công',
+    };
+  }
+
+  async createContent(createDto: CreateContentsDto) {
+   const chat = this.contentsRepository.create({
+      ...createDto,
+      chat: await this.chatRepository.findOne({
+        where: {id:createDto.chat }}),
+      id: uuidv4(),
+    });
+    await this.contentsRepository.save(chat);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Send chat tạo thành công',
+    };
+  }
+
+  async deleteContent(datas: string[]) {
+    try {
+      const rm = await this.contentsRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async findAllContentByChat(id:string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.contentsRepository.find({where:{chat:In([id])}}),
+    };
+  }
+  
+
+  async updateContent(
+    id: string,
+    updateDto: UpdateContentsDto,
+  ) {
+    const {chat,...reqUpdate} = updateDto
+    await this.contentsRepository.update(id,reqUpdate);
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.contentsRepository.findOne({
+        where: { id: id },
+      }),
+      message: 'Cập nhật thành công',
     };
   }
 }

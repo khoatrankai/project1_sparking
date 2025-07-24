@@ -11,6 +11,12 @@ import { GetFilterProjectDto } from 'src/dto/ProjectDto/get-filter.dto';
 import { CreateNotifyProjectDto } from 'src/dto/NotifyProject/create-notify_project.dto';
 import { CreateContractorDto } from 'src/dto/Contractor/create_contractor.dto';
 import { UpdateContractorDto } from 'src/dto/Contractor/update_contractor.dto';
+import { CreateRoleProjectDto } from 'src/dto/RoleProjectDto/create-role_project.dto';
+import { UpdateRoleProjectDto } from 'src/dto/RoleProjectDto/update-role_project.dto';
+import { CreateChatDto } from 'src/dto/ChatDto/create-chat.dto';
+import { UpdateChatDto } from 'src/dto/ChatDto/update-chat.dto';
+import { CreateContentsDto } from 'src/dto/ContentsDto/create-content.dto';
+import { UpdateContentsDto } from 'src/dto/ContentsDto/update-content.dto';
 
 @Controller('/project')
 @UseFilters(ConflictExceptionFilter)
@@ -24,7 +30,7 @@ export class LayerController {
 
   @MessagePattern({ cmd: 'create-project' })
   async createProject(@Payload() createProjectDto: CreateProjectDto) {
-    return await this.layerService.createProject(createProjectDto);
+    return await this.layerService.createProject({...createProjectDto,users:createProjectDto?.users ? JSON.parse(createProjectDto.users.toString()):[]});
   }
 
   @MessagePattern({ cmd: 'delete-project' })
@@ -60,7 +66,7 @@ export class LayerController {
     @Payload() payload: { id: string; updateProjectDto: UpdateProjectDto },
   ) {
     const { id, updateProjectDto } = payload;
-    return await this.layerService.updateProject(id, updateProjectDto);
+    return await this.layerService.updateProject(id, {...updateProjectDto,users:updateProjectDto?.users ? JSON.parse(updateProjectDto.users.toString()):[]});
   }
 
   @MessagePattern({ cmd: 'get-project_ids' })
@@ -178,5 +184,100 @@ export class LayerController {
   @MessagePattern({ cmd: 'delete-contractor' })
   async deleteContractor(@Payload() id: string) {
     return this.layerService.deleteContractor([id]);
+  }
+
+  @MessagePattern({ cmd: 'get-id_chat_by_user' })
+  async getIDChatsByUser(@Payload() id: string) {
+    return this.layerService.getIDChatsByUser(id);
+  }
+
+  @MessagePattern({ cmd: 'create-role_project' })
+  async createRoleProject(
+    @Payload() createDto: CreateRoleProjectDto,
+  ) {
+    return this.layerService.createRoleProject(createDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-role_project' })
+  async deleteRoleProject(@Payload() datas: string[]) {
+    return this.layerService.deleteRoleProject(datas);
+  }
+
+  @MessagePattern({ cmd: 'find-all_role_project' })
+  async findAllRoleProject() {
+    return this.layerService.findAllRoleProject();
+  }
+
+  @MessagePattern({ cmd: 'find-one_role_project' })
+  async findOneRoleProject(@Payload() id: string) {
+    return this.layerService.findOneRoleProject(id);
+  }
+
+  @MessagePattern({ cmd: 'update-role_project' })
+  async updateRoleProject(
+    @Payload() data: { id: string; updateRoleProjectDto: UpdateRoleProjectDto },
+  ) {
+    const { id, updateRoleProjectDto } = data;
+    return this.layerService.updateRoleProject(id, updateRoleProjectDto);
+  }
+
+  @MessagePattern({ cmd: 'create-chat' })
+  async createChat(
+    @Payload() createDto: CreateChatDto,
+  ) {
+    return this.layerService.createChat(createDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-chat' })
+  async deleteChat(@Payload() datas: string[]) {
+    return this.layerService.deleteChat(datas);
+  }
+
+  @MessagePattern({ cmd: 'find-all_chat_by_user' })
+  async findAllChatByUser(@Payload('id') id:string,@Payload('project') project:string) {
+    return this.layerService.findAllChatByUser(id,project);
+  }
+
+  
+
+  @MessagePattern({ cmd: 'find-one_chat' })
+  async findOneChat(@Payload() id: string) {
+    return this.layerService.findOneChat(id);
+  }
+
+  @MessagePattern({ cmd: 'update-chat' })
+  async updateChat(
+    @Payload() data: { id: string; updateDto: UpdateChatDto },
+  ) {
+    const { id, updateDto } = data;
+    return this.layerService.updateChat(id, updateDto);
+  }
+
+  @MessagePattern({ cmd: 'create-content' })
+  async createContent(
+    @Payload() createDto: CreateContentsDto,
+  ) {
+    return this.layerService.createContent(createDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-content' })
+  async deleteContent(@Payload() datas: string[]) {
+    return this.layerService.deleteContent(datas);
+  }
+
+  @MessagePattern({ cmd: 'find-all_content_by_chat' })
+  async findAllContentByChat(@Payload() id:string) {
+    return this.layerService.findAllContentByChat(id);
+  }
+
+  
+
+
+  @MessagePattern({ cmd: 'update-content' })
+  async updateContent(
+    @Payload() data: { id: string; updateDto: UpdateContentsDto },
+  ) {
+    const { id, updateDto } = data;
+    return this.layerService.updateContent(id, updateDto);
   }
 }

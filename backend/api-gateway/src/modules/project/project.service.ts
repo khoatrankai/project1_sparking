@@ -10,6 +10,8 @@ import { GetFilterProjectDto } from './dto/ProjectDto/get-filter.dto';
 import { CreateNotifyProjectDto } from './dto/NotifyProject/create-notify_project.dto';
 import { UpdateContractDto } from '../contract/dto/ContractDto/update_contract.dto';
 import { CreateContractDto } from '../contract/dto/ContractDto/create_contract.dto';
+import { CreateRoleProjectDto } from './dto/RoleProjectDto/create-role_project.dto';
+import { UpdateRoleProjectDto } from './dto/RoleProjectDto/update-role_project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -352,4 +354,75 @@ export class ProjectService {
         );
       }
     }
+
+    async createRoleProject(createDto: CreateRoleProjectDto) {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send(
+          { cmd: 'create-role_project' },
+          { ...createDto },
+        ),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create role product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async sendDeleteRoleProject(datas: string[]) {
+    return await firstValueFrom(
+      this.projectClient.send({cmd:'delete-role_project'}, datas),
+    );
+  }
+
+  async findAllRoleProject() {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send({ cmd: 'find-all_role_project' }, {}),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch role products',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  
+
+  async findOneRoleProject(id: string) {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send({ cmd: 'find-one_role_project' }, id),
+      );
+      if (!result)
+        throw new HttpException('Role product not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateRoleProject(
+    id: string,
+    updateRoleProjectDto: UpdateRoleProjectDto,
+  ) {
+    try {
+      const result = await firstValueFrom(
+        this.projectClient.send(
+          { cmd: 'update-role_project' },
+          { id, updateRoleProjectDto },
+        ),
+      );
+      if (!result)
+        throw new HttpException('Role product not found', HttpStatus.NOT_FOUND);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

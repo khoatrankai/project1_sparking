@@ -2,37 +2,30 @@ import { IsString, IsEnum, IsDateString, IsOptional, Length } from 'class-valida
 
 export class UpdateCustomerInfoDto {
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   info_id?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   name_company?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional()
   opportunity?: string;
 
   @IsOptional()
   @IsString()
-  @Length(1, 50)
   picture_url?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   group_customer?: string; // ID của GroupCustomer
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   tax_code?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   province?: string;
 
@@ -42,7 +35,6 @@ export class UpdateCustomerInfoDto {
   phone_number?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   website?: string;
 
@@ -55,22 +47,18 @@ export class UpdateCustomerInfoDto {
   date_establish?: Date;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   address_payment?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   address_delivery?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   province_payment?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   province_delivery?: string;
 
@@ -79,7 +67,6 @@ export class UpdateCustomerInfoDto {
   status_active?: string;
 
   @IsString()
-  @Length(1, 50)
   @IsOptional() // Có thể cập nhật hoặc không
   staff_support?: string;
 }

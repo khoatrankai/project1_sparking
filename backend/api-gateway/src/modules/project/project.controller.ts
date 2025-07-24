@@ -25,6 +25,7 @@ import { Request } from 'express';
 import { CreateNotifyProjectDto } from './dto/NotifyProject/create-notify_project.dto';
 import { CreateContractorDto } from './dto/Contractor/create_contractor.dto';
 import { UpdateContractorDto } from './dto/Contractor/update_contractor.dto';
+import { CreateRoleProjectDto } from './dto/RoleProjectDto/create-role_project.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -266,4 +267,36 @@ export class ProjectController {
     async getContractors() {
       return this.projectService.getContractors();
     }
+
+    @Post('role')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+  @SetMetadata('type', ['admin'])
+  async createRoleProject(@Body() createRoleProjectDto: CreateRoleProjectDto) {
+    return this.projectService.createRoleProject(createRoleProjectDto);
+  }
+
+  @Delete('role')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteRoleProject(@Body() datas: string[]) {
+    return this.projectService.sendDeleteRoleProject(datas);
+  }
+
+  @Get('role')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async findAllRoleProject() {
+    return this.projectService.findAllRoleProject();
+  }
+
+  @Get('role/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async findOneRoleProject(@Param('id') id: string) {
+    return this.projectService.findOneRoleProject(id);
+  }
 }

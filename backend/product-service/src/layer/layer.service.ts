@@ -492,9 +492,9 @@ export class LayerService {
   async findAllTypeProduct() {
     return (
       await this.typeProductRepository.find({ relations: ['classify_type'] })
-    ).map((dt) => {
-      return { ...dt, classify_type: dt.classify_type.classify_id };
-    });
+    )?.map((dt) => {
+      return { ...dt, classify_type: dt?.classify_type?.classify_id };
+    }) ?? [];
   }
 
   async findOneTypeProduct(id: string): Promise<TypeProducts | undefined> {

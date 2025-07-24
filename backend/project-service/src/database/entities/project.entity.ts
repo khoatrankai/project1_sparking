@@ -11,6 +11,9 @@ import {
 import { TypeProject } from './type_project.entity';
 import { NotifyProject } from './notify.entity';
 import { Contractor } from './contractor';
+import { RoleUser } from './role_user.entity';
+import { ChatGroup } from './chat_group.entity';
+import { Chat } from './chat.entity';
 
 @Entity('projects')
 export class Projects {
@@ -69,4 +72,13 @@ export class Projects {
 
   @OneToMany(() => Contractor, (contractor) => contractor.project)
   contractors: Contractor[];
+
+  @OneToMany(() => RoleUser, roleUser => roleUser.project)
+  users: RoleUser[];
+
+  @OneToMany(() => ChatGroup, chatGroup => chatGroup.project)
+  chat_group: ChatGroup[];
+  
+  @OneToMany(() => Chat, chat => chat.project)
+  chat: Chat[];
 }

@@ -35,6 +35,7 @@ import { TargetRevenue } from './entities/target_revenue.entity';
 
         return {
           type: 'mysql',
+          connectTimeout: 15000,
           host: configService.get<string>('DB_HOST'),
           port: configService.get<number>('DB_PORT'),
           username: configService.get<string>('DB_USER'),

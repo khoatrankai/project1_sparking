@@ -7,6 +7,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeProject } from 'src/database/entities/type_project.entity';
 import { NotifyProject } from '../database/entities/notify.entity';
 import { Contractor } from 'src/database/entities/contractor';
+import { ChatGroup } from 'src/database/entities/chat_group.entity';
+import { Chat } from 'src/database/entities/chat.entity';
+import { ContentGroup } from 'src/database/entities/content_group.entity';
+import { Contents } from 'src/database/entities/content.entity';
+import { Members } from 'src/database/entities/member.entity';
+import { RoleProject } from 'src/database/entities/role_project.entity';
+import { RoleUser } from 'src/database/entities/role_user.entity';
 
 @Module({
   imports: [
@@ -36,7 +43,7 @@ import { Contractor } from 'src/database/entities/contractor';
         },
       },
     ]),
-    TypeOrmModule.forFeature([Projects, TypeProject,NotifyProject,Contractor]),
+    TypeOrmModule.forFeature([Projects, TypeProject,NotifyProject,Contractor,ChatGroup,Chat,ContentGroup,Contents,Members,RoleProject,RoleUser]),
   ],
   controllers: [LayerController],
   providers: [LayerService],

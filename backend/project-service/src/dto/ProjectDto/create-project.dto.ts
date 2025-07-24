@@ -6,6 +6,8 @@ import {
   IsDate,
   Length,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { CreateRoleUserDto } from '../RoleUserDto/create-role_user.dto';
 
 export class CreateProjectDto {
   @IsString()
@@ -61,4 +63,20 @@ export class CreateProjectDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+
+  @IsOptional()
+  @Transform(({ value }) => {
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          if (!Array.isArray(parsed)) throw new Error();
+          return parsed;
+        } catch {
+          throw new Error('Invalid JSON format in "answers"');
+        }
+      }
+      return value; // Trường hợp gửi qua JSON raw thì để nguyên
+  })
+  users:CreateRoleUserDto[]
 }

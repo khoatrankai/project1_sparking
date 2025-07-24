@@ -84,6 +84,7 @@ import { AccountApartment } from './entities/account_apartment.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
+          connectTimeout: 15000,
       host: '45.119.83.123',
       port: 3306,
       username: 'root',
