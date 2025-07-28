@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column, OneToMany,ManyToOne,JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,ManyToOne,JoinColumn } from 'typeorm';
 import { RoleUser } from './role_user.entity';
 import { Projects } from './project.entity';
 import { ChatGroup } from './chat_group.entity';
@@ -31,4 +33,9 @@ export class Members {
   @JoinColumn({ name: 'chat_group' })
   chat_group: ChatGroup;
 
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }

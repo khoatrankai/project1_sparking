@@ -26,6 +26,10 @@ import { CreateNotifyProjectDto } from './dto/NotifyProject/create-notify_projec
 import { CreateContractorDto } from './dto/Contractor/create_contractor.dto';
 import { UpdateContractorDto } from './dto/Contractor/update_contractor.dto';
 import { CreateRoleProjectDto } from './dto/RoleProjectDto/create-role_project.dto';
+import { CreateContentsDto } from './dto/ContentsDto/create-content.dto';
+import { CreateChatDto } from './dto/ChatDto/create-chat.dto';
+import { CreateChatGroupDto } from './dto/ChatGroupDto/create-chat_group.dto';
+import { CreateContentsGroupDto } from './dto/ContentsGroupDto/create-content_group.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -268,7 +272,7 @@ export class ProjectController {
       return this.projectService.getContractors();
     }
 
-    @Post('role')
+  @Post('role')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
   @SetMetadata('type', ['admin'])
@@ -299,4 +303,124 @@ export class ProjectController {
   async findOneRoleProject(@Param('id') id: string) {
     return this.projectService.findOneRoleProject(id);
   }
+
+  @Get('chat/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getChatByUser(@Param('id') id: string,@Req() req:Request) {
+    return this.projectService.getChatByUser(req['user'].sub,id);
+  }
+
+  @Post('chat')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async createChat(@Body() data:CreateChatDto,@Req() req:Request) {
+    return this.projectService.createChat({user_one:req?.['user']?.sub,user_two:data.user_two,project:data.project});
+  }
+
+  @Get('chat-group/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getChatGroupByUser(@Param('id') id: string,@Req() req:Request) {
+    return this.projectService.getChatGroupByUser(req['user'].sub,id);
+  }
+
+  @Post('chat-group')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async createChatGroup(@Body() data:CreateChatGroupDto,@Req() req:Request) {
+    return this.projectService.createChatGroup({...data,head:req?.['user']?.sub});
+  }
+
+  @Get('users/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getUsersByProject(@Param() id: string) {
+    return this.projectService.getUsersByProject(id);
+  }
+
+  @Get('contents-chat/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getContentsByChat(@Param() id: string) {
+    return this.projectService.getContentsByChat(id);
+  }
+
+  @Delete('contents-chat')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteContent(@Body() datas: string[]) {
+    return this.projectService.sendDeleteContent(datas);
+  }
+
+  @Delete('chat')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteChat(@Body() datas: string[]) {
+    return this.projectService.sendDeleteChat(datas);
+  }
+
+  @Delete('chat-group')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteChatGroup(@Body() datas: string[]) {
+    return this.projectService.sendDeleteChatGroup(datas);
+  }
+
+  @Delete('member-chat-group')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteMemberChatGroup(@Body() data: {chat_group:string},@Req() req:Request) {
+    return this.projectService.sendDeleteMemberChatGroup(req['user'].sub,data.chat_group);
+  }
+
+  @Delete('contents-group-chat')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-edit'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteContentGroup(@Body() datas: string[]) {
+    return this.projectService.sendDeleteContentGroup(datas);
+  }
+
+    @UseGuards(RoleGuard)
+    @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+    @SetMetadata('type', ['admin'])
+    @Post('contents-chat')
+    @UseInterceptors(FilesInterceptor('link', 1))
+    async createContent(
+      @Body() createDto: CreateContentsDto,
+      @UploadedFiles() link: Express.Multer.File[],
+    ) {
+      return await this.projectService.createContentChat(createDto, link?.[0]);
+    }
+
+    @Get('contents-group-chat/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getContentsGroupByChat(@Param() id: string) {
+    return this.projectService.getContentsGroupByChat(id);
+  }
+
+    @UseGuards(RoleGuard)
+    @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+    @SetMetadata('type', ['admin'])
+    @Post('contents-group-chat')
+    @UseInterceptors(FilesInterceptor('link', 1))
+    async createContentGroupChat(
+      @Body() createDto: CreateContentsGroupDto,
+      @UploadedFiles() link: Express.Multer.File[],
+    ) {
+      return await this.projectService.createContentGroupChat(createDto, link?.[0]);
+    }
 }

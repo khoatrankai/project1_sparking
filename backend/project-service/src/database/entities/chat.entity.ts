@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column, OneToMany,ManyToOne,JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany,ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,JoinColumn } from 'typeorm';
 import { Projects } from './project.entity';
 import { Contents } from './content.entity';
 
@@ -25,4 +27,10 @@ export class Chat {
 
   @OneToMany(() => Contents, content => content.chat)
   contents: Contents[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }

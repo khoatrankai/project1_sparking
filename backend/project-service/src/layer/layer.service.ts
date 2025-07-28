@@ -28,6 +28,11 @@ import { Contents } from 'src/database/entities/content.entity';
 import { UpdateChatDto } from 'src/dto/ChatDto/update-chat.dto';
 import { CreateContentsDto } from 'src/dto/ContentsDto/create-content.dto';
 import { UpdateContentsDto } from 'src/dto/ContentsDto/update-content.dto';
+import { CreateChatGroupDto } from 'src/dto/ChatGroupDto/create-chat_group.dto';
+import { Members } from 'src/database/entities/member.entity';
+import { CreateContentsGroupDto } from 'src/dto/ContentsGroupDto/create-content_group.dto';
+import { ContentGroup } from 'src/database/entities/content_group.entity';
+import { UpdateContentsGroupDto } from 'src/dto/ContentsGroupDto/update-content_group.dto';
 
 @Injectable()
 export class LayerService {
@@ -51,8 +56,13 @@ export class LayerService {
     private readonly chatGroupRepository: Repository<ChatGroup>,
     @InjectRepository(Chat)
     private readonly chatRepository: Repository<Chat>,
+    @InjectRepository(Members)
+    private readonly membersRepository: Repository<Members>,
+    
     @InjectRepository(Contents)
     private readonly contentsRepository: Repository<Contents>,
+    @InjectRepository(ContentGroup)
+    private readonly contentGroupRepository: Repository<ContentGroup>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -307,11 +317,10 @@ export class LayerService {
   async findOneProject(id: string): Promise<any> {
     const project = await this.projectsRepository.findOne({
       where: { project_id: id },
-      relations: ['type','users'],
+      relations: ['type','users','users.role'],
     });
     const listUser = await firstValueFrom(this.activityClient.send({ cmd: 'get-list_user_by_projects' },id))
     const progresses = (await firstValueFrom(this.activityClient.send({ cmd: 'get-progress_by_project' },id))) ?? {}
-    console.log(progresses)
     const attach = (await firstValueFrom(this.activityClient.send({ cmd: 'get-attach_by_project' },id)))?.data ?? []
     if (!project) {
       throw new HttpException(
@@ -326,7 +335,9 @@ export class LayerService {
 
     return {
       statusCode: HttpStatus.OK,
-      data: { ...project, type: project.type.type_id,user_participants:listUser,progress:progresses,attach },
+      data: { ...project, type: project.type.type_id,user_participants:listUser,progress:progresses,attach,users:project?.users?.map(dt => {
+        return {...dt,role:dt?.role?.role_id}
+      }) },
       message: 'Project retrieved successfully',
     };
   }
@@ -947,21 +958,65 @@ export class LayerService {
     const infoUsers = await firstValueFrom(this.userClient.send({cmd:'get-user_ids'},[createChatDto.user_one,createChatDto.user_two]))
     const chat = this.chatRepository.create({
       ...createChatDto,
-      name_one:infoUsers?.[0]?.first_name + infoUsers?.[0]?.last_name,
-      name_two:infoUsers?.[1]?.first_name + infoUsers?.[1]?.last_name,
+      name_one:infoUsers?.[0]?.first_name +" "+ infoUsers?.[0]?.last_name,
+      name_two:infoUsers?.[1]?.first_name +" "+ infoUsers?.[1]?.last_name,
       project: await this.projectsRepository.findOne({where:{
         project_id: createChatDto.project}
       }),
       id: uuidv4(),
     });
-    await this.chatRepository.save(chat);
+    
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Chat tạo thành công',
+      data:await this.chatRepository.save(chat)
     };
   }
 
+  async createChatGroup(createChatDto: CreateChatGroupDto) {
+    const {members,...reqCreate} = createChatDto
+   
+    const chatGroup = this.chatGroupRepository.create({...reqCreate,id:uuidv4(),project: await this.projectsRepository.findOne({where:{
+        project_id: createChatDto.project}
+      })})
+    const saveChatGroup = await this.chatGroupRepository.save(chatGroup)
+    if(saveChatGroup && members && members.length > 0){
+       const infoUsers = members?.length > 0 ? await firstValueFrom(this.userClient.send({cmd:'get-user_ids'},members)): []
+      const newMembers = members.map((dt,index)=>{
+        return this.membersRepository.create({id:uuidv4(),user:dt,name:infoUsers[index]?.first_name +" "+infoUsers[index]?.last_name,chat_group:saveChatGroup})
+      })
+      await this.membersRepository.save(newMembers)
+    }
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Chat tạo thành công',
+      data:await this.chatGroupRepository.findOne({
+        where: { id: saveChatGroup.id },relations:['members']
+      })
+    };
+  }
+   
+
   async deleteChat(datas: string[]) {
+    try {
+      const rm = await this.chatRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async deleteChatGroup(datas: string[]) {
     try {
       const rm = await this.chatGroupRepository.delete({
         id: In(datas),
@@ -980,10 +1035,47 @@ export class LayerService {
     }
   }
 
+  async deleteMemberGroup(user:string,chat_group:string) {
+    try {
+      const rm = await this.membersRepository.delete({
+        user,chat_group:In([chat_group])
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
   async findAllChatByUser(id:string,idProject:string) {
     return {
       statusCode: HttpStatus.OK,
-      data: await this.chatRepository.find({where:[{user_one:id,project:In([idProject])},{user_one:id,project:In([idProject])}]}),
+      data: await this.chatRepository.createQueryBuilder("chat")
+            .leftJoinAndSelect("chat.contents", "contents")
+            .where("(chat.user_one = :id OR chat.user_two = :id)", { id })
+            .andWhere("chat.project = :idProject", { idProject })
+            .orderBy("contents.created_at", "DESC")
+            .getMany()
+    };
+  }
+
+  async findAllChatGroupByUser(id:string,idProject:string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.chatGroupRepository.createQueryBuilder("chatGroup")
+            .leftJoinAndSelect("chatGroup.contents", "contents")
+            .leftJoinAndSelect("chatGroup.members", "members")
+            .where("(members.user = :id OR chatGroup.head = :id)", { id })
+            .andWhere("chatGroup.project = :idProject", { idProject })
+            .orderBy("contents.created_at", "DESC")
+            .getMany()
     };
   }
   async findOneChat(id: string) {
@@ -1016,10 +1108,26 @@ export class LayerService {
         where: {id:createDto.chat }}),
       id: uuidv4(),
     });
-    await this.contentsRepository.save(chat);
+    
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Send chat tạo thành công',
+      data: await this.contentsRepository.save(chat)
+    };
+  }
+
+  async createContentGroup(createDto: CreateContentsGroupDto) {
+   const chat = this.contentGroupRepository.create({
+      ...createDto,
+      chat_group: await this.chatGroupRepository.findOne({
+        where: {id:createDto.chat_group }}),
+      id: uuidv4(),
+    });
+    
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Send chat tạo thành công',
+      data: await this.contentGroupRepository.save(chat)
     };
   }
 
@@ -1042,10 +1150,30 @@ export class LayerService {
     }
   }
 
+  async deleteContentGroup(datas: string[]) {
+    try {
+      const rm = await this.contentGroupRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
   async findAllContentByChat(id:string) {
+    console.log(id)
     return {
       statusCode: HttpStatus.OK,
-      data: await this.contentsRepository.find({where:{chat:In([id])}}),
+      data: await this.contentsRepository.find({where:{chat:In([id])},order:{created_at:'ASC'}}),
     };
   }
   
@@ -1062,6 +1190,39 @@ export class LayerService {
         where: { id: id },
       }),
       message: 'Cập nhật thành công',
+    };
+  }
+
+  async findAllContentGroupByChat(id:string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.contentGroupRepository.find({where:{chat_group:In([id])},order:{created_at:'ASC'}}),
+    };
+  }
+  
+
+  async updateContentGroup(
+    id: string,
+    updateDto: UpdateContentsGroupDto,
+  ) {
+    const {chat_group,...reqUpdate} = updateDto
+    await this.contentGroupRepository.update(id,reqUpdate);
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.contentGroupRepository.findOne({
+        where: { id: id },
+      }),
+      message: 'Cập nhật thành công',
+    };
+  }
+
+  async findAllUsersByProject(id:string) {
+    const project = await this.projectsRepository.findOne({where:{project_id:id},relations:['users']});
+    const users = project?.users?.map((user)=>user.user);
+    const dataUser = users?.length > 0 ? await firstValueFrom(this.userClient.send({cmd: 'get-user_ids'},users)) : []
+    return {
+      statusCode: HttpStatus.OK,
+      data: dataUser
     };
   }
 }

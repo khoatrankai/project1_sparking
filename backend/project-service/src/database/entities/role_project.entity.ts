@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn, Column, OneToMany } from 'typeorm';
 import { RoleUser } from './role_user.entity';
 
 @Entity()
@@ -14,4 +16,10 @@ export class RoleProject {
 
   @OneToMany(() => RoleUser, roleUser => roleUser.role)
   users: RoleUser[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }

@@ -17,6 +17,9 @@ import { CreateChatDto } from 'src/dto/ChatDto/create-chat.dto';
 import { UpdateChatDto } from 'src/dto/ChatDto/update-chat.dto';
 import { CreateContentsDto } from 'src/dto/ContentsDto/create-content.dto';
 import { UpdateContentsDto } from 'src/dto/ContentsDto/update-content.dto';
+import { CreateChatGroupDto } from 'src/dto/ChatGroupDto/create-chat_group.dto';
+import { CreateContentsGroupDto } from 'src/dto/ContentsGroupDto/create-content_group.dto';
+import { UpdateContentsGroupDto } from 'src/dto/ContentsGroupDto/update-content_group.dto';
 
 @Controller('/project')
 @UseFilters(ConflictExceptionFilter)
@@ -228,14 +231,36 @@ export class LayerController {
     return this.layerService.createChat(createDto);
   }
 
+  @MessagePattern({ cmd: 'create-chat_group' })
+  async createChatGroup(
+    @Payload() createDto: CreateChatGroupDto,
+  ) {
+    return this.layerService.createChatGroup(createDto);
+  }
+
   @MessagePattern({ cmd: 'delete-chat' })
   async deleteChat(@Payload() datas: string[]) {
     return this.layerService.deleteChat(datas);
   }
 
+  @MessagePattern({ cmd: 'delete-member_group' })
+  async deleteMemberGroup(@Payload('user') user: string,@Payload('chat_group') chat_group: string) {
+    return this.layerService.deleteMemberGroup(user,chat_group);
+  }
+
+  @MessagePattern({ cmd: 'delete-chat_group' })
+  async deleteChatGroup(@Payload() datas: string[]) {
+    return this.layerService.deleteChatGroup(datas);
+  }
+
   @MessagePattern({ cmd: 'find-all_chat_by_user' })
   async findAllChatByUser(@Payload('id') id:string,@Payload('project') project:string) {
     return this.layerService.findAllChatByUser(id,project);
+  }
+
+  @MessagePattern({ cmd: 'find-all_chat_group_by_user' })
+  async findAllChatGroupByUser(@Payload('id') id:string,@Payload('project') project:string) {
+    return this.layerService.findAllChatGroupByUser(id,project);
   }
 
   
@@ -266,7 +291,7 @@ export class LayerController {
   }
 
   @MessagePattern({ cmd: 'find-all_content_by_chat' })
-  async findAllContentByChat(@Payload() id:string) {
+  async findAllContentByChat(@Payload('id') id:string) {
     return this.layerService.findAllContentByChat(id);
   }
 
@@ -279,5 +304,40 @@ export class LayerController {
   ) {
     const { id, updateDto } = data;
     return this.layerService.updateContent(id, updateDto);
+  }
+
+  @MessagePattern({ cmd: 'get-users-by-project' })
+  async findAllUsersByProject(
+    @Payload('id') id:string
+  ) {
+    return this.layerService.findAllUsersByProject(id);
+  }
+
+  @MessagePattern({ cmd: 'create-content_group' })
+  async createContentGroup(
+    @Payload() createDto: CreateContentsGroupDto,
+  ) {
+    return this.layerService.createContentGroup(createDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-content_group' })
+  async deleteContentGroup(@Payload() datas: string[]) {
+    return this.layerService.deleteContentGroup(datas);
+  }
+
+  @MessagePattern({ cmd: 'find-all_content_group_by_chat' })
+  async findAllContentGroupByChat(@Payload('id') id:string) {
+    return this.layerService.findAllContentGroupByChat(id);
+  }
+
+  
+
+
+  @MessagePattern({ cmd: 'update-content_group' })
+  async updateContentGroup(
+    @Payload() data: { id: string; updateDto: UpdateContentsGroupDto },
+  ) {
+    const { id, updateDto } = data;
+    return this.layerService.updateContentGroup(id, updateDto);
   }
 }

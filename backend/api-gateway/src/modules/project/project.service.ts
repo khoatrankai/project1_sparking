@@ -12,6 +12,10 @@ import { UpdateContractDto } from '../contract/dto/ContractDto/update_contract.d
 import { CreateContractDto } from '../contract/dto/ContractDto/create_contract.dto';
 import { CreateRoleProjectDto } from './dto/RoleProjectDto/create-role_project.dto';
 import { UpdateRoleProjectDto } from './dto/RoleProjectDto/update-role_project.dto';
+import { CreateContentsDto } from './dto/ContentsDto/create-content.dto';
+import { CreateChatDto } from './dto/ChatDto/create-chat.dto';
+import { CreateChatGroupDto } from './dto/ChatGroupDto/create-chat_group.dto';
+import { CreateContentsGroupDto } from './dto/ContentsGroupDto/create-content_group.dto';
 
 @Injectable()
 export class ProjectService {
@@ -423,6 +427,200 @@ export class ProjectService {
       return result;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getChatByUser(id:string,project:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'find-all_chat_by_user' },
+            {id,project},
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to get chat',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    async getChatGroupByUser(id:string,project:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'find-all_chat_group_by_user' },
+            {id,project},
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to get chat group',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    async getUsersByProject(id:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'get-users-by-project' },
+            id,
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to get users',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+
+    async getContentsByChat(id:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'find-all_content_by_chat' },
+            id,
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to get contents',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+     async createContentChat(createDto: CreateContentsDto,
+    picture_url: Express.Multer.File) {
+    try {
+      const data = picture_url
+      ? await this.cloudinaryService.uploadFile(picture_url)
+      : undefined;
+      const result = await firstValueFrom(
+        this.projectClient.send(
+          { cmd: 'create-content' },
+          { ...createDto, link: data ? data.secure_url : undefined },
+        ),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create role product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+   async getContentsGroupByChat(id:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'find-all_content_group_by_chat' },
+            id,
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to get contents',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    async sendDeleteContent(datas: string[]) {
+    return await firstValueFrom(
+      this.projectClient.send({cmd:'delete-content'}, datas),
+    );
+  }
+
+   async sendDeleteChat(datas: string[]) {
+    return await firstValueFrom(
+      this.projectClient.send({cmd:'delete-chat'}, datas),
+    );
+  }
+
+  async sendDeleteChatGroup(datas: string[]) {
+    return await firstValueFrom(
+      this.projectClient.send({cmd:'delete-chat_group'}, datas),
+    );
+  }
+
+  async sendDeleteMemberChatGroup(user:string,chat_group:string) {
+    return await firstValueFrom(
+      this.projectClient.send({cmd:'delete-member_group'}, {user,chat_group}),
+    );
+  }
+
+  async sendDeleteContentGroup(datas: string[]) {
+    return await firstValueFrom(
+      this.projectClient.send({cmd:'delete-content_group'}, datas),
+    );
+  }
+
+     async createContentGroupChat(createDto: CreateContentsGroupDto,
+    picture_url: Express.Multer.File) {
+    try {
+      const data = picture_url
+      ? await this.cloudinaryService.uploadFile(picture_url)
+      : undefined;
+      const result = await firstValueFrom(
+        this.projectClient.send(
+          { cmd: 'create-content_group' },
+          { ...createDto, link: data ? data.secure_url : undefined },
+        ),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create content chat',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async createChat(createDto: CreateChatDto) {
+    try {
+     
+      const result = await firstValueFrom(
+        this.projectClient.send(
+          { cmd: 'create-chat' },
+          { ...createDto},
+        ),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create role product',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async createChatGroup(createDto: CreateChatGroupDto) {
+    try {
+     
+      const result = await firstValueFrom(
+        this.projectClient.send(
+          { cmd: 'create-chat_group' },
+          { ...createDto},
+        ),
+      );
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to create role product',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

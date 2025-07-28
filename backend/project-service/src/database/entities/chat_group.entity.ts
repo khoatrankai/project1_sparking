@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column, OneToMany,ManyToOne,JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany,ManyToOne,JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn, } from 'typeorm';
 import { RoleUser } from './role_user.entity';
 import { Projects } from './project.entity';
 import { ContentGroup } from './content_group.entity';
@@ -27,4 +29,10 @@ export class ChatGroup {
 
   @OneToMany(() => ContentGroup, contentGroup => contentGroup.chat_group)
   contents: ContentGroup[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }

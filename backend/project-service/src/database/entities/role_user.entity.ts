@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column, OneToMany,ManyToOne,JoinColumn} from 'typeorm';
+import { Entity, PrimaryColumn, Column,
+  CreateDateColumn,
+  UpdateDateColumn, OneToMany,ManyToOne,JoinColumn} from 'typeorm';
 import { RoleProject } from './role_project.entity';
 import { Projects } from './project.entity';
 
@@ -17,4 +19,10 @@ export class RoleUser {
   @ManyToOne(() => RoleProject, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'role' })
   role: RoleProject;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }
