@@ -68,7 +68,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     this.server.to(data.user).emit('load_list_chat'); // broadcast
-    client.emit('load_list_chat'); // broadcast
+    // client.emit('load_list_chat'); // broadcast
+    this.server.to(client['user'].sub).emit('load_list_chat');
     this.server.to(data.chat).emit('load_chat',{data:data.data}); // broadcast
   }
 
@@ -78,7 +79,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     this.server.to(data.user).emit('load_list_chat'); // broadcast
-    client.emit('load_list_chat'); // broadcast
+    this.server.to(client['user'].sub).emit('load_list_chat');
     this.server.to(data.chat).emit('load_delete_chat',{data:data.data}); // broadcast
   }
 
