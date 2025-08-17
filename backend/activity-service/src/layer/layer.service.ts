@@ -64,6 +64,12 @@ import { CreateFolderWorkDto } from 'src/dto/FolderWorkDto/create-folder_work.dt
 import { FileWork } from 'src/database/entities/file_work.entity';
 import { FolderWork } from 'src/database/entities/folder_work.entity';
 import { CreateFileWorkDto } from 'src/dto/FileWorkDto/create-folder_work.dto';
+import { ReviewUsers } from 'src/database/entities/review_user.entity';
+import { Reminds } from 'src/database/entities/remind.entity';
+import { CreateReviewUserDto } from 'src/dto/ReviewUserDto/create-review_user.dto';
+import { UpdateReviewUserDto } from 'src/dto/ReviewUserDto/update-review_user.dto';
+import { CreateRemindDto } from 'src/dto/RemindDto/create-remind.dto';
+import { UpdateRemindDto } from 'src/dto/RemindDto/update-remind.dto';
 
 @Injectable()
 export class LayerService {
@@ -103,6 +109,10 @@ export class LayerService {
     private readonly pictureWorkRepository: Repository<PictureWork>,
     @InjectRepository(ListUser)
     private readonly listUserRepository: Repository<ListUser>,
+     @InjectRepository(ReviewUsers)
+    private readonly reviewUsersRepository: Repository<ReviewUsers>,
+    @InjectRepository(Reminds)
+    private readonly remindsRepository: Repository<Reminds>,
     private readonly configService: ConfigService,
   ) {}
   getHello(): string {
@@ -1719,6 +1729,7 @@ export class LayerService {
       where: { work_id },
       relations: ['type', 'status', 'picture_urls', 'list_user', 'activity','tasks','folders','folders.files'],
     });
+    console.log("listuser:",work)
     const userIds = work.list_user.map((dt) => {
       return dt.user;
     });
@@ -1728,7 +1739,9 @@ export class LayerService {
     const dataUserCreate = await firstValueFrom(
       this.usersClient.send({ cmd: 'get-user_ids' }, [work.user_create]),
     );
-    const dataRes = { ...work, list_user: dataUsers,user_create:dataUserCreate?.[0] };
+    const dataRes = { ...work, list_user: dataUsers.map((dt,index)=>{
+      return {...dt,list_id:work?.list_user?.[index]?.list_id}
+    }),user_create:dataUserCreate?.[0] };
     if (!work) {
       throw new NotFoundException(`Activity not found`);
     }
@@ -3068,5 +3081,152 @@ export class LayerService {
 
 
    }
+
+   async createReviewUser(createReviewUserDto: CreateReviewUserDto) {
+    const user_work = await this.listUserRepository.findOne({where:{list_id:createReviewUserDto.user_work}})
+    const newReviewUser = this.reviewUsersRepository.create({
+      ...createReviewUserDto,
+      review_id: uuidv4(),
+      user_work
+    });
+    const result = await this.reviewUsersRepository.save(newReviewUser);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Review user created successfully',
+      data: result,
+    };
+  }
+
+  async deleteReviewUser(datas: string[]) {
+    try {
+      const rm = await this.reviewUsersRepository.delete({
+        review_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateReviewUser(
+    review_id: string,
+    updateReviewUserDto: UpdateReviewUserDto,
+  ) {
+    const user_work = await this.listUserRepository.findOne({where:{list_id:updateReviewUserDto.user_work}})
+    const result = await this.reviewUsersRepository.update(
+      review_id,
+      {...updateReviewUserDto,user_work},
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Cập nhật thành công',
+      data: result,
+    };
+  }
+
+  async getReviewUser(review_id: string) {
+    const reviewUser = await this.reviewUsersRepository.findOne({
+      where: { review_id },
+    });
+    if (!reviewUser)
+      throw new NotFoundException(
+        `TypeActivity with ID ${review_id} not found`,
+      );
+    return { statusCode: HttpStatus.OK, data: reviewUser };
+  }
+
+  async getReviewUserByWork(user: string,work:string) {
+    const reviewUser = await this.listUserRepository.findOne({
+      where: { work:In([work]),user:user },
+      relations:['review_user']
+    });
+    console.log(reviewUser)
+    if (!reviewUser)
+      throw new NotFoundException(
+        `Review with ID not found`,
+      );
+    return { statusCode: HttpStatus.OK, data: reviewUser?.review_user?.[0] || {} };
+  }
+
+  async createRemind(createRemindDto: CreateRemindDto) {
+    const work = await this.worksRepository.findOne({where:{work_id:createRemindDto.work}})
+    const newRemind = this.remindsRepository.create({
+      ...createRemindDto,
+      remind_id: uuidv4(),
+      work
+    });
+    const result = await this.remindsRepository.save(newRemind);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Remind user created successfully',
+      data: result,
+    };
+  }
+
+  async deleteRemind(datas: string[]) {
+    try {
+      const rm = await this.remindsRepository.delete({
+        remind_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateRemind(
+    remind_id: string,
+    updateRemindDto: UpdateRemindDto,
+  ) {
+    const work = await this.worksRepository.findOne({where:{work_id:updateRemindDto.work}})
+    const result = await this.remindsRepository.update(
+      remind_id,
+      {...updateRemindDto,work},
+       
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Cập nhật thành công',
+      data: result,
+    };
+  }
+
+  async getRemind(remind_id: string) {
+    const remind = await this.remindsRepository.findOne({
+      where: { remind_id },
+    });
+    if (!remind)
+      throw new NotFoundException(
+        `Remind with ID ${remind_id} not found`,
+      );
+    return { statusCode: HttpStatus.OK, data: remind };
+  }
+
+  async getRemindByUser(user_remind: string) {
+    const remind = await this.remindsRepository.find({
+      where: { user_remind },
+    });
+    if (!remind)
+      throw new NotFoundException(
+        `Remind with ID ${user_remind} not found`,
+      );
+    return { statusCode: HttpStatus.OK, data: remind };
+  }
     
 }

@@ -34,6 +34,10 @@ import { CreateCommentDto } from 'src/dto/CommentDto/create-comment.dto';
 import { UpdateCommentDto } from 'src/dto/CommentDto/update-comment.dto';
 import { CreateFolderWorkDto } from 'src/dto/FolderWorkDto/create-folder_work.dto';
 import { CreateFileWorkDto } from 'src/dto/FileWorkDto/create-folder_work.dto';
+import { CreateReviewUserDto } from 'src/dto/ReviewUserDto/create-review_user.dto';
+import { UpdateReviewUserDto } from 'src/dto/ReviewUserDto/update-review_user.dto';
+import { CreateRemindDto } from 'src/dto/RemindDto/create-remind.dto';
+import { UpdateRemindDto } from 'src/dto/RemindDto/update-remind.dto';
 
 @Controller('/activity')
 @UseFilters(ConflictExceptionFilter)
@@ -646,5 +650,71 @@ export class LayerController {
   @MessagePattern({ cmd: 'get-documents_by_project' })
   async getDocumentsByProject(project:string) {
     return this.layerService.getDocumentsByProject(project);
+  }
+
+  @MessagePattern('create-review_user')
+  async createReviewUser(
+    @Payload() createDto: CreateReviewUserDto,
+  ) {
+    return await this.layerService.createReviewUser(
+      createDto,
+    );
+  }
+
+  @MessagePattern('delete-review_user')
+  async deleteReviewUser(@Payload() datas: string[]) {
+    return await this.layerService.deleteReviewUser(datas);
+  }
+
+  @MessagePattern('update-review_user')
+  async updateReviewUser(
+    @Payload()
+    payload: {
+      review_id: string;
+      updateDto: UpdateReviewUserDto;
+    },
+  ) {
+    return await this.layerService.updateReviewUser(
+      payload.review_id,
+      payload.updateDto,
+    );
+  }
+
+  @MessagePattern('get-review_user_by_work')
+  async getReviewUserByWork(@Payload('user') user: string,@Payload('work') work: string) {
+    return await this.layerService.getReviewUserByWork(user,work);
+  }
+
+  @MessagePattern('create-remind')
+  async createRemind(
+    @Payload() createDto: CreateRemindDto,
+  ) {
+    return await this.layerService.createRemind(
+      createDto,
+    );
+  }
+
+  @MessagePattern('delete-remind')
+  async deleteRemind(@Payload() datas: string[]) {
+    return await this.layerService.deleteRemind(datas);
+  }
+
+  @MessagePattern('update-remind')
+  async updateRemind(
+    @Payload()
+    payload: {
+      remind_id: string;
+      updateDto: UpdateRemindDto;
+    },
+  ) {
+    return await this.layerService.updateRemind(
+      payload.remind_id,
+      payload.updateDto,
+    );
+  }
+
+  @MessagePattern('get-remind_by_user')
+  async getRemindByUser(@Payload('user_remind') user: string) {
+    return await this.layerService.getRemindByUser(user);
   }
 }

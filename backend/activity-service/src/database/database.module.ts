@@ -18,6 +18,8 @@ import { Comments } from './entities/comment.entity';
 import { Reviews } from './entities/review.entity';
 import { FileWork } from './entities/file_work.entity';
 import { FolderWork } from './entities/folder_work.entity';
+import { ReviewUsers } from './entities/review_user.entity';
+import { Reminds } from './entities/remind.entity';
 
 @Module({
   imports: [
@@ -57,7 +59,7 @@ import { FolderWork } from './entities/folder_work.entity';
             PictureTask,
             Comments,
             Reviews,
-                  FolderWork,FileWork
+                  FolderWork,FileWork,ReviewUsers,Reminds
           ],
           // synchronize: true,
           // dropSchema: true,

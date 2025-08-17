@@ -34,6 +34,10 @@ import { UpdateCommentDto } from './dto/CommentDto/update-comment.dto';
 import { CreateCommentDto } from './dto/CommentDto/create-comment.dto';
 import { CreateFolderWorkDto } from './dto/FolderWorkDto/create-folder_work.dto';
 import { CreateFileWorkDto } from './dto/FileWorkDto/create-folder_work.dto';
+import { CreateReviewUserDto } from './dto/ReviewUserDto/create-review_user.dto';
+import { UpdateReviewUserDto } from './dto/ReviewUserDto/update-review_user.dto';
+import { CreateRemindDto } from './dto/RemindDto/create-remind.dto';
+import { UpdateRemindDto } from './dto/RemindDto/update-remind.dto';
 
 @Injectable()
 export class ActivityService {
@@ -994,6 +998,70 @@ export class ActivityService {
   async sendGetProjectsByType(id:string) {
     return await firstValueFrom(
       this.activityClient.send({ cmd: 'get-projects_by_type' }, id),
+    );
+  }
+
+  async sendCreateReviewUser(
+    createDto: CreateReviewUserDto,
+  ) {
+    return await firstValueFrom(
+      this.activityClient.send('create-review_user', createDto),
+    );
+  }
+
+  async sendDeleteReviewUser(datas: string[]) {
+    return await firstValueFrom(
+      this.activityClient.send('delete-review_user', datas),
+    );
+  }
+
+  async sendUpdateReviewUser(
+    review_id: string,
+    updateDto: UpdateReviewUserDto,
+  ) {
+    return await firstValueFrom(
+      this.activityClient.send('update-review_user', {
+        review_id,
+        updateDto,
+      }),
+    );
+  }
+
+  async sendGetReviewUserByWork(user: string,work:string) {
+    return await firstValueFrom(
+      this.activityClient.send('get-review_user_by_work', {user,work}),
+    );
+  }
+
+  async sendCreateRemind(
+    createDto: CreateRemindDto,
+  ) {
+    return await firstValueFrom(
+      this.activityClient.send('create-remind', createDto),
+    );
+  }
+
+  async sendDeleteRemind(datas: string[]) {
+    return await firstValueFrom(
+      this.activityClient.send('delete-remind', datas),
+    );
+  }
+
+  async sendUpdateRemind(
+    remind_id: string,
+    updateDto: UpdateRemindDto,
+  ) {
+    return await firstValueFrom(
+      this.activityClient.send('update-remind', {
+        remind_id,
+        updateDto,
+      }),
+    );
+  }
+
+  async sendGetRemindByUser(user_remind: string) {
+    return await firstValueFrom(
+      this.activityClient.send('get-remind_by_user', {user_remind}),
     );
   }
 }

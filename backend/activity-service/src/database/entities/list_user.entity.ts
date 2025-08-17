@@ -1,5 +1,6 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn,OneToMany } from 'typeorm';
 import { Works } from './work.entity';
+import { ReviewUsers } from './review_user.entity';
 
 @Entity()
 export class ListUser {
@@ -18,4 +19,7 @@ export class ListUser {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @OneToMany(() => ReviewUsers, (review) => review.user_work, { cascade: true })
+  review_user: ReviewUsers[];
 }

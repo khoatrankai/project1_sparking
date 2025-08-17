@@ -46,6 +46,10 @@ import { CreateCommentDto } from './dto/CommentDto/create-comment.dto';
 import { UpdateCommentDto } from './dto/CommentDto/update-comment.dto';
 import { CreateFolderWorkDto } from './dto/FolderWorkDto/create-folder_work.dto';
 import { CreateFileWorkDto } from './dto/FileWorkDto/create-folder_work.dto';
+import { CreateReviewUserDto } from './dto/ReviewUserDto/create-review_user.dto';
+import { UpdateReviewUserDto } from './dto/ReviewUserDto/update-review_user.dto';
+import { CreateRemindDto } from './dto/RemindDto/create-remind.dto';
+import { UpdateRemindDto } from './dto/RemindDto/update-remind.dto';
 
 @Controller('activity')
 export class ActivityController {
@@ -1138,5 +1142,89 @@ export class ActivityController {
   async sendGetProjectsByType(@Param('id') type:string) {
     // return
     return this.activityService.sendGetProjectsByType(type);
+  }
+
+  @Post('review-user')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-type-create', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendCreateReviewUser(@Req() req:Request,
+    @Body() createDto: CreateReviewUserDto,
+  ) {
+    return this.activityService.sendCreateReviewUser(
+      {...createDto,user_create:req['user'].sub},
+    );
+  }
+
+  @Delete('review-user')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-type-delete', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteReviewUser(@Body() datas: string[]) {
+    return this.activityService.sendDeleteReviewUser(datas);
+  }
+
+  @Put('review-user/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-type-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateReviewUser(
+    @Param('id') review_id: string,
+    @Body() updateDto: UpdateReviewUserDto,
+  ) {
+    return this.activityService.sendUpdateReviewUser(
+      review_id,
+      updateDto,
+    );
+  }
+
+  @Get('review-user-by-work')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-type-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetReviewUserByWork(@Query('user') user: string,@Query('work') work: string) {
+    return this.activityService.sendGetReviewUserByWork(user,work);
+  }
+
+  @Post('remind')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-type-create', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendCreateRemind(@Req() req:Request,
+    @Body() createDto: CreateRemindDto,
+  ) {
+    return this.activityService.sendCreateRemind(
+      {...createDto, user_create:req['user'].sub},
+    );
+  }
+
+  @Delete('remind')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-type-delete', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteRemind(@Body() datas: string[]) {
+    return this.activityService.sendDeleteRemind(datas);
+  }
+
+  @Put('remind/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-type-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateRemind(
+    @Param('id') remind_id: string,
+    @Body() updateDto: UpdateRemindDto,
+  ) {
+    return this.activityService.sendUpdateRemind(
+      remind_id,
+      updateDto,
+    );
+  }
+
+  @Get('remind-by-user')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'activity-type-read', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetRemindByUser(@Query('user') user_remind: string) {
+    return this.activityService.sendGetRemindByUser(user_remind);
   }
 }
