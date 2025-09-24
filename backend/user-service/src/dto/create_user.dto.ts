@@ -6,7 +6,8 @@ import {
   Length,
   IsEmail,
 } from 'class-validator';
-
+import { Transform } from 'class-transformer';
+import { CreateSkillDto } from './create_skill.dto';
 export class CreateUserDto {
   @IsString()
   @Length(1, 50)
@@ -35,6 +36,11 @@ export class CreateUserDto {
   @IsString()
   @Length(1, 50)
   phone_number?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  position?: string;
 
   @IsOptional()
   @IsUrl()
@@ -69,4 +75,19 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   group_user?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          if (!Array.isArray(parsed)) throw new Error();
+          return parsed;
+        } catch {
+          throw new Error('Invalid JSON format in "answers"');
+        }
+      }
+      return value; // Trường hợp gửi qua JSON raw thì để nguyên
+  })
+  skills?: CreateSkillDto[ ];
 }

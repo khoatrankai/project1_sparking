@@ -1322,5 +1322,94 @@ export class ContractService {
     }
     
   }
+
+    async getDashboardRevenue(year:string){
+    try{
+      const listRevenue = await this.paymentRepository
+      .createQueryBuilder('payment')
+      .select("MONTH(payment.created_at)", "month")
+      .addSelect("SUM(payment.price)", "totalPrice")
+      .where("payment.type = :type", { type: 'import' })
+      .andWhere("YEAR(payment.created_at) = :year", { year })
+      .groupBy("MONTH(payment.created_at)")
+      .orderBy("month", "ASC")
+      .getRawMany();
+      const maxRevenue = listRevenue?.reduce((max,curr)=>{
+        if(curr?.totalPrice > max){
+          return curr?.totalPrice 
+        }
+        return max
+      },0)
+      return {
+        statusCode:HttpStatus.OK,
+        data:{
+          max:maxRevenue,
+          list:listRevenue
+        }
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST
+      }
+    }
+    
+  }
+
+  async getSalesByProvince(data:{ids:string,timestamp_start:string,timestamp_end:string}){
+    try{
+      const datasCustomer = await firstValueFrom(await this.customersClient.send({ cmd: 'get-ids_customer_by_provinces' },[data.ids]))
+      
+      const idsCustomer = datasCustomer?.data?.map((dt)=>{
+        return dt?.info_id
+      })
+      console.log(idsCustomer)
+      const startDate = new Date(Number(data.timestamp_start) * 1000); // nhân 1000 vì JS Date dùng ms
+        const endDate = new Date(Number(data.timestamp_end) * 1000);
+        const payments = await this.paymentRepository
+        .createQueryBuilder('payment')
+        .leftJoinAndSelect('payment.contract', 'contract')
+        .where('payment.created_at BETWEEN :start AND :end', {
+          start: startDate,
+          end: endDate,
+        })
+        .andWhere('contract.customer IN (:...idsCustomer)', { idsCustomer })
+        .getMany();
+
+      // Gom nhóm theo type_product
+      let idsTypeProduct = []
+      const grouped = payments.reduce((acc, pay) => {
+        const key = pay.type_product || 'UNKNOWN';
+        if (!acc[key]) {
+          idsTypeProduct.push(key)
+          acc[key] = [];
+        }
+        acc[key].push(pay);
+        return acc;
+      }, {} as Record<string, Payment[]>);
+
+      // Chuyển về [{type_product, datas}]
+      const dataTypeProducts = await firstValueFrom(this.productsClient.send({ cmd: 'find-ids_type_product' },idsTypeProduct))
+      const dataOK = Object.entries(grouped).map(([type_product, datas]) => ({
+        type_product,
+        datas,
+      }));
+      const dataReturn = dataOK.map((dt,index)=>{
+        return {
+          ...dt,type_product:dataTypeProducts[index]
+        }
+      })
+      return {
+        statusCode:HttpStatus.OK,
+        data:dataReturn
+      }
+      
+    }catch(err){
+      return {
+        statusCode:HttpStatus.BAD_REQUEST,
+        data:err
+      }
+    }
+    
+  }
  
 }

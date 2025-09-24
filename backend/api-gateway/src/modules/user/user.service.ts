@@ -19,6 +19,8 @@ import { CreateCategoryRoleUserDto } from './dto/create_category.dto';
 import { UpdateCategoryRoleUserDto } from './dto/update_category.dto';
 import { CreateGroupUserDto } from './dto/GroupUser/create_group.dto';
 import { UpdateGroupUserDto } from './dto/GroupUser/update_group.dto';
+import { CreateSkillDto } from './dto/create_skill.dto';
+import { UpdateSkillDto } from './dto/update_skill.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -261,6 +263,26 @@ export class UserService {
     return this.usersClient.send(
       { cmd: 'update-group_user' },
       updateGroupUserDto,
+    );
+  }
+
+  async createSkill(creategroupUserDto: CreateSkillDto) {
+    return this.usersClient.send(
+      { cmd: 'create-skill' },
+      creategroupUserDto,
+    );
+  }
+
+  async sendDeleteSkills(datas: string[]) {
+    return await firstValueFrom(
+      this.usersClient.send({cmd:'delete-skill'}, datas),
+    );
+  }
+
+  async updateSkill(skill_id:string,updateGroupUserDto: UpdateSkillDto) {
+    return this.usersClient.send(
+      { cmd: 'update-skill' },
+      {skill_id,data:updateGroupUserDto},
     );
   }
 

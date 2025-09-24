@@ -1064,4 +1064,10 @@ export class ActivityService {
       this.activityClient.send('get-remind_by_user', {user_remind}),
     );
   }
+
+    async sendGetWorkEfficiencyByUser(user_id: string) {
+    return await firstValueFrom(
+      this.activityClient.send('get-work_efficiency', user_id),
+    );
+  }
 }

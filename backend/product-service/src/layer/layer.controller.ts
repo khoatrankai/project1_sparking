@@ -193,6 +193,11 @@ export class LayerController {
     return this.layerService.findAllTypeProduct();
   }
 
+  @MessagePattern({ cmd: 'find-ids_type_product' })
+  async findTypeProductByIds(@Payload() ids: string[]) {
+    return this.layerService.findTypeProductByIds(ids);
+  }
+
   @MessagePattern({ cmd: 'find-one_type_product' })
   async findOneTypeProduct(@Payload() id: string) {
     return this.layerService.findOneTypeProduct(id);

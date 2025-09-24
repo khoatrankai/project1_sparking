@@ -717,4 +717,9 @@ export class LayerController {
   async getRemindByUser(@Payload('user_remind') user: string) {
     return await this.layerService.getRemindByUser(user);
   }
+
+  @MessagePattern('get-work_efficiency')
+  async getWorkEfficiency(user_id: string) {
+    return await this.layerService.getWorkEfficiency(user_id);
+  }
 }

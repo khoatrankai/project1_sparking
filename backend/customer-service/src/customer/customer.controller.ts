@@ -228,5 +228,8 @@ export class CustomerController {
     );
   }
 
-  
+  @MessagePattern({ cmd: 'get-ids_customer_by_provinces' })
+  getCustomerIdsByProvinces(ids: string[]) {
+    return this.customerService.getCustomerIdsByProvinces(ids);
+  }
 }

@@ -13,6 +13,9 @@ import { Notify } from 'src/database/entities/notify.entity';
 import { NotifyRole } from 'src/database/entities/notify_role.entity';
 import { NotifyUser } from 'src/database/entities/notify_user.entity';
 import { TimeKeeping } from 'src/database/entities/timekeeping.entity';
+import { Skills } from 'src/database/entities/skill.entity';
+import { FollowWork } from 'src/database/entities/follow_work.entity';
+import { Documents } from 'src/database/entities/document.entity';
 
 @Module({
   imports: [
@@ -26,7 +29,9 @@ import { TimeKeeping } from 'src/database/entities/timekeeping.entity';
       Notify,
       NotifyRole,
       NotifyUser,
-      TimeKeeping
+      TimeKeeping,
+      Skills,
+      FollowWork,Documents
     ]),
   ],
   controllers: [UserController],

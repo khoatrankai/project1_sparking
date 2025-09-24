@@ -287,4 +287,16 @@ export class ContractController {
   async getProjectsByContracts(ids:string[]) {
     return this.contractService.getProjectsByContracts(ids);
   }
+
+
+  @MessagePattern({ cmd: 'get-sales_by_province' })
+  async getSalesByProvince(data:any) {
+    console.log(data)
+    return this.contractService.getSalesByProvince(data);
+  }
+
+  @MessagePattern({ cmd: 'get-dashboard_revenue' })
+  async getDashboardRevenue(year:string) {
+    return this.contractService.getDashboardRevenue(year);
+  }
 }

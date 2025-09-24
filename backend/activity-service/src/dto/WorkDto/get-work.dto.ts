@@ -38,6 +38,9 @@ export class CreateWorkDto {
   @IsDate()
   time_end: Date;
 
+  @IsDate()
+  time_complete: Date;
+
   @IsArray()
   @IsOptional()
   picture_urls?: string[];

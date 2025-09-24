@@ -45,6 +45,10 @@ export class UpdateWorkDto {
   @IsOptional()
   time_end?: Date;
 
+  @IsDate()
+  @IsOptional()
+  time_complete: Date;
+
   @IsArray()
   @IsOptional()
   picture_urls?: CreatePictureWorkDto[];

@@ -1017,6 +1017,13 @@ export class CustomerService {
     }
   }
 
-
+  async getCustomerIdsByProvinces(provinces: string[]) {
+    const data = await this.customerInfoRepository.find({where:{ province: In(provinces)}
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data: data,
+    };
+  }
 
 }

@@ -10,6 +10,8 @@ import { UpdateUserDto } from 'src/dto/update_user.dto';
 import { CreateGroupUserDto } from 'src/dto/GroupUser/create_group.dto';
 import { UpdateGroupUserDto } from 'src/dto/GroupUser/update_group.dto';
 import { CreateNotifyrDto } from 'src/dto/Notify/create_notify.dto';
+import { CreateSkillDto } from 'src/dto/create_skill.dto';
+import { UpdateSkillDto } from 'src/dto/update_skill.dto';
 
 @Controller()
 @UseFilters(ConflictExceptionFilter)
@@ -129,6 +131,21 @@ export class UserController {
     return this.userService.updateGroupUser(updateGroupUser);
   }
 
+  @MessagePattern({ cmd: 'create-skill' })
+  createSkill(createGroupUser: CreateSkillDto) {
+    return this.userService.createSkill(createGroupUser);
+  }
+
+  @MessagePattern({ cmd: 'delete-skill' })
+  async deleteSkill(@Payload() datas: string[]) {
+    return this.userService.deleteSkills(datas);
+  }
+
+  @MessagePattern({ cmd: 'update-skill' })
+  updateSkill(@Payload('data') updateGroupUser: UpdateSkillDto,@Payload('skill_id') skill_id: string) {
+    return this.userService.updateSkill(skill_id,updateGroupUser);
+  }
+
   @MessagePattern({ cmd: 'get-user_filter' })
   getUserFilter(@Payload('group') group?: string) {
     return this.userService.getUserFilter(group);
@@ -177,6 +194,11 @@ export class UserController {
   @MessagePattern({ cmd: 'get-ids_group' })
   getIdsByGroup(user:string) {
     return this.userService.getIdsByGroup(user);
+  }
+
+   @MessagePattern({ cmd: 'get-ids_work_by_user' })
+  getIdsWorkByUser(user:string) {
+    return this.userService.getIdsWorkByUser(user);
   }
   
 }

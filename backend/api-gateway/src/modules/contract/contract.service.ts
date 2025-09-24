@@ -323,4 +323,16 @@ export class ContractService {
       this.contractClient.send({cmd:'get-contract_filter_by_project'}, filter),
     );
   }
+
+  async sendGetSalesByProvince(filter: {ids:string,timestamp_start:string,timestamp_end:string}) {
+    return await firstValueFrom(
+      this.contractClient.send({cmd:'get-sales_by_province'}, filter),
+    );
+  }
+
+  async sendGetDashboardRevenue(year:string) {
+    return await firstValueFrom(
+      this.contractClient.send({cmd:'get-dashboard_revenue'}, year),
+    );
+  }
 }

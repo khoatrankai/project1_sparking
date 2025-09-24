@@ -1,4 +1,6 @@
+import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, Length, IsEmail } from 'class-validator';
+import { CreateSkillDto } from './create_skill.dto';
 
 export class CreateUserDto {
   @IsString()
@@ -51,4 +53,20 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   group_user?: string;
+
+
+  @IsOptional()
+  @Transform(({ value }) => {
+        if (typeof value === 'string') {
+          try {
+            const parsed = JSON.parse(value);
+            if (!Array.isArray(parsed)) throw new Error();
+            return parsed;
+          } catch {
+            throw new Error('Invalid JSON format in "answers"');
+          }
+        }
+        return value; // Trường hợp gửi qua JSON raw thì để nguyên
+  })
+  skill?: CreateSkillDto[];
 }

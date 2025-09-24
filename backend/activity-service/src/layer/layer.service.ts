@@ -2049,7 +2049,8 @@ export class LayerService {
   }
 
   async getFullTypeWorksID(type_work_id: string) {
-    const typeWork = await this.typeWorkRepository.findOne({
+    try{
+      const typeWork = await this.typeWorkRepository.findOne({
       where: { type_work_id },
       relations: ['status', 'status.work', 'status.work.picture_urls'],
     });
@@ -2072,6 +2073,11 @@ export class LayerService {
             }
           : typeWork,
     };
+    }catch(err){
+      console.log(err.message)
+      return 
+    }
+    
   }
 
   async createTypeWork(createTypeWorkDto: CreateTypeWorkDto) {
@@ -2412,10 +2418,10 @@ export class LayerService {
             statusCode:HttpStatus.OK,
             data:{
               total:works.length,
-              waitting:works.filter((dt)=> dt.status.name_tag === "waitting").length,
-              process:works.filter((dt)=> dt.status.name_tag === "process").length,
-              review:works.filter((dt)=> dt.status.name_tag === "review").length,
-              yet_completed:works.filter((dt)=> dt.status.name_tag === "yet_completed").length
+              waitting:works.filter((dt)=> dt?.status?.name_tag === "waitting").length,
+              process:works.filter((dt)=> dt?.status?.name_tag === "process").length,
+              review:works.filter((dt)=> dt?.status?.name_tag === "review").length,
+              yet_completed:works.filter((dt)=> dt?.status?.name_tag === "yet_completed").length
             }
           }
       }
@@ -2433,10 +2439,10 @@ export class LayerService {
             statusCode:HttpStatus.OK,
             data:{
               total:works.length,
-              waitting:works.filter((dt)=> dt.status.name_tag === "waitting").length,
-              process:works.filter((dt)=> dt.status.name_tag === "process").length,
-              review:works.filter((dt)=> dt.status.name_tag === "review").length,
-              yet_completed:works.filter((dt)=> dt.status.name_tag === "yet_completed").length
+              waitting:works.filter((dt)=> dt?.status?.name_tag === "waitting").length,
+              process:works.filter((dt)=> dt?.status?.name_tag === "process").length,
+              review:works.filter((dt)=> dt?.status?.name_tag === "review").length,
+              yet_completed:works.filter((dt)=> dt?.status?.name_tag === "yet_completed").length
             }
           }
       }
@@ -2454,10 +2460,10 @@ export class LayerService {
             statusCode:HttpStatus.OK,
             data:{
               total:works.length,
-              waitting:works.filter((dt)=> dt.status.name_tag === "waitting").length,
-              process:works.filter((dt)=> dt.status.name_tag === "process").length,
-              review:works.filter((dt)=> dt.status.name_tag === "review").length,
-              yet_completed:works.filter((dt)=> dt.status.name_tag === "yet_completed").length
+              waitting:works.filter((dt)=> dt?.status?.name_tag === "waitting").length,
+              process:works.filter((dt)=> dt?.status?.name_tag === "process").length,
+              review:works.filter((dt)=> dt?.status?.name_tag === "review").length,
+              yet_completed:works.filter((dt)=> dt?.status?.name_tag === "yet_completed").length
             }
           }
       }
@@ -2473,10 +2479,10 @@ export class LayerService {
           statusCode:HttpStatus.OK,
           data:{
             total:works.length,
-            waitting:works.filter((dt)=> dt.status.name_tag === "waitting").length,
-            process:works.filter((dt)=> dt.status.name_tag === "process").length,
-            review:works.filter((dt)=> dt.status.name_tag === "review").length,
-            yet_completed:works.filter((dt)=> dt.status.name_tag === "yet_completed").length
+            waitting:works.filter((dt)=> dt?.status?.name_tag === "waitting").length,
+            process:works.filter((dt)=> dt?.status?.name_tag === "process").length,
+            review:works.filter((dt)=> dt?.status?.name_tag === "review").length,
+            yet_completed:works.filter((dt)=> dt?.status?.name_tag === "yet_completed").length
           }
         }
     }
@@ -2491,7 +2497,7 @@ export class LayerService {
         const limit = filters.limit ? Number(filters.limit) : 0
   
         const queryBuilder = this.worksRepository.createQueryBuilder('works')
-        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.status', 'status')
         .leftJoinAndSelect('works.type', 'type')
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
@@ -2536,7 +2542,7 @@ export class LayerService {
         const limit = filters.limit ? Number(filters.limit) : 0
   
         const queryBuilder = this.worksRepository.createQueryBuilder('works')
-        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.status', 'status')
         .leftJoinAndSelect('works.type', 'type')
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
@@ -2580,12 +2586,65 @@ export class LayerService {
         const limit = filters.limit ? Number(filters.limit) : 0
   
         const queryBuilder = this.worksRepository.createQueryBuilder('works')
-        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.status', 'status')
         .leftJoinAndSelect('works.type', 'type')
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
         .leftJoinAndSelect('works.tasks', 'tasks')
         .where('list_user.user IN (:...listIdsUser)',{listIdsUser})
+        if (status) {
+          queryBuilder.andWhere('status.name_tag IN (:...statuses)', { statuses: [status] });
+        }
+    // Lấy tổng số bản ghi
+        const total = await queryBuilder.getCount();
+        
+        // Lấy danh sách công việc với pagination
+        const works = await queryBuilder
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getMany();
+    
+      const listIdUser = ((works.map(dt => dt.list_user)).flat()).map(dt => dt.user)
+      const dataUser = await firstValueFrom(
+        this.usersClient.send({ cmd: 'get-user_ids' }, listIdUser),
+      );
+      let countID = 0
+      if (!works)
+        throw new NotFoundException(`Activity not found`);
+      return { statusCode: HttpStatus.OK, data: {
+        datas:works.map((dt,index)=>{
+          return {...dt,list_user:dt.list_user.map((dtt)=>{
+            countID ++;
+            return {...dtt,...dataUser[countID-1]}
+          })}
+        }),
+        current_page: page ?? 1,
+        total_pages: Math.ceil(total / limit) ?? 1,
+      } };
+        }
+        if(filters.type === "follow"){
+          const listIdsWork = (await firstValueFrom(this.usersClient.send({cmd:'get-ids_work_by_user'},filters.user))).data ?? ['']
+          const status = filters.status ?? '';
+        const page = filters.page ? Number(filters.page) : 1
+        const limit = filters.limit ? Number(filters.limit) : 0
+        if (!listIdsWork.length) {
+  // Nếu không có work nào → return rỗng luôn, khỏi query DB
+  return {
+    statusCode: HttpStatus.OK,
+    data: {
+      datas: [],
+      current_page: page ?? 1,
+      total_pages: 0,
+    }
+  }
+}
+        const queryBuilder = this.worksRepository.createQueryBuilder('works')
+        .leftJoinAndSelect('works.status', 'status')
+        .leftJoinAndSelect('works.type', 'type')
+        .leftJoinAndSelect('works.picture_urls', 'picture_urls')
+        .leftJoinAndSelect('works.list_user', 'list_user')
+        .leftJoinAndSelect('works.tasks', 'tasks')
+        .where('works.work_id IN (:...listIdsWork)',{listIdsWork})
         if (status) {
           queryBuilder.andWhere('status.name_tag IN (:...statuses)', { statuses: [status] });
         }
@@ -2622,7 +2681,7 @@ export class LayerService {
         const limit = filters.limit ? Number(filters.limit) : 0
   
         const queryBuilder = this.worksRepository.createQueryBuilder('works')
-        .leftJoin('works.status', 'status')
+        .leftJoinAndSelect('works.status', 'status')
         .leftJoinAndSelect('works.type', 'type')
         .leftJoinAndSelect('works.picture_urls', 'picture_urls')
         .leftJoinAndSelect('works.list_user', 'list_user')
@@ -3227,6 +3286,29 @@ export class LayerService {
         `Remind with ID ${user_remind} not found`,
       );
     return { statusCode: HttpStatus.OK, data: remind };
+  }
+
+  async getWorkEfficiency(user_id: string) {
+    try{
+      const listWork = await this.worksRepository.createQueryBuilder('works')
+      .leftJoin('works.list_user','list_user')
+      .where('list_user.user =:user_id',{user_id})
+      .select([
+        `SUM(CASE WHEN works.time_complete IS NULL THEN 1 ELSE 0 END) AS yetComplete`,
+        `SUM(CASE WHEN works.time_complete < works.time_end THEN 1 ELSE 0 END) AS completedBefore`,
+        `SUM(CASE WHEN works.time_complete = works.time_end THEN 1 ELSE 0 END) AS completedSame`,
+        `SUM(CASE WHEN works.time_complete > works.time_end THEN 1 ELSE 0 END) AS completedAfter`,
+      ])
+      .getRawOne();
+      return {
+        statusCode:HttpStatus.OK,
+        data:listWork
+      }
+    }catch{
+      return {
+        statusCode:HttpStatus.BAD_REQUEST
+      }
+    }
   }
     
 }

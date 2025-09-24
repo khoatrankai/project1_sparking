@@ -389,4 +389,18 @@ export class ContractController {
   async sendGetContractFilterbyProject(@Query() filter:{id:string}) {
     return this.contractService.sendGetContractFilterbyProject(filter);
   }
+
+  @Get('get-sales-by-province')
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetSalesByProvince(@Query() filter:{ids:string,timestamp_start:string,timestamp_end:string}) {
+    return this.contractService.sendGetSalesByProvince(filter);
+  }
+
+  @Get('get-dashboard-revenue')
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetDashboardRevenue(@Query('year') year:string) {
+    return this.contractService.sendGetDashboardRevenue(year);
+  }
 }

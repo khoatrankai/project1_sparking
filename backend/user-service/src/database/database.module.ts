@@ -12,6 +12,9 @@ import { Notify } from './entities/notify.entity';
 import { NotifyRole } from './entities/notify_role.entity';
 import { NotifyUser } from './entities/notify_user.entity';
 import { TimeKeeping } from './entities/timekeeping.entity';
+import { Skills } from './entities/skill.entity';
+import { Documents } from './entities/document.entity';
+import { FollowWork } from './entities/follow_work.entity';
 
 @Module({
   imports: [
@@ -46,7 +49,7 @@ import { TimeKeeping } from './entities/timekeeping.entity';
             Notify,
             NotifyRole,
             NotifyUser,
-            TimeKeeping
+            TimeKeeping,Skills,Documents,FollowWork
           ],
           // synchronize: true,
           // dropSchema: true,

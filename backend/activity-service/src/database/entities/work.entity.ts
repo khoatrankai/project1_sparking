@@ -58,6 +58,9 @@ export class Works {
   time_start: Date;
 
   @Column({ type: 'timestamp' })
+  time_complete: Date;
+
+  @Column({ type: 'timestamp' })
   time_end: Date;
 
   @Column({ type: 'boolean', default: false })

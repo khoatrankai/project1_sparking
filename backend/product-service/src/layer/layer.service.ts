@@ -503,6 +503,17 @@ export class LayerService {
     });
   }
 
+  async findTypeProductByIds(ids: string[]) {
+    const datas = await this.typeProductRepository.find({
+      where: { type_product_id: In(ids) },
+    });
+
+    const sortedData = ids.map((id) =>
+      datas.find((typeProduct) => typeProduct.type_product_id === id),
+    );
+    return sortedData
+  }
+
   async getTypeProductIDs(type_ids: string[]) {
     if (!type_ids || type_ids.length === 0) {
       return [];

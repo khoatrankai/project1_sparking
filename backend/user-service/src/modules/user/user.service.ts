@@ -25,6 +25,9 @@ import { Notify } from 'src/database/entities/notify.entity';
 import { NotifyRole } from 'src/database/entities/notify_role.entity';
 import { NotifyUser } from 'src/database/entities/notify_user.entity';
 import { TimeKeeping } from 'src/database/entities/timekeeping.entity';
+import { CreateSkillDto } from 'src/dto/create_skill.dto';
+import { Skills } from 'src/database/entities/skill.entity';
+import { UpdateSkillDto } from 'src/dto/update_skill.dto';
 
 @Injectable()
 export class UserService {
@@ -43,6 +46,8 @@ export class UserService {
     private readonly notifyRoleRepository: Repository<NotifyRole>,
     @InjectRepository(NotifyUser)
     private readonly notifyUserRepository: Repository<NotifyUser>,
+     @InjectRepository(Skills)
+    private readonly skillsRepository: Repository<Skills>,
     private configService: ConfigService,
     private roleService: RoleService,
     @InjectRepository(TimeKeeping)
@@ -97,8 +102,14 @@ export class UserService {
         user_id: id,
         password: pass,
         group_user,
+        skills:undefined
       });
       const data = await this.accountUserRepository.save(user);
+      if(registerDto.skills){
+        await this.createSkills(registerDto.skills.map((dt)=>{
+          return {...dt,user:id}
+        }))
+      }
       await this.createNotify({
         description: 'Thông báo có nhân sự mới',
         link: `${this.configService.get<string>('DOMAIN')}/user?id=${data.user_id}`,
@@ -192,14 +203,20 @@ export class UserService {
     updateDto: UpdateUserDto,
   ): Promise<ResultResponse> {
     try {
+      if(updateDto.skills){
+        await this.createSkills(updateDto.skills?.map((dt)=>{
+          return {...dt,user:user_id}
+        }))
+      }
       if (updateDto.password) {
         const pass = await this.hashPassword(updateDto.password);
         await this.accountUserRepository.update(user_id, {
           ...updateDto,
           password: pass,
+          skills:undefined
         });
       } else {
-        await this.accountUserRepository.update(user_id, { ...updateDto });
+        await this.accountUserRepository.update(user_id, { ...updateDto,skills:undefined });
       }
       return {
         statusCode: HttpStatus.CREATED,
@@ -293,16 +310,26 @@ export class UserService {
         'link_zalo',
         'link_skype',
         'link_in',
+        'skills',
+        'group_user',
+        'documents',
+        'number_workday',
+        'number_golay',
+        'number_leaveearly',
+        'number_rest',
+        'number_overtime'
       ],
       where: { user_id },
+      relations:['skills','group_user','documents']
     });
     return data;
   }
 
   async getUserIDAdmin(user_id: string) {
+    console.log("vao ne")
     const data = await this.accountUserRepository.findOne({
       where: { user_id: user_id },
-      relations: ['group_user'],
+      relations: ['group_user','skills','documents'],
     });
     data && delete data.password;
     return {
@@ -327,7 +354,7 @@ export class UserService {
 
   async getGroupUser() {
     try {
-      const data = await this.groupUserRepository.find();
+      const data = await this.groupUserRepository.find({relations:['users']});
 
       return {
         statusCode: HttpStatus.OK,
@@ -382,6 +409,89 @@ export class UserService {
       await this.groupUserRepository.update(
         updateGroupUser.group_id,
         updateGroupUser,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
+  async createSkill(createData: CreateSkillDto) {
+    try {
+      const id = uuidv4();
+      const user = await this.accountUserRepository.findOne({where:{user_id:createData?.user}})
+      const dataMew = this.skillsRepository.create({
+        ...createData,
+        user,
+        skill_id: id,
+      });
+      await this.skillsRepository.save(dataMew);
+      return {
+        statusCode: HttpStatus.CREATED,
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
+   async createSkills(createData: CreateSkillDto[]) {
+    try {
+      await this.skillsRepository.delete({user:In([createData?.[0]?.user])})
+      const user = await this.accountUserRepository.findOne({where:{user_id:createData?.[0]?.user ?? ""}})
+      const skills = createData.map((item)=>{
+        const id = uuidv4();
+        return this.skillsRepository.create({
+        ...item,
+        user,
+        skill_id: id,
+      });
+      })
+      // const dataMew = this.skillsRepository.create({
+      //   ...createData,
+      //   user,
+      //   skill_id: id,
+      // });
+      await this.skillsRepository.save(skills);
+      return {
+        statusCode: HttpStatus.CREATED,
+      };
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+  }
+
+  async deleteSkills(datas: string[]) {
+    try {
+      const rm = await this.skillsRepository.delete({
+        skill_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateSkill(skill_id:string,updateData: UpdateSkillDto) {
+    try {
+      await this.skillsRepository.update(
+        skill_id,
+        {...updateData,user:undefined},
       );
       return {
         statusCode: HttpStatus.OK,
@@ -784,6 +894,17 @@ export class UserService {
       data:group.users.map((dt)=>{
         dt.user_id
       })
+    }
+
+  }
+
+   async getIdsWorkByUser(user?:string){
+    const userOne = await this.accountUserRepository.createQueryBuilder('users').leftJoinAndSelect('users.follow_works','follow_works').where('user_id =:user',{user}).getOne()
+    return {
+      statusCode:HttpStatus.OK,
+      data:userOne?.follow_works?.map((dt)=>{
+        dt.work
+      }) ?? []
     }
 
   }

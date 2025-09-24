@@ -1227,4 +1227,9 @@ export class ActivityController {
   async sendGetRemindByUser(@Query('user') user_remind: string) {
     return this.activityService.sendGetRemindByUser(user_remind);
   }
+
+  @Get('get-work-efficiency-by-user')
+  async sendGetWorkEfficiencyByUser(@Query('user_id') user: string) {
+    return this.activityService.sendGetWorkEfficiencyByUser(user);
+  }
 }

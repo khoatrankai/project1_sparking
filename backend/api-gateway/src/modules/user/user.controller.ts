@@ -28,6 +28,8 @@ import { CreateCategoryRoleUserDto } from './dto/create_category.dto';
 import { UpdateCategoryRoleUserDto } from './dto/update_category.dto';
 import { CreateGroupUserDto } from './dto/GroupUser/create_group.dto';
 import { UpdateGroupUserDto } from './dto/GroupUser/update_group.dto';
+import { CreateSkillDto } from './dto/create_skill.dto';
+import { UpdateSkillDto } from './dto/update_skill.dto';
 // import { RoleGuard } from 'src/guards/role.guard';
 
 @Controller('user')
@@ -339,6 +341,34 @@ export class UserController {
       ...updateGroupUserDto,
       group_id: id,
     });
+  }
+
+
+  @Post('create-skill')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-edit', 'user-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  createSkill(@Body() createGroupUserDto: CreateSkillDto) {
+    return this.userService.createSkill(createGroupUserDto);
+  }
+
+  @Delete('/skill')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteSkill(@Body() datas: string[]) {
+    return this.userService.sendDeleteSkills(datas);
+  }
+
+  @Put('update-skill/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  updateSkill(
+    @Param('id') id: string,
+    @Body() updateGroupUserDto: UpdateSkillDto,
+  ) {
+    return this.userService.updateSkill(id,updateGroupUserDto);
   }
 
   @Get('get-user-filter')
