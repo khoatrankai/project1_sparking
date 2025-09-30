@@ -5,7 +5,7 @@ SALT=10
 DB_HOST=45.119.83.123
 DB_USER=root
 DB_PASSWORD=x6X3pVIh10RH
-DB_NAME=db_sparking_activity2
+DB_NAME=db_sparking_activity
 DB_PORT=3306
 
 DOMAIN=https://sparking.cloud

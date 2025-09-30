@@ -447,6 +447,23 @@ export class ProjectService {
       }
     }
 
+  async getChatByUserID(id:string) {
+      try {
+        const result = (await firstValueFrom(
+          this.projectClient.send(
+            { cmd: 'find-all_chat_by_user_id' },
+            {id},
+          ),
+        )) 
+        return result;
+      } catch (error) {
+        throw new HttpException(
+          'Failed to get chat',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
     async getChatGroupByUser(id:string,project:string) {
       try {
         const result = (await firstValueFrom(

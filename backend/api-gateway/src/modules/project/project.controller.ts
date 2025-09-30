@@ -312,6 +312,14 @@ export class ProjectController {
     return this.projectService.getChatByUser(req['user'].sub,id);
   }
 
+  @Get('chat-all')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['project', 'admin-top', 'project-read'])
+  @SetMetadata('type', ['admin'])
+  async getChatByUserID(@Req() req:Request) {
+    return this.projectService.getChatByUserID(req['user'].sub);
+  }
+
   @Post('chat')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['project', 'admin-top', 'project-read'])

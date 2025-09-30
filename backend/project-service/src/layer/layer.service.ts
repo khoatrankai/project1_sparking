@@ -1078,6 +1078,17 @@ export class LayerService {
             .getMany()
     };
   }
+  async findAllChatGroupByUserID(id:string) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.chatGroupRepository.createQueryBuilder("chatGroup")
+            .leftJoinAndSelect("chatGroup.contents", "contents")
+            .leftJoinAndSelect("chatGroup.members", "members")
+            .where("(members.user = :id OR chatGroup.head = :id)", { id })
+            .orderBy("contents.created_at", "DESC")
+            .getMany()
+    };
+  }
   async findOneChat(id: string) {
     return {
       statusCode: HttpStatus.OK,

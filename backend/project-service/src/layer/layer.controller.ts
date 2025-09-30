@@ -258,6 +258,11 @@ export class LayerController {
     return this.layerService.findAllChatByUser(id,project);
   }
 
+  @MessagePattern({ cmd: 'find-all_chat_by_user_id' })
+  async findAllChatByUserID(@Payload('id') id:string) {
+    return this.layerService.findAllChatGroupByUserID(id);
+  }
+
   @MessagePattern({ cmd: 'find-all_chat_group_by_user' })
   async findAllChatGroupByUser(@Payload('id') id:string,@Payload('project') project:string) {
     return this.layerService.findAllChatGroupByUser(id,project);
