@@ -45,6 +45,15 @@ export class Works {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ type: 'text', nullable: true })
+  uncompleted: string;
+
+  @Column({ type: 'text', nullable: true })
+  completed: string;
+
+  @Column({ type: 'text', nullable: true })
+  solution: string;
+
   @Column({ type: 'int', nullable: true })
   position: number;
 

@@ -402,6 +402,18 @@ export class LayerController {
     return this.layerService.getFilterWork(filter);
   }
 
+  @MessagePattern({ cmd: 'get-filter_work_by_user' })
+  async getFilterWorkByUser(filter?: {
+    date_start?: number;
+    date_end?: number;
+    contract?: string;
+    user?:string
+    type?: 'date'|'week' | 'month' | 'year';
+    export?: boolean;
+  }) {
+    return this.layerService.getFilterWorkByUser(filter);
+  }
+
   @MessagePattern('get-all_year_works')
   async getAllYearWorks(year: string) {
     return await this.layerService.getAllYearWorks(year);

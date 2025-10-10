@@ -590,6 +590,28 @@ export class ActivityController {
     });
   }
 
+  @Get('work-filter-by-user')
+  // @UseGuards(RoleGuard)
+  // @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
+  // @SetMetadata('type', ['admin'])
+  async sendGetFilterWorkByUser(
+    @Query()
+    filter?: {
+      date_start?: string;
+      date_end?: string;
+      contract?: string;
+      user?:string
+      type?: 'date'|'week' | 'month' | 'year';
+      export?: boolean;
+    },
+  ) {
+    return this.activityService.sendGetFilterWorkByUser({
+      ...filter,
+      date_start: Number(filter.date_start),
+      date_end: Number(filter.date_end),
+    });
+  }
+
   @Get('work/all')
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])

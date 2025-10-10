@@ -25,6 +25,18 @@ export class UpdateWorkDto {
   @IsString()
   description?: string;
 
+  @IsOptional()
+  @IsString()
+  completed?: string;
+
+  @IsOptional()
+  @IsString()
+  uncompleted?: string;
+
+  @IsOptional()
+  @IsString()
+  solution?: string;
+
   @IsInt()
   @IsOptional()
   position: number;
