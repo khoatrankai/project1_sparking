@@ -30,6 +30,10 @@ export class CreateWorkDto {
   @IsString()
   activity?: string;
 
+   @IsOptional()
+    @IsString()
+    project?: string;
+
   @Type(() => Date)
   @IsDate()
   time_start: Date;
@@ -49,6 +53,10 @@ export class CreateWorkDto {
   @IsArray()
   @IsOptional()
   list_users?: string[];
+
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
 
   @IsOptional()
   @IsBoolean()

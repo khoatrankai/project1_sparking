@@ -38,6 +38,10 @@ import { CreateReviewUserDto } from './dto/ReviewUserDto/create-review_user.dto'
 import { UpdateReviewUserDto } from './dto/ReviewUserDto/update-review_user.dto';
 import { CreateRemindDto } from './dto/RemindDto/create-remind.dto';
 import { UpdateRemindDto } from './dto/RemindDto/update-remind.dto';
+import { CreateScheduleDto } from './dto/ScheduleDto/create-schedule.dto';
+import { UpdateScheduleDto } from './dto/ScheduleDto/update-schedule.dto';
+import { CreateTagDto } from './dto/TagDto/create-tag.dto';
+import { UpdateTagDto } from './dto/TagDto/update-tag.dto';
 
 @Injectable()
 export class ActivityService {
@@ -1083,4 +1087,78 @@ export class ActivityService {
       this.activityClient.send('get-work_efficiency', user_id),
     );
   }
+
+
+  async sendCreateSchedule(createScheduleDto: CreateScheduleDto) {
+    return await firstValueFrom(
+      this.activityClient.send('create-schedule', createScheduleDto),
+    );
+  }
+
+  async sendDeleteSchedule(datas: string[]) {
+    return await firstValueFrom(
+      this.activityClient.send('delete-schedule', datas),
+    );
+  }
+
+  async sendUpdateSchedule(id: string, updateScheduleDto: UpdateScheduleDto) {
+    return await firstValueFrom(
+      this.activityClient.send(
+       'update-schedule',
+        { id, updateScheduleDto },
+      ),
+    );
+  }
+
+  async sendGetSchedule(id: string) {
+    return await firstValueFrom(
+      this.activityClient.send('get-schedule', id),
+    );
+  }
+
+  async sendGetAllScheduleFilter(filter?:{week_start:string,group_name:string,assigned_to:string,type:string}) {
+    return await firstValueFrom(
+      this.activityClient.send('get-schedules', filter),
+    );
+  }
+
+   async sendCreateTag(createTagDto: CreateTagDto) {
+    return await firstValueFrom(
+      this.activityClient.send('create-tag', createTagDto),
+    );
+  }
+
+  async sendDeleteTag(datas: string[]) {
+    return await firstValueFrom(
+      this.activityClient.send('delete-tag', datas),
+    );
+  }
+
+  async sendUpdateTag(tag_id: string, updateTagDto: UpdateTagDto) {
+    return await firstValueFrom(
+      this.activityClient.send(
+       'update-tag',
+        { tag_id, updateTagDto },
+      ),
+    );
+  }
+
+  async sendGetTag(tag_id: string) {
+    return await firstValueFrom(
+      this.activityClient.send('get-tag', tag_id),
+    );
+  }
+
+  async sendGetAllTag() {
+    return await firstValueFrom(
+      this.activityClient.send('get-tags',{}),
+    );
+  }
+
+   async sendGetWorkTagFilter(filter?:{user?:string,type:"all"|"user", week_start: string}) {
+    return await firstValueFrom(
+      this.activityClient.send('get-work_tag_filter',filter),
+    );
+  }
+
 }

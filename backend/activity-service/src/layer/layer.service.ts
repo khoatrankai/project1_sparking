@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import * as dayjs from 'dayjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getISOWeek, getYear, format, getMonth } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
@@ -70,6 +71,13 @@ import { CreateReviewUserDto } from 'src/dto/ReviewUserDto/create-review_user.dt
 import { UpdateReviewUserDto } from 'src/dto/ReviewUserDto/update-review_user.dto';
 import { CreateRemindDto } from 'src/dto/RemindDto/create-remind.dto';
 import { UpdateRemindDto } from 'src/dto/RemindDto/update-remind.dto';
+import { CreateTagDto } from 'src/dto/TagDto/create-tag.dto';
+import { Tags } from 'src/database/entities/tag.entity';
+import { UpdateTagDto } from 'src/dto/TagDto/update-tag.dto';
+import { TagWork } from 'src/database/entities/tag_work.entity';
+import { CreateScheduleDto } from 'src/dto/ScheduleDto/create-schedule.dto';
+import { Schedule } from 'src/database/entities/schedules.entity';
+import { UpdateScheduleDto } from 'src/dto/ScheduleDto/update-schedule.dto';
 
 @Injectable()
 export class LayerService {
@@ -103,12 +111,18 @@ export class LayerService {
     private readonly pictureTaskRepository: Repository<PictureTask>,
     @InjectRepository(TypeWork)
     private readonly typeWorkRepository: Repository<TypeWork>,
+    @InjectRepository(Schedule)
+    private readonly scheduleRepository: Repository<Schedule>,
+    @InjectRepository(Tags)
+    private readonly tagRepository: Repository<Tags>,
     @InjectRepository(StatusWork)
     private readonly statusWorkRepository: Repository<StatusWork>,
     @InjectRepository(PictureWork)
     private readonly pictureWorkRepository: Repository<PictureWork>,
     @InjectRepository(ListUser)
     private readonly listUserRepository: Repository<ListUser>,
+    @InjectRepository(TagWork)
+    private readonly tagWorkRepository: Repository<TagWork>,
      @InjectRepository(ReviewUsers)
     private readonly reviewUsersRepository: Repository<ReviewUsers>,
     @InjectRepository(Reminds)
@@ -1491,6 +1505,7 @@ export class LayerService {
   }
 
   async createWork(createWorkDto: CreateWorkDto) {
+    console.log(createWorkDto)
     const activity = await this.activitiesRepository.findOne({
       where: { activity_id: createWorkDto.activity },
     });
@@ -1505,7 +1520,7 @@ export class LayerService {
       return preValue < currValue.position ? currValue.position : preValue;
     }, 0);
     if (createWorkDto.picture_urls) {
-      const { picture_urls, ...reqWork } = createWorkDto;
+      const { picture_urls,tags, ...reqWork } = createWorkDto;
       const newWork = this.worksRepository.create({
         ...reqWork,
         work_id: uuidv4(),
@@ -1529,6 +1544,12 @@ export class LayerService {
             }),
           );
         }
+         if (createWorkDto.tags) {
+          console.log(createWorkDto,savedWork)
+          await this.createTagWork(
+            savedWork.work_id,createWorkDto.tags
+          );
+        }
       }
       return {
         statusCode: HttpStatus.CREATED,
@@ -1536,7 +1557,7 @@ export class LayerService {
         data: savedWork,
       };
     } else {
-      const { picture_urls, ...reqWork } = createWorkDto;
+      const { picture_urls,tags, ...reqWork } = createWorkDto;
       const newWork = this.worksRepository.create({
         ...reqWork,
         work_id: uuidv4(),
@@ -1561,6 +1582,12 @@ export class LayerService {
                 notify_user: createWorkDto.list_users,
               },
             ),
+          );
+        }
+         if (createWorkDto.tags) {
+          console.log(createWorkDto,result)
+          await this.createTagWork(
+            result.work_id,createWorkDto.tags
           );
         }
       }
@@ -1658,7 +1685,7 @@ export class LayerService {
   }
 
   async updateWork(work_id: string, updateWorkDto: UpdateWorkDto) {
-    const { picture_urls, list_users, ...reqUpdateWork } = updateWorkDto;
+    const { picture_urls,tags, list_users, ...reqUpdateWork } = updateWorkDto;
     const activity = updateWorkDto.activity
       ? await this.activitiesRepository.findOne({
           where: { activity_id: In([updateWorkDto.activity]) },
@@ -1683,6 +1710,13 @@ export class LayerService {
         }),
       );
     }
+    if (tags) {
+          await this.createTagWork(
+            work_id,tags
+          );
+        }
+    
+    
 
     const updatedWork = await this.worksRepository.update(work_id, {
       ...reqUpdateWork,
@@ -1727,7 +1761,7 @@ export class LayerService {
   async getWork(work_id: string) {
     const work = await this.worksRepository.findOne({
       where: { work_id },
-      relations: ['type', 'status', 'picture_urls', 'list_user', 'activity','tasks','folders','folders.files'],
+      relations: ['type', 'status', 'picture_urls', 'list_user', 'activity','tasks','folders','folders.files','tags','tags.tag'],
     });
     console.log("listuser:",work)
     const userIds = work.list_user.map((dt) => {
@@ -2588,6 +2622,21 @@ export class LayerService {
       );
       const savedListUser = await this.listUserRepository.save(newListUser);
       return { statusCode: HttpStatus.CREATED, data: savedListUser };
+    }
+  }
+
+  async createTagWork(work_id:string,createTagWorkDto: string[]) {
+    if (createTagWorkDto.length > 0) {
+      const work = await this.worksRepository.findOne({
+        where: { work_id },
+      });
+      await this.tagWorkRepository.delete({work:In([work_id])})
+      const newTagWork = await Promise.all(createTagWorkDto.map(async(dt)=>{
+        const tag = await this.tagRepository.findOne({where:{tag_id:dt}})
+        return this.tagWorkRepository.create({tag,id:uuidv4(),work})
+      }))
+      const savedTagWork = await this.tagWorkRepository.save(newTagWork);
+      return { statusCode: HttpStatus.CREATED, data: savedTagWork };
     }
   }
 
@@ -3587,5 +3636,229 @@ export class LayerService {
       }
     }
   }
+
+  async createTag(createTagDto: CreateTagDto) {
+    const newTag = this.tagRepository.create({
+      ...createTagDto,
+      tag_id: uuidv4(),
+    });
+    const savedTag = await this.tagRepository.save(newTag);
+    return { statusCode: HttpStatus.CREATED, data: savedTag };
+  }
+
+  async deleteTag(datas: string[]) {
+    try {
+      const rm = await this.tagRepository.delete({
+        tag_id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateTag(
+    tag_id: string,
+    updateTagDto: UpdateTagDto,
+  ) {
+    const updatedTag = await this.tagRepository.update(
+      tag_id,
+      updateTagDto,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      data: updateTagDto,
+      message: 'Cập nhật thành công',
+    };
+  }
+
+  async getTag(tag_id: string) {
+    const tagWork = await this.tagRepository.findOne({
+      where: { tag_id },
+      relations: ['works', 'works.work'],
+    });
+    if (!tagWork) {
+      throw new NotFoundException(
+        `TypeActivity with ID ${tag_id} not found`,
+      );
+    }
+    return { statusCode: HttpStatus.OK, data: tagWork };
+  }
+
+  async getAllTag() {
+    const tagWork = await this.tagRepository.find({
+      relations: ['works'],
+      order: { created_at: 'DESC' },
+    });
+    if (!tagWork) {
+      throw new NotFoundException(`Tag not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: tagWork };
+  }
+
+   async createSchedule(createScheduleDto: CreateScheduleDto) {
+    const newSchedule = this.scheduleRepository.create({
+      ...createScheduleDto,
+      id: uuidv4(),
+    });
+    const savedSchedule = await this.scheduleRepository.save(newSchedule);
+    return { statusCode: HttpStatus.CREATED, data: savedSchedule };
+  }
+
+  async deleteSchedule(datas: string[]) {
+    try {
+      const rm = await this.scheduleRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateSchedule(
+    id: string,
+    updateScheduleDto: UpdateScheduleDto,
+  ) {
+    console.log(updateScheduleDto)
+    const updatedSchedule = await this.scheduleRepository.update(
+      id,
+      updateScheduleDto,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      data: updateScheduleDto,
+      message: 'Cập nhật thành công',
+    };
+  }
+
+  async getSchedule(id: string) {
+    const schedule = await this.scheduleRepository.findOne({
+      where: { id },
+    });
+    if (!schedule) {
+      throw new NotFoundException(
+        `TypeActivity with ID ${id} not found`,
+      );
+    }
+    return { statusCode: HttpStatus.OK, data: schedule };
+  }
+
+  async getAllSchedule() {
+    const schedules = await this.scheduleRepository.find({
+      order: { created_at: 'DESC' },
+    });
+    if (!schedules) {
+      throw new NotFoundException(`schedules not found`);
+    }
+    return { statusCode: HttpStatus.OK, data: schedules };
+  }
+
+  async getAllScheduleFilter(filter?: { group_name: string; assigned_to: string; week_start: string,type:string }) {
+  const where: any = {};
+
+  if (filter?.group_name) {
+    where.group_name = filter.group_name;
+  }
+  if(filter?.type){
+    where.type = filter.type
+  }
+
+  if (filter?.assigned_to) {
+    where.assigned_to = filter.assigned_to;
+  }
+
+  if (filter?.week_start) {
+    const startDate = dayjs(Number(filter.week_start)).format('YYYY-MM-DD'); // 👈 convert timestamp string to number
+    const endDate = dayjs(Number(filter.week_start)).add(6, 'day').format('YYYY-MM-DD'); // 👈 add 6 days
+    where.schedule_date = Between(startDate, endDate);
+  }
+
+  const schedules = await this.scheduleRepository.find({
+    where,
+    order: { created_at: 'DESC' },
+  });
+
+  // if (!schedules || schedules.length === 0) {
+  //   throw new NotFoundException(`schedules not found`);
+  // }
+
+  return {
+    statusCode: HttpStatus.OK,
+    data: schedules,
+  };
+}
+  async getWorkTagFilter(filter?: { user?: string; type: "all" | "user"; week_start: string }) {
+  try {
+    const query = this.tagRepository.createQueryBuilder('tags')
+      .leftJoinAndSelect('tags.works', 'works')
+      .leftJoinAndSelect('works.work', 'work')
+      .leftJoinAndSelect('work.activity', 'activity')
+      .leftJoinAndSelect('work.list_user', 'list_user');
+
+    // 👉 Nếu là filter theo user
+    if (filter?.type === "user" && filter?.user) {
+      query.where('list_user.user = :user', { user: filter.user });
+    }
+
+    // 👉 Nếu có filter theo tuần
+    if (filter?.week_start) {
+      const weekStart = dayjs(Number(filter.week_start)).startOf('day').toISOString();
+      const weekEnd = dayjs(Number(filter.week_start)).add(6, 'day').endOf('day').toISOString();
+
+      query.andWhere(
+        `
+        (
+          work.time_start <= :weekEnd AND
+          work.time_end >= :weekStart
+        )
+        `,
+        {
+          weekStart,
+          weekEnd,
+        }
+      );
+    }
+
+    const tags = await query.getMany();
+    console.log(tags)
+    const dataReturn = tags?.map(dt => ({
+      name: dt?.name,
+      works: dt?.works?.map(dtt => ({
+        name: dtt?.work?.name,
+        description: dtt?.work?.description,
+        project: dtt?.work?.project,
+        list_user: dtt?.work?.list_user?.map(dttt => dttt?.user),
+        time_process: new Date(dtt?.work?.time_start).toLocaleDateString("vi-VN") + "-" + new Date(dtt?.work?.time_end).toLocaleDateString("vi-VN")
+      }))
+    }));
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: dataReturn
+    };
+
+  } catch (e) {
+    console.log(e)
+    throw new NotFoundException(`Tag with ID not found`);
+  }
+}
+
     
 }

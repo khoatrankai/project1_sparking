@@ -20,6 +20,9 @@ import { FileWork } from './entities/file_work.entity';
 import { FolderWork } from './entities/folder_work.entity';
 import { ReviewUsers } from './entities/review_user.entity';
 import { Reminds } from './entities/remind.entity';
+import { TagWork } from './entities/tag_work.entity';
+import { Tags } from './entities/tag.entity';
+import { Schedule } from './entities/schedules.entity';
 
 @Module({
   imports: [
@@ -59,7 +62,7 @@ import { Reminds } from './entities/remind.entity';
             PictureTask,
             Comments,
             Reviews,
-                  FolderWork,FileWork,ReviewUsers,Reminds
+                  FolderWork,FileWork,ReviewUsers,Reminds,TagWork,Tags,Schedule
           ],
           // synchronize: true,
           // dropSchema: true,

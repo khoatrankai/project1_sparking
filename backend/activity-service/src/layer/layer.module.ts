@@ -21,6 +21,9 @@ import { FolderWork } from 'src/database/entities/folder_work.entity';
 import { FileWork } from 'src/database/entities/file_work.entity';
 import { Reminds } from 'src/database/entities/remind.entity';
 import { ReviewUsers } from 'src/database/entities/review_user.entity';
+import { TagWork } from 'src/database/entities/tag_work.entity';
+import { Tags } from 'src/database/entities/tag.entity';
+import { Schedule } from 'src/database/entities/schedules.entity';
 
 @Module({
   imports: [
@@ -39,7 +42,8 @@ import { ReviewUsers } from 'src/database/entities/review_user.entity';
       PictureTask,
       Comments,
       Reviews,
-      FolderWork,FileWork,Reminds,ReviewUsers
+      FolderWork,FileWork,Reminds,ReviewUsers,
+      TagWork,Tags,Schedule
     ]),
     ClientsModule.register([
       {

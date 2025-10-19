@@ -50,6 +50,10 @@ import { CreateReviewUserDto } from './dto/ReviewUserDto/create-review_user.dto'
 import { UpdateReviewUserDto } from './dto/ReviewUserDto/update-review_user.dto';
 import { CreateRemindDto } from './dto/RemindDto/create-remind.dto';
 import { UpdateRemindDto } from './dto/RemindDto/update-remind.dto';
+import { CreateScheduleDto } from './dto/ScheduleDto/create-schedule.dto';
+import { UpdateScheduleDto } from './dto/ScheduleDto/update-schedule.dto';
+import { CreateTagDto } from './dto/TagDto/create-tag.dto';
+import { UpdateTagDto } from './dto/TagDto/update-tag.dto';
 
 @Controller('activity')
 export class ActivityController {
@@ -1253,5 +1257,92 @@ export class ActivityController {
   @Get('get-work-efficiency-by-user')
   async sendGetWorkEfficiencyByUser(@Query('user_id') user: string) {
     return this.activityService.sendGetWorkEfficiencyByUser(user);
+  }
+
+
+
+  @Post('schedule')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'work-type-create', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendCreateSchedule(@Body() createScheduleDto: CreateScheduleDto) {
+    return this.activityService.sendCreateSchedule(createScheduleDto);
+  }
+
+  @Delete('schedule')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'work-type-delete', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteSchedule(@Body() datas: string[]) {
+    return this.activityService.sendDeleteSchedule(datas);
+  }
+
+  @Put('schedule/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'work-type-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateSchedule(
+    @Param('id') id: string,
+    @Body() updateScheduleDto: UpdateScheduleDto,
+  ) {
+    return this.activityService.sendUpdateSchedule(
+      id,
+      updateScheduleDto,
+    );
+  }
+
+  @Get('schedule/id/:id')
+  async sendGetSchedule(@Param('id') id: string) {
+    return this.activityService.sendGetSchedule(id);
+  }
+
+  @Get('schedule-filter')
+  async sendGetAllScheduleFilter(@Query() filter?:{week_start:string,group_name:string,assigned_to:string,type:string}) {
+    return this.activityService.sendGetAllScheduleFilter(filter);
+  }
+
+  @Post('tag')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'work-type-create', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendCreateTag(@Body() createTagDto: CreateTagDto) {
+    return this.activityService.sendCreateTag(createTagDto);
+  }
+
+  @Delete('tag')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'work-type-delete', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendDeleteTag(@Body() datas: string[]) {
+    return this.activityService.sendDeleteTag(datas);
+  }
+
+  @Put('tag/:id')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['activity', 'work-type-update', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendUpdateTag(
+    @Param('id') id: string,
+    @Body() updateTagDto: UpdateTagDto,
+  ) {
+    return this.activityService.sendUpdateTag(
+      id,
+      updateTagDto,
+    );
+  }
+
+  @Get('tag/id/:id')
+  async sendGetTag(@Param('id') id: string) {
+    return this.activityService.sendGetTag(id);
+  }
+
+  @Get('tags')
+  async sendGetAllTag() {
+    return this.activityService.sendGetAllTag();
+  }
+
+  @Get('work-tag')
+  async sendGetWorkTagFilter(@Query() filter:{user?:string,type:"all"|"user", week_start: string}) {
+    return this.activityService.sendGetWorkTagFilter(filter);
   }
 }

@@ -35,6 +35,10 @@ export class CreateWorkDto {
 
   @IsOptional()
   @IsString()
+  project?: string;
+
+  @IsOptional()
+  @IsString()
   user_create?: string;
 
   @IsDate()
@@ -57,4 +61,8 @@ export class CreateWorkDto {
   @IsOptional()
   @IsBoolean()
   urgent?: boolean;
+
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
 }

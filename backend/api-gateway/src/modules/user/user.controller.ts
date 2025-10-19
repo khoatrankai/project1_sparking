@@ -66,6 +66,23 @@ export class UserController {
     );
   }
 
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', ['user', 'user-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  @Put('update-profile')
+  @UseInterceptors(FilesInterceptor('picture_url', 1))
+  async updateUserProfile(
+    @Req() req:Request,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFiles() picture_url: Express.Multer.File[],
+  ) {
+    return await this.userService.updateUser(
+      req?.['user']?.sub,
+      updateUserDto,
+      picture_url?.[0],
+    );
+  }
+
   @Put('update-password')
   async updatePasswordUser(
     @Req() req: Request,

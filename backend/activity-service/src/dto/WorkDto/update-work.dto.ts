@@ -25,6 +25,10 @@ export class UpdateWorkDto {
   @IsString()
   description?: string;
 
+   @IsOptional()
+  @IsString()
+  project?: string;
+
   @IsOptional()
   @IsString()
   completed?: string;
@@ -68,4 +72,8 @@ export class UpdateWorkDto {
   @IsOptional()
   @IsBoolean()
   urgent?: boolean;
+
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
 }

@@ -21,6 +21,10 @@ export class CreateWorkDto {
   @IsString()
   activity?: string;
 
+   @IsOptional()
+  @IsString()
+  project?: string;
+
   @IsDate()
   time_start: Date;
 

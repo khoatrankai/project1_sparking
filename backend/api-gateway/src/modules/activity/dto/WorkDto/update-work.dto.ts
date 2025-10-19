@@ -40,6 +40,10 @@ export class UpdateWorkDto {
   @IsString()
   activity?: string;
 
+  @IsOptional()
+  @IsString()
+  project?: string;
+
   @Type(() => Date)
   @IsDate()
   @IsOptional()
@@ -49,6 +53,10 @@ export class UpdateWorkDto {
   @IsDate()
   @IsOptional()
   time_end?: Date;
+
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
 
   @IsArray()
   @IsOptional()

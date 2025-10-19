@@ -18,6 +18,7 @@ import { Comments } from './comment.entity';
 import { Reviews } from './review.entity';
 import { FolderWork } from './folder_work.entity';
 import { Reminds } from './remind.entity';
+import { TagWork } from './tag_work.entity';
 
 @Entity('works')
 export class Works {
@@ -81,6 +82,9 @@ export class Works {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
+  @Column({ type: 'varchar', length: 50,nullable:true })
+  project: string;
+
   @OneToMany(() => PictureWork, (pictureWork) => pictureWork.work)
   picture_urls: PictureWork[];
 
@@ -101,4 +105,7 @@ export class Works {
 
   @OneToMany(() => FolderWork, (folder) => folder.work, { cascade: true })
   folders: FolderWork[];
+
+  @OneToMany(() => TagWork, (tagWork) => tagWork.work)
+  tags: TagWork[];
 }

@@ -38,6 +38,10 @@ import { CreateReviewUserDto } from 'src/dto/ReviewUserDto/create-review_user.dt
 import { UpdateReviewUserDto } from 'src/dto/ReviewUserDto/update-review_user.dto';
 import { CreateRemindDto } from 'src/dto/RemindDto/create-remind.dto';
 import { UpdateRemindDto } from 'src/dto/RemindDto/update-remind.dto';
+import { CreateScheduleDto } from 'src/dto/ScheduleDto/create-schedule.dto';
+import { UpdateScheduleDto } from 'src/dto/ScheduleDto/update-schedule.dto';
+import { CreateTagDto } from 'src/dto/TagDto/create-tag.dto';
+import { UpdateTagDto } from 'src/dto/TagDto/update-tag.dto';
 
 @Controller('/activity')
 @UseFilters(ConflictExceptionFilter)
@@ -59,7 +63,7 @@ export class LayerController {
     return await this.layerService.createActivityWarranty(createActivityDto,activity);
   }
 
-  @MessagePattern('delete-activity')
+  @MessagePattern({cmd:'delete-activity'})
   async deleteActivity(@Payload() datas: string[]) {
     return await this.layerService.deleteActivity(datas);
   }
@@ -360,12 +364,12 @@ export class LayerController {
     return this.layerService.createTask(createTaskDto);
   }
 
-  @MessagePattern('delete-work')
+  @MessagePattern({ cmd: 'delete-work'})
   async deleteWork(@Payload() datas: string[]) {
     return await this.layerService.deleteWork(datas);
   }
 
-  @MessagePattern('delete-task')
+  @MessagePattern({ cmd: 'delete-task'})
   async deleteTask(@Payload() datas: string[]) {
     return await this.layerService.deleteTask(datas);
   }
@@ -734,4 +738,99 @@ export class LayerController {
   async getWorkEfficiency(user_id: string) {
     return await this.layerService.getWorkEfficiency(user_id);
   }
+
+  @MessagePattern('create-schedule')
+  async createSchedule(
+    @Payload() createScheduleDto: CreateScheduleDto,
+  ) {
+    return await this.layerService.createSchedule(
+      createScheduleDto,
+    );
+  }
+
+  @MessagePattern('delete-schedule')
+  async deleteSchedule(@Payload() datas: string[]) {
+    return await this.layerService.deleteSchedule(datas);
+  }
+
+  @MessagePattern('update-schedule')
+  async updateSchedule(
+    @Payload()
+    payload: {
+      id: string;
+      updateScheduleDto: UpdateScheduleDto;
+    },
+  ) {
+    return await this.layerService.updateSchedule(
+      payload.id,
+      payload.updateScheduleDto,
+    );
+  }
+
+  @MessagePattern('get-schedules')
+  async getSchedules(@Payload() payload: {
+      week_start: string;
+      group_name: string;
+      assigned_to:string;
+      type:string;
+    }) {
+    return await this.layerService.getAllScheduleFilter(payload);
+  }
+
+  @MessagePattern('get-schedule')
+  async getSchedule(@Payload() 
+      id: string
+    ) {
+    return await this.layerService.getSchedule(id);
+  }
+
+
+  @MessagePattern('create-tag')
+  async createTag(
+    @Payload() createTagDto: CreateTagDto,
+  ) {
+    return await this.layerService.createTag(
+      createTagDto,
+    );
+  }
+
+  @MessagePattern('delete-tag')
+  async deleteTag(@Payload() datas: string[]) {
+    return await this.layerService.deleteTag(datas);
+  }
+
+  @MessagePattern('update-tag')
+  async updateTag(
+    @Payload()
+    payload: {
+      tag_id: string;
+      updateTagDto: UpdateTagDto;
+    },
+  ) {
+    return await this.layerService.updateTag(
+      payload.tag_id,
+      payload.updateTagDto,
+    );
+  }
+
+  @MessagePattern('get-tags')
+  async getAllTag() {
+    return await this.layerService.getAllTag();
+  }
+
+  @MessagePattern('get-tag')
+  async getTag(@Payload() 
+      tag_id: string
+    ) {
+    return await this.layerService.getTag(tag_id);
+  }
+
+  
+  @MessagePattern('get-work_tag_filter')
+  async getWorkTagFilter(@Payload() 
+      filter: {user?:string,type:"all"|"user", week_start: string}
+    ) {
+    return await this.layerService.getWorkTagFilter(filter);
+  }
+
 }
