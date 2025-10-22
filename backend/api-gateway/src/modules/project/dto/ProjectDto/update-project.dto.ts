@@ -30,6 +30,7 @@ export class UpdateProjectDto {
   @IsOptional()
   picture_url?: any;
 
+  @Type(() => Number)
   @IsInt()
   @IsOptional()
   time_job?: number;

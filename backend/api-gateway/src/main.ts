@@ -12,6 +12,7 @@ async function bootstrap() {
   const customValidationPipe = new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
+    forbidUnknownValues: true,
     transform: true,
     exceptionFactory: (validationErrors: ValidationError[] = []) => {
       const customErrors = validationErrors.map((error) => {

@@ -486,6 +486,7 @@ export class ActivityController {
   // Work Methods
   @Post('work/create')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', [
     'activity',
     'activity-update',
@@ -503,6 +504,7 @@ export class ActivityController {
   }
 
   @Post('task/create')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', [
     'activity',
@@ -520,6 +522,7 @@ export class ActivityController {
   }
 
   @Delete('work')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -536,6 +539,7 @@ export class ActivityController {
   }
 
   @Put('work/update/:id')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -558,6 +562,7 @@ export class ActivityController {
   }
 
   @Get('work/id/:id')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -617,6 +622,7 @@ export class ActivityController {
   }
 
   @Get('work/all')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -625,6 +631,7 @@ export class ActivityController {
   }
 
   @Get('work-urgent/all')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -665,6 +672,7 @@ export class ActivityController {
   }
 
   @Get('work-expired-urgent/all')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -706,6 +714,7 @@ export class ActivityController {
 
   // Type Work Methods
   @Post('type-work/create')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'work-type-create', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -714,6 +723,7 @@ export class ActivityController {
   }
 
   @Delete('type-work')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'work-type-delete', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -722,6 +732,7 @@ export class ActivityController {
   }
 
   @Put('type-work/update/:id')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'work-type-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -736,17 +747,20 @@ export class ActivityController {
   }
 
   @Get('type-work/id/:id')
+  @SetMetadata('checkfull', ['all'])
   async sendGetTypeWork(@Param('id') type_work_id: string) {
     return this.activityService.sendGetTypeWork(type_work_id);
   }
 
   @Get('type-work/all')
+  @SetMetadata('checkfull', ['all'])
   async sendGetAllTypeWork() {
     return this.activityService.sendGetAllTypeWork();
   }
 
   // Status Work Methods
   @Post('status-work/create')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'work-type-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -755,6 +769,7 @@ export class ActivityController {
   }
 
   @Delete('status-work')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'work-type-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -763,6 +778,7 @@ export class ActivityController {
   }
 
   @Put('status-work/update/:id')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'work-type-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -777,17 +793,20 @@ export class ActivityController {
   }
 
   @Get('status-work/id/:id')
+  @SetMetadata('checkfull', ['all'])
   async sendGetStatusWork(@Param('id') status_work_id: string) {
     return this.activityService.sendGetStatusWork(status_work_id);
   }
 
   @Get('status-work/all')
+  @SetMetadata('checkfull', ['all'])
   async sendGetAllStatusWork() {
     return this.activityService.sendGetAllStatusWork();
   }
 
   // Picture Work Methods
   @Post('pictures-work/create')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
@@ -803,6 +822,7 @@ export class ActivityController {
   }
 
   @Get('picture-work/all/:work_id')
+  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
   @SetMetadata('roles', [
     'activity',

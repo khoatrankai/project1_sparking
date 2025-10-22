@@ -28,6 +28,7 @@ export class CreateProjectDto {
   @IsOptional()
   status: string = 'waiting';
 
+  @Type(() => Number)
   @IsInt()
   @IsOptional()
   price?: number;
@@ -37,6 +38,7 @@ export class CreateProjectDto {
   @Length(1, 50)
   picture_url?: string;
 
+  @Type(() => Number)
   @IsInt()
   @IsOptional()
   time_job?: number;
