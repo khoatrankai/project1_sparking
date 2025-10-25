@@ -995,7 +995,7 @@ export class LayerService {
       .where('activity.contract IN (:...contracts)', {
         contracts: listContract.length > 0 ? listContract : [''],
       })
-      .orWhere('work.project =:project', {
+      .orWhere('works.project =:project', {
         project: project,
       })
       .getMany() as [];
