@@ -151,6 +151,7 @@ export class ActivityController {
 
   @Get('work-by-project/:id')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', ['activity', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async getWorkByProject(@Param('id') id: string) {
@@ -994,6 +995,7 @@ export class ActivityController {
 
   @Get('get-reviews/:id')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', [
     'activity',
     'activity-read',
@@ -1054,6 +1056,7 @@ export class ActivityController {
 
   @Get('get-comments/:id')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', [
     'activity',
     'activity-read',
