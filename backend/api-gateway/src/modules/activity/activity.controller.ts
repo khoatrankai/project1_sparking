@@ -622,8 +622,8 @@ export class ActivityController {
   }
 
   @Get('work/all')
-  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', ['activity', 'activity-read', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendGetAllWork(@Query() filter?: GetFilterWorkDto) {
@@ -822,8 +822,8 @@ export class ActivityController {
   }
 
   @Get('picture-work/all/:work_id')
-  @SetMetadata('checkfull', ['all'])
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', [
     'activity',
     'activity-read',
@@ -840,12 +840,14 @@ export class ActivityController {
   @UseGuards(RoleGuard)
   @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
+  @SetMetadata('checkfull', ['all'])
   async sendCreateListUser(@Body() createListUserDto: CreateListUserDto[]) {
     return this.activityService.sendCreateListUser(createListUserDto);
   }
 
   @Delete('list-user')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendDeleteListUser(@Body() datas: string[]) {
@@ -854,6 +856,7 @@ export class ActivityController {
 
   @Put('list-user/update/:id')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', ['activity', 'activity-update', 'admin-top'])
   @SetMetadata('type', ['admin'])
   async sendUpdateListUser(
@@ -865,6 +868,7 @@ export class ActivityController {
 
   @Get('list-user/:id')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', [
     'activity',
     'activity-read',
@@ -878,6 +882,7 @@ export class ActivityController {
 
   @Get('list-user/all/:work_id')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', [
     'activity',
     'activity-read',
@@ -917,6 +922,7 @@ export class ActivityController {
 
   @Get('works-filter')
   @UseGuards(RoleGuard)
+  @SetMetadata('checkfull', ['all'])
   @SetMetadata('roles', [
     'activity',
     'activity-read',
