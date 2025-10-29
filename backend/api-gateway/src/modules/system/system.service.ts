@@ -23,6 +23,8 @@ import { CreateLinkSystemDto } from './dto/create_link_system.dto';
 import { UpdateLinkSystemDto } from './dto/update_link_system.dto';
 import { CreateTargetRevenueDto } from './dto/TargetRevenue/create_target_revenue.dto';
 import { UpdateTargetRevenueDto } from './dto/TargetRevenue/update_target_revenue.dto';
+import { CreateBudgetDto } from './dto/Budget/create.dto';
+import { UpdateBudgetDto } from './dto/Budget/update.dto';
 
 @Injectable()
 export class SystemService {
@@ -343,4 +345,47 @@ export class SystemService {
   async getAllTarget() {
     return this.systemClient.send({ cmd: 'get-all_target_revenue' }, {});
   }
+
+   async createBudget(createBudgetDto: CreateBudgetDto) {
+      return firstValueFrom(
+        this.systemClient.send(
+          { cmd: 'create-budget' },
+          createBudgetDto,
+        ),
+      );
+    }
+  
+    async sendDeleteBudget(datas: string[]) {
+      return await firstValueFrom(
+        this.systemClient.send({cmd:'delete-budget'}, datas),
+      );
+    }
+  
+    async updateBudget(
+      id: string,
+      updateBudgetDto: UpdateBudgetDto,
+    ) {
+      return firstValueFrom(
+        this.systemClient.send(
+          { cmd: 'update-budget' },
+          { id, updateBudgetDto },
+        ),
+      );
+    }
+  
+    async getBudget(id: string) {
+      return firstValueFrom(
+        this.systemClient.send({ cmd: 'get-budget' }, id),
+      );
+    }
+  
+    async getAllBudget(filter?: { 
+  date_start?: string;  // dạng "1719766800000"
+  date_end?: string;
+}) {
+      return firstValueFrom(
+        this.systemClient.send({ cmd: 'get-all-budget' }, filter),
+      );
+    }
+  
 }

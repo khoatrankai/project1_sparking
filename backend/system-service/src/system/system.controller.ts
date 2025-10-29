@@ -18,6 +18,8 @@ import { UpdateProfitDto } from 'src/dto/update_profit.dto';
 import { UpdateLinkSystemDto } from 'src/dto/update_link_system.dto';
 import { UpdateTargetRevenueDto } from 'src/dto/TargetRevenue/update_target_revenue.dto';
 import { CreateTargetRevenueDto } from 'src/dto/TargetRevenue/create_target_revenue.dto';
+import { CreateBudgetDto } from 'src/dto/Budget/create.dto';
+import { UpdateBudgetDto } from 'src/dto/Budget/update.dto';
 
 @Controller('/system')
 @UseFilters(ConflictExceptionFilter)
@@ -242,5 +244,42 @@ export class SystemController {
   @MessagePattern({ cmd: 'get-list_product_type_id' })
   getListProductTypeId(@Payload() data) {
     return this.systemService.getListProductType(data);
+  }
+
+  @MessagePattern({ cmd: 'create-budget' })
+  async createBudget(@Payload() createBudgetDto: CreateBudgetDto) {
+    return this.systemService.createBudget(createBudgetDto);
+  }
+
+  @MessagePattern({ cmd: 'delete-budget' })
+  async deleteBudget(@Payload() datas: string[]) {
+    return this.systemService.deleteBudget(datas);
+  }
+
+  @MessagePattern({ cmd: 'update-budget' })
+  async updateBudget(
+    @Payload()
+    data: {
+      id: string;
+      updateBudgetDto: UpdateBudgetDto;
+    },
+  ) {
+    return this.systemService.updateBudget(
+      data.id,
+      data.updateBudgetDto,
+    );
+  }
+
+  @MessagePattern({ cmd: 'get-budget' })
+  async getBudget(@Payload() id: string) {
+    return this.systemService.getBudget(id);
+  }
+
+  @MessagePattern({ cmd: 'get-all-budget' })
+  async getAllBudget(@Payload() filter?: { 
+  date_start?: string;  // dạng "1719766800000"
+  date_end?: string;
+}) {
+    return this.systemService.getAllBudget(filter);
   }
 }

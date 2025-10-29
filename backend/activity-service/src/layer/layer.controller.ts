@@ -833,4 +833,26 @@ export class LayerController {
     return await this.layerService.getWorkTagFilter(filter);
   }
 
+  @MessagePattern({cmd:'get-dashboard_work_by_filter'})
+  async getDashboardWorkByFilter(@Payload() filter?: {
+  date_start?: string;  // timestamp string, ví dụ "1719766800000"
+  date_end?: string;    // timestamp string
+  project?: string;
+  contract?: string;
+  activity?: string;
+}) {
+    return await this.layerService.getDashboardWorkByFilter(filter);
+  }
+
+  @MessagePattern({cmd:'get-dashboard_type_work_by_filter'})
+  async getDashboardTypeWorkByFilter(@Payload() filter?: {
+  date_start?: string;  // timestamp string, ví dụ "1719766800000"
+  date_end?: string;    // timestamp string
+  project?: string;
+  contract?: string;
+  activity?: string;
+}) {
+    return await this.layerService.getDashboardTypeWorkByFilter(filter);
+  }
+
 }

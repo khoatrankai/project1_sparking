@@ -13,6 +13,7 @@ import { Vats } from 'src/database/entities/vat.entity';
 import { Profits } from 'src/database/entities/profit.entity';
 import { LinkSystems } from 'src/database/entities/link_system.entity';
 import { TargetRevenue } from 'src/database/entities/target_revenue.entity';
+import { Budget } from 'src/database/entities/budget.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TargetRevenue } from 'src/database/entities/target_revenue.entity';
       Profits,
       LinkSystems,
       TargetRevenue,
+      Budget
     ]),
   ],
   controllers: [SystemController],

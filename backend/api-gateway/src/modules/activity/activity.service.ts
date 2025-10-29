@@ -1161,4 +1161,27 @@ export class ActivityService {
     );
   }
 
+  async sendGetDashboardWorkByFilter(filter?: {
+  date_start?: string;  // timestamp string, ví dụ "1719766800000"
+  date_end?: string;    // timestamp string
+  project?: string;
+  contract?: string;
+  activity?: string;
+}) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-dashboard_work_by_filter' }, filter),
+    );
+  }
+
+  async sendGetDashboardTypeWorkByFilter(filter?: {
+  date_start?: string;  // timestamp string, ví dụ "1719766800000"
+  date_end?: string;    // timestamp string
+  project?: string;
+  contract?: string;
+  activity?: string;
+}) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-dashboard_type_work_by_filter' }, filter),
+    );
+  }
 }

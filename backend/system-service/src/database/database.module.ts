@@ -17,6 +17,7 @@ import { LinkSystems } from './entities/link_system.entity';
 import { createConnection } from 'mysql2/promise';
 import { ConfigService } from '@nestjs/config';
 import { TargetRevenue } from './entities/target_revenue.entity';
+import { Budget } from './entities/budget.entity';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { TargetRevenue } from './entities/target_revenue.entity';
             Profits,
             LinkSystems,
             TargetRevenue,
+            Budget
           ],
           // synchronize: true,
           // dropSchema: true,

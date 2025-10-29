@@ -2731,6 +2731,193 @@ export class LayerService {
     }
   }
 
+  async getDashboardWorkByFilter(filter?: {
+  date_start?: string;  // timestamp string, ví dụ "1719766800000"
+  date_end?: string;    // timestamp string
+  project?: string;
+  contract?: string;
+  activity?: string;
+}) {
+  // 🔹 Nếu có project → lấy danh sách contract tương ứng
+  const contracts = filter?.project
+    ? await firstValueFrom(
+        this.contractsClient.send(
+          { cmd: 'get-contract_by_project_id' },
+          filter.project
+        )
+      )
+    : [];
+
+  // 🔹 Tạo query builder
+  const query = this.worksRepository
+    .createQueryBuilder('works')
+    .leftJoinAndSelect('works.type', 'type')
+    .leftJoinAndSelect('works.status', 'status')
+    .leftJoinAndSelect('works.activity', 'activity');
+
+  // 🔹 Lọc theo project
+  if (filter?.project) {
+    query.andWhere('works.project = :project', { project: filter.project });
+  }
+
+  if (filter?.contract || contracts.length > 0) {
+    query.andWhere('activity.contract IN (:...contracts)', { contracts: [...contracts,filter.contract??undefined] });
+  }
+
+    // 🔹 Lọc theo activity
+    if (filter?.activity) {
+      query.andWhere('activity.activity_id = :activity', {
+        activity: filter.activity,
+      });
+    }
+
+    // 🔹 Ép kiểu timestamp string → Date
+    const dateStart = filter?.date_start ? new Date(Number(filter.date_start)) : null;
+    const dateEnd = filter?.date_end ? new Date(Number(filter.date_end)) : null;
+
+    // 🔹 Lọc theo khoảng thời gian time_start hoặc time_end
+    if (dateStart && dateEnd) {
+      query.andWhere('works.time_end BETWEEN :start AND :end', {
+        start: dateStart,
+        end: dateEnd,
+      });
+    } else if (dateStart) {
+      query.andWhere('works.time_end >= :start', { start: dateStart });
+    } else if (dateEnd) {
+      query.andWhere('works.time_end <= :end', { end: dateEnd });
+    }
+
+    // 🔹 Lấy dữ liệu
+    const dataWork = await query.getMany();
+    const now = new Date();
+    const workExpire = dataWork.filter(dt => {
+      const timeEnd = new Date(dt.time_end);
+      const timeComplete = dt.time_complete ? new Date(dt.time_complete) : null;
+
+      return (
+        // Hoàn thành sau hạn
+        (timeComplete && timeComplete > timeEnd) ||
+
+        // Chưa hoàn thành và đã quá hạn
+        (!timeComplete && now > timeEnd)
+      );
+    });
+    const workProcess = dataWork.filter(dt => {
+      if(dt?.status?.name_tag !== "delete" && dt?.status?.name_tag !== "cancel" && dt?.status?.name_tag !== "completed" && dt?.status?.name_tag !== "not_yet" && dt?.status?.name_tag !== "waitting") 
+      {
+        return true
+      }
+      return false
+      });
+
+      const workCompleted = dataWork.filter(dt => {
+      if(dt?.status?.name_tag === "completed" || dt?.time_complete !== null) 
+      {
+        return true
+      }
+      return false
+      });
+      const workCancel = dataWork.filter(dt => {
+      if(dt?.status?.name_tag === "cancel") 
+      {
+        return true
+      }
+      return false
+      });
+
+      const workWaitting = dataWork.filter(dt => {
+      if(dt?.status?.name_tag === "waitting") 
+      {
+        return true
+      }
+      return false
+      });
+
+      const workNotCompleted = dataWork.filter(dt => {
+      if(dt?.status?.name_tag !== "completed" && dt?.time_complete === null && dt?.status?.name_tag !== "not_yet" ) 
+      {
+        return true
+      }
+      return false
+      });
+      return {
+        statusCode:HttpStatus.OK,
+        data:{
+          works:dataWork,
+          expire:workExpire.length,
+          process:workProcess.length,
+          completed:workCompleted.length,
+          cancel:workCancel.length,
+          waitting:workWaitting.length,
+          not_completed:workNotCompleted.length,
+        }
+      }
+  }
+
+  async getDashboardTypeWorkByFilter(filter?: {
+  date_start?: string;  // timestamp string, ví dụ "1719766800000"
+  date_end?: string;    // timestamp string
+  project?: string;
+  contract?: string;
+  activity?: string;
+}) {
+  // 🔹 Nếu có project → lấy danh sách contract tương ứng
+  const contracts = filter?.project
+    ? await firstValueFrom(
+        this.contractsClient.send(
+          { cmd: 'get-contract_by_project_id' },
+          filter.project
+        )
+      )
+    : [];
+
+  // 🔹 Tạo query builder
+  const query = this.typeWorkRepository
+    .createQueryBuilder('typeWork')
+    .leftJoinAndSelect('typeWork.work', 'works')
+    .leftJoinAndSelect('works.activity', 'activity')
+
+  // 🔹 Lọc theo project
+  if (filter?.project) {
+    query.andWhere('works.project = :project', { project: filter.project });
+  }
+
+  if (filter?.contract || contracts.length > 0) {
+    query.andWhere('activity.contract IN (:...contracts)', { contracts: [...contracts,filter.contract??undefined] });
+  }
+
+    // 🔹 Lọc theo activity
+    if (filter?.activity) {
+      query.andWhere('activity.activity_id = :activity', {
+        activity: filter.activity,
+      });
+    }
+
+    // 🔹 Ép kiểu timestamp string → Date
+    const dateStart = filter?.date_start ? new Date(Number(filter.date_start)) : null;
+    const dateEnd = filter?.date_end ? new Date(Number(filter.date_end)) : null;
+
+    // 🔹 Lọc theo khoảng thời gian time_start hoặc time_end
+    if (dateStart && dateEnd) {
+      query.andWhere('works.time_end BETWEEN :start AND :end', {
+        start: dateStart,
+        end: dateEnd,
+      });
+    } else if (dateStart) {
+      query.andWhere('works.time_end >= :start', { start: dateStart });
+    } else if (dateEnd) {
+      query.andWhere('works.time_end <= :end', { end: dateEnd });
+    }
+
+    // 🔹 Lấy dữ liệu
+    const dataType = await query.getMany();
+    
+      return {
+        statusCode:HttpStatus.OK,
+        data:dataType
+      }
+  }
+
   async getDashboardWorkManagement(filters?:{user?:string,type?:string}){
     if(filters.type){
       if(filters.type === "perform"){

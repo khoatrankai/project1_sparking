@@ -1374,4 +1374,42 @@ export class ActivityController {
   async sendGetWorkTagFilter(@Query() filter:{user?:string,type:"all"|"user", week_start: string}) {
     return this.activityService.sendGetWorkTagFilter(filter);
   }
+
+  @Get('dashboard-work-filter')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetDashboardWorkByFilter(@Query() filter?: {
+  date_start?: string;  // timestamp string, ví dụ "1719766800000"
+  date_end?: string;    // timestamp string
+  project?: string;
+  contract?: string;
+  activity?: string;
+}) {
+    return this.activityService.sendGetDashboardWorkByFilter(filter);
+  }
+
+  @Get('dashboard-type-work-filter')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetDashboardTypeWorkByFilter(@Query() filter?: {
+  date_start?: string;  // timestamp string, ví dụ "1719766800000"
+  date_end?: string;    // timestamp string
+  project?: string;
+  contract?: string;
+  activity?: string;
+}) {
+    return this.activityService.sendGetDashboardTypeWorkByFilter(filter);
+  }
 }

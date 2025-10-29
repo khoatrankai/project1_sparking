@@ -2,7 +2,9 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { In, Repository } from 'typeorm';
+import {  Between,
+  LessThanOrEqual,
+  MoreThanOrEqual,In, Repository } from 'typeorm';
 
 import { Label } from 'src/database/entities/label.entity';
 import { CreateLabelDto } from 'src/dto/label/create_label.dto';
@@ -33,6 +35,9 @@ import { UpdateLinkSystemDto } from 'src/dto/update_link_system.dto';
 import { CreateTargetRevenueDto } from 'src/dto/TargetRevenue/create_target_revenue.dto';
 import { TargetRevenue } from 'src/database/entities/target_revenue.entity';
 import { UpdateTargetRevenueDto } from 'src/dto/TargetRevenue/update_target_revenue.dto';
+import { CreateBudgetDto } from 'src/dto/Budget/create.dto';
+import { Budget } from 'src/database/entities/budget.entity';
+import { UpdateBudgetDto } from 'src/dto/Budget/update.dto';
 
 @Injectable()
 export class SystemService {
@@ -50,6 +55,8 @@ export class SystemService {
     @InjectRepository(Vats) private readonly vatRepository: Repository<Vats>,
     @InjectRepository(Profits)
     private readonly profitRepository: Repository<Profits>,
+    @InjectRepository(Budget)
+    private readonly budgetRepository: Repository<Budget>,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     @InjectRepository(PictureProduct)
@@ -558,4 +565,87 @@ export class SystemService {
     });
     return listData;
   }
+
+  async createBudget(createBudgetDto: CreateBudgetDto) {
+    const newTypeActivity = this.budgetRepository.create(createBudgetDto);
+    const result = await this.budgetRepository.save(newTypeActivity);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Budget created successfully',
+      data: result,
+    };
+  }
+
+  async deleteBudget(datas: string[]) {
+    try {
+      const rm = await this.budgetRepository.delete({
+        id: In(datas),
+      });
+      if (rm) {
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Đã xóa thành công',
+        };
+      }
+    } catch {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Xóa thất bại',
+      };
+    }
+  }
+
+  async updateBudget(
+    id: string,
+    updateBudgetDto: UpdateBudgetDto,
+  ) {
+    const result = await this.budgetRepository.update(
+      id,
+      updateBudgetDto,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Cập nhật thành công',
+      data: result,
+    };
+  }
+
+  async getBudget(id: string) {
+    const typeActivity = await this.budgetRepository.findOne({
+      where: { id }
+    });
+      
+    return { statusCode: HttpStatus.OK, data: typeActivity };
+  }
+
+  
+
+  async getAllBudget(filter?: { 
+  date_start?: string;  // dạng "1719766800000"
+  date_end?: string;
+}) {
+  const where: any = {};
+
+  // Nếu có truyền vào khoảng thời gian thì thêm điều kiện WHERE
+  if (filter?.date_start && filter?.date_end) {
+    const startDate = new Date(Number(filter.date_start));
+    const endDate = new Date(Number(filter.date_end));
+
+    // dùng Between để lọc trong khoảng
+    where.created_at = Between(startDate, endDate);
+  } else if (filter?.date_start) {
+    const startDate = new Date(Number(filter.date_start));
+    where.created_at = MoreThanOrEqual(startDate);
+  } else if (filter?.date_end) {
+    const endDate = new Date(Number(filter.date_end));
+    where.created_at = LessThanOrEqual(endDate);
+  }
+
+  const budgets = await this.budgetRepository.find({
+    where,
+    order: { created_at: 'DESC' },
+  });
+
+  return { statusCode: HttpStatus.OK, data: budgets };
+}
 }

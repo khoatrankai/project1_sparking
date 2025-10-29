@@ -20,6 +20,8 @@ import { UpdateProfitDto } from './dto/update_profit.dto';
 import { UpdateLinkSystemDto } from './dto/update_link_system.dto';
 import { CreateTargetRevenueDto } from './dto/TargetRevenue/create_target_revenue.dto';
 import { UpdateTargetRevenueDto } from './dto/TargetRevenue/update_target_revenue.dto';
+import { CreateBudgetDto } from './dto/Budget/create.dto';
+import { UpdateBudgetDto } from './dto/Budget/update.dto';
 
 @Controller('system')
 export class SystemController {
@@ -176,4 +178,32 @@ export class SystemController {
   updateTarget(@Param('id') id: string, @Body() data: UpdateTargetRevenueDto) {
     return this.systemService.updateTarget(id, data);
   }
+
+   @Post('/budget')
+    async createBudget(@Body() createBudgetDto: CreateBudgetDto) {
+      return this.systemService.createBudget(createBudgetDto);
+    }
+  
+    @Delete('/budget')
+    async sendDeleteBudget(@Body() datas: string[]) {
+      return this.systemService.sendDeleteBudget(datas);
+    }
+  
+    // Update an existing type method
+    @Put('/budget/:id')
+    async updateBudget(
+      @Param('id') id: string,
+      @Body() updateBudgetDto: UpdateBudgetDto,
+    ) {
+      return this.systemService.updateBudget(id, updateBudgetDto);
+    }
+  
+    // Get all type methods
+    @Get('/budget')
+    async getAllBudget(@Query() filter?: { 
+  date_start?: string;  // dạng "1719766800000"
+  date_end?: string;
+}) {
+      return this.systemService.getAllBudget(filter);
+    }
 }
