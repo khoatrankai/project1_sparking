@@ -47,6 +47,11 @@ export class LayerController {
     return await this.layerService.findAllProjects(filter);
   }
 
+  @MessagePattern({ cmd: 'find-filter_projects' })
+  async findFilterProjects(filter?: {time_start?:Date,time_end?:Date}) {
+    return await this.layerService.findFilterProjects({time_start:filter.time_start?new Date(Number(filter.time_start)):undefined,time_end:filter.time_end?new Date(Number(filter.time_end)):undefined});
+  }
+
   @MessagePattern({ cmd: 'find-all_projects_by_token' })
   async findAllProjectsByToken(customer_id: string) {
     return await this.layerService.findAllProjectsByToken(customer_id);

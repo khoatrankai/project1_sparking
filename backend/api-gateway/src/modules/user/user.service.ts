@@ -363,4 +363,17 @@ export class UserService {
       );
     }
 
+    async sendFindFilterUser(filter?: {time_start?:number,time_end?:number}) {
+      console.log(filter)
+    return this.usersClient
+      .send({ cmd: 'find-filter_user' }, {...filter})
+      .toPromise();
+  }
+
+   async sendTimeKeepingFilter(filter?: {time_start?:number,time_end?:number}) {
+    return this.usersClient
+      .send({ cmd: 'find-filter_timekeeping' }, filter)
+      .toPromise();
+  }
+
 }

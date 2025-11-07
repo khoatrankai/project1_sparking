@@ -3238,6 +3238,36 @@ export class LayerService {
       }
       
   }
+
+  async getWorksCompleted(filters?: { time_start?: number; time_end?: number }) {
+  const qb = this.worksRepository.createQueryBuilder('work');
+
+  if (filters?.time_start && filters?.time_end) {
+    qb.where('work.time_complete IS NOT NULL')
+      .andWhere('work.time_complete BETWEEN :start AND :end', {
+        start: new Date(Number(filters.time_start)),
+        end: new Date(filters.time_end),
+      });
+  } else if (filters?.time_start) {
+    qb.where('work.time_complete IS NOT NULL')
+      .andWhere('work.time_complete >= :start', {
+        start: new Date(Number(filters.time_start)),
+      });
+  } else if (filters?.time_end) {
+    qb.where('work.time_complete IS NOT NULL')
+      .andWhere('work.time_complete <= :end', {
+        end: new Date(Number(filters.time_end)),
+      });
+  } else {
+    qb.where('work.time_complete IS NOT NULL');
+  }
+
+  return {
+    statusCode:HttpStatus.OK,
+    data:await qb.getMany()
+  }
+  
+}
   
   async updateTasks(datas:UpdateTaskDto[]){
     try{
@@ -4042,6 +4072,31 @@ export class LayerService {
     return {
       statusCode: HttpStatus.OK,
       data: dataReturn
+    };
+
+  } catch (e) {
+    console.log(e)
+    throw new NotFoundException(`Tag with ID not found`);
+  }
+}
+
+ async getUserWork() {
+  try {
+    const workCount = await this.worksRepository.count()
+    const result = await this.listUserRepository
+    .createQueryBuilder('list')
+    .select('list.user', 'user_id')
+    .addSelect('COUNT(DISTINCT list.work)', 'work_count')
+    .groupBy('list.user')
+    .orderBy('work_count', 'DESC')
+    .getRawMany();
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: {
+        count:workCount,
+        result
+      }
     };
 
   } catch (e) {

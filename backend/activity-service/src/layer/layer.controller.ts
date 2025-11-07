@@ -855,4 +855,14 @@ export class LayerController {
     return await this.layerService.getDashboardTypeWorkByFilter(filter);
   }
 
+  @MessagePattern({cmd:'get-user_work'})
+  async getUserWork() {
+    return await this.layerService.getUserWork();
+  }
+
+   @MessagePattern({cmd:'get-work_completed'})
+  async getWorkFigetWorksCompletedter(filters?: { time_start?: number; time_end?: number }) {
+    return await this.layerService.getWorksCompleted(filters);
+  }
+
 }

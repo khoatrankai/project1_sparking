@@ -1184,4 +1184,16 @@ export class ActivityService {
       this.activityClient.send({ cmd: 'get-dashboard_type_work_by_filter' }, filter),
     );
   }
+
+  async sendGetUserWork() {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-user_work' }, {}),
+    );
+  }
+
+   async sendGetWorkCompleted(filters?: { time_start?: number; time_end?: number }) {
+    return await firstValueFrom(
+      this.activityClient.send({ cmd: 'get-work_completed' }, filters),
+    );
+  }
 }

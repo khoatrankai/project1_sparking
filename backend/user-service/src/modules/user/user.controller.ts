@@ -200,5 +200,16 @@ export class UserController {
   getIdsWorkByUser(user:string) {
     return this.userService.getIdsWorkByUser(user);
   }
+
+  @MessagePattern({ cmd: 'find-filter_user' })
+  findFilterUser(filter?: {time_start?:Date,time_end?:Date}) {
+    console.log(filter)
+    return this.userService.findFilterUser({time_start:filter.time_start?new Date(Number(filter.time_start)):undefined,time_end:filter.time_end?new Date(Number(filter.time_end)):undefined});
+  }
+
+  @MessagePattern({ cmd: 'find-filter_timekeeping' })
+  findFilterTimeKeepingHour(filter?: {time_start?:Date,time_end?:Date}) {
+    return this.userService.findFilterTimeKeepingHour({time_start:filter.time_start?new Date(Number(filter.time_start)):undefined,time_end:filter.time_end?new Date(Number(filter.time_end)):undefined});
+  }
   
 }

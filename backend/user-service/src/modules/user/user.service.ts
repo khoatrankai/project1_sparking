@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AccountUsers } from 'src/database/entities/account_users.entity';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { In, Not, Repository } from 'typeorm';
+import { In, Not, Repository,Between,MoreThanOrEqual,LessThanOrEqual } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from 'src/dto/create_user.dto';
 import { ResultResponse } from 'src/common/interfaces/result.interface';
@@ -908,6 +908,87 @@ export class UserService {
       }) ?? []
     }
 
+  }
+
+  async   findFilterUser(filter?: {time_start?:Date,time_end?:Date}): Promise<any> {
+    console.log(filter)
+    const whereCondition: any = {};
+    
+    // Lọc theo khoảng thời gian (date_start và date_expired)
+    if (filter.time_start || filter.time_end) {
+      if (filter.time_start && filter.time_end) {
+        whereCondition.created_at = Between(filter.time_start, filter.time_end);
+      } else {
+        if (filter.time_start) {
+          whereCondition.created_at = MoreThanOrEqual(filter.time_start);
+        }
+        if (filter.time_end) {
+          whereCondition.created_at = LessThanOrEqual(filter.time_end);
+        }
+      }
+    }
+
+    const data = await this.accountUserRepository.find({
+      where: whereCondition,
+      order: { created_at: 'DESC' },
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
+  }
+
+  async   findFilterTimeKeepingHour(filter?: {time_start?:Date,time_end?:Date}): Promise<any> {
+    const whereCondition: any = {};
+    
+    // Lọc theo khoảng thời gian (date_start và date_expired)
+    if (filter.time_start || filter.time_end) {
+      if (filter.time_start && filter.time_end) {
+        whereCondition.time_start = Between(filter.time_start, filter.time_end);
+      } else {
+        if (filter.time_start) {
+          whereCondition.time_start = MoreThanOrEqual(filter.time_start);
+        }
+        if (filter.time_end) {
+          whereCondition.time_start = LessThanOrEqual(filter.time_start);
+        }
+      }
+    }
+
+    const data = await this.timeKeepingRepository.find({
+      where: whereCondition,
+      order: { time_start: 'DESC' },
+    });
+    function getHoursBetweenTimestamps(startTime:Date, endTime:Date) {
+      const startTimestamp = startTime.getTime(); // Lấy timestamp của thời gian bắt đầu
+      const endTimestamp = endTime.getTime(); // Lấy timestamp của thời gian kết thúc
+    
+      // Tính hiệu giữa 2 timestamp (kết quả là miligiây)
+      const timeDifference = endTimestamp - startTimestamp;
+    
+      // Chuyển miligiây thành giờ (1 giờ = 3,600,000 miligiây)
+      const hours = (timeDifference / 3600000);
+      return hours;
+    }
+    const res = data.map((dt,i) => {
+      const key = i+1
+      return {
+        key,
+        time_start:dt.time_start.toLocaleString("vi-VN", { 
+          timeZone: "UTC", 
+          hour12: false 
+      }),
+        time_end:dt.time_end.toLocaleString("vi-VN", { 
+          timeZone: "UTC", 
+          hour12: false 
+      }),
+        time_total:getHoursBetweenTimestamps(dt.time_start,dt.time_end)
+      }
+    })
+    return {
+      statusCode: HttpStatus.OK,
+      data:res,
+    };
   }
 
  

@@ -4,7 +4,7 @@ import {
   Column,
   OneToMany,
   JoinColumn,
-  ManyToOne,
+  ManyToOne,CreateDateColumn,UpdateDateColumn
 } from 'typeorm';
 import { RoleUser } from './role_user.entity';
 import { GroupUser } from './group_user.entity';
@@ -98,4 +98,10 @@ export class AccountUsers {
 
   @OneToMany(() => FollowWork, (followWork) => followWork.user)
   follow_works: FollowWork[];
+
+   @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 }

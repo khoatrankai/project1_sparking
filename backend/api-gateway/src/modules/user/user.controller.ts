@@ -427,4 +427,44 @@ export class UserController {
   getTimeKeepingPerson(@Query() data: {user_id:string,start_time:string,end_time:string}) {
     return this.userService.getTimeKeepingPerson(data);
   }
+
+  @Get('filter-all')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'project',
+    'contract',
+    'contract-edit',
+    'contract-read',
+    'price_quote',
+    'price_quote-edit',
+    'price_quote-read',
+    'contract-update',
+    'contract-create',
+    'admin-top',
+    'project-read',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendFindFilterUser(@Query() filter?: {time_start?:number,time_end?:number}) {
+    return this.userService.sendFindFilterUser(filter);
+  }
+
+  @Get('filter-timekeeping')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'project',
+    'contract',
+    'contract-edit',
+    'contract-read',
+    'price_quote',
+    'price_quote-edit',
+    'price_quote-read',
+    'contract-update',
+    'contract-create',
+    'admin-top',
+    'project-read',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendTimeKeepingFilter(@Query() filter?: {time_start?:number,time_end?:number}) {
+    return this.userService.sendTimeKeepingFilter(filter);
+  }
 }

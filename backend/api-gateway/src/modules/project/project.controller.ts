@@ -85,6 +85,27 @@ export class ProjectController {
     return this.projectService.sendFindAllProjects({...filter,user:req['user'].sub});
   }
 
+  @Get('filter-all')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'project',
+    'contract',
+    'contract-edit',
+    'contract-read',
+    'price_quote',
+    'price_quote-edit',
+    'price_quote-read',
+    'contract-update',
+    'contract-create',
+    'admin-top',
+    'project-read',
+  ])
+  @SetMetadata('type', ['admin'])
+  async findFilterProjects(@Query() filter?: {time_start?:number,time_end?:number}) {
+    return this.projectService.sendFindFilterProjects(filter);
+  }
+
+
   @Get('all-project')
   async findAllProjectsByToken(@Req() req: Request) {
     return this.projectService.sendFindAllProjectsByToken(req['project'].sub);

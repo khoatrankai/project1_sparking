@@ -55,6 +55,12 @@ export class ProjectService {
       .toPromise();
   }
 
+  async sendFindFilterProjects(filter?: {time_start?:number,time_end?:number}) {
+    return this.projectClient
+      .send({ cmd: 'find-filter_projects' }, filter)
+      .toPromise();
+  }
+
   async sendFindAllProjectsByToken(customer_id: string) {
     return await firstValueFrom(
       this.projectClient.send(

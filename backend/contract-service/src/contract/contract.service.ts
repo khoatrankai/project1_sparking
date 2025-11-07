@@ -1240,7 +1240,9 @@ export class ContractService {
 
   async getDashboardContractByProject(project_id:string){
     try{
-      const dataContract = await this.contractRepository.find({where:{project:In([project_id])}})
+      console.log(project_id)
+      if(project_id){
+        const dataContract = await this.contractRepository.find({where:{project:In([project_id])}})
       const completedContract = dataContract.filter(dt => dt.status === "completed")
       const hideContract = dataContract.filter(dt => dt.status === "hide")
       const expiredSuccessContract = completedContract.filter((dt)=>{
@@ -1289,6 +1291,58 @@ export class ContractService {
         }
        
       }
+      }else{
+        const dataContract = await this.contractRepository.find()
+      const completedContract = dataContract.filter(dt => dt.status === "completed")
+      const hideContract = dataContract.filter(dt => dt.status === "hide")
+      const expiredSuccessContract = completedContract.filter((dt)=>{
+        const dateExpired = dt.date_expired.getTime()
+        const dateCompleted = dt.date_completed.getTime()
+        return dateCompleted <= dateExpired
+      })
+      const expiredContract = dataContract.filter((dt)=>{
+        const dateExpired = dt.date_expired.getTime()
+        const dateNow = new Date().getTime()
+        return dt.status === "active" && dateExpired < dateNow
+      })
+      const deleteContract = dataContract.filter(dt => dt.status === "delete")
+      const activeContract = dataContract.filter(dt => dt.status === "active")
+      const dataContractOK = dataContract.sort((a,b)=>{
+        return b.created_at.getTime() - a.created_at.getTime()
+      })
+      
+      return {
+        statusCode:HttpStatus.OK,
+        data:{
+          expired_success:expiredSuccessContract.length,
+          total:dataContract.length,
+          overdue:expiredContract.length,
+          delete:deleteContract.length,
+          active:activeContract.length,
+          completed:completedContract.length,
+          hide:hideContract.length,
+          statuses:{
+            pending: dataContract.filter((dt) => dt.status === "pending").length,
+            completed:dataContract.filter((dt) => dt.status === "completed").length
+          },
+          list_contract:dataContractOK.reduce((preValue:{time:string,list:Contract[]}[], currValue:Contract) => {
+            const timeCheck =  currValue.created_at.toLocaleDateString('vi-vn')
+            const dataCheck = preValue.find(dt => dt.time === timeCheck)
+            if(dataCheck){
+              return preValue.map((dt) => {
+                if(dt.time === timeCheck){
+                  return {...dt,list:[...dt.time,currValue]}
+                }
+                return dt
+              })
+            }
+            return preValue.push({time:timeCheck,list:[currValue]}) 
+          }, [])
+        }
+       
+      }
+      }
+      
     }catch(err){
       console.log(err,"loi")
     }

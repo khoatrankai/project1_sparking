@@ -1412,4 +1412,30 @@ export class ActivityController {
 }) {
     return this.activityService.sendGetDashboardTypeWorkByFilter(filter);
   }
-}
+
+  @Get('user-work')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetUserWork() {
+    return this.activityService.sendGetUserWork();
+  }
+
+  @Get('work-completed')
+  @UseGuards(RoleGuard)
+  @SetMetadata('roles', [
+    'activity',
+    'activity-read',
+    'activity-update',
+    'admin-top',
+  ])
+  @SetMetadata('type', ['admin'])
+  async sendGetWorkCompleted(@Query() filters?: { time_start?: number; time_end?: number }) {
+    return this.activityService.sendGetWorkCompleted(filters);
+  }
+} 

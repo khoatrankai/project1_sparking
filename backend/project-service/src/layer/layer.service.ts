@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { Between, In, Not, Repository } from 'typeorm';
+import { Between, In, Not, Repository,MoreThanOrEqual,LessThanOrEqual } from 'typeorm';
 import { Projects } from 'src/database/entities/project.entity';
 import { CreateProjectDto } from 'src/dto/ProjectDto/create-project.dto';
 import { UpdateProjectDto } from 'src/dto/ProjectDto/update-project.dto';
@@ -236,6 +236,33 @@ export class LayerService {
       data: dataRes,
       message: 'Projects retrieved successfully',
       total_pages:Math.ceil(countProjects/(filter?.limit ?? 1))
+    };
+  }
+
+  async   findFilterProjects(filter?: {time_start?:Date,time_end?:Date}): Promise<any> {
+    const whereCondition: any = {};
+    
+    // Lọc theo khoảng thời gian (date_start và date_expired)
+    if (filter.time_start || filter.time_end) {
+      if (filter.time_start && filter.time_end) {
+        whereCondition.start_date = Between(filter.time_start, filter.time_end);
+      } else {
+        if (filter.time_start) {
+          whereCondition.created_at = MoreThanOrEqual(filter.time_start);
+        }
+        if (filter.time_end) {
+          whereCondition.created_at = LessThanOrEqual(filter.time_end);
+        }
+      }
+    }
+
+    const data = await this.projectsRepository.find({
+      where: whereCondition,
+      order: { created_at: 'DESC' },
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data,
     };
   }
 
