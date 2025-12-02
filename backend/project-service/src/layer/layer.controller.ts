@@ -36,6 +36,11 @@ export class LayerController {
     return await this.layerService.createProject({...createProjectDto,users:createProjectDto?.users ? JSON.parse(createProjectDto.users.toString()):[]});
   }
 
+  @MessagePattern({ cmd: 'check-create-project-name' })
+  async checkCreateProjectName(@Payload('name') name: string,@Payload('customer') customer: string) {
+    return await this.layerService.checkCreateProjectName(name,customer);
+  }
+
   @MessagePattern({ cmd: 'delete-project' })
   async deleteProject(@Payload() datas: string[]) {
     return this.layerService.deleteProjects(datas);

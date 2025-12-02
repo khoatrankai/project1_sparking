@@ -9,10 +9,12 @@ import {
   Query,
   Req,
   SetMetadata,
+  // UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+// import * as fs from 'fs';
 import { ContractService } from './contract.service';
 import { CreateContractDto } from './dto/ContractDto/create_contract.dto';
 import { UpdateContractDto } from './dto/ContractDto/update_contract.dto';
@@ -25,7 +27,7 @@ import { UpdateTypeMethodDto } from './dto/TypeMethodDto/update-type_method.dto'
 import { RoleGuard } from 'src/guards/role.guard';
 import { GetFilterPaymentDto } from './dto/PaymentDto/get-filter.dto';
 import { GetFilterContractDto } from './dto/ContractDto/get-filter.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import {  FilesInterceptor } from '@nestjs/platform-express';
 import { CreateDocumentContractDto } from './dto/DocumentContractDto/create-document_contract.dto';
 import { Request } from 'express';
 
@@ -402,5 +404,23 @@ export class ContractController {
   @SetMetadata('type', ['admin'])
   async sendGetDashboardRevenue(@Query('year') year:string) {
     return this.contractService.sendGetDashboardRevenue(year);
+  }
+
+  @Post('/import')
+  // @UseInterceptors(FileInterceptor('file'))
+  async sendCreateExcelContract(@Body() data:any) {
+    // if (!file) return { error: 'No file uploaded' };
+    return await this.contractService.sendCreateExcelContract(data);
+// 
+    // fs.unlinkSync(file.path);
+    // return { success: true, data };
+    // return
+  }
+
+   @Get('get-contracts-filter-full')
+  @SetMetadata('roles', ['contract', 'contract-edit', 'admin-top'])
+  @SetMetadata('type', ['admin'])
+  async sendGetContractsFilterFull(@Query() filter?:{time_start?:string,time_end?:string}) {
+    return this.contractService.sendGetContractsFilterFull(filter);
   }
 }

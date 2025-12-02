@@ -1026,4 +1026,37 @@ export class CustomerService {
     };
   }
 
+  async checkCreateCustomerName(name: string): Promise<any> {
+    const checkCustomer = await this.customerInfoRepository.findOne({where:{name_company:name}})
+    if(!checkCustomer){
+      const customer = this.customerInfoRepository.create({
+      info_id: uuidv4(),name_company:name
+      });
+      const savedCustomer = await this.customerInfoRepository.save(customer);
+      // await firstValueFrom(
+      //   this.userClient.emit(
+      //     { cmd: 'create-notify' },
+      //     {
+      //       description: 'Thông báo có một dự án mới',
+      //       link: `${this.configService.get<string>('DOMAIN')}/project?id=${savedProject.project_id}`,
+      //       notify_role: ['admin-top', 'project'],
+      //     },
+      //   ),
+      // );
+      // const notify = this.notifyProjectRepository.create({notify_id:uuidv4(),description:'Đã tạo dự án',user_create:createProjectDto.user_support,project:savedProject})
+      // await this.notifyProjectRepository.save(notify)
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: savedCustomer,
+        message: 'Customer created successfully',
+      };
+    }
+    return {
+        statusCode: HttpStatus.OK,
+        data: checkCustomer,
+        message: 'Customer get successfully',
+      };
+    
+  }
+
 }

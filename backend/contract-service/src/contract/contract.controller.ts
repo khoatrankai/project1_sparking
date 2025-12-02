@@ -299,4 +299,14 @@ export class ContractController {
   async getDashboardRevenue(year:string) {
     return this.contractService.getDashboardRevenue(year);
   }
+
+   @MessagePattern({ cmd: 'create-import_contract' })
+  async createImport(data:any) {
+    return this.contractService.createImportContract(data);
+  }
+
+  @MessagePattern({ cmd: 'get-contracts_filter_full' })
+  async getContractsFilterFull(filter?:{time_start?:string,time_end?:string}) {
+    return this.contractService.getContractsFilterFull(filter);
+  }
 }

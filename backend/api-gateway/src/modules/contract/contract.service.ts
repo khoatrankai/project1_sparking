@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-
+// import * as XLSX from 'xlsx';
 import { firstValueFrom } from 'rxjs';
 import { CreateContractDto } from './dto/ContractDto/create_contract.dto';
 import { UpdateContractDto } from './dto/ContractDto/update_contract.dto';
@@ -335,4 +335,71 @@ export class ContractService {
       this.contractClient.send({cmd:'get-dashboard_revenue'}, year),
     );
   }
+
+  async sendCreateExcelContract(data:any) {
+  //  const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+  //   const sheetName = workbook.SheetNames[0];
+  //   const worksheet = workbook.Sheets[sheetName];
+  //   const data = [];
+  //   const range = XLSX.utils.decode_range(worksheet['!ref']);
+  //   for (let row = 4; row <= range.e.r; row++) {
+  //    const cell = (c: number) => worksheet[XLSX.utils.encode_cell({ r: row, c })];
+  //     if (!cell(1) && !cell(2) && !cell(3) && !cell(4)) {
+  //       continue;
+  //     }
+
+  //     const name_contract = cell(1)?.v
+  //       ? String(cell(1).v).toLowerCase().replace(/\s+/g, ' ')
+  //       : null;
+
+  //     const code_contract = cell(2)?.v
+  //       ? String(cell(2).v).toLowerCase().replace(/\s+/g, ' ')
+  //       : null;
+
+  //     const project = cell(3)?.v
+  //       ? String(cell(3).v).toLowerCase().replace(/\s+/g, ' ')
+  //       : null;
+
+  //     const customer = cell(4)?.v
+  //       ? String(cell(4).v).toLowerCase().replace(/\s+/g, ' ')
+  //       : null;
+
+  //     const price = cell(5)?.v ? Number(cell(5).v) : 0;
+
+  //     const type_contract = cell(6)?.v
+  //       ? String(cell(6).v).toLowerCase().replace(/\s+/g, ' ')
+  //       : null;
+
+  //     const date_start = cell(7)?.w ? new Date(cell(7).w) : null;
+  //     const date_end = cell(8)?.w ? new Date(cell(8).w) : null;
+
+  //     const description = cell(9)?.v ?? null;
+
+  //     data.push({
+  //       name_contract,
+  //       code_contract,
+  //       project,
+  //       customer,
+  //       price,
+  //       type_contract,
+  //       date_start,
+  //       date_end,
+  //       description,
+  //     });
+  //   }
+    return await firstValueFrom(
+      this.contractClient.send({cmd:'create-import_contract'}, data),
+    );
+    // return data
+
+    
+  }
+
+
+  async sendGetContractsFilterFull(filter?:{time_start?:string,time_end?:string}) {
+    return await firstValueFrom(
+      this.contractClient.send({cmd:'get-contracts_filter_full'}, filter),
+    );
+  }
 }
+

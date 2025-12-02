@@ -101,6 +101,39 @@ export class LayerService {
     };
   }
 
+   async checkCreateProjectName(name: string,customer?:string): Promise<any> {
+    const checkProject = await this.projectsRepository.findOne({where:{name}})
+    if(!checkProject){
+      const project = this.projectsRepository.create({
+      project_id: uuidv4(),name,customer:customer?customer:undefined
+      });
+      const savedProject = await this.projectsRepository.save(project);
+      // await firstValueFrom(
+      //   this.userClient.emit(
+      //     { cmd: 'create-notify' },
+      //     {
+      //       description: 'Thông báo có một dự án mới',
+      //       link: `${this.configService.get<string>('DOMAIN')}/project?id=${savedProject.project_id}`,
+      //       notify_role: ['admin-top', 'project'],
+      //     },
+      //   ),
+      // );
+      // const notify = this.notifyProjectRepository.create({notify_id:uuidv4(),description:'Đã tạo dự án',user_create:createProjectDto.user_support,project:savedProject})
+      // await this.notifyProjectRepository.save(notify)
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: savedProject,
+        message: 'Project created successfully',
+      };
+    }
+    return {
+        statusCode: HttpStatus.OK,
+        data: checkProject,
+        message: 'Project get successfully',
+      };
+    
+  }
+
   async deleteProjects(datas: string[]) {
     try {
       const rm = await this.projectsRepository.delete({

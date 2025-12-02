@@ -1465,5 +1465,109 @@ export class ContractService {
     }
     
   }
- 
+  
+   async createImportContract(data:any){
+    try{
+      const contractNew = await Promise.all(data?.map(async(dt:any)=>{
+        const contract = await this.contractRepository.createQueryBuilder('contracts')
+        .where("LOWER(contracts.name_contract) = LOWER(:name_contract)", { name_contract: dt?.name_contact })
+        .orWhere("LOWER(contracts.code_contract) = LOWER(:code_contract)", { code_contract: dt?.code_contract })
+        .getOne();
+        if(contract){
+          return
+        }
+       
+        const resCustomer = await firstValueFrom(this.customersClient.send({cmd:"check-create-customer-name"},dt.customer))
+        
+        if(resCustomer?.statusCode === 200 || resCustomer?.statusCode === 201){
+          const resProject = await firstValueFrom(this.projectsClient.send({cmd:"check-create-project-name"},{name:dt.project,customer:resCustomer?.data?.info_id}))
+          const id = uuidv4();
+          const typeContract = dt?.type_contract? await this.typeContractRepository.createQueryBuilder('type_contract')
+          .where("LOWER(type_contract.name_type) = LOWER(:name_type)", { name_type: dt?.type_contract })
+          .getOne() : undefined;
+          if(typeContract){
+             return this.contractRepository.create({
+            contract_id: id, 
+            type_contract: typeContract,
+            name_contract:dt.name_contract,
+            code_contract:dt.code_contract,
+            price:dt?.price?? 0,
+            project:resProject?.statusCode === 200 || resProject?.statusCode === 201? resProject?.data?.project_id:undefined,
+            customer:resCustomer?.data?.info_id,
+
+          });
+          }
+          const newType = dt?.type_contract ? await this.typeContractRepository.save(this.typeContractRepository.create({type_id:uuidv4(),name_type:dt?.type_contract})) : undefined
+          return this.contractRepository.create({
+            contract_id: id, 
+            type_contract: newType,
+            name_contract:dt.name_contract,
+            code_contract:dt.code_contract,
+            price:dt?.price?? 0,
+            project:resProject?.statusCode === 200 || resProject?.statusCode === 201? resProject?.data?.project_id:undefined,
+            customer:resCustomer?.data?.info_id,
+
+          });
+        }
+
+         const resProject = await firstValueFrom(this.projectsClient.send({cmd:"check-create-project-name"},{name:dt.project}))
+          const id = uuidv4();
+         const typeContract = dt?.type_contract? await this.typeContractRepository.createQueryBuilder('type_contract')
+          .where("LOWER(type_contract.name_type) = LOWER(:name_type)", { name_type: dt?.type_contract })
+          .getOne() : undefined;
+        if(typeContract){
+             return this.contractRepository.create({
+            contract_id: id, 
+            type_contract: typeContract,
+            name_contract:dt.name_contract,
+            code_contract:dt.code_contract,
+            price:dt?.price?? 0,
+            project:resProject?.statusCode === 200 || resProject?.statusCode === 201? resProject?.data?.project_id:undefined,
+
+          });
+          }
+          const newType = dt?.type_contract ? await this.typeContractRepository.save(this.typeContractRepository.create({type_id:uuidv4(),name_type:dt?.type_contract})) : undefined
+          return this.contractRepository.create({
+            contract_id: id, 
+            type_contract: newType,
+            name_contract:dt.name_contract,
+            code_contract:dt.code_contract,
+            price:dt?.price?? 0,
+            project:resProject?.statusCode === 200 || resProject?.statusCode === 201? resProject?.data?.project_id:undefined,
+
+          });
+         
+      }))
+      await this.contractRepository.save(contractNew)
+      return {
+      statusCode:HttpStatus.OK,
+      message:"Thêm vào thành công"
+    }
+    }catch(e){
+      console.log(e)
+      return {
+      statusCode:HttpStatus.BAD_REQUEST,
+      message:"Thêm vào thất bại"
+    }
+    }
+    
+  }
+
+
+   async getContractsFilterFull(filter?:{time_start?:string,time_end?:string}){
+    // .toLocaleDateString("vi-VN")
+    console.log(filter)
+    const startDate = new Date(Number(filter.time_start));
+    const endDate = new Date(Number(filter.time_end));
+    console.log(startDate,endDate)
+    const dataContract = await this.contractRepository.find({relations:['type_contract'],
+      where: {
+        date_start: Between(startDate, endDate),
+      },
+    });
+    return {
+      statusCode:HttpStatus.OK,
+      data:dataContract
+    }
+  }
 }

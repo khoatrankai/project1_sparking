@@ -232,4 +232,9 @@ export class CustomerController {
   getCustomerIdsByProvinces(ids: string[]) {
     return this.customerService.getCustomerIdsByProvinces(ids);
   }
+
+  @MessagePattern({ cmd: 'check-create-customer-name' })
+  checkCreateCustomerName(name: string) {
+    return this.customerService.checkCreateCustomerName(name);
+  }
 }
